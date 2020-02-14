@@ -1,0 +1,2 @@
+{"tag": "function", "depth": 2, "time": "2020-01-15 18:20:27", "data": {"name": "try_log_screen", "call_args": {"screen": null}, "start_time": 1579083627.0075314, "ret": "1579083627104.jpg", "end_time": 1579083627.115293}}
+{"tag": "function", "depth": 1, "time": "2020-01-15 18:20:27", "data": {"name": "touch", "call_args": {"v": [728, 186], "kwargs": {}, "times": 1}, "start_time": 1579083627.0075314, "ret": [728, 186], "end_time": 1579083627.2756464}}
