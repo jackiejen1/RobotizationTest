@@ -164,7 +164,7 @@ class GmMethod:
         """
         this_time = time.time()
         order_num = int(this_time/10000)
-        data_value = self.mri.get_data_select(resource_name)  # todo 需要确定充值类型的字段
+        data_value = self.mri.get_data_select_money(resource_name)  # todo 需要确定充值类型的字段
         body = {"account": self.account,
                 "role_id": self.role_id,
                 "sever": self.server_id,
@@ -172,6 +172,7 @@ class GmMethod:
                 "time": this_time,
                 "type": data_value["type"],
                 "amount": data_value["id"],
+                "num": data_value["num"],#todo 金额
                 }
         log_dic = self.gah.recharge_supplement(body)
         operation_description = "充值补单" + resource_name

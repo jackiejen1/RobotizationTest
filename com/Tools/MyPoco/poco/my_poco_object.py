@@ -217,15 +217,12 @@ class MyPocoObject():
         """
         return self.make_poco_dic.get_log_path(file_name)
 
-    def end_log(self, file_name, log_path, outputname):
+    def end_log(self):
         """
         生成测试报告，目前限测试使用,todo  后续考虑使用线程号区分
-        :param file_name: __file__
-        :param log_path: log存放路径，通过get_log_path获得
-        :param outputname：文件名称,通过get_log_path获得
         :return:
         """
-        self.make_poco_dic.end_log(file_name, log_path, outputname)
+        self.make_poco_dic.end_log()
 
     def get_poco_visible(self, poco_path):
         """

@@ -16,7 +16,7 @@ class GetResourceType:
         """
         self.xl = xlrd.open_workbook(excel_path)
 
-    def get_type_id(self, resource_name):
+    def get_type_id_from_name(self, resource_name):
         """
         根据资源名返回该资源在表中对应的type、id
         :param resource_name: str 资源名
@@ -35,6 +35,28 @@ class GetResourceType:
             print(resource_name + "道具不存在")
             raise Exception
         return resource_type, resource_id
+    def get_type_id_from_name_money(self, resource_name):
+        """
+        根据资源名返回该资源在表中对应的type、id、金额
+        用于充值补单
+        :param resource_name: str 资源名
+        :return: resource_type:  int 资源的type
+        :return: resource_id:  int 资源的id
+        :return: resource_money:  int 资源的金额
+        """
+        # 根据资源名查询该资源对应的type、id
+        # 读取的整数出来是小数，所以要取整
+        table = self.xl.sheets()[0]
+        col = table.col_values(0)
+        if resource_name in col:
+            row = table.row_values(col.index(resource_name))
+            resource_type = int(row[1])
+            resource_id = int(row[2])
+            resource_money = int(row[3])
+        else:
+            print(resource_name + "道具不存在")
+            raise Exception
+        return resource_type, resource_id,resource_money
     def get_name_from_type_id(self,type_id_dic):
         """
         根据传入的道具type和id，查询道具的名字
@@ -52,7 +74,8 @@ class GetResourceType:
                 if id == int(row[2]):
                     resource_name = row[0]
         if resource_name=="":
-            print("type："+str(type_num)+"id："+str(id)+"的道具不存在")
+            print("type:"+str(type_num)+",id:"+str(id)+"的道具不存在")
             raise Exception
         else:
             return resource_name
+
