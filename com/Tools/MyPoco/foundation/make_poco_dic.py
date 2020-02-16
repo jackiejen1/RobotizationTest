@@ -5,13 +5,14 @@
 # @Time: 2020/1/14  17:08
 # @Author: 洞洞
 # @File: make_poco_dic.py
-# @Function:
+# @Function:框架基础类，不要直接在脚本中调用，编写辅助脚本使用MyPocoObject类
+#           用于拓展框架函数使用
 # @Method:
 # Reference:********************************
 import threading
-from information import Information
+from foundation.information import Information
 from airtest.core.api import *
-from MyException import *
+from foundation.MyException import *
 from airtest.report.report import simple_report
 from airtest.utils.compat import script_dir_name
 

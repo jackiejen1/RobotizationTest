@@ -5,7 +5,7 @@
 # @File : make_resource_info.py 
 # @function : 生成GM后台接口所需的信息
 from get_resource_type import GetResourceType
-from information import Information
+from foundation.information import Information
 import time
 
 

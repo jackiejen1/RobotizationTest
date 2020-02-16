@@ -11,25 +11,19 @@
 
 from airtest.core.api import *
 from poco.drivers.android.uiautomation import AndroidUiautomationPoco
-
-using("Tools")
-from get_info.information import Information
-from new_poco.my_poco_object import MyPocoObject
+from foundation.information import Information
+from my_poco_object import MyPocoObject
 from game_support.entry_game import EntryGame
-#from Tools.get_info.information import Information
-#from Tools.poco.my_poco_object import MyPocoObject
-#from Tools.game_support.entry_game import EntryGame
+
 
 
 class YzTest2Performance:
     """
+    todo 重构
     性能测试类
     """
-
     def __init__(self):
         self.info = Information()
-        self.my_andriod_poco = MyPocoObject()
-        self.eg = EntryGame()
         self.phone_name = self.info.get_phone_name()
         self.use_name = self.info.get_config("Account_Number", "YzTest2")
         self.game_name = self.info.get_config("App_Name", "game_name")
@@ -55,6 +49,7 @@ class YzTest2Performance:
         self.test_end_x = self.info.get_config("Coordinate", "test_end_x")
         self.test_end_y = self.info.get_config("Coordinate", "test_end_y")
         self.game_name = self.info.get_config("App_Name", "game_name")
+        self.eg = EntryGame(self.game_name)
 
     def first_open_yztest(self):
         '''
@@ -67,22 +62,20 @@ class YzTest2Performance:
         sleep(2)
         start_app("com.youzu.yztest_nosdk")
         sleep(10)
-        poco_android = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
-        self.my_andriod_poco.set_poco(poco_android)
+        self.poco = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
         sleep(1)
-        self.my_andriod_poco.find_poco("请输入用户名")
+        self.poco("请输入用户名")
         sleep(1)
         os.system("adb shell input text " + self.use_name)  # 没有输入框也执行的话也不影响
-        self.my_andriod_poco.find_poco("登录")
+        self.poco("登录")
         sleep(3)
-        # self.my_andriod_poco.find_poco("总是允许")  # todo 三挡机
+        # self.poco("总是允许")  # todo 三挡机
         sleep(3)
-        self.my_andriod_poco.find_poco("选择应用")
+        self.poco("选择应用")
         sleep(2)
-        self.my_andriod_poco.find_poco(self.game_name, ynlist="下翻页")
+        self.poco(self.game_name, ynlist="下翻页")
         sleep(2)
-        self.my_andriod_poco.find_poco("自动截图", click_name="com.youzu.yztest_nosdk:id/auto_screen_shot",
-                                       click_type="name")  # 每次打开软件是默认关闭的
+        self.poco(name="com.youzu.yztest_nosdk:id/auto_screen_shot")  # 每次打开软件是默认关闭的
         # os.system("start /b adb shell sh /data/local/tmp/yztest_sh.sh") 需要平台启动该服务
         sleep(2)
 
@@ -93,18 +86,17 @@ class YzTest2Performance:
         """
         stop_app(self.game_name)
         sleep(1)
-        poco_android = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
-        self.my_andriod_poco.set_poco(poco_android)
-        self.my_andriod_poco.find_poco("开始测试")
+        self.poco = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
+
+        self.poco(name="开始测试")
         phone_name = self.info.get_phone_name()
         phone_name_low = self.info.get_config("Phone_Model", "low")
         if phone_name == phone_name_low:
             sleep(20)
         else:
             sleep(10)
-        game_poco = self.eg.entry_game(sever_name_input, game_account_input)
+        self.eg.entry_game(sever_name_input, game_account_input)
 
-        return game_poco
 
     # 点击标记测试按钮
     def touch_tab(self):
@@ -136,15 +128,15 @@ class YzTest2Performance:
             touch([int(self.test_end_x), int(self.test_end_y)])
 
         # 点击弹出的确认框
-        self.my_andriod_poco.find_poco("退出")
+        self.poco(name="退出")
         os.system(
             "adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0")
         os.system(
             "adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0")
-        self.my_andriod_poco.find_poco("上传报告")
+        self.poco(name="上传报告")
         sleep(10)
         # 返回主界面
-        self.my_andriod_poco.find_poco("转到上一层级", find_type="name")
+        self.poco(name="转到上一层级")
         os.system(
             "adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1")
         sleep(1)

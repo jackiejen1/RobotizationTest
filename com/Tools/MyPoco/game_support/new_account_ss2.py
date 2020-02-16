@@ -8,7 +8,7 @@
 #@Function:使用协议登录游戏创建账号
 #@Method:
 #Reference:********************************
-from get_info.information import Information
+from foundation.information import Information
 
 class NewAccountSs2:
 
@@ -18,9 +18,13 @@ class NewAccountSs2:
 
     def new_account_ss2(self, dic_input, sever_name_input):
         """
-
         创建一个符合要求的账号，时间戳账号记录在config.ini.new_game_account字段
         :param dic_input: 字典，账号的数据
         :param sever_name_input: 区服名
-        :return:
+        :return:账号、角色名
         """
+
+        account =str(self.info.get_now_tiem_num())
+        role_name=account[:4]
+
+        return account,role_name

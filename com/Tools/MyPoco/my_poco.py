@@ -6,24 +6,27 @@
 # @Author: 洞洞
 # @File: my_poco.py
 # @Function:
-# @Method:作为主要类，所有方法集中在这里供脚本调用
+# @Method:作为编写脚本时使用的类，所有方法集中在这里供脚本调用
+#         辅助脚本使用MyPocoObject类编写
 # Reference:********************************
-from airtest.core.api import *
 
 from gm_method import GmMethod
 from my_poco_object import MyPocoObject
-from decorator import err_close_game
-from information import Information
+from foundation.decorator import err_close_game
+from foundation.information import Information
 from entry_game import EntryGame
 from first_function_go_run import FirstFunctionGoRun
 
 
 class MyPoco:
     def __init__(self, game_name):
+        """
+        :param game_name: 游戏名字，见ini文件App_Name项
+        """
         self.info = Information()
-        self.my_poco_obj = MyPocoObject()
         self.game_name = self.info.get_config("App_Name", game_name)
-        self.gm = GmMethod(game_name)
+        self.my_poco_obj = MyPocoObject(self.game_name)
+        self.gm = GmMethod(self.game_name)
 
     # todo err_close_game
     def first_function_go_run(self):
@@ -40,13 +43,21 @@ class MyPoco:
         功能向,启动游戏并到游戏主界面
         :param sever_name_input: 区服,读配置或新建账号
         :param game_account_input: 账号,读配置或新建账号
-        :return:返回StdPoco().poco对象，可直接用于脚本的控件点击
+        :return:返回StdPoco().poco对象，可使用原生框架
         """
         entry = EntryGame(self.game_name)
-        poco = entry.entry_game(sever_name_input, game_account_input)
-        self.my_poco_obj.new_poco_obj(self.game_name)
-        # todo 登录游戏的具体实现
+        entry.entry_game(sever_name_input, game_account_input)
+        poco = self.my_poco_obj.new_poco_obj()
         return poco
+
+    def set_account_information_gm(self, account, server_name=None):
+        """
+        使用GM方法前需要调用该方法,来确定向哪个账号的哪个区下面的角色发送道具
+        :param account:账号
+        :param server_name:如果不传，说明该账号只有一个区有角色
+        :return:
+        """
+        self.gm.set_account_information(account, server_name=server_name)
 
     def close_game(self):
         """
@@ -56,7 +67,12 @@ class MyPoco:
         self.my_poco_obj.close_game(self.game_name)
 
     def test_touch(self, poco_path):
-        self.my_poco_obj.new_poco_obj(self.game_name)
+        """
+        编写脚本时使用测试控件名正确性的方法
+        :param poco_path:
+        :return:
+        """
+        self.my_poco_obj.new_poco_obj()
         self.my_touch(poco_path)
 
     # @err_close_game
@@ -224,7 +240,9 @@ class MyPoco:
         性能，点击开始测试按钮，启动游戏并在游戏界面停止
         :return:poco对象
         """
-
+        # todo
+        poco = self.my_poco_obj.new_poco_obj()
+        return poco
     def touch_tab_xn(self):
         """
         点击标记按钮

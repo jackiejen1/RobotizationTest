@@ -9,16 +9,16 @@
 # @Method:
 # Reference:********************************
 from my_poco_object import MyPocoObject
-from information import Information
+from foundation.information import Information
 from airtest.core.api import *
 
 class EntryGameSs2:
-    def __init__(self):
-
+    def __init__(self,game_name):
+        self.game_name=game_name
         self.info = Information()
-        self.my_poco_obj = MyPocoObject()
+        self.my_poco_obj = MyPocoObject(self.game_name)
 
-    def entry_game_ss2(self, sever_name_input, game_account_input,game_name):
+    def entry_game_ss2(self, sever_name_input, game_account_input):
         """
         ss2的登录游戏，游戏已经启动，到游戏主界面的操作
         :param sever_name_input: 服务器名称，和ini一致
@@ -27,11 +27,11 @@ class EntryGameSs2:
         """
         snapshot(msg="上个脚本结束画面")
         home()
-        stop_app(game_name)
+        stop_app(self.game_name)
         sleep(2)
-        start_app(game_name)
+        start_app(self.game_name)
         sleep(16)
-        poco = self.my_poco_obj.new_poco_obj(game_name)
+        poco = self.my_poco_obj.new_poco_obj()
         game_account = self.info.get_config("Account_Number", game_account_input)
         self.my_poco_obj.touch_poco("InputName0")
         text(game_account)
@@ -53,11 +53,11 @@ class EntryGameSs2:
         if self.my_poco_obj.is_in_dic("RedPacketRainReceiveLayer0/__view0/Comp_effect0"):  # 红包雨
             self.my_poco_obj.touch_poco("RedPacketRainReceiveLayer0/__view0/Comp_effect0")
             sleep(2)
-            stop_app(game_name)
+            stop_app(self.game_name)
             sleep(2)
-            start_app(game_name)
+            start_app(self.game_name)
             sleep(20)
-            poco = self.my_poco_obj.new_poco_obj(game_name)
+            poco = self.my_poco_obj.new_poco_obj()
             game_account = self.info.get_config("Account_Number", game_account_input)
             self.my_poco_obj.touch_poco("InputName0")
             text(game_account)
@@ -82,4 +82,4 @@ class EntryGameSs2:
                 self.my_poco_obj.touch_poco("LoginRewardPop0/__view0/n30/img00")
             if self.my_poco_obj.is_in_dic("RedPacketRainPop0/__view0/Btn_close0"):  # 红包雨锦鲤
                 self.my_poco_obj.touch_poco("RedPacketRainPop0/__view0/Btn_close0")
-        return poco
+

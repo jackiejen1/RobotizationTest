@@ -5,7 +5,8 @@
 # @Time: 2019/11/6  14:58
 # @Author: 洞洞
 # @File: information.py
-# @Function:
+# @Function:框架基础类，不要直接在脚本中调用，编写辅助脚本使用MyPocoObject类
+#           用于拓展框架函数使用
 # @Method:
 # Reference:********************************
 import configparser
@@ -19,10 +20,10 @@ import shutil
 class Information:
     def __init__(self):
         self.cf = configparser.ConfigParser()
-        # 获取当前文件所在目录的上一级目录，即项目所在目录
-        root_dir = os.path.abspath(os.path.dirname(__file__))
+        # 获取当前文件所在目录的上一级目录
+        root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
         # 拼接得到config.ini文件的路径，直接使用
-        self.root_dir_path = root_dir + "\\config.ini"
+        self.root_dir_path = root_dir + "\\info_tab\\config.ini"
         self.cf.read(self.root_dir_path)
         self.thread_file_name = str(threading.get_ident())
 
@@ -136,6 +137,12 @@ class Information:
         else:
             is_run = True
         return is_run
+    def get_now_tiem_num(self):
+        """
+        获取当前时间戳
+        :return: int
+        """
+        return int(time.time())
     def get_time_str(self, str_time_input):
         """
         根据时间戳字符串换算日期和星期

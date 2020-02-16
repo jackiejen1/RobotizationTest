@@ -4,8 +4,7 @@
 # @Author : 洞洞
 # @File : get_protocol_args.py 
 # @function :
-from information import Information
-
+from foundation.information import Information
 import xlrd
 class GetProtocolArgs:
     def __init__(self,game_name):

@@ -8,7 +8,8 @@
 #@Function:
 #@Method:
 #Reference:********************************
-from get_resource_type import GetResourceType
+
+from new_account import NewAccount
 
 __author__ = "v.lidd"
 __title__ = '登录游戏'
@@ -17,10 +18,8 @@ __desc__ = """ 1.
 
                 """
 if __name__ == '__main__':
-    filte=GetResourceType(r"E:\object\RobotizationTest\com\Tools\MyPoco\excel_tab\少三2道具类型表.xlsx")
-    name = filte.get_name_from_type_id({"type":1,"id":30})
-    print(name)
-
+    na = NewAccount()
+    na.new_game_account({},"QA1")
 
 
 

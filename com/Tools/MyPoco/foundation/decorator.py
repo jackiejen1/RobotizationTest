@@ -5,14 +5,14 @@
 #@Time: 2019/12/31  15:48
 #@Author: 洞洞
 #@File: decorators.py
-#@Function:
+#@Function:装饰器类
 #@Method:
 #Reference:********************************
 import threading
 
 from airtest.core.api import *
-from MyException import *
-from information import Information
+from foundation.MyException import *
+from foundation.information import Information
 
 
 class err_resetting(object):

@@ -11,14 +11,12 @@
 from time import sleep
 from airtest.core.api import *
 from poco.drivers.std import StdPoco
-
-from MyException import *
-from make_poco_dic import MakePocoDic
+from foundation.MyException import *
+from foundation.make_poco_dic import MakePocoDic
 
 
 class UnexpectedWinSs2:
     def __init__(self):
-
         self.make_poco_dic = MakePocoDic()
         self.poco = StdPoco()
         self.make_poco_dic.set_poco(self.poco)

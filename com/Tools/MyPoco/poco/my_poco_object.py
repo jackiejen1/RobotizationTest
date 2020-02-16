@@ -5,42 +5,41 @@
 # @Time: 2019/10/9  10:38
 # @Author: 洞洞
 # @File: my_poco_object.py
-# @Function:可以先初始化该类，但必须启动app之后再初始化poco对象，且需调用set_poco方法
+# @Function:脚本基础类，用于实现各个辅助脚本的类，比如登录游戏，启动游戏后必须先调用new_poco_obj（）
 # @Method:
 # Reference:********************************
 import threading
-
 from airtest.core.api import *
 from poco.drivers.std import StdPoco
 from poco.drivers.android.uiautomation import AndroidUiautomationPoco
 
 import re, time
-
-from MyPoco.poco.make_poco_dic import MakePocoDic
-from information import Information
+from foundation.make_poco_dic import MakePocoDic
+from foundation.information import Information
 from unexpected_win import UnexpectedWin
 
 
 class MyPocoObject():
 
-    def __init__(self):
+    def __init__(self,game_name):
         """
         创建依赖对象，保存全局信息
         """
+        self.game_name=game_name
         self.make_poco_dic = MakePocoDic()
         self.info = Information()
-        self.uw = UnexpectedWin()
+        self.uw = UnexpectedWin(game_name)
         self.poco = None
 
-    def new_poco_obj(self, game_name):
+    def new_poco_obj(self):
         """
         游戏启动之后启动该方法
         根据游戏不同创建不同的poco对象，用来刷新poco_dic数据
         先运行此方法，然后才能使用其他方法
         """
-        if game_name == "com.youzu.test.qa" or game_name == "com.youzu.wgame2":
+        if self.game_name == "com.youzu.test.qa" or self.game_name == "com.youzu.wgame2":
             self.poco = StdPoco()
-        elif game_name == "com.youzu.yztest_nosdk":
+        elif self.game_name == "com.youzu.yztest_nosdk":
             self.poco = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
         self.make_poco_dic.set_poco(self.poco)
         return self.poco

@@ -9,16 +9,16 @@
 # @Method:
 # Reference:********************************
 from my_poco_object import *
-from information import *
+from foundation.information import *
 
 
 class EntryGameSx:
 
-    def __init__(self):
+    def __init__(self,game_name):
+        self.game_name=game_name
         self.info = Information()
-        self.my_poco = MyPocoObject()
-        self.game_name = self.info.get_config("App_Name", "game_name")
-        self.sever_poco = self.info.get_config("Sever_poco", self.game_name)
+        self.my_poco = MyPocoObject(self.game_name)
+
 
     def entry_game_sx(self, sever_name_input, game_account_input):
         """
