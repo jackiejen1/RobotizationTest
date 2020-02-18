@@ -6,7 +6,7 @@
 # @function :
 from foundation.information import Information
 from gm_api_http import GmApiHttp
-from make_resource_info import MakeResourceInfo
+from make_resource_body import MakeResourceBody
 import time
 
 class GmMethod:
@@ -17,7 +17,7 @@ class GmMethod:
         """
         self.game_name=game_name
         self.info = Information()
-        self.mri = MakeResourceInfo(game_name)
+        self.mri = MakeResourceBody(game_name)
         # 游戏端口 todo
         self.host = self.info.get_config("Server_Host", game_name)
         self.gah = GmApiHttp(self.host)

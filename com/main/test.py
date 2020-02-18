@@ -8,8 +8,7 @@
 #@Function:
 #@Method:
 #Reference:********************************
-
-from new_account import NewAccount
+import re
 
 __author__ = "v.lidd"
 __title__ = '登录游戏'
@@ -18,8 +17,7 @@ __desc__ = """ 1.
 
                 """
 if __name__ == '__main__':
-    na = NewAccount()
-    na.new_game_account({},"QA1")
+    pass
 
 
 
@@ -43,5 +41,5 @@ if __name__ == '__main__':
 
 
 
-# todo 兼容平台日志系统
+        # todo 兼容平台日志系统
 # simple_report(__file__,logpath=log_path)
