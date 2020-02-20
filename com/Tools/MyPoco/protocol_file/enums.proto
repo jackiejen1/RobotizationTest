@@ -1,0 +1,245 @@
+syntax = "proto2";
+package enums; 
+
+//所有enums必须以_TYPE结尾 并且前面的单词只能为大写A-Z以及_
+enum BATTLE_TYPE {
+  PVE = 1;
+  PVP = 2;
+  ARENA = 3;
+}
+
+enum BATTLE_IDENTITY_TYPE {
+  OWN = 1;
+  ENEMY = 2;
+}
+
+enum GROUP_TYPE {
+  WEI = 1;
+  SHU = 2;
+  WU = 3;
+  QUN = 4;
+  MAX = 5;
+}
+
+enum ATTR_TYPE {
+  HP                = 1; //生命
+  ATTACK   		      = 2; //攻击力
+  PHY_DEFENCE       = 3; //物理防御力，抵消物理伤害
+  MAG_DEFENCE       = 4; //魔法防御力，抵消法术伤害
+  DEFENCE           = 5; //防御力,养成中同时增加物理防御与法术防御
+
+  HP_PCT            = 11; //生命百分比
+  ATTACK_PCT        = 12; //攻击百分比
+  PHY_DEFENCE_PCT   = 13; //物防百分比
+  MAG_DEFENCE_PCT   = 14; //法防百分比
+  DEFENCE_PCT       = 15; //防御百分比，养成中同时增加物防百分比与法防百分比
+  ALL_PCT           = 16; //全属性百分比，养成中同时增加生命百分比、攻击百分比、物防百分比与发放百分比
+
+  ACCURACY_RATE     = 101; //命中率
+  DODGE_RATE        = 102; //闪避率
+  CRIT_RATE         = 103; //暴击率
+  HARDEN_RATE       = 104; //抗暴率
+  BLOCK_RATE        = 105; //格挡率
+  PIERCE_RATE       = 106; //破击率
+
+  BLOCK_DAMAGE_ADD  = 201; //格挡强度
+  BLOCK_DAMAGE_DEC  = 202; //格挡减免
+  CRIT_DAMAGE_ADD   = 203; //暴击伤害增加
+  CRIT_DAMAGE_DEC   = 204; //暴击伤害减免
+  PVP_DAMAGE_ADD    = 205; //PVP伤害增加百分比
+  PVP_DAMAGE_DEC    = 206; //PVP伤害减免百分比
+  DAMAGE_ADD        = 207; //伤害增加百分比
+  DAMAGE_DEC        = 208; //伤害减免百分比
+  FIN_DAMAGE_ADD    = 209; //最终伤害增加百分比
+  FIN_DAMAGE_DEC    = 210; //最终伤害减免百分比
+  HEAL_ADD          = 211; //治疗增益
+  HEAL_DEC          = 212; //治疗减益
+
+  WEI_DAMAGE_DEC  = 301; //抗魏
+  SHU_DAMAGE_DEC  = 302; //抗蜀
+  WU_DAMAGE_DEC   = 303; //抗吴
+  QUN_DAMAGE_DEC  = 304; //抗群
+  WEI_DAMAGE_ADD  = 305; //灭魏
+  SHU_DAMAGE_ADD  = 306; //灭蜀
+  WU_DAMAGE_ADD   = 307; //灭吴
+  QUN_DAMAGE_ADD  = 308; //灭群
+
+  INITIAL_ANGER  = 401; //初始怒气
+  ANGER_RECOVER  = 402; //怒气回复
+
+  IGNORE_DEF_ADD        = 501; //无视防御
+  IGNORE_DEF_DEC        = 502; //无视防御抵抗
+  DRAIN_LIFE_ADD        = 503; //攻击吸血
+  DRAIN_LIFE_DEC        = 504; //吸血抵抗
+  DRAIN_LIFE_ADD_RATE   = 505; //受击回血概率
+  DRAIN_LIFE_DEC_RATE   = 506; //无视受击回血概率
+  DRAIN_LIFE_ADD_PCT    = 507; //受击回血百分比
+  DRAIN_LIFE_DEC_PCT    = 508; //抵消目标回血百分比
+  PHY_HITBACK_RATE_ADD  = 509; //物理反伤概率
+  PHY_HITBACK_RATE_DEC  = 510; //无视物理反伤概率
+  PHY_HITBACK_PCT_ADD   = 511; //物理反伤百分比
+  PHY_HITBACK_PCT_DEC   = 512; //抵抗物理反伤百分比
+  MAG_HITBACK_RATE_ADD  = 513; //法术反伤概率
+  MAG_HITBACK_RATE_DEC  = 514; //无视法术反伤概率
+  MAG_HITBACK_PCT_ADD   = 515; //法术反伤百分比
+  MAG_HITBACK_PCT_DEC   = 516; //抵抗法术反伤百分比
+  REANGER_ACCURATY_ADD  = 517; //减怒命中
+  REANGER_ACCURATY_DEC  = 518; //减怒抗性
+  DEBUFF_ACCURATY_ADD   = 519; //减益buff命中
+  DEBUFF_ACCURATY_DEC   = 520; //减益buff闪避
+
+  INITIAL_COMBO          = 601; //初始合击值
+  MAXIMUM_COMBO          = 602; //最大合击值
+  COMBO_RECOVER_ACTION   = 603; //合击值行动回复
+  COMBO_RECOVER_SKILL    = 604; //技能合击值回复
+  COMBO_RECOVER_ROUND    = 605; //合击值回合回复
+  COMBO_CRIT_RATE        = 606; //合击暴击率
+  COMBO_HARDEN_RATE      = 607; //合击抗暴率
+  COMBO_CRIT_DAMAGE_ADD  = 608; //合击暴击强度
+  COMBO_CRIT_DAMAGE_DEC  = 609; //合击暴击减免
+  COMBO_DAMAGE_ADD       = 610; //合击增伤
+  COMBO_DAMAGE_DEC       = 611; //合击减伤
+
+  BATTLE_HP              = 701; //战斗血量
+  BATTLE_ANGER           = 702; //战斗怒气
+  BATTLE_COMBO           = 703; //战斗合击值
+
+  SKILL_FIGHT_VALUE_RATE = 801; //武将技能战斗力系数
+  COMBO_FIGHT_VALUE_RATEA = 802; //合击技能战力系数A
+  COMBO_FIGHT_VALUE_RATEB = 803; //合击技能战力系数A
+
+  MONSTER_KNIGHT_DAMAGE_ADD = 901; //怪物额外受武将伤害
+  MONSTER_KNIGHT_DAMAGE_DEC = 902; //怪物额外减免武将伤害
+  MONSTER_COMBO_DAMAGE_ADD = 903; //怪物额外受合击伤害
+  MONSTER_COMBO_DAMAGE_DEC = 904; //怪物额外减免合击伤害
+
+
+  STAR_TRAIN_HP       = 10001;	//将星培养生命
+  STAR_TRAIN_ATTACK       = 10002;	//将星培养攻击
+  STAR_TRAIN_PHY_DEFENCE = 10003;	//将星培养物理防御
+  STAR_TRAIN_MAG_DEFENCE = 10004;	//将星培养法术防御
+  STAR_TRAIN_TMP_HP       = 10005;	//将星培养临时生命
+  STAR_TRAIN_TMP_ATTACK       = 10006;	//将星培养临时攻击
+  STAR_TRAIN_TMP_PHY_DEFENCE = 10007;	//将星培养临时物理防御
+  STAR_TRAIN_TMP_MAG_DEFENCE = 10008;	//将星培养临时法术防御
+}
+
+enum AWARD_TYPE {
+	RESOURCE          = 1; //资源
+	FRAGMENT          = 2; //碎片
+	ITEM              = 3; //道具
+	KNIGHT            = 4; //武将
+	UNITETOKEN        = 5; //合击兵符
+	ADVANCE_EQUIPMENT = 6; //进阶材料
+	EQUIPMENT 				= 7; //装备
+	TREASURE 					= 8; //宝物
+	TITLE						  = 9; //称号
+	RED_PACKET 				= 10; //红包
+	DRESS 						= 11; //时装
+  BIOGRAPHY_ITEM    = 12; //名将传道具
+  SKIN    = 13; //变装
+
+  GOLD              = 999; //元宝
+  DROP							= 1000; //掉落
+	LIMIT 						= 10000;//所有定义不能超过这个值，所有type+LIMIT代表对于这个type的特殊处理
+}
+
+enum AWARD_VALUE_TYPE {
+  ROLEEXP           = 1; //角色经验
+  VIPEXP            = 2; //vip经验
+  SILVER            = 3; //银币
+  VIT               = 4; //体力
+  DBATTLE_SCORE     = 6; //威名
+  PRESTIGE          = 8; //声望
+  CONTEND_TREASURE_TIMES          = 9; //夺宝次数
+  CONTEND_TREASURE_SCORE          = 10; //夺宝积分
+  GUILD_CONTRIBUTE = 11; //军团贡献
+	REBEL_ATTACK = 12;	// 叛军攻打次数
+	REBEL_SCORE = 13;	// 战功
+  GUILD_DUNGEON_SCORE = 14; //军团副本挑战积分
+  GUILD_DUNGEON_COUNT = 15; //军团副本挑战次数
+	ACHIEVEMENT_POINT = 19; //成就点
+	BUCKET = 21; //水桶
+	COURAGE = 22; //勇气1(14日活动)
+	FATIGUE = 24; //疲劳值
+	STORM_SCORE = 25; //攻城略地积分:军功
+	COURAGE2 = 27; //勇气2(14日活动)
+  ESSENCE           = 35; //兵符精华
+}
+
+enum RANK_ID_TYPE {
+  DUNGEON_STAR = 1;//主线副本星数排行
+  KNIGHTBOOK_SCORE = 2;	// 武将图鉴积分
+	DEADBATTLE_RECORD = 3;//三国无双历史最高
+	DEADBATTLE_WEEK = 4;//三国无双周排行
+  GUILD_FIGHT_VALUE = 5;//军团战力排行
+  GUILD_LEVEL = 6;//军团等级排行
+	REBEL_TOTAL = 7;//叛军总伤害
+	REBEL_MAX = 8;//叛军最大伤害
+	REDPACKET_POINT = 9;//军团红包财神排行
+	REDPACKET_LUCK = 10;//军团红包手气排行
+  GUILD_DUNGEON_DAMAGE = 11;//军团副本伤害排行
+  GUILD_EXPERIENCE = 12;//军团经验排行
+  GUILD_STATUE_PROGRESS = 13;//军团铸像进度排行
+  STORM_PROGRESS = 14;//攻城略地进度排行
+  KNIGHTBOOK_SCORE_NEW = 15;//武将图鉴积分活动
+  RECRUIT_KNIGHT = 16; //限时神将排行榜
+}
+
+enum HANDBOOK_TYPE {
+	KNIGHT_HB = 1;
+	DRESS_HB = 2;
+	BIOBOSS_HB = 3;
+	SKIN_HB = 4;
+}
+
+enum ACTION_TYPE {
+	STATUS_ACHIEVEMENT = 1;
+  STATUS_SHOP = 2;
+  STATUS_DAILY_TASK = 3;
+  STATUS_SEVENDAYS = 4;	//七日活动
+  STATUS_GUIDE_TASK = 5;	//功能引导
+}
+
+enum REBORN_SYS_TYPE {
+  R_KNIGHT = 1;
+  R_UNITE_TOKEN = 2;
+  R_EQUIPMENT = 3;
+  R_TREASURE = 4;
+  R_DRESS = 5;
+}
+ 
+enum REBORN_OP_TYPE {
+  REBIRTH = 1; //重生
+  RESOLVE = 2; //分解
+}
+
+enum USER_INFO_TYPE {
+  FRAME = 0x1; //头像框
+  NAME = 0x2; //角色名
+}
+
+enum SCROLL_TYPE {
+	MAIN = 1;
+	HERO = 2;
+}
+
+enum STATE_MODULE {
+  BIOGRAPHY = 1; //名将传
+}
+
+enum UNIT_TYPE {
+  UT_KNIGHT = 1;      //武将
+  UT_UNITETOKEN = 2;  //合击兵符
+}
+
+enum CHAT_SHARE_TYPE {
+  CST_BATTLE_RES = 1; //战斗结果分享
+}
+
+enum RECHARGE_INFO_TYPE {
+  RIT_RECHARGE_TOTAL       = 0; //总充值金额
+  RIT_RECHARGE_DAILY_TOTAL = 1; //每日总充值金额
+  RIT_RECHARGE_FUND_ACTIVE = 2; //基金购买人数
+  RIT_RECHARGE_MAX = 3;
+}
