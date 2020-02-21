@@ -31,10 +31,10 @@ class test:
 
 
 if __name__ == '__main__':
-    test= random.randint(1001, 1003)
-    print(test)
-    print(type(test))
-
+    test_list_dic = [{},{},{}]
+    for dic  in test_list_dic:
+        dic["log"] = "1234"
+    print(test_list_dic)
 
 
 

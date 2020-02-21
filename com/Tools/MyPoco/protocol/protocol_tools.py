@@ -96,14 +96,14 @@ class ProtocolTools:
         return C2SID, S2CID
     def make_def(self,socket,protocol_name,keys_list_dic):
         """
-
         :param socket: socket链接
         :param protocol_name:
         :param keys_list_dic:
         :return:
         """
+        obj_name = "cg_pb2."+protocol_name+"()"
         #创建对象
-        protocol_obj = eval("cg_pb2.C2G_Create()")
+        protocol_obj = eval(obj_name)
         # 获取参数列表，循环赋值
         keys_list = self.get_arg_list(protocol_name)
         for i in range(len(keys_list)):
@@ -124,14 +124,15 @@ class ProtocolTools:
 
     def make_def_kv(self,socket,protocol_name,keys_list_dic,protocol_name_kv):
         """
-
         :param socket: socket链接
         :param protocol_name:
         :param keys_list_dic:
         :return:
         """
         #创建对象
-        protocol_obj = eval("cg_pb2.C2G_Create()")
+        obj_name = "cg_pb2." + protocol_name + "()"
+        # 创建对象
+        protocol_obj = eval(obj_name)
         KV = out_base_pb2.KV()
         keys_list_kv = self.get_arg_list(protocol_name_kv)
         for i in range(len(keys_list_kv)):
