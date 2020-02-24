@@ -119,7 +119,7 @@ class ProtocolTools:
         protocol_obj_attr = {'name': protocol_name, 'protocol': 'protobuf-ss', 'send_cmd': send_cmd,
                                     'recv_cmd': recv_cmd, 'uid': uid, 'sid': sid}
         senddata = packdata.pack_data(protocol_obj, protocol_obj_attr)
-        # flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, xxx) todo
+        flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, 36) # todo 数字什么意思
         return flag, data
 
     def make_def_kv(self,socket,protocol_name,keys_list_dic,protocol_name_kv):
@@ -157,5 +157,5 @@ class ProtocolTools:
         protocol_obj_attr = {'name': protocol_name, 'protocol': 'protobuf-ss', 'send_cmd': send_cmd,
                                     'recv_cmd': recv_cmd, 'uid': uid, 'sid': sid}
         senddata = packdata.pack_data(protocol_obj, protocol_obj_attr)
-        # flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, xxx)todo
+        flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, 24)# todo 数字什么意思
         return flag, data
