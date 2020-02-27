@@ -9,6 +9,13 @@
 #@Method:
 #Reference:********************************
 
+# encoding: utf-8
+#@Time: ${DATE}  ${TIME}
+#@Author: 洞洞
+#@File: ${NAME}.py
+#@Function:
+#@Method:
+from airtest.cli.parser import cli_setup
 
 __author__ = "v.lidd"
 __title__ = '登录游戏'
