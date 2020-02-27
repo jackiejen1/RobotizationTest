@@ -11,14 +11,12 @@
 from time import sleep
 from airtest.core.api import *
 from poco.drivers.std import StdPoco
-
-from MyException import *
-from make_poco_dic import MakePocoDic
+from foundation.MyException import *
+from foundation.make_poco_dic import MakePocoDic
 
 
 class UnexpectedWinSs2:
     def __init__(self):
-
         self.make_poco_dic = MakePocoDic()
         self.poco = StdPoco()
         self.make_poco_dic.set_poco(self.poco)
@@ -69,10 +67,10 @@ class UnexpectedWinSs2:
             for i in range(3):
                 if self.make_poco_dic.is_in_dic("ComAssistPop0/__view0/Btn_confirm0"):
                     s = self.make_poco_dic.get_poco_text("ComAssistPop0/__view0/Label_des0")
-                if "是否" in s:
-                    pass
-                else:
-                    self.make_poco_dic.my_touch("ComAssistPop0/__view0/Btn_confirm0")
+                    if "是否" in s:
+                        pass
+                    else:
+                        self.make_poco_dic.my_touch("ComAssistPop0/__view0/Btn_confirm0")
                 sleep(5)
                 if i == 2:  # 就当连不上，放弃重连
                     if self.make_poco_dic.is_in_dic("ComAssistPop0/__view0/Btn_cancel0"):

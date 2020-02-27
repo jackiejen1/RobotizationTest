@@ -9,14 +9,14 @@
 # @Method:
 # Reference:********************************
 
-from information import Information
+from foundation.information import Information
 from unexpected_win_sx import UnexpectedWinSx
 from unexpected_win_ss2 import UnexpectedWinSs2
 
 class UnexpectedWin:
-    def __init__(self):
+    def __init__(self,game_name):
         self.info = Information()
-        self.game_name = self.info.get_config("App_Name", "shaosan2")
+        self.game_name = game_name
 
     def unexpected_win(self):
         """

@@ -8,15 +8,16 @@
 # @Function:
 # @Method:
 # Reference:********************************
-
-
-from make_poco_dic import *
+from poco.drivers.std import StdPoco
+from foundation.make_poco_dic import *
 
 class UnexpectedWinSx:
     def __init__(self):
-
         self.make_poco_dic = MakePocoDic()
-    def sx_unexpected_win(self,poco_name_list):
+        self.poco = StdPoco()
+        self.make_poco_dic.set_poco(self.poco)
+        self.make_poco_dic.get_poco_dic()
+    def sx_unexpected_win(self):
 
         # 战斗结束会出现等级礼包
         if self.make_poco_dic.is_in_dic("<Label | Tag = -1, Label = >少年，我们为你准备了丰富的等级礼包，是否前往购买？0"):

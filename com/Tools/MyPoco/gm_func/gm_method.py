@@ -4,30 +4,42 @@
 # @Author : 洞洞
 # @File : gm_method.py 
 # @function :
-from information import Information
+from foundation.information import Information
 from gm_api_http import GmApiHttp
-from make_resource_info import MakeResourceInfo
+from make_resource_body import MakeResourceBody
 import time
 
 class GmMethod:
-    def __init__(self, game_name, server):
+    def __init__(self, game_name):
         """
         根据游戏名字和服务器确定账号
-        :param game: 游戏名字
-        :param server: 服务器名字
+        :param game: 游戏客户端ID
         """
+        self.game_name=game_name
         self.info = Information()
-        # 账号 考虑直接生成，不去取，或者放到以线程名的列表
-        self.account = self.info.get_config("Account_Number", "new_game_account")
-        # 区服ID
-        self.server_id = self.info.get_config("Server_Id", server)
+        self.mri = MakeResourceBody(game_name)
+        # 游戏端口 todo
         self.host = self.info.get_config("Server_Host", game_name)
-        # 角色名
-        self.role_name = self.info.get_config(self.account, server)
         self.gah = GmApiHttp(self.host)
-        # 角色ID
+
+    def set_account_information(self, account,server_name=None):
+        """
+        创建对象后需要调用该方法
+        :param account:账号
+        :param server_name:如果不传，说明该账号只有一个区有角色
+        :return:
+        """
+        # 账号
+        self.account=account
+        if server_name==None:
+            server_name = self.info.get_config(self.account, "server_name")
+        # 服务器ID
+        self.server_id = self.info.get_config(self.game_name, server_name)
+        # 角色名
+        self.role_name = self.info.get_config(self.account, server_name)
+        # 获取角色ID
         self.role_id = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
-        self.mri = MakeResourceInfo(game_name)
+
 
     def add_resources(self, resource_name_dic):
         """
@@ -163,8 +175,8 @@ class GmMethod:
         :return:
         """
         this_time = time.time()
-        order_num = int(this_time/10000)
-        data_value = self.mri.get_data_select(resource_name)  # todo 需要确定充值类型的字段
+        order_num = int(this_time / 10000)
+        data_value = self.mri.get_data_select_money(resource_name)  # todo 需要确定充值类型的字段
         body = {"account": self.account,
                 "role_id": self.role_id,
                 "sever": self.server_id,
@@ -172,6 +184,7 @@ class GmMethod:
                 "time": this_time,
                 "type": data_value["type"],
                 "amount": data_value["id"],
+                "num": data_value["num"],  # todo 金额
                 }
         log_dic = self.gah.recharge_supplement(body)
         operation_description = "充值补单" + resource_name

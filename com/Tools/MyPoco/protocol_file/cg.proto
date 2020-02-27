@@ -1,0 +1,109 @@
+syntax = "proto2";
+
+import "out_base.proto";
+
+package cg;
+
+enum RET {
+	RET_ERROR = 0;
+	RET_OK = 1;
+  RET_SERVER_MAINTAIN = 2;
+  RET_USER_NOT_EXIST = 3;
+  RET_USER_NAME_REPEAT = 4;
+  RET_LOGIN_REPEAT = 5;
+  RET_LOGIC_CLEAR = 6;
+}
+
+enum ID{
+  MSG_NONE = 0;
+
+  MSG_BEGIN = 10001;
+  MSG_END = 10099;
+
+  MSG_C2G_Login = 10002;
+  MSG_G2C_Login = 10003;
+  MSG_C2G_Create = 10004;
+  MSG_G2C_Create = 10005;
+  MSG_C2G_KeepAlive = 10006;
+  MSG_G2C_KeepAlive = 10007;
+  MSG_C2G_SayHi = 10008;
+  MSG_G2C_SayHi = 10009;
+  MSG_C2G_Offline = 10010;
+  MSG_G2C_Offline = 10011;
+  MSG_G2C_Broadcast = 10012;
+  MSG_C2G_Activate = 10013;
+  MSG_G2C_Activate = 10014;
+}
+
+message C2G_Login {
+  required string token = 1;
+  required uint64 server_id = 2;
+  optional uint32 version = 3;
+	optional uint64 sequence_id = 4;
+  optional out_base.Client client = 5;
+  optional uint32 uuid_reg_time = 6;
+	optional string gateway_ip = 7;
+}
+
+message G2C_Login {
+  required uint32 ret = 1;
+  required uint64 uid = 2;
+	optional uint64 sid = 3;
+  optional uint32 version = 4;
+  optional uint32 time = 5;
+	optional uint32 zone = 6;
+	optional uint64 sequence_id = 7;
+	optional bool auto_flush = 8;
+	optional string git_version = 9;
+  optional bool need_activate = 10;
+}
+
+message C2G_Create {
+  required string name = 1;
+  optional uint32 type = 2;
+	optional uint64 server_id = 3;
+}
+
+message G2C_Create {
+  required uint32 ret = 1;
+  optional uint64 uid = 2;
+	optional uint64 sid = 3;
+}
+
+message C2G_SayHi {
+}
+
+message G2C_SayHi {
+  required uint64 id = 1;
+	repeated uint64 current = 2;
+	repeated uint64 del = 3;
+}
+
+message C2G_KeepAlive {
+}
+
+message G2C_KeepAlive {
+}
+
+message C2G_Offline {
+}
+
+message G2C_Offline {
+}
+
+message G2C_Broadcast {
+  repeated uint64 ids = 1;
+  required uint32 cmd = 2;
+	required uint32 sid = 3;
+  optional bytes info = 4;
+}
+
+message C2G_Activate {
+  required string token = 1;
+  required string code = 2;
+  required uint64 server_id = 3;
+}
+
+message G2C_Activate {
+  required uint32 ret = 1;
+}

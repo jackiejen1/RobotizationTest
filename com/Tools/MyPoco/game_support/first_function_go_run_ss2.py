@@ -19,8 +19,8 @@ class FirstFunctionGoRunSs2:
         :return:
         """
         
-        my_poco = MyPocoObject()
-        my_poco.new_poco_obj("com.youzu.test.qa")
+        my_poco = MyPocoObject("com.youzu.test.qa")
+        my_poco.new_poco_obj()
         my_poco.touch_poco("Comp_dungeon0/Btn_dungeon0") # 副本
         try:
             for i in range(2):

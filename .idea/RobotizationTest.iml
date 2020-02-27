@@ -5,7 +5,6 @@
       <sourceFolder url="file://$MODULE_DIR$/com" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/com/Tools/NewPoco" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/decorators" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/game_support" isTestSource="false" />
@@ -14,6 +13,10 @@
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/my_err" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/poco" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/yztest" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/foundation" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/protocol" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/protocol_file" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/info_tab" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

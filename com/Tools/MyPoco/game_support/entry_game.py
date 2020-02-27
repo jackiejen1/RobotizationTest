@@ -24,12 +24,10 @@ class EntryGame:
         :return:poco
         """
         if self.game_name == "com.youzu.test.qa":  # ss2
-            egss2 = EntryGameSs2()
-            poco = egss2.entry_game_ss2(sever_name_input, game_account_input,self.game_name)
-            return poco
+            egss2 = EntryGameSs2(self.game_name)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
         elif self.game_name == "com.youzu.wgame2":
-            egsx = EntryGameSx()
-            poco = egsx.entry_game_sx(sever_name_input, game_account_input)
-            return poco
+            egsx = EntryGameSx(self.game_name)
+            egsx.entry_game_sx(sever_name_input, game_account_input)
         else:
             pass
