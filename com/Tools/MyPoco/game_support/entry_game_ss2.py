@@ -8,9 +8,12 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from my_poco_object import MyPocoObject
-from foundation.information import Information
+
 from airtest.core.api import *
+
+from MyPoco.foundation.information import Information
+from MyPoco.poco.my_poco_object import MyPocoObject
+
 
 class EntryGameSs2:
     def __init__(self,game_name):

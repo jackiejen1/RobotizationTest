@@ -8,8 +8,8 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from my_poco_object import *
-from foundation.information import *
+from MyPoco.foundation.information import Information
+from MyPoco.poco.my_poco_object import MyPocoObject
 
 
 class EntryGameSx:

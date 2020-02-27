@@ -8,13 +8,13 @@
 #@Function:
 #@Method:
 #Reference:********************************
-from protocol_file import cs_pb2, cg_pb2, out_base_pb2
+from MyPoco.protocol import packdata, sendrecvpub
+from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
 import re
 
-from foundation.information import Information
+from MyPoco.foundation.information import Information
 import xlrd
-import packdata
-import sendrecvpub
+
 class ProtocolTools:
     def __init__(self,game_name):
 

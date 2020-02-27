@@ -9,14 +9,13 @@
 # @Method:作为编写脚本时使用的类，所有方法集中在这里供脚本调用
 #         辅助脚本使用MyPocoObject类编写
 # Reference:********************************
+import os
 
-from gm_method import GmMethod
-from my_poco_object import MyPocoObject
-from foundation.decorator import err_close_game
-from foundation.information import Information
-from entry_game import EntryGame
-from first_function_go_run import FirstFunctionGoRun
-
+from MyPoco.foundation.information import Information
+from MyPoco.game_support.entry_game import EntryGame
+from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
+from MyPoco.gm_func.gm_method import GmMethod
+from MyPoco.poco.my_poco_object import MyPocoObject
 
 class MyPoco:
     def __init__(self, game_name):
@@ -24,6 +23,8 @@ class MyPoco:
         :param game_name: 游戏名字，见ini文件App_Name项
         """
         self.info = Information()
+        my_poco_path=os.path.abspath(os.path.dirname(__file__))
+        self.info.set_config("MyPocoPath","MyPocoPath",my_poco_path)
         self.game_name = self.info.get_config("App_Name", game_name)
         self.my_poco_obj = MyPocoObject(self.game_name)
         self.gm = GmMethod(self.game_name)
@@ -269,7 +270,7 @@ class MyPoco:
         """
         self.my_poco_obj.text_str(input_str)
 
-    @err_close_game
+    # @err_close_game
     def new_account(self, dic_input, sever_name_input):
         """
         根据输入的要求在sever_name区创建一个账号

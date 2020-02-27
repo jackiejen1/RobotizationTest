@@ -11,8 +11,9 @@
 import threading
 
 from airtest.core.api import *
-from foundation.MyException import *
-from foundation.information import Information
+
+from MyPoco.foundation.MyException import NotPocoServeException
+from MyPoco.foundation.information import Information
 
 
 class err_resetting(object):

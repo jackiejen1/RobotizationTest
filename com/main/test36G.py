@@ -8,7 +8,10 @@
 #@Function:
 #@Method:
 #Reference:********************************
+import os
+
 from airtest.cli.parser import cli_setup
+from airtest.core.api import auto_setup
 
 __author__ = "v.lidd"
 __title__ = '登录游戏'

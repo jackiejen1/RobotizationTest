@@ -8,8 +8,11 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from entry_game_ss2 import *
-from entry_game_sx import *
+from MyPoco.foundation.information import Information
+from MyPoco.game_support.entry_game_ss2 import EntryGameSs2
+from MyPoco.game_support.entry_game_sx import EntryGameSx
+
+
 class EntryGame:
 
     def __init__(self,game_name):

@@ -5,9 +5,9 @@
 # @File : make_resource_body.py
 # @function : 生成GM后台接口所需的信息
 
-from foundation.information import Information
+from MyPoco.foundation.information import Information
 import time
-import xlrd
+from MyPoco.airtestide_lack_packages import xlrd
 
 class MakeResourceBody:
     """
@@ -16,8 +16,11 @@ class MakeResourceBody:
 
     def __init__(self, game_name):
         info = Information()
-        excel_path = info.get_config("ExcelPath", game_name)
-        self.xl = xlrd.open_workbook(excel_path)
+        excel_path = info.get_config("ProtocolExcelPath", game_name)
+        MyPocoPath = info.get_config("MyPocoPath", "MyPocoPath")
+        all_path=MyPocoPath+excel_path
+
+        self.xl = xlrd.open_workbook(all_path)
 
     def get_type_id_from_name(self, resource_name):
         """

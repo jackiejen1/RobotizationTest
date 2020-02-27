@@ -8,7 +8,8 @@
 #@Function:使用协议登录游戏创建账号
 #@Method:
 #Reference:********************************
-from foundation.information import Information
+from MyPoco.foundation.information import Information
+
 
 class NewAccountSs2:
 

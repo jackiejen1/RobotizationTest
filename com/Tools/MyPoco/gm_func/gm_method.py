@@ -4,9 +4,9 @@
 # @Author : 洞洞
 # @File : gm_method.py 
 # @function :
-from foundation.information import Information
-from gm_api_http import GmApiHttp
-from make_resource_body import MakeResourceBody
+from MyPoco.foundation.information import Information
+from MyPoco.gm_func.gm_api_http import GmApiHttp
+from MyPoco.gm_func.make_resource_body import MakeResourceBody
 import time
 
 class GmMethod:

@@ -8,10 +8,10 @@
 # @Function:
 # @Method:
 # Reference:********************************
+from MyPoco.foundation.information import Information
+from MyPoco.game_support.unexpected_win_ss2 import UnexpectedWinSs2
+from MyPoco.game_support.unexpected_win_sx import UnexpectedWinSx
 
-from foundation.information import Information
-from unexpected_win_sx import UnexpectedWinSx
-from unexpected_win_ss2 import UnexpectedWinSs2
 
 class UnexpectedWin:
     def __init__(self,game_name):
