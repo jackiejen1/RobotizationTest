@@ -9,7 +9,7 @@
 # @Method:
 # Reference:********************************
 from poco.drivers.std import StdPoco
-
+from time import sleep
 from MyPoco.foundation.make_poco_dic import MakePocoDic
 
 
@@ -19,7 +19,7 @@ class UnexpectedWinSx:
         self.poco = StdPoco()
         self.make_poco_dic.set_poco(self.poco)
         self.make_poco_dic.get_poco_dic()
-    def sx_unexpected_win(self):
+    def unexpected_win(self):
 
         # 战斗结束会出现等级礼包
         if self.make_poco_dic.is_in_dic("<Label | Tag = -1, Label = >少年，我们为你准备了丰富的等级礼包，是否前往购买？0"):

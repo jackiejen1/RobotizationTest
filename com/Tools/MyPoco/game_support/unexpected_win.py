@@ -12,11 +12,11 @@ from MyPoco.foundation.information import Information
 from MyPoco.game_support.unexpected_win_ss2 import UnexpectedWinSs2
 from MyPoco.game_support.unexpected_win_sx import UnexpectedWinSx
 
-
 class UnexpectedWin:
-    def __init__(self,game_name):
+    def __init__(self, game_name):
         self.info = Information()
         self.game_name = game_name
+        self.uw = None
 
     def unexpected_win(self):
         """
@@ -24,12 +24,14 @@ class UnexpectedWin:
         :param poco_input: poco对象
         :return:
         """
-
-        if self.game_name == "com.youzu.wgame2":
-            sxuw = UnexpectedWinSx()
-            sxuw.sx_unexpected_win()
-        elif self.game_name == "com.youzu.test.qa":
-            ss2uw = UnexpectedWinSs2()
-            ss2uw.ss2_unexpected_win()
+        if self.uw == None:
+            if self.game_name == "com.youzu.wgame2":
+                self.uw = UnexpectedWinSx()
+                self.uw.unexpected_win()
+            elif self.game_name == "com.youzu.test.qa":
+                self.uw = UnexpectedWinSs2()
+                self.uw.unexpected_win()
         else:
-            pass
+            print("开始查找异常窗口")
+            self.uw.unexpected_win()
+            print("异常窗口排查完毕")

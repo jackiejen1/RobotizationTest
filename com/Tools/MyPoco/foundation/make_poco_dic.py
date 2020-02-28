@@ -15,7 +15,6 @@ from airtest.core.api import *
 
 from airtest.report.report import simple_report
 
-
 from MyPoco.airtestide_lack_packages.compat import script_dir_name
 
 from MyPoco.foundation.MyException import *
@@ -50,7 +49,7 @@ class MakePocoDic:
         with open(file_path) as f:
             poco_name_dic_str_list = f.readlines()
         self.poco_dic = eval(poco_name_dic_str_list[0])
-        print("刷新数据完成")
+        print("本地poco数据刷新完成")
         return self.poco_dic
 
     def get_poco_dic(self):
@@ -58,7 +57,7 @@ class MakePocoDic:
         with open(file_path) as f:
             poco_name_dic_str_list = f.readlines()
         self.poco_dic = eval(poco_name_dic_str_list[0])
-        print("获取数据完成")
+        print("本地poco数据获取完成")
         return self.poco_dic
 
     def get_poco_name_path_list(self):
@@ -74,7 +73,7 @@ class MakePocoDic:
             return True
         # 再判断在不在路径里面
         if poco_path in self.poco_dic.keys():
-            print("找到路径")
+            print("找到路径"+poco_path)
             return True
         # 看看某些唯一路径存不存在简写
         for dic_key in self.poco_dic.keys():
@@ -106,11 +105,10 @@ class MakePocoDic:
                 phone_list_str = self.info.get_config("Phone_Size", self.thread_file_name)
                 phone_list = eval(phone_list_str)
                 # 取整
-                print(poco_path)
-                print(pos_list)
+                print(poco_path+"pos属性为"+str(pos_list))
                 x = int(phone_list[0] * pos_list[0])
                 y = int(phone_list[1] * pos_list[1])
-                print([x, y])
+                print(poco_path+"坐标为"+str([x, y]))
                 return [x, y]
             else:  # 还是有问题
                 sleep(3)
@@ -121,8 +119,11 @@ class MakePocoDic:
 
     def my_touch(self, poco_path):
         touch_int_list = self.get_poco_pos(poco_path)
-        touch(touch_int_list)
+        touch(touch_int_list)  # 这里需要换一下，尝试换成adb直接点击坐标 todo
         print("点击坐标" + str(touch_int_list) + "完成")
+        # x, y = self.get_poco_pos(poco_path)
+        # os.system("adb input tap %d %d" % (x, y))
+        # print("点击坐标(%d,%d)完成" % (x, y))
         self.renovate_and_get_poco_dic()
 
     def my_swipe(self, start_path, end_path, duration=2):

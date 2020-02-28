@@ -43,7 +43,7 @@ class EntryGameSs2:
         sleep(1)
         self.my_poco_obj.touch_poco("AnnoCloseBtn0")
         self.my_poco_obj.touch_poco("点击选服")
-        self.my_poco_obj.touch_poco_obj(poco("List_kind_server").child(text="11 - 20区"),click_list=[0.95, 0.15])  # todo 不同游戏可能要改
+        self.my_poco_obj.touch_poco("11 - 20区")  # todo 不同游戏可能要改
         sever_name = self.info.get_config("Sever_Name", sever_name_input)
         self.my_poco_obj.touch_poco(sever_name)
         self.my_poco_obj.touch_poco("Txt_guide0")  # 关闭新手引导

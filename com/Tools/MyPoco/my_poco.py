@@ -29,6 +29,23 @@ class MyPoco:
         self.my_poco_obj = MyPocoObject(self.game_name)
         self.gm = GmMethod(self.game_name)
 
+    def set_poco(self):
+        """
+        编写脚本时使用
+        :param poco_path:
+        :return:
+        """
+        self.my_poco_obj.new_poco_obj()
+
+    def test_touch(self, poco_path):
+        """
+        编写脚本时使用测试控件名正确性的方法
+        :param poco_path:
+        :return:
+        """
+        self.set_poco()
+        self.my_touch(poco_path)
+
     # todo err_close_game
     def first_function_go_run(self):
         """
@@ -65,16 +82,7 @@ class MyPoco:
         关闭游戏，不区分功能或者性能
         :return:
         """
-        self.my_poco_obj.close_game(self.game_name)
-
-    def test_touch(self, poco_path):
-        """
-        编写脚本时使用测试控件名正确性的方法
-        :param poco_path:
-        :return:
-        """
-        self.my_poco_obj.new_poco_obj()
-        self.my_touch(poco_path)
+        self.my_poco_obj.close_game()
 
     # @err_close_game
     def my_swipe(self, start_path, end_path, timein):

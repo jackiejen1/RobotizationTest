@@ -6,6 +6,7 @@
 from redis import Redis
 
 
+# 从服务器读取账号
 # 具体使用时，需要设置 redis 服务器地址
 
 def getuserid():

@@ -200,10 +200,10 @@ class MyPocoObject():
         number_list = re.findall("\](.*)\）", number_str1)
         return int(number_list[0])
 
-    def close_game(self, game_name):
+    def close_game(self):
         """关闭游戏"""
         snapshot(msg="关闭游戏")
-        stop_app(game_name)
+        stop_app(self.game_name)
         thread_file_name = str(threading.get_ident())
         self.info.remove_option("Phone_Size", thread_file_name)
 
