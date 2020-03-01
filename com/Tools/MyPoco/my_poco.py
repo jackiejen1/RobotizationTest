@@ -14,7 +14,7 @@ import os
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.entry_game import EntryGame
 from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
-from MyPoco.gm_func.gm_method import GmMethod
+from MyPoco.protocol.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject
 from MyPoco.protocol.protocol_function import ProtocolFunction
 

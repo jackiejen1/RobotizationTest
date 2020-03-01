@@ -5,8 +5,8 @@
 # @File : gm_method.py 
 # @function :
 from MyPoco.foundation.information import Information
-from MyPoco.gm_func.gm_api_http import GmApiHttp
-from MyPoco.gm_func.make_resource_body import MakeResourceBody
+from MyPoco.protocol.gm_api_http import GmApiHttp
+from MyPoco.protocol.make_resource_body import MakeResourceBody
 import time
 
 class GmMethod:
