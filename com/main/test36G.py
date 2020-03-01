@@ -20,6 +20,7 @@ __desc__ = """ 1.
                2.
 
                 """
+from MyPoco.foundation.information import Information
 # from my_poco import *
 # my_poco = MyPoco("shaosan2")
 # log_path,log_name= my_poco.get_log_path(__file__)
@@ -29,13 +30,15 @@ __desc__ = """ 1.
 #         os.makedirs(log_path)
 #     auto_setup(__file__, logdir=log_path, devices=["Android:///", ])
 # my_poco.test_touch("")
-start_time=time.time()
-time.sleep(0.3)
-end_time = time.time()
-use_time = end_time - start_time
-print("poco数据获取用时%f" % use_time)
+class test:
+    def __init__(self):
+        self.a = 10
 
+    # def __ceil__(self):
+    #     return self.a
 
-
+if __name__ == '__main__':
+    a = test()
+    print(a.a)
 
 

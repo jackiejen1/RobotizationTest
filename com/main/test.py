@@ -12,12 +12,7 @@ import os
 import random
 import re
 
-# encoding: utf-8
-# @Time: ${DATE}  ${TIME}
-# @Author: 洞洞
-# @File: ${NAME}.py
-# @Function:
-# @Method:
+
 from airtest.cli.parser import cli_setup
 
 import xlrd

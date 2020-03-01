@@ -18,9 +18,7 @@ class GmMethod:
         self.game_name=game_name
         self.info = Information()
         self.mri = MakeResourceBody(game_name)
-        # 游戏端口 todo
-        self.host = self.info.get_config("Server_Host", game_name)
-        self.gah = GmApiHttp(self.host)
+
 
     def set_account_information(self, account,server_name=None):
         """
@@ -29,17 +27,21 @@ class GmMethod:
         :param server_name:如果不传，说明该账号只有一个区有角色
         :return:
         """
-        # 账号
-        self.account=account
         if server_name==None:
             server_name = self.info.get_config(self.account, "server_name")
+        socket_ages_dic = eval(self.info.get_config(self.game_name, server_name))
+        self.host = socket_ages_dic["host"]  # host = "10.3.128.5"
+        self.port = socket_ages_dic["port"]  # port = 16865
+        self.server_id = socket_ages_dic["server_id"]
+        self.gah = GmApiHttp(self.host)
+        # 账号
+        self.account=account
         # 服务器ID
         self.server_id = self.info.get_config(self.game_name, server_name)
         # 角色名
         self.role_name = self.info.get_config(self.account, server_name)
         # 获取角色ID
         self.role_id = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
-
 
     def add_resources(self, resource_name_dic):
         """

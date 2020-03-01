@@ -16,20 +16,21 @@ class CatchResponseError(Exception):
 
 
 def success(restype, workname, response_time, content_size):
-    """
-    记录成功数据
-    :param restype:
-    :param workname:
-    :param response_time:
-    :param content_size:
-    :return: None
-    """
-    events.request_success.fire(
-        request_type=restype,
-        name=workname,
-        response_time=response_time,
-        response_length=content_size,
-    )
+#     """
+#     记录成功数据
+#     :param restype:
+#     :param workname:
+#     :param response_time:
+#     :param content_size:
+#     :return: None
+#     """
+    pass
+#     events.request_success.fire(
+#         request_type=restype,
+#         name=workname,
+#         response_time=response_time,
+#         response_length=content_size,
+#     )
 
 
 def failure(restype, workname, errormsg):
@@ -41,15 +42,16 @@ def failure(restype, workname, errormsg):
     :return: None
     """
     exc = CatchResponseError(errormsg)
-    events.request_failure.fire(
-        request_type=restype,
-        name=workname,
-        response_time=0,
-        exception=exc,
-    )
+    # events.request_failure.fire(
+    #     request_type=restype,
+    #     name=workname,
+    #     response_time=0,
+    #     exception=exc,
+    # )
 
 
 def _send_data(s, socketdata):
+
     flag = True
     send_time = time.time()
     try:

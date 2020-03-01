@@ -4,9 +4,9 @@
 # datetime:2018/11/21 11:26
 # software: PyCharm
 
-from protocol_file import cs_pb2, cg_pb2, out_base_pb2
-from packdata import pack_data
-from sendrecvpub import send_receive, recv_data
+from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
+from MyPoco.protocol.packdata import pack_data
+from MyPoco.protocol.sendrecvpub import send_receive, recv_data
 import hashlib, json, base64
 # from locust.exception import StopLocust
 import random

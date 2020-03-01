@@ -12,7 +12,7 @@ from google.protobuf import symbol_database as _symbol_database
 # @@protoc_insertion_point(imports)
 _sym_db = _symbol_database.Default()
 
-from protocol_file import out_base_pb2 as out__base__pb2
+from MyPoco.protocol_file import out_base_pb2 as out__base__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='bs.proto',

@@ -8,16 +8,13 @@
 #@Function:
 #@Method:
 #Reference:********************************
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# author:liaozhj
-# datetime:2018/11/21 10:56
-# software: PyCharm
-from MyPoco.protocol_file import cg_pb2, cs_pb2
-from MyPoco.protocol_file.func import *
-from MyPoco.protocol_file.rclient import getuserid
-from socket import create_connection
 
+# from MyPoco.protocol.protocol_function import ProtocolFunction
+# from MyPoco.protocol_file import cg_pb2, cs_pb2
+# from MyPoco.protocol_file.func import *
+# from MyPoco.protocol_file.rclient import getuserid
+# from socket import create_connection
+from MyPoco.my_poco import MyPoco
 
 class WorkTaskSet():
 
@@ -68,6 +65,8 @@ class WorkTaskSet():
 
 
 if __name__ == '__main__':
+    # work = WorkTaskSet()
+    # work.Run()
+    my = MyPoco("少三2")
+    my.open_protocol("QA1","xieyi")
 
-    work = WorkTaskSet()
-    work.Run()

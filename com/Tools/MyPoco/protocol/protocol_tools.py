@@ -1,13 +1,13 @@
 # _*_coding:utf-8 _*_
-#!/usr/bin/python3
-#Reference:********************************
+# !/usr/bin/python3
+# Reference:********************************
 # encoding: utf-8
-#@Time: 2020/02/20  17:16
-#@Author: 洞洞
-#@File:
-#@Function:
-#@Method:
-#Reference:********************************
+# @Time: 2020/02/20  17:16
+# @Author: 洞洞
+# @File:
+# @Function:
+# @Method:
+# Reference:********************************
 from MyPoco.protocol import packdata, sendrecvpub
 from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
 import re
@@ -15,18 +15,19 @@ import re
 from MyPoco.foundation.information import Information
 import xlrd
 
-class ProtocolTools:
-    def __init__(self,game_name):
 
+class ProtocolTools:
+    def __init__(self, game_name):
+        self.game_name = game_name
         self.info = Information()
         # 通过游戏名字获取表格路径
-        excel_path = self.info.get_config("ProtocolExcelPath", game_name)
-        self.excel = xlrd.open_workbook(excel_path)
+        excel_path = self.info.get_config(game_name, "protocolexcelpath")
+        obj_path = self.info.get_config("MyPocoPath", "mypocopath") + excel_path
+        self.excel = xlrd.open_workbook(obj_path)
         # 协议文件路径，需要将后端给的协议文件从proto类型改为txt
-        self.protocol_file_path = self.info.get_config("ProtocolFilePath", game_name)
+        self.protocol_file_path = self.info.get_config(game_name, "protocolfilepath")
 
-
-    def get_arg_list(self,protocol_name):
+    def get_arg_list(self, protocol_name):
         """
         根据传入的协议名查找对应协议的参数列表
         :param name: 协议名称，用例中的名字
@@ -81,8 +82,8 @@ class ProtocolTools:
         :return C2SID: 客户端发包协议ID
         :return S2CID: 客户端收包协议ID
         """
-        C2Sname = self.info.get_config("ProtocolFilePath", "C2Sname") + protocol_name
-        S2Cname = self.info.get_config("ProtocolFilePath", "S2Cname") + protocol_name
+        C2Sname = self.info.get_config(self.game_name, "C2Sname") + protocol_name
+        S2Cname = self.info.get_config(self.game_name, "S2Cname") + protocol_name
         C2SID = None
         S2CID = None
         with open(self.protocol_file_path, 'r+', encoding="utf-8") as fw:
@@ -94,42 +95,43 @@ class ProtocolTools:
             if S2Cname in f:
                 S2CID = re.findall(" = ([\s\S]*);", f)
         return C2SID, S2CID
-    def make_def(self,socket,protocol_name,keys_list_dic):
+
+    def make_def(self, socket, protocol_name, keys_list_dic):
         """
         :param socket: socket链接
         :param protocol_name:
         :param keys_list_dic:
         :return:
         """
-        obj_name = "cg_pb2."+protocol_name+"()"
-        #创建对象
+        obj_name = "cg_pb2." + protocol_name + "()"
+        # 创建对象
         protocol_obj = eval(obj_name)
         # 获取参数列表，循环赋值
         keys_list = self.get_arg_list(protocol_name)
         for i in range(len(keys_list)):
             value = keys_list_dic[keys_list[i]]
-            if value =="Ture"or"False":
-                setattr(protocol_obj,keys_list[i],eval(value))
+            if value == "Ture" or "False":
+                setattr(protocol_obj, keys_list[i], eval(value))
             else:
                 setattr(protocol_obj, keys_list[i], value)
-        send_cmd,recv_cmd=self.get_id_protocol(protocol_name)
+        send_cmd, recv_cmd = self.get_id_protocol(protocol_name)
         protocol_obj = protocol_obj.SerializeToString()
-        uid = self.info.get_config("ProtocolArgs","uid")
-        sid = self.info.get_config("ProtocolArgs","sid")
+        uid = self.info.get_config(self.game_name, "uid")
+        sid = self.info.get_config(self.game_name, "sid")
         protocol_obj_attr = {'name': protocol_name, 'protocol': 'protobuf-ss', 'send_cmd': send_cmd,
-                                    'recv_cmd': recv_cmd, 'uid': uid, 'sid': sid}
+                             'recv_cmd': recv_cmd, 'uid': int(float(uid)), 'sid': int(float(sid))}
         senddata = packdata.pack_data(protocol_obj, protocol_obj_attr)
-        flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, 36) # todo 数字什么意思
+        flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, 36)  # 消息头长度，需要和后端程序一一确认
         return flag, data
 
-    def make_def_kv(self,socket,protocol_name,keys_list_dic,protocol_name_kv):
+    def make_def_kv(self, socket, protocol_name, keys_list_dic, protocol_name_kv):
         """
         :param socket: socket链接
         :param protocol_name:
         :param keys_list_dic:
         :return:
         """
-        #创建对象
+        # 创建对象
         obj_name = "cg_pb2." + protocol_name + "()"
         # 创建对象
         protocol_obj = eval(obj_name)
@@ -137,8 +139,8 @@ class ProtocolTools:
         keys_list_kv = self.get_arg_list(protocol_name_kv)
         for i in range(len(keys_list_kv)):
             value = keys_list_dic[keys_list_kv[i]]
-            if value =="Ture"or"False":
-                setattr(protocol_obj,keys_list_kv[i],eval(value))
+            if value == "Ture" or "False":
+                setattr(protocol_obj, keys_list_kv[i], eval(value))
             else:
                 setattr(protocol_obj, keys_list_kv[i], value)
         protocol_obj.info.MergeFrom(KV)
@@ -146,16 +148,16 @@ class ProtocolTools:
         keys_list = self.get_arg_list(protocol_name)
         for i in range(len(keys_list)):
             value = keys_list_dic[keys_list[i]]
-            if value =="Ture"or"False":
-                setattr(protocol_obj,keys_list[i],eval(value))
+            if value == "Ture" or "False":
+                setattr(protocol_obj, keys_list[i], eval(value))
             else:
                 setattr(protocol_obj, keys_list[i], value)
-        send_cmd,recv_cmd=self.get_id_protocol(protocol_name)
+        send_cmd, recv_cmd = self.get_id_protocol(protocol_name)
         protocol_obj = protocol_obj.SerializeToString()
-        uid = self.info.get_config("ProtocolArgs","uid")
-        sid = self.info.get_config("ProtocolArgs","sid")
+        uid = self.info.get_config(self.game_name, "uid")
+        sid = self.info.get_config(self.game_name, "sid")
         protocol_obj_attr = {'name': protocol_name, 'protocol': 'protobuf-ss', 'send_cmd': send_cmd,
-                                    'recv_cmd': recv_cmd, 'uid': uid, 'sid': sid}
+                             'recv_cmd': recv_cmd, 'uid': int(float(uid)), 'sid': int(float(sid))}
         senddata = packdata.pack_data(protocol_obj, protocol_obj_attr)
-        flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, 24)# todo 数字什么意思
+        flag, data = sendrecvpub.send_receive(socket, senddata, protocol_obj_attr, 24)  # 消息头长度，需要和后端程序一一确认
         return flag, data

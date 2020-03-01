@@ -16,6 +16,8 @@ from MyPoco.game_support.entry_game import EntryGame
 from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
 from MyPoco.gm_func.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject
+from MyPoco.protocol.protocol_function import ProtocolFunction
+
 
 class MyPoco:
     def __init__(self, game_name):
@@ -384,3 +386,11 @@ class MyPoco:
         :return:
         """
         self.my_poco_obj.end_log()
+    def open_protocol(self,server_name,protocol_name):
+        """
+        传入服务器名和协议名
+        :param server_name: 服务器名
+        :param protocol_name:
+        :return:
+        """
+        self.pf = ProtocolFunction(self.game_name,server_name,protocol_name)

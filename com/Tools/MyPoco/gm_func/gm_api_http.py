@@ -37,6 +37,7 @@ class GmApiHttp:
         if self.port != '':
             self.url += ':' + self.port
 
+
     def construct_url(self, path_key):
         """
         拼接url

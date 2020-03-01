@@ -16,10 +16,9 @@ class MakeResourceBody:
 
     def __init__(self, game_name):
         info = Information()
-        excel_path = info.get_config("ProtocolExcelPath", game_name)
-        MyPocoPath = info.get_config("MyPocoPath", "MyPocoPath")
+        excel_path = info.get_config(game_name, "protocolexcelpath")
+        MyPocoPath = info.get_config("MyPocoPath", "mypocopath")
         all_path=MyPocoPath+excel_path
-
         self.xl = xlrd.open_workbook(all_path)
 
     def get_type_id_from_name(self, resource_name):
