@@ -8,7 +8,7 @@
 # @Function:开局指定测试哪个游戏的哪条协议，每个脚本只测试一条协议
 # @Method:
 # Reference:********************************
-import os
+
 from socket import create_connection
 from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
 from MyPoco.protocol.login_game import LoginGame
