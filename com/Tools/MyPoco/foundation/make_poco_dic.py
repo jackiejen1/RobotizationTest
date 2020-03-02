@@ -119,7 +119,7 @@ class MakePocoDic:
 
     def my_touch(self, poco_path):
         touch_int_list = self.get_poco_pos(poco_path)
-        touch(touch_int_list)  # 这里需要换一下，尝试换成adb直接点击坐标 todo
+        touch(touch_int_list)
         print("点击坐标" + str(touch_int_list) + "完成")
         # x, y = self.get_poco_pos(poco_path)
         # os.system("adb input tap %d %d" % (x, y))

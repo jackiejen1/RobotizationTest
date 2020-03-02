@@ -13,10 +13,12 @@ import os
 
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.entry_game import EntryGame
-from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
-from MyPoco.protocol.gm_method import GmMethod
+# from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
+from MyPoco.poco.poco_pos import PocoPos
+from MyPoco.poco.xn_test_tools import XnTest
+# from MyPoco.protocol.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject
-from MyPoco.protocol.protocol_function import ProtocolFunction
+# from MyPoco.protocol.protocol_function import ProtocolFunction
 
 
 class MyPoco:
@@ -25,11 +27,12 @@ class MyPoco:
         :param game_name: 游戏名字，见ini文件App_Name项
         """
         self.info = Information()
-        my_poco_path=os.path.abspath(os.path.dirname(__file__))
-        self.info.set_config("MyPocoPath","MyPocoPath",my_poco_path)
+        my_poco_path = os.path.abspath(os.path.dirname(__file__))
+        self.info.set_config("MyPocoPath", "MyPocoPath", my_poco_path)
         self.game_name = self.info.get_config("App_Name", game_name)
         self.my_poco_obj = MyPocoObject(self.game_name)
-        self.gm = GmMethod(self.game_name)
+        # self.gm = GmMethod(self.game_name)
+        self.pp = PocoPos()
 
     def set_poco(self):
         """
@@ -47,6 +50,20 @@ class MyPoco:
         """
         self.set_poco()
         self.my_touch(poco_path)
+
+    def set_account_information_gm(self, account, server_name=None):
+        """
+        使用GM方法前需要调用该方法,来确定向哪个账号的哪个区下面的角色发送道具
+        :param account:账号
+        :param server_name:如果不传，说明该账号只有一个区有角色
+        :return:
+        """
+        self.gm.set_account_information(account, server_name=server_name)
+
+    def set_xn_test(self):
+
+    # 进行性能测试时需要先启动该方法
+        self.xt = XnTest()
 
     # todo err_close_game
     def first_function_go_run(self):
@@ -70,15 +87,6 @@ class MyPoco:
         poco = self.my_poco_obj.new_poco_obj()
         return poco
 
-    def set_account_information_gm(self, account, server_name=None):
-        """
-        使用GM方法前需要调用该方法,来确定向哪个账号的哪个区下面的角色发送道具
-        :param account:账号
-        :param server_name:如果不传，说明该账号只有一个区有角色
-        :return:
-        """
-        self.gm.set_account_information(account, server_name=server_name)
-
     def close_game(self):
         """
         关闭游戏，不区分功能或者性能
@@ -97,6 +105,14 @@ class MyPoco:
         """
         return self.my_poco_obj.my_swipe(start_path, end_path, timein)
 
+    def my_swipe_pos(self,start_pos_list,end_pos_list):
+        """
+        默认滑动时长3秒
+        :param pos_list_int:控件的pos属性
+        :return:
+        """
+        self.pp.swipe_pos(start_pos_list,end_pos_list)
+
     # @err_close_game
     def my_touch(self, poco_path):
         """
@@ -104,6 +120,34 @@ class MyPoco:
         :return:Exception
         """
         self.my_poco_obj.touch_poco(poco_path)
+
+    def my_touch_pos(self, pos_list_int):
+        """
+        :param pos_list_int:控件的pos属性
+        :return:Exception
+        """
+        self.pp.touch_pos(pos_list_int)
+
+
+    def xn_touch(self, pos_list_int):
+        """
+        横屏
+        直接调用底层Android框架，只需要执行点击操作，不需要截图添加日志
+        根据控件位置在屏幕的百分比进行点击操作
+        :param pos_list_int:控件的pos属性
+        :return:
+        """
+        self.xt.xn_touch(pos_list_int)
+
+    def xn_swipe(self, start, end):
+        """
+        直接调用底层Android框架，只需要执行滑动操作，不需要截图添加日志
+        根据控件位置在屏幕的百分比进行点击操作
+        :param start: 开始控件pos
+        :param end: 结束控件pos
+        :return:
+        """
+        self.xt.xn_swipe(start, end)
 
     # todo 报错刷新
     # @err_close_game
@@ -254,6 +298,7 @@ class MyPoco:
         # todo
         poco = self.my_poco_obj.new_poco_obj()
         return poco
+
     def touch_tab_xn(self):
         """
         点击标记按钮
@@ -262,6 +307,7 @@ class MyPoco:
 
     def end_tab_xn(self):
         """
+        在这里添加截图，来判断性能测试操作步骤是否正确
         结束测试并上传报告，在开始测试界面结束
         :return:
         """
@@ -386,11 +432,12 @@ class MyPoco:
         :return:
         """
         self.my_poco_obj.end_log()
-    def open_protocol(self,server_name,protocol_name):
+
+    def start_protocol(self, server_name, protocol_name):
         """
         传入服务器名和协议名
         :param server_name: 服务器名
         :param protocol_name:
         :return:
         """
-        self.pf = ProtocolFunction(self.game_name,server_name,protocol_name)
+        self.pf = ProtocolFunction(self.game_name, server_name, protocol_name)
