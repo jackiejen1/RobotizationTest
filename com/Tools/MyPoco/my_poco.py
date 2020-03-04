@@ -13,12 +13,12 @@ import os
 
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.entry_game import EntryGame
-# from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
+from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
 from MyPoco.poco.poco_pos import PocoPos
 from MyPoco.poco.xn_test_tools import XnTest
-# from MyPoco.protocol.gm_method import GmMethod
+from MyPoco.protocol.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject
-# from MyPoco.protocol.protocol_function import ProtocolFunction
+from MyPoco.protocol.protocol_function import ProtocolFunction
 
 
 class MyPoco:
@@ -31,7 +31,7 @@ class MyPoco:
         self.info.set_config("MyPocoPath", "MyPocoPath", my_poco_path)
         self.game_name = self.info.get_config("App_Name", game_name)
         self.my_poco_obj = MyPocoObject(self.game_name)
-        # self.gm = GmMethod(self.game_name)
+        self.gm = GmMethod(self.game_name)
         self.pp = PocoPos()
 
     def set_poco(self):
