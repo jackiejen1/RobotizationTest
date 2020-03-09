@@ -416,22 +416,22 @@ class MyPoco:
         """
         self.gm.recharge_supplement(resource_name)
 
-    def get_log_path(self, file_name):  # todo 可以保存，不返回
-        """
-        将脚本的__file__属性传入，获取脚本的log存放路径
-        :param file_name: __file__
-        :return: log存放路径
-        """
-        return self.my_poco_obj.get_log_path(file_name)
-
-    def end_log(self):
-        """
-        生成测试报告，目前限测试使用
-        :param file_name: __file__
-        :param outputname: todo
-        :return:
-        """
-        self.my_poco_obj.end_log()
+    # def get_log_path(self, file_name):  # 废弃
+    #     """
+    #     将脚本的__file__属性传入，获取脚本的log存放路径
+    #     :param file_name: __file__
+    #     :return: log存放路径
+    #     """
+    #     return self.my_poco_obj.get_log_path(file_name)
+    #
+    # def end_log(self):
+    #     """
+    #     生成测试报告，目前限测试使用
+    #     :param file_name: __file__
+    #     :param outputname: todo
+    #     :return:
+    #     """
+    #     self.my_poco_obj.end_log()
 
     def start_protocol(self, server_name, protocol_name):
         """

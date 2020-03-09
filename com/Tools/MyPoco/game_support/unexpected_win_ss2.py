@@ -32,52 +32,52 @@ class UnexpectedWinSs2:
             self.make_poco_dic.my_touch("下载点2")
             sleep(15)
         if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
-            self.make_poco_dic.my_touch("Btn_close0/n40")
+            self.make_poco_dic.my_touch("Btn_close/n4")
             sleep(1)
-        if self.make_poco_dic.is_in_dic("RedPacketRainPop0/__view0/Btn_close0"):
-            self.make_poco_dic.my_touch("RedPacketRainPop0/__view0/Btn_close0")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/40010"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/40010")
-            self.make_poco_dic.my_touch("MailLayer0/__view0/n00/btn00")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/10010"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/10010")
-            self.make_poco_dic.my_touch("btn00")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/10020"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/10020")
+        if self.make_poco_dic.is_in_dic("RedPacketRainPop/__view/Btn_close"):
+            self.make_poco_dic.my_touch("RedPacketRainPop/__view/Btn_close")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/4001")
+            self.make_poco_dic.my_touch("MailLayer/__view/n0/btn0")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1001"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1001")
+            self.make_poco_dic.my_touch("btn0")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1002"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1002")
             self.make_poco_dic.my_touch("点击屏幕继续")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/10030"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/10030")
-            self.make_poco_dic.my_touch("FloatHotTimePop0/__view0/Comp_panel0/btn00")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/10040"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/10040")
-            self.make_poco_dic.my_touch("FloatHotTimePop0/__view0/Comp_panel0/btn00")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/20010"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/20010")
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/20010")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/30020"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/30020")
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/30020")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer0/未命名0/40020"):
-            self.make_poco_dic.my_touch("FloatMessageLayer0/未命名0/40020")
-            self.make_poco_dic.my_touch("Btn_return0")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1003"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1003")
+            self.make_poco_dic.my_touch("FloatHotTimePop/__view/Comp_panel0/btn00")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1004"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1004")
+            self.make_poco_dic.my_touch("FloatHotTimePop/__view/Comp_panel/btn0")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/2001"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/2001")
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/2001")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/3002"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/3002")
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/3002")
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4002"):
+            self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/4002")
+            self.make_poco_dic.my_touch("Btn_return")
         # 断网
-        if self.make_poco_dic.is_in_dic("ComAssistPop0"):
+        if self.make_poco_dic.is_in_dic("ComAssistPop"):
             for i in range(3):
-                if self.make_poco_dic.is_in_dic("ComAssistPop0/__view0/Btn_confirm0"):
-                    s = self.make_poco_dic.get_poco_text("ComAssistPop0/__view0/Label_des0")
+                if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_confirm"):
+                    s = self.make_poco_dic.get_poco_text("ComAssistPop/__view/Label_des")
                     if "是否" in s:
                         pass
                     else:
-                        self.make_poco_dic.my_touch("ComAssistPop0/__view0/Btn_confirm0")
+                        self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_confirm")
                 sleep(5)
                 if i == 2:  # 就当连不上，放弃重连
-                    if self.make_poco_dic.is_in_dic("ComAssistPop0/__view0/Btn_cancel0"):
-                        self.make_poco_dic.my_touch("ComAssistPop0/__view0/Btn_cancel0")
+                    if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_cancel"):
+                        self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_cancel")
             # todo 异常弹窗的后续操作
 
         # 报错
-        if self.make_poco_dic.is_in_dic("ErrorMessagePop0"):
+        if self.make_poco_dic.is_in_dic("ErrorMessagePop"):
             snapshot(msg="游戏报错")
-            self.make_poco_dic.my_touch("Btn_ok0")
+            self.make_poco_dic.my_touch("Btn_ok")
             raise NotHaveGameException
 

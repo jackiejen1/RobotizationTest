@@ -63,12 +63,12 @@ class MakePocoDic:
     def get_poco_name_path_list(self):
         print("获取列表，刷新poco")
         self.renovate_and_get_poco_dic()
-        poco_name_path_list = self.poco_dic["ui_path_list"]
+        poco_name_path_list = self.poco_dic.keys()
         return poco_name_path_list
 
     def is_in_dic(self, poco_path):
         # 先判断在不在地址表里面
-        if poco_path in self.poco_dic["ui_path_list"]:
+        if poco_path in self.poco_dic.keys():
             print("找到路径")
             return True
         # 再判断在不在路径里面
@@ -179,24 +179,24 @@ class MakePocoDic:
         else:
             raise NoneException
 
-    def get_log_path(self, file_name):
-        """
-        将脚本的__file__属性传入，获取脚本的log存放路径
-        :param file_name: __file__
-        :param name:文件名称
-        :return: log存放路径
-        """
-        self.input_file_name = file_name
-        path, name = script_dir_name(file_name)
-        self.log_path = path + "/" + name[:-3] + ".air/log"
-        self.file_name = name[:-3]
-        return self.log_path, self.file_name
-
-    def end_log(self):
-        """
-        生成测试报告，目前限测试使用,todo  后续考虑使用线程号区分
-        :param file_name: __file__
-        :return:
-        """
-        outputname = self.file_name + "_log.html"
-        simple_report(self.input_file_name, logpath=self.log_path, output=outputname)
+    # def get_log_path(self, file_name):
+    #     """
+    #     将脚本的__file__属性传入，获取脚本的log存放路径
+    #     :param file_name: __file__
+    #     :param name:文件名称
+    #     :return: log存放路径
+    #     """
+    #     self.input_file_name = file_name
+    #     path, name = script_dir_name(file_name)
+    #     self.log_path = path + "/" + name[:-3] + ".air/log"
+    #     self.file_name = name[:-3]
+    #     return self.log_path, self.file_name
+    #
+    # def end_log(self):
+    #     """
+    #     生成测试报告，目前限测试使用,todo  后续考虑使用线程号区分
+    #     :param file_name: __file__
+    #     :return:
+    #     """
+    #     outputname = self.file_name + "_log.html"
+    #     simple_report(self.input_file_name, logpath=self.log_path, output=outputname)
