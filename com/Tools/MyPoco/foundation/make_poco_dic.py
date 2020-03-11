@@ -194,7 +194,7 @@ class MakePocoDic:
     #
     # def end_log(self):
     #     """
-    #     生成测试报告，目前限测试使用
+    #     生成测试报告，目前限测试使用,todo  后续考虑使用线程号区分
     #     :param file_name: __file__
     #     :return:
     #     """

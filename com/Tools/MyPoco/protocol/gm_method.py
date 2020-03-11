@@ -30,9 +30,10 @@ class GmMethod:
         if server_name==None:
             server_name = self.info.get_config(self.account, "server_name")
         socket_ages_dic = eval(self.info.get_config(self.game_name, server_name))
-        self.url = self.info.get_config(self.game_name, "gm_url")
+        self.host = socket_ages_dic["host"]  # host = "10.3.128.5"
+        self.port = socket_ages_dic["port"]  # port = 16865
         self.server_id = socket_ages_dic["server_id"]
-        self.gah = GmApiHttp(self.url)
+        self.gah = GmApiHttp(self.host)
         # 账号
         self.account=account
         # 服务器ID
@@ -40,7 +41,7 @@ class GmMethod:
         # 角色名
         self.role_name = self.info.get_config(self.account, server_name)
         # 获取角色ID
-        self.role_id = self.gah.get_role_id( self.account,self.server_id,self.role_name)
+        self.role_id = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
 
     def add_resources(self, resource_name_dic):
         """
