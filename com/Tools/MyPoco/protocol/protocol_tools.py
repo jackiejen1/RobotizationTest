@@ -8,8 +8,8 @@
 # @Function:
 # @Method:
 # Reference:********************************
-
-from protocol_file import cs_pb2, cg_pb2, out_base_pb2
+from MyPoco.airtestide_lack_packages import xlrd
+from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
 import re
 from foundation.information import Information
 import airtestide_lack_packages.xlrd
@@ -214,7 +214,7 @@ class ProtocolTools:
         # 通过游戏名字获取表格路径
         excel_path = self.info.get_config(game_name, "protocolexcelpath")
         obj_path = self.info.get_config("MyPocoPath", "mypocopath") + excel_path
-        self.excel = airtestide_lack_packages.xlrd.open_workbook(obj_path)
+        self.excel = xlrd.open_workbook(obj_path)
         # 协议文件路径，需要将后端给的协议文件从proto类型改为txt
         self.protocol_file_path = self.info.get_config(game_name, "protocolfilepath")
 
