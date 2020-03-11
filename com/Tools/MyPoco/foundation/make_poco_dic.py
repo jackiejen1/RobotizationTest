@@ -15,10 +15,10 @@ from airtest.core.api import *
 
 from airtest.report.report import simple_report
 
-from MyPoco.airtestide_lack_packages.compat import script_dir_name
+from airtestide_lack_packages.compat import script_dir_name
 
-from MyPoco.foundation.MyException import *
-from MyPoco.foundation.information import Information
+from foundation.MyException import *
+from foundation.information import Information
 
 
 class MakePocoDic:

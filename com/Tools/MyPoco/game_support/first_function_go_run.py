@@ -8,7 +8,7 @@
 #@Function:
 #@Method:
 #Reference:********************************
-from MyPoco.game_support.first_function_go_run_ss2 import FirstFunctionGoRunSs2
+from game_support.first_function_go_run_ss2 import FirstFunctionGoRunSs2
 
 
 class FirstFunctionGoRun:

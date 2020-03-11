@@ -13,7 +13,7 @@ import re
 from time import sleep
 
 from airtest.core.api import *
-from MyPoco.foundation.information import Information
+from foundation.information import Information
 from airtest.core.android.adb import *
 
 

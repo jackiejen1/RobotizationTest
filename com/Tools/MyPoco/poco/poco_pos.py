@@ -11,7 +11,7 @@
 from poco.drivers.std import StdPoco
 from airtest.core.api import *
 
-from MyPoco.foundation.information import Information
+from foundation.information import Information
 
 
 class PocoPos:

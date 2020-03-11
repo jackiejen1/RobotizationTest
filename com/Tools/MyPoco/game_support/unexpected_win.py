@@ -8,9 +8,9 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from MyPoco.foundation.information import Information
-from MyPoco.game_support.unexpected_win_ss2 import UnexpectedWinSs2
-from MyPoco.game_support.unexpected_win_sx import UnexpectedWinSx
+from foundation.information import Information
+from game_support.unexpected_win_ss2 import UnexpectedWinSs2
+from game_support.unexpected_win_sx import UnexpectedWinSx
 
 class UnexpectedWin:
     def __init__(self, game_name):

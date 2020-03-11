@@ -5,9 +5,9 @@
 # @File : make_resource_body.py
 # @function : 生成GM后台接口所需的信息
 
-from MyPoco.foundation.information import Information
+from foundation.information import Information
 import time
-from MyPoco.airtestide_lack_packages import xlrd
+from airtestide_lack_packages import xlrd
 
 class MakeResourceBody:
     """

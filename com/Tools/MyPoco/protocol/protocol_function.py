@@ -10,10 +10,10 @@
 # Reference:********************************
 
 from socket import create_connection
-from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
-from MyPoco.protocol.login_game import LoginGame
-from MyPoco.protocol.protocol_tools import ProtocolTools
-from MyPoco.foundation.information import Information
+from protocol_file import cs_pb2, cg_pb2, out_base_pb2
+from protocol.login_game import LoginGame
+from protocol.protocol_tools import ProtocolTools
+from foundation.information import Information
 
 
 class ProtocolFunction:

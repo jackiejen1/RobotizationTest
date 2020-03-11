@@ -10,7 +10,7 @@
 # Reference:********************************
 from poco.drivers.std import StdPoco
 from time import sleep
-from MyPoco.foundation.make_poco_dic import MakePocoDic
+from foundation.make_poco_dic import MakePocoDic
 
 
 class UnexpectedWinSx:

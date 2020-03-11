@@ -10,7 +10,7 @@
 # Reference:********************************
 from time import sleep
 
-from MyPoco.poco.my_poco_object import MyPocoObject
+from poco.my_poco_object import MyPocoObject
 
 
 class FirstFunctionGoRunSs2:

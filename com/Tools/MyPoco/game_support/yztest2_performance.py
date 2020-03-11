@@ -12,8 +12,8 @@
 from airtest.core.api import *
 from poco.drivers.android.uiautomation import AndroidUiautomationPoco
 
-from MyPoco.foundation.information import Information
-from MyPoco.game_support.entry_game import EntryGame
+from foundation.information import Information
+from game_support.entry_game import EntryGame
 
 
 class YzTest2Performance:

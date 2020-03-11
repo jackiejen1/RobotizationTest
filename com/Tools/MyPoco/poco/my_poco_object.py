@@ -14,9 +14,9 @@ from poco.drivers.std import StdPoco
 from poco.drivers.android.uiautomation import AndroidUiautomationPoco
 
 import re, time
-from MyPoco.foundation.make_poco_dic import MakePocoDic
-from MyPoco.foundation.information import Information
-from MyPoco.game_support.unexpected_win import UnexpectedWin
+from foundation.make_poco_dic import MakePocoDic
+from foundation.information import Information
+from game_support.unexpected_win import UnexpectedWin
 
 
 class MyPocoObject():

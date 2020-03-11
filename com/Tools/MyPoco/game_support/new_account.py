@@ -8,8 +8,8 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from MyPoco.foundation.information import Information
-from MyPoco.game_support.new_account_ss2 import NewAccountSs2
+from foundation.information import Information
+from game_support.new_account_ss2 import NewAccountSs2
 
 
 class NewAccount:
