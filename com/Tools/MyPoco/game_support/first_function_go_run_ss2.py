@@ -23,56 +23,56 @@ class FirstFunctionGoRunSs2:
         
         my_poco = MyPocoObject("com.youzu.test.qa")
         my_poco.new_poco_obj()
-        my_poco.touch_poco("Comp_dungeon0/Btn_dungeon0") # 副本
+        my_poco.touch_poco("Comp_dungeon/Btn_dungeon") # 副本
         try:
             for i in range(2):
                 sleep(3)
-                my_poco.touch_poco("ComTopBar0/Btn_home0")
+                my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
-        my_poco.touch_poco("HomeBioBtnComp0")  # 列传
+        my_poco.touch_poco("HomeBioBtnComp")  # 列传
         try:
             for i in range(10):
                 try:
-                    my_poco.touch_poco("BtnSkip0")
+                    my_poco.touch_poco("BtnSkip")
                 except:
                     pass
                 sleep(5)
-                my_poco.touch_poco("topbar0/Btn_home0")
+                my_poco.touch_poco("topbar/Btn_home")
         except:
             pass
 
-        my_poco.touch_poco("Btn_pvp0")
+        my_poco.touch_poco("Btn_pvp")
         my_poco.touch_poco("竞技场")
         try:
             for i in range(2):
                 sleep(5)
-                my_poco.touch_poco("ComTopBar0/Btn_home0")
+                my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
-        my_poco.touch_poco("Btn_pvp0")
+        my_poco.touch_poco("Btn_pvp")
         my_poco.touch_poco("无双试炼")
         try:
             for i in range(3):
                 sleep(5)
-                my_poco.touch_poco("ComTopBar0/Btn_home0")
+                my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
-        my_poco.touch_poco("Btn_pvp0")
+        my_poco.touch_poco("Btn_pvp")
         my_poco.touch_poco("讨伐巨兽")
         try:
             for i in range(2):
                 sleep(5)
-                my_poco.touch_poco("TopBar0/Btn_home0")
+                my_poco.touch_poco("TopBar/Btn_home")
         except:
             pass
-        my_poco.touch_poco("Btn_pvp0")
+        my_poco.touch_poco("Btn_pvp")
         my_poco.my_swipe("讨伐巨兽","竞技场")
         my_poco.touch_poco("秘境寻宝")  # 秘境寻宝
         try:
             for i in range(2):
                 sleep(5)
-                my_poco.touch_poco("ComTopBar0/Btn_home0")
+                my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
 

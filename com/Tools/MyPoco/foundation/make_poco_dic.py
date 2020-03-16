@@ -71,10 +71,6 @@ class MakePocoDic:
         if poco_path in self.poco_dic.keys():
             print("找到路径")
             return True
-        # 再判断在不在路径里面
-        if poco_path in self.poco_dic.keys():
-            print("找到路径"+poco_path)
-            return True
         # 看看某些唯一路径存不存在简写
         for dic_key in self.poco_dic.keys():
             if poco_path in dic_key:

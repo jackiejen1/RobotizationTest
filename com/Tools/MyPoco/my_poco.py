@@ -95,7 +95,7 @@ class MyPoco:
         self.my_poco_obj.close_game()
 
     # @err_close_game
-    def my_swipe(self, start_path, end_path, timein):
+    def my_swipe(self, start_path, end_path, timein=3):
         """
         两个对象中心点之间的滑动
         :param start_path:开始路径
@@ -151,7 +151,7 @@ class MyPoco:
 
     # todo 报错刷新
     # @err_close_game
-    def touch_poco_obj(self, find_poco, click_list):
+    def touch_poco_obj(self, find_poco, click_list=[0.5,0.5]):
         """
 
         :param find_poco:poco对象
