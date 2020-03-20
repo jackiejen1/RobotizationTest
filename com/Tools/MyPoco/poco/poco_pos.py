@@ -21,7 +21,7 @@ class PocoPos:
         在配置文件中配置
         """
         self.info = Information()
-        self.sleep_time = self.info.get_config("Poco_Ages","sleep_time")
+        self.sleep_time = self.info.get_config("com.youzu.yztest_nosdk","allphnoe_poco_sleep_time")
         self.poco = None
     def set_poco(self):
         self.poco = StdPoco()
@@ -38,7 +38,7 @@ class PocoPos:
         y = int(self.phone_size_list_int[1] * pos_list_int[1])
         touch([x,y])
         sleep(self.sleep_time)
-    def swipe_pos(self,start_pos_list,end_pos_list):
+    def swipe_pos(self,start_pos_list,end_pos_list,timein=3):
         """
         滑动方法
         :param start_pos_list: 滑动起始控件坐标
@@ -52,5 +52,5 @@ class PocoPos:
         start_y = int(self.phone_size_list_int[1] * start_pos_list[1])
         end_x = int(self.phone_size_list_int[0] * end_pos_list[0])
         end_y = int(self.phone_size_list_int[1] * end_pos_list[1])
-        swipe([start_x,start_y],[end_x,end_y],duration =3)
+        swipe([start_x,start_y],[end_x,end_y],duration =timein)
         sleep(self.sleep_time)

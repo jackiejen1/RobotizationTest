@@ -8,17 +8,7 @@
 # @Function:
 # @Method:
 # Reference:********************************
-import os
-import random
-import re
-
-from airtest.core.api import *
-from airtest.cli.parser import cli_setup
-
-import xlrd
-from airtest.core.android.adb import ADB
-from MyPoco.my_poco import MyPoco
-from MyPoco.protocol_file import cg_pb2
+import json
 
 __author__ = "v.lidd"
 __title__ = '登录游戏'
@@ -27,7 +17,7 @@ __desc__ = """ 1.
 
                 """
 
-from MyPoco.foundation.information import Information
+
 # from my_poco import *
 # my_poco = MyPoco("shaosan2")
 # log_path,log_name= my_poco.get_log_path(__file__)
@@ -37,7 +27,18 @@ from MyPoco.foundation.information import Information
 #         os.makedirs(log_path)
 #     auto_setup(__file__, logdir=log_path, devices=["Android:///", ])
 # my_poco.test_touch("")
+import requests
+from MyPoco.poco.my_poco_object import MyPocoObject
+from MyPoco.poco.my_poco_object import MakePocoDic
 if __name__ == '__main__':
-    mypoco = MyPoco("少三2")
-    mypoco.set_xn_test()
-    mypoco.xn_touch([0.35678210678211, 0.86624999046326])
+    url = "http://qa.test.snxyj.youzu.com/api/gm/resources/add"
+    # payload = {"account": "_mxq777","role_id":40001004231 ,"server": "2246440002","level":103}
+    # response = requests.request("POST", url, data=payload)
+    # print(response.text.encode('utf8'))
+    data = {"type": 1, "id": 0, "num": 1}
+    data = {"data": [data]}
+    data = json.dumps(data, ensure_ascii=False)
+    payload = {"account": "_mxq777", "role_id": 40001004231, "server": "2246440002", "data": data}
+    response = requests.request("POST", url, data=payload)
+    print(response.text.encode('utf8'))
+

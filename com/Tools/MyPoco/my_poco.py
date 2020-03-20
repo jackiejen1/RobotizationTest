@@ -33,14 +33,15 @@ class MyPoco:
         self.my_poco_obj = MyPocoObject(self.game_name)
         self.gm = GmMethod(self.game_name)
         self.pp = PocoPos()
-
+        self.rg = ResourceGm(self.game_name)
+        self.newaccount = NewAccount(self.game_name)
     def set_poco(self):
         """
         编写脚本时使用
         :param poco_path:
         :return:
         """
-        self.my_poco_obj.new_poco_obj()
+        return self.my_poco_obj.new_poco_obj()
 
     def test_touch(self, poco_path):
         """
@@ -51,18 +52,17 @@ class MyPoco:
         self.set_poco()
         self.my_touch(poco_path)
 
-    def set_account_information_gm(self, account, server_name=None):
+    def set_account_information_gm(self, account, server_name):
         """
         使用GM方法前需要调用该方法,来确定向哪个账号的哪个区下面的角色发送道具
         :param account:账号
         :param server_name:如果不传，说明该账号只有一个区有角色
         :return:
         """
-        self.gm.set_account_information(account, server_name=server_name)
+        self.gm.set_account_information(account, server_name_input=server_name)
 
     def set_xn_test(self):
-
-    # 进行性能测试时需要先启动该方法
+        # 进行性能测试时需要先启动该方法
         self.xt = XnTest()
 
     # todo err_close_game
@@ -105,21 +105,24 @@ class MyPoco:
         """
         return self.my_poco_obj.my_swipe(start_path, end_path, timein)
 
-    def my_swipe_pos(self,start_pos_list,end_pos_list):
+    def my_swipe_pos(self, start_pos_list, end_pos_list,timein=3):
         """
         默认滑动时长3秒
         :param pos_list_int:控件的pos属性
         :return:
         """
-        self.pp.swipe_pos(start_pos_list,end_pos_list)
+        self.pp.swipe_pos(start_pos_list, end_pos_list,timein)
 
     # @err_close_game
-    def my_touch(self, poco_path):
+    def my_touch(self, poco_path,click_list=None):
         """
         :param poco_path:控件路径
         :return:Exception
         """
-        self.my_poco_obj.touch_poco(poco_path)
+        if click_list ==None:
+            self.my_poco_obj.touch_poco(poco_path)
+        else:
+            self.touch_poco_obj(poco_path,click_list)
 
     def my_touch_pos(self, pos_list_int):
         """
@@ -127,7 +130,6 @@ class MyPoco:
         :return:Exception
         """
         self.pp.touch_pos(pos_list_int)
-
 
     def xn_touch(self, pos_list_int):
         """
@@ -151,14 +153,13 @@ class MyPoco:
 
     # todo 报错刷新
     # @err_close_game
-    def touch_poco_obj(self, find_poco, click_list=[0.5,0.5]):
+    def touch_poco_obj(self, poco_path, click_list=[0.5, 0.5]):
         """
-
-        :param find_poco:poco对象
+        :param find_poco:查找的poco对象的name(路径)
         :param click_list:控件点击偏移点[0,0]-[1,1]范围
         :raise:PocoNoSuchNodeException
         """
-        self.my_poco_obj.touch_poco_obj(find_poco, click_list)
+        self.my_poco_obj.touch_poco_obj(poco_path, click_list)
 
     def get_config(self, list_name, key):
         """
@@ -235,6 +236,13 @@ class MyPoco:
         :return:int
         """
         return self.my_poco_obj.get_game_number(poco_path)
+    def get_poco_position(self,poco_path):
+        """
+        获取节点的绝对坐标，经过手机分辨率换算
+        :param poco_path: poco_name
+        :return:
+        """
+        return self.my_poco_obj.get_poco_position(poco_path)
 
     def get_game_number_instr(self, poco_path):
         """
@@ -256,6 +264,7 @@ class MyPoco:
         """
         获取游戏poco对象value_name_str属性中的值，需要自行判断类型
         :param find_poco_path:poco对象的路径
+        :param value_name_str:属性的key
         :return:value
         """
         return self.my_poco_obj.get_poco_any_value(find_poco_path, value_name_str)
@@ -290,7 +299,7 @@ class MyPoco:
         :return:
         """
 
-    def start_test_xn(self, sever_name_input="sever_name", game_account_input="new_game_account"):
+    def start_test_xn(self,):
         """
         性能，点击开始测试按钮，启动游戏并在游戏界面停止
         :return:poco对象
@@ -327,13 +336,14 @@ class MyPoco:
         self.my_poco_obj.text_str(input_str)
 
     # @err_close_game
-    def new_account(self, dic_input, sever_name_input):
+    def new_account(self, resource_dic_input, sever_name_input,play_dic):
         """
         根据输入的要求在sever_name区创建一个账号
         :param dic_input: 字典，需要添加的各种资源
         :param sever_name_input: 区服名和配置一致
         :return:
         """
+        self.newaccount.new_game_account( resource_dic_input, sever_name_input,play_dic)
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """
@@ -358,8 +368,8 @@ class MyPoco:
         :param dic_input:dic {"资源名称":资源数量,"资源名称":资源数量,...}
         :return:
         """
-        self.gm.add_resources(dic_input)
-
+        # self.gm.add_resources(dic_input)
+        self.rg.add_resource(dic_input)
     def get_resource_quantity(self, list_input):
         """
         根据传入的道具列表查询道具数量
@@ -374,7 +384,8 @@ class MyPoco:
         :param dic_input:dic {"资源名称":资源数量,"资源名称":资源数量,...}
         :return:
         """
-        self.gm.delete_resources(dic_input)
+        # self.gm.delete_resources(dic_input)
+        self.rg.delete_resource(dic_input)
 
     def get_sever_time(self, server_name):
         """
@@ -415,23 +426,6 @@ class MyPoco:
         :return:
         """
         self.gm.recharge_supplement(resource_name)
-
-    # def get_log_path(self, file_name):  # 废弃
-    #     """
-    #     将脚本的__file__属性传入，获取脚本的log存放路径
-    #     :param file_name: __file__
-    #     :return: log存放路径
-    #     """
-    #     return self.my_poco_obj.get_log_path(file_name)
-    #
-    # def end_log(self):
-    #     """
-    #     生成测试报告，目前限测试使用
-    #     :param file_name: __file__
-    #     :param outputname: todo
-    #     :return:
-    #     """
-    #     self.my_poco_obj.end_log()
 
     def start_protocol(self, server_name, protocol_name):
         """

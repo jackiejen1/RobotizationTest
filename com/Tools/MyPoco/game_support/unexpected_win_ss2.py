@@ -27,13 +27,16 @@ class UnexpectedWinSs2:
         :return:
         """
         # todo 算法有问题，异常窗口排列顺序影响，需要改成完全排除所有窗口后才算排查完毕
+        # ComLoading 转菊花的name
         self.make_poco_dic.get_poco_dic()
         if self.make_poco_dic.is_in_dic("内更新"):  # 点击完下载资源启动游戏
             self.make_poco_dic.my_touch("下载点2")
-            sleep(15)
+            time.sleep(15)
         if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")
-            sleep(1)
+            time.sleep(1)
+        if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 首页广告
+            self.make_poco_dic.my_touch("未命名0/popup/HomeAdvPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("RedPacketRainPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("RedPacketRainPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):
@@ -47,7 +50,7 @@ class UnexpectedWinSs2:
             self.make_poco_dic.my_touch("点击屏幕继续")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1003"):
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1003")
-            self.make_poco_dic.my_touch("FloatHotTimePop/__view/Comp_panel0/btn00")
+            self.make_poco_dic.my_touch("FloatHotTimePop/__view/Comp_panel/btn0")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1004"):
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1004")
             self.make_poco_dic.my_touch("FloatHotTimePop/__view/Comp_panel/btn0")
@@ -60,6 +63,9 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4002"):
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/4002")
             self.make_poco_dic.my_touch("Btn_return")
+        if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):#副本龙炮
+            self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
+
         # 断网
         if self.make_poco_dic.is_in_dic("ComAssistPop"):
             for i in range(3):

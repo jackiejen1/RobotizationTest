@@ -30,6 +30,19 @@ class MyPocoObject():
         self.info = Information()
         self.uw = UnexpectedWin(game_name)
         self.poco = None
+    def renovate_and_get_poco_dic(self):
+        """
+        刷新UI信息并保存本地
+        :return: ui dic
+        """
+        return self.make_poco_dic.renovate_and_get_poco_dic()
+
+    def get_poco_dic(self):
+        """
+        获取本地UI信息
+        :return: ui dic
+        """
+        return  self.make_poco_dic.get_poco_dic()
 
     def new_poco_obj(self):
         """
@@ -55,7 +68,13 @@ class MyPocoObject():
         start, end = self.make_poco_dic.my_swipe(start_path, end_path, duration=timein)
         time.sleep(1)
         return start, end
-
+    def touch(self,pos_list):
+        """
+        输入坐标，使用airtest框架的touch点击
+        :param pos_list: [123,123]
+        :return:
+        """
+        self.make_poco_dic.touch(pos_list)
     def touch_poco(self, poco_path):
         """
         需要查找的控件路径
@@ -67,17 +86,17 @@ class MyPocoObject():
         self.make_poco_dic.my_touch(poco_path)
         time.sleep(1)
 
-    def touch_poco_obj(self, poco_obj, click_list):
+    def touch_poco_obj(self, poco_path, click_list):
         """
-        :param find_poco:查找的poco对象
+        :param find_poco:查找的poco对象的name(路径)
         :param click_list:控件点击偏移点[0,0]-[1,1]范围
         :return:
         raise：PocoNoSuchNodeException、RpcTimeoutError
         """
         self.uw.unexpected_win()
-        poco_obj.click(click_list)
+        self.make_poco_dic.touch_poco_obj(poco_path,click_list)
         time.sleep(1)
-        self.make_poco_dic.renovate_and_get_poco_dic()
+
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """
@@ -103,8 +122,19 @@ class MyPocoObject():
         return bool
 
     def is_in_dic(self, poco_path):
+        """
+        判断节点是否在当前屏幕
+        :param poco_path:
+        :return:
+        """
         return self.make_poco_dic.is_in_dic(poco_path)
-
+    def get_poco_position(self,poco_path):
+        """
+        获取节点的绝对坐标，经过手机分辨率换算
+        :param poco_path: poco_name
+        :return:
+        """
+        return self.make_poco_dic.get_poco_pos(poco_path)
     def is_exist_poco(self, poco_path):
         """
         先判断传入的对象是否存在
@@ -207,22 +237,6 @@ class MyPocoObject():
         thread_file_name = str(threading.get_ident())
         self.info.remove_option("Phone_Size", thread_file_name)
 
-    def get_log_path(self, file_name):
-        """
-        将脚本的__file__属性传入，获取脚本的log存放路径
-        :param file_name: __file__
-        :param name:文件名称
-        :return: log存放路径
-        """
-        return self.make_poco_dic.get_log_path(file_name)
-
-    def end_log(self):
-        """
-        生成测试报告，目前限测试使用,todo  后续考虑使用线程号区分
-        :return:
-        """
-        self.make_poco_dic.end_log()
-
     def get_poco_visible(self, poco_path):
         """
         获取游戏visible属性中的值
@@ -236,6 +250,7 @@ class MyPocoObject():
         """
         获取游戏poco对象value_name_str属性中的值
         :param poco_path:poco_path
+        :param value_name_str:属性的key
         :return: str value
         """
         return self.make_poco_dic.get_poco_any_value(poco_path, value_name_str)

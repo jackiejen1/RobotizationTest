@@ -18,30 +18,33 @@ class GmMethod:
         self.game_name=game_name
         self.info = Information()
         self.mri = MakeResourceBody(game_name)
+        self.host = self.info.get_config(self.game_name, "gm_url")
+        self.gah = GmApiHttp(self.host)
 
-
-    def set_account_information(self, account,server_name=None):
+    def set_account_information(self, account,server_name_input):
         """
         创建对象后需要调用该方法
         :param account:账号
-        :param server_name:如果不传，说明该账号只有一个区有角色
+        :param server_name:区服名
         :return:
         """
-        if server_name==None:
-            server_name = self.info.get_config(self.account, "server_name")
-        socket_ages_dic = eval(self.info.get_config(self.game_name, server_name))
-        self.host = socket_ages_dic["host"]  # host = "10.3.128.5"
-        self.port = socket_ages_dic["port"]  # port = 16865
-        self.server_id = socket_ages_dic["server_id"]
-        self.gah = GmApiHttp(self.host)
+        # if server_name==None:
+        #     server_name = self.info.get_config(self.account, "server_name")
+        # socket_ages_dic = eval(self.info.get_config(self.game_name, server_name))
+        # self.host = socket_ages_dic["host"]  # host = "10.3.128.5"
+        # self.port = socket_ages_dic["port"]  # port = 16865
+        # self.server_id = socket_ages_dic["server_id"]
         # 账号
         self.account=account
         # 服务器ID
-        self.server_id = self.info.get_config(self.game_name, server_name)
+        server_name = server_name_input+"_server_ages"
+        server_id_dic = eval(self.info.get_config(self.game_name, server_name))
+        self.server_id = server_id_dic["server_id"]
         # 角色名
-        self.role_name = self.info.get_config(self.account, server_name)
+        role_name_dic = eval(self.info.get_config(self.game_name,self.account))
+        self.role_name = role_name_dic[server_name_input]
         # 获取角色ID
-        self.role_id = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
+        # self.role_id = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
 
     def add_resources(self, resource_name_dic):
         """
@@ -55,7 +58,7 @@ class GmMethod:
             resource_num = resource_name_dic[resource_name]
             data_value = self.mri.get_data_addordel(resource_name, resource_num)
             data_list.append(data_value)
-        body = {"account": self.account, "role_id": self.role_id, "sever": self.server_id, "data": data_list}
+        body = {"account": self.account, "role_id": self.role_id, "sever": self.server_id, "data": {"data":data_list}}
         log_dic = self.gah.add_resources(body)
         operation_description = "添加道具" + str(resource_name_list)
         self.dispose_log(operation_description, log_dic)

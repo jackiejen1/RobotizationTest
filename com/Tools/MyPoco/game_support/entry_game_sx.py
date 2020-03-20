@@ -27,4 +27,4 @@ class EntryGameSx:
         :param game_account_input: 需要登录的账号，和ini中一致
         :return:
         """
-        game_account = self.info.get_config("Account_Number", game_account_input)
+        game_account = self.info.get_config(self.game_name, game_account_input)

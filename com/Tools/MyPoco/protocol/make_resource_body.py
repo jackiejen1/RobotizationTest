@@ -4,6 +4,7 @@
 # @Author : 洞洞
 # @File : make_resource_body.py
 # @function : 生成GM后台接口所需的信息
+import json
 
 from foundation.information import Information
 import time
@@ -109,6 +110,7 @@ class MakeResourceBody:
         """
         self.make_type_id(resource_name)
         data = {"type": self.this_type, "id": self.this_id, "num": num}
+        data = json.dumps(data,ensure_ascii=False)
         return data
 
     def get_data_select(self, resource_name):

@@ -32,13 +32,13 @@ class FirstFunctionGoRunSs2:
             pass
         my_poco.touch_poco("HomeBioBtnComp")  # 列传
         try:
-            for i in range(10):
+            for i in range(5):
                 try:
                     my_poco.touch_poco("BtnSkip")
                 except:
                     pass
                 sleep(5)
-                my_poco.touch_poco("topbar/Btn_home")
+                my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
 
@@ -63,7 +63,7 @@ class FirstFunctionGoRunSs2:
         try:
             for i in range(2):
                 sleep(5)
-                my_poco.touch_poco("TopBar/Btn_home")
+                my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
         my_poco.touch_poco("Btn_pvp")

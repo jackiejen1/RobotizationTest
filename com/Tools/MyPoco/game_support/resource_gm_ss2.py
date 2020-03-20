@@ -20,15 +20,15 @@ from MyPoco.poco.my_poco_object import MyPocoObject
 class ResourceGmSs2:
     def __init__(self,game_name):
         self.info = Information()
-        self.my_poco = MyPocoObject(game_name)
-        self.uw = UnexpectedWinSs2()
+        self.my_poco_obj = MyPocoObject(game_name)
+
 
     def add_resource_ss2(self, add_name_input_dic):  # todo
         """
         从开始到结束都在当前界面,添加一些资源
         :return:
         """
-        self.poco = self.my_poco.new_poco_obj()
+        self.poco = self.my_poco_obj.new_poco_obj()
         mes = MessageSs2()
         # 将传入的字典的key转换成列表
         keys_list = list(add_name_input_dic.keys())
@@ -45,13 +45,14 @@ class ResourceGmSs2:
             counter_num += 1
         order_str = order_str + "]}"
         order_str.replace(" ", "")
-        self.my_poco.touch_poco("Comp_res3")  # 点击元宝进入gm
-        self.my_poco.touch_poco("自动测试")
-        self.my_poco.touch_poco("input1")
-        self.my_poco.text_str(order_str)
-        self.my_poco.touch_poco("btn1")
-        self.my_poco.touch_poco("close")
-        self.my_poco.touch_poco("close1")  # 回到主界面
+        self.my_poco_obj.touch_poco("Comp_res3")  # 点击元宝进入gm
+        self.my_poco_obj.touch_poco("自动测试")
+        self.my_poco_obj.touch_poco("input1")
+        self.my_poco_obj.text_str(order_str)
+        self.my_poco_obj.touch_poco("btn1")
+        time.sleep(4)
+        self.my_poco_obj.touch_poco("未命名0/popup/AutoTestLayer/__view/close")
+        self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")  # 回到主界面
 
     def delete_resource_ss2(self, del_name_input_dic):
         """
@@ -59,7 +60,7 @@ class ResourceGmSs2:
         :return:
         """
 
-        self.poco = self.my_poco.new_poco_obj()
+        self.poco = self.my_poco_obj.new_poco_obj()
         mes = MessageSs2()
         # 将传入的字典的key转换成列表
         keys_list = list(del_name_input_dic.keys())
@@ -76,13 +77,14 @@ class ResourceGmSs2:
             counter_num += 1
         order_str = order_str + "]}"
         order_str.replace(" ", "")
-        self.my_poco.touch_poco("Comp_res3")  # 点击元宝进入gm
-        self.my_poco.touch_poco("自动测试")
-        self.my_poco.touch_poco("input1")
-        self.my_poco.text_str(order_str)
-        self.my_poco.touch_poco("btn1")
-        self.my_poco.touch_poco("close")
-        self.my_poco.touch_poco("close1")  # 回到主界面
+        self.my_poco_obj.touch_poco("Comp_res3")  # 点击元宝进入gm
+        self.my_poco_obj.touch_poco("自动测试")
+        self.my_poco_obj.touch_poco("input1")
+        self.my_poco_obj.text_str(order_str)
+        self.my_poco_obj.touch_poco("btn1")
+        time.sleep(4)
+        self.my_poco_obj.touch_poco("未命名0/popup/AutoTestLayer/__view/close")
+        self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")  # 回到主界面
 
     def get_resource_num_ss2(self, get_name_input_list):
         """
@@ -90,7 +92,7 @@ class ResourceGmSs2:
         :return:返回字典，道具的名称和数量
         """
 
-        self.poco = self.my_poco.new_poco_obj()
+        self.poco = self.my_poco_obj.new_poco_obj()
         mes = MessageSs2()
         s = "["
         for key_num in range(len(get_name_input_list)):
@@ -100,11 +102,11 @@ class ResourceGmSs2:
             else:
                 s = s + ","
         s = s + "]"
-        self.my_poco.touch_poco("Comp_res3")
-        self.my_poco.touch_poco("自动测试")
-        self.my_poco.touch_poco("input2")
-        self.my_poco.text_str(s)
-        self.my_poco.touch_poco("btn2")
+        self.my_poco_obj.touch_poco("Comp_res3")
+        self.my_poco_obj.touch_poco("自动测试")
+        self.my_poco_obj.touch_poco("input2")
+        self.my_poco_obj.text_str(s)
+        self.my_poco_obj.touch_poco("btn2")
         str_txt = self.poco("txt").get_text()
         number_list = str_txt.split(",")  # 将获取到的字符串解析成列表
         resource_dic = {}
@@ -113,8 +115,9 @@ class ResourceGmSs2:
             value_name = int(number_list[i])
             resource_dic.update({key_name: value_name})
 
-        self.my_poco.touch_poco("close")
-        self.my_poco.touch_poco("close1")
+        time.sleep(4)
+        self.my_poco_obj.touch_poco("未命名0/popup/AutoTestLayer/__view/close")
+        self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")
         return resource_dic
 
     def get_sever_time_ss2(self):
@@ -123,14 +126,15 @@ class ResourceGmSs2:
         :return: int [日期，时间，星期]
         """
 
-        self.poco = self.my_poco.new_poco_obj()
+        self.poco = self.my_poco_obj.new_poco_obj()
         time.sleep(2)
-        self.my_poco.touch_poco("Comp_res3")
-        self.my_poco.touch_poco("自动测试")
+        self.my_poco_obj.touch_poco("Comp_res3")
+        self.my_poco_obj.touch_poco("自动测试")
         game_time_str = self.poco("time").get_text()
         time_list = self.info.get_time_str(game_time_str)
-        self.my_poco.touch_poco("close")
-        self.my_poco.touch_poco("close1")
+        time.sleep(4)
+        self.my_poco_obj.touch_poco("未命名0/popup/AutoTestLayer/__view/close")
+        self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")
         return time_list
     def get_resource_id_ss2(self, get_name_input_list):# todo
         """
@@ -138,7 +142,7 @@ class ResourceGmSs2:
         :return:返回字典，道具的名称和id
         """
 
-        self.poco = self.my_poco.new_poco_obj()
+        self.poco = self.my_poco_obj.new_poco_obj()
         mes = MessageSs2()
         s = "["
         for key_num in range(len(get_name_input_list)):
@@ -148,11 +152,11 @@ class ResourceGmSs2:
             else:
                 s = s + ","
         s = s + "]"
-        self.my_poco.touch_poco("Comp_res3")
-        self.my_poco.touch_poco("自动测试")
-        self.my_poco.touch_poco("input2")
-        self.my_poco.text_str(s)
-        self.my_poco.touch_poco("btn2")
+        self.my_poco_obj.touch_poco("Comp_res3")
+        self.my_poco_obj.touch_poco("自动测试")
+        self.my_poco_obj.touch_poco("input2")
+        self.my_poco_obj.text_str(s)
+        self.my_poco_obj.touch_poco("btn2")
         str_txt = self.poco("txt").get_text()
         number_list = str_txt.split(",")  # 将获取到的字符串解析成列表
         resource_dic = {}
@@ -161,43 +165,43 @@ class ResourceGmSs2:
             value_name = int(number_list[i])
             resource_dic.update({key_name: value_name})
 
-        self.my_poco.touch_poco("close")
-        self.my_poco.touch_poco("close1")
+        time.sleep(4)
+        self.my_poco_obj.touch_poco("未命名0/popup/AutoTestLayer/__view/close")
+        self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")
         return resource_dic
 
     def set_play_fuben_num(self, num):
-        self.poco = self.my_poco.new_poco_obj()
+        self.poco = self.my_poco_obj.new_poco_obj()
         print("开始一键功能")
         nums = str(num)
-        self.my_poco.touch_poco("Comp_res3")
-        self.my_poco.touch_poco("一键功能")
-        self.my_poco.touch_poco("OnekeyLayer/__view/n21")
-        self.my_poco.text_str(nums)
-        self.my_poco.touch_poco("btn_challenge")#一键主线
+        self.my_poco_obj.touch_poco("Comp_res3")
+        self.my_poco_obj.touch_poco("一键功能")
+        self.my_poco_obj.touch_poco("OnekeyLayer/__view/n21")
+        self.my_poco_obj.text_str(nums)
+        pos_list = self.my_poco_obj.get_poco_position("OnekeyLayer/__view/btn_challenge")#一键主线
         if num>10:
-            num = int(num/7)*3
+            num = int(num/7*3.5)
         for i in range(num):
-            time.sleep(6)
-            self.uw.unexpected_win()
-            self.my_poco.touch_poco("OnekeyLayer/__view/btn_challenge")#一键主线
-        self.my_poco.touch_poco("OnekeyLayer/__view/btn0")
-        self.my_poco.touch_poco("close1")
+            time.sleep(8)
+            self.my_poco_obj.touch(pos_list)#一键主线
+        self.my_poco_obj.touch_poco("OnekeyLayer/__view/btn0")
+        self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")
 
     def set_play_liezhuan_num(self, num):
-        poco = self.my_poco.new_poco_obj()
+        poco = self.my_poco_obj.new_poco_obj()
         print("开始一键名将")
         nums = str(num)
-        self.my_poco.touch_poco("Comp_res3")
-        self.my_poco.touch_poco("一键功能")
-        self.my_poco.touch_poco("一键名将")
-        self.my_poco.touch_poco("OnekeyLayer/__view/n21")
-        self.my_poco.text_str(nums)
+        self.my_poco_obj.touch_poco("Comp_res3")
+        self.my_poco_obj.touch_poco("一键功能")
+        self.my_poco_obj.touch_poco("一键名将")
+        self.my_poco_obj.touch_poco("OnekeyLayer/__view/n21")
+        self.my_poco_obj.text_str(nums)
+        pos_list = self.my_poco_obj.get_poco_position("OnekeyLayer/__view/btn_challenge")
         for i in range(num*11):
-            self.uw.unexpected_win()
-            self.my_poco.touch_poco("OnekeyLayer/__view/btn_challenge")#一键主线
+            self.my_poco_obj.touch(pos_list)#一键主线
             time.sleep(1.5)
             print("列传")
-        # self.my_poco.touch_poco("btn_challenge", )  # 一键主线
+        # self.my_poco_obj.touch_poco("btn_challenge", )  # 一键主线
         # sleep(num * 4)
-        self.my_poco.touch_poco("OnekeyLayer/__view/btn0")
-        self.my_poco.touch_poco("close1",)
+        self.my_poco_obj.touch_poco("OnekeyLayer/__view/btn0")
+        self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")

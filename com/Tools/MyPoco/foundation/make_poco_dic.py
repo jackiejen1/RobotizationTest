@@ -43,7 +43,7 @@ class MakePocoDic:
         目前只适配poco—lua ，安卓、unity后续添加
         :return: poco_dic
         """
-        sleep(1)
+        time.sleep(1)
         self.poco("未命名").exists()
         file_path = "D:\\poco_list_file\\" + self.thread_file_name + ".txt"
         with open(file_path) as f:
@@ -70,6 +70,7 @@ class MakePocoDic:
         # 先判断在不在地址表里面
         if poco_path in self.poco_dic.keys():
             print("找到路径")
+            self.complete_poco_path = poco_path
             return True
         # 看看某些唯一路径存不存在简写
         for dic_key in self.poco_dic.keys():
@@ -106,8 +107,8 @@ class MakePocoDic:
                 y = int(phone_list[1] * pos_list[1])
                 print(poco_path+"坐标为"+str([x, y]))
                 return [x, y]
-            else:  # 还是有问题
-                sleep(3)
+            else:
+                time.sleep(3)
                 print("第" + str(i + 1) + "次未找到，再次查找" + poco_path)
                 self.renovate_and_get_poco_dic()
                 if i >= 2:
@@ -120,6 +121,29 @@ class MakePocoDic:
         # x, y = self.get_poco_pos(poco_path)
         # os.system("adb input tap %d %d" % (x, y))
         # print("点击坐标(%d,%d)完成" % (x, y))
+        self.renovate_and_get_poco_dic()
+
+    def touch(self,pos_list):
+        """
+        输入坐标，使用airtest框架的touch点击
+        :param pos_list: [123,123]
+        :return:
+        """
+        touch(pos_list)
+        print("点击坐标" + str(pos_list) + "完成")
+        self.renovate_and_get_poco_dic()
+
+    def touch_poco_obj(self, poco_path,click_list):
+        if self.is_in_dic(poco_path):
+            try:
+                print("以name属性查找对象")
+                self.poco(name = self.complete_poco_path).click(click_list)
+            except Exception:
+                print("name属性未找到，改为text属性查找")
+                self.poco(text=self.complete_poco_path).click(click_list)
+        else:
+            print("未找到节点"+poco_path)
+            raise NoneException
         self.renovate_and_get_poco_dic()
 
     def my_swipe(self, start_path, end_path, duration=2):
@@ -137,7 +161,7 @@ class MakePocoDic:
         :return:True/False
         """
         if self.is_in_dic(poco_path):
-            visible_value_bool = self.poco_dic[poco_path]["getVisible"]
+            visible_value_bool = self.poco_dic[self.complete_poco_path]["getVisible"]
             return visible_value_bool
         else:
             raise NoneException
@@ -149,13 +173,7 @@ class MakePocoDic:
         :return:True/False
         """
         if self.is_in_dic(poco_path):
-            if self.complete_poco_path != None:
-                visible_value_bool = self.poco_dic[self.complete_poco_path]["text"]
-                self.complete_poco_path = None
-            else:
-                visible_value_bool = self.poco_dic[poco_path]["text"]
-            if visible_value_bool == "":
-                raise NoneStrException
+            visible_value_bool = self.poco_dic[self.complete_poco_path]["text"]
             return visible_value_bool
         else:
             raise NoneException
@@ -164,10 +182,11 @@ class MakePocoDic:
         """
         获取游戏poco对象value_name_str属性中的值
         :param poco_path:poco_path
+        :param value_name_str:属性的key
         :return: str value
         """
         if self.is_in_dic(poco_path):
-            visible_value_bool = self.poco_dic[poco_path][value_name_str]
+            visible_value_bool = self.poco_dic[self.complete_poco_path][value_name_str]
             # visible_value_str = visible_value_bool
             if visible_value_bool == "":
                 raise NoneStrException

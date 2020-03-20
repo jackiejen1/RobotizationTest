@@ -9,13 +9,13 @@ import json
 import requests
 
 PATH_DICT = {
-    "COMMON": '/mock/876/api/gm',
+    "COMMON": '/api/gm',
     'GET_ROLE_ID': '/role_id',
     'ADD_RESOURCES': '/resources/add',
     'QUERY_RESOURCES': '/resources/query',
     'DELETE_RESOURCES': '/resources/delete',
     'QUERY_SERVER_TIME': '/server_time',
-    'MOD_SERVER_TIME': '/server_time',
+    'MOD_SERVER_TIME': '/server_time/mod',
     'SET_CHECKPOINT': '/checkpoint',
     'SET_LEVEL': '/level',
     'RECHARGE_SUPPLEMENT': '/recharge_supplement',
@@ -88,7 +88,7 @@ class GmApiHttp:
         :return: dic
         """
         path_key = inspect.stack()[0][3]
-        data = self.__do_http_get(path_key, params=payload)
+        data = self.__do_http_post(path_key, data=payload)
         return data
 
     def add_resources(self, body):
@@ -131,7 +131,7 @@ class GmApiHttp:
             'server': server
         }
         path_key = inspect.stack()[0][3]
-        data = self.__do_http_get(path_key, params=payload)
+        data = self.__do_http_post(path_key, data=payload)
         return data
 
     def set_server_time(self, body):
