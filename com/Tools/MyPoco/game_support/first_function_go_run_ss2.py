@@ -8,9 +8,8 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from time import sleep
-
-from poco.my_poco_object import MyPocoObject
+import time
+from MyPoco.poco.my_poco_object import MyPocoObject
 
 
 class FirstFunctionGoRunSs2:
@@ -26,18 +25,18 @@ class FirstFunctionGoRunSs2:
         my_poco.touch_poco("Comp_dungeon/Btn_dungeon") # 副本
         try:
             for i in range(2):
-                sleep(3)
+                time.sleep(3)
                 my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
         my_poco.touch_poco("HomeBioBtnComp")  # 列传
         try:
-            for i in range(5):
+            for i in range(4):
                 try:
                     my_poco.touch_poco("BtnSkip")
                 except:
                     pass
-                sleep(5)
+                time.sleep(5)
                 my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
@@ -46,7 +45,7 @@ class FirstFunctionGoRunSs2:
         my_poco.touch_poco("竞技场")
         try:
             for i in range(2):
-                sleep(5)
+                time.sleep(5)
                 my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
@@ -54,7 +53,7 @@ class FirstFunctionGoRunSs2:
         my_poco.touch_poco("无双试炼")
         try:
             for i in range(3):
-                sleep(5)
+                time.sleep(5)
                 my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
@@ -62,7 +61,7 @@ class FirstFunctionGoRunSs2:
         my_poco.touch_poco("讨伐巨兽")
         try:
             for i in range(2):
-                sleep(5)
+                time.sleep(5)
                 my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass
@@ -71,7 +70,7 @@ class FirstFunctionGoRunSs2:
         my_poco.touch_poco("秘境寻宝")  # 秘境寻宝
         try:
             for i in range(2):
-                sleep(5)
+                time.sleep(5)
                 my_poco.touch_poco("ComTopBar/Btn_home")
         except:
             pass

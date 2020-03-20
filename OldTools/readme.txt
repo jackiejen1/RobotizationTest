@@ -1,0 +1,1 @@
+将get_info文件夹下的config.ini改成自己项目的信息配置

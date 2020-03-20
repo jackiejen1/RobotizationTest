@@ -77,6 +77,7 @@ class MakePocoDic:
             if poco_path in dic_key:
                 # 是简写路径的话就把完整路径传递出去
                 self.complete_poco_path = dic_key
+                # print("获取完整路径"+self.complete_poco_path+"完成")
                 print("获取完整路径完成")
                 return True
         return False
@@ -90,14 +91,8 @@ class MakePocoDic:
         """
         for i in range(3):
             if self.is_in_dic(poco_path):
-                # [x,y]
-                # 判断poco_path是否是简写路径
-                if self.complete_poco_path == None:
-                    pos_list = self.poco_dic[poco_path]['pos']
-                else:
-                    # 是简写路径就采用完整路径
-                    pos_list = self.poco_dic[self.complete_poco_path]['pos']
-                    self.complete_poco_path = None
+                print(self.complete_poco_path)
+                pos_list = self.poco_dic[self.complete_poco_path]['pos']
                 # [宽,高]
                 phone_list_str = self.info.get_config("Phone_Size", self.thread_file_name)
                 phone_list = eval(phone_list_str)

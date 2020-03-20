@@ -180,9 +180,9 @@ class ResourceGmSs2:
         self.my_poco_obj.text_str(nums)
         pos_list = self.my_poco_obj.get_poco_position("OnekeyLayer/__view/btn_challenge")#一键主线
         if num>10:
-            num = int(num/7*3.5)
+            num = int(num/7*5)
         for i in range(num):
-            time.sleep(8)
+            time.sleep(7)
             self.my_poco_obj.touch(pos_list)#一键主线
         self.my_poco_obj.touch_poco("OnekeyLayer/__view/btn0")
         self.my_poco_obj.touch_poco("未命名0/popup/AddItemLayer/__view/close1")

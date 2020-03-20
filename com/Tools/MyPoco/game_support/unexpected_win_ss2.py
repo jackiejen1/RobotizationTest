@@ -31,7 +31,7 @@ class UnexpectedWinSs2:
         self.make_poco_dic.get_poco_dic()
         if self.make_poco_dic.is_in_dic("内更新"):  # 点击完下载资源启动游戏
             self.make_poco_dic.my_touch("下载点2")
-            time.sleep(15)
+            time.sleep(50)
         if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")
             time.sleep(1)

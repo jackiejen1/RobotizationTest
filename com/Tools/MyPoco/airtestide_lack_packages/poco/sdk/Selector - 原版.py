@@ -1,8 +1,6 @@
 # coding=utf-8
 from .DefaultMatcher import DefaultMatcher
 from .exceptions import NoSuchTargetException
-import configparser, os,time
-import threading
 
 __author__ = 'lxn3032'
 __all__ = ['ISelector', 'Selector']
@@ -46,8 +44,7 @@ class Selector(ISelector):
         '>': offsprings, select all offsprings matched expr1 from all roots matched expr0.
         '/': children, select all children matched expr1 from all roots matched expr0.
         '-': siblings, select all siblings matched expr1 from all roots matched expr0.
-        '^': parent, select the parent of 1st UI element matched expr0. expr1 is always None.
-
+    
     - ``'index'``: select specific n-th UI element from the previous results
 
     - ``others``: passes the expression to matcher
@@ -69,76 +66,14 @@ class Selector(ISelector):
         Returns:
             default root node from the dumper.
         """
-        print("开始获取数据")
-        print(time.time())
-        new_poco_dic = {"ui_path_list": []}
-        poco_subscript = 0
-        new_poco_dic = self.get_ui_tree(self.dumper.getRoot().__dict__, "", new_poco_dic, poco_subscript)
-        file_name = str(threading.get_ident())
-        file_path = r"D:\\poco_list_file\\" + file_name + ".txt"
-        with open(file_path, 'w') as f:
-            f.write(str(new_poco_dic))
-        print(time.time())
-        print("数据储存完毕")
-        return self.dumper.getRoot()
 
-    def get_ui_tree(self, dic, ui_path, new_poco_dic, poco_subscript):
-        dics = dic
-        keys = dic.keys()
-        if 'node' in keys:
-            dics = dic['node']
-            keys = dics.keys()
-        # 名字加编号
-        # print(dics.keys())
-        if "name" in dics.keys():
-            # print("into")
-            # print(dics.keys())
-            ui_path_name = dics['name'] + str(poco_subscript)
-            # print("ui_path_name为"+ui_path_name)
-            # 名字拼接路径
-            ui_path = ui_path + ui_path_name
-            new_poco_dic["ui_path_list"].append(ui_path_name)
-            new_poco_dic["ui_path_list"].append(ui_path)
-            # print(new_poco_dic["ui_path_list"])
-            # 名字加编号作为key
-            new_poco_dic[ui_path_name] = dics['payload']
-            # 名字拼接路径为key
-            new_poco_dic[ui_path] = dics['payload']
-        if "text" in dics['payload'].keys():
-            # 获取text内容
-            ui_path_text = dics['payload']['text']
-            if ui_path_text != "":
-                # text作为key
-                # 名字加编号、名字拼接路径、text都在元素列表里面
-                new_poco_dic["ui_path_list"].append(ui_path_text)
-                new_poco_dic[ui_path_text] = dics['payload']
-        if 'children' in keys:
-            poco_subscript = 0
-            children_name_list = []
-            childs_list = dics['children']
-            ui_path = ui_path + "/"
-            for i in range(len(childs_list)):
-                childs_dic = childs_list[i]
-                # 遍历所有的子节点name储存起来,用来给重复的加编号
-                if "name" in childs_dic.keys():
-                    children_name_list.append(childs_dic["name"])
-            for i in range(len(childs_list)):
-                childs_dic = childs_list[i]
-                if len(children_name_list)>0:
-                    now_name = children_name_list.pop(0)# 因为删除之后列表改变，只删除最前面的即可
-                    # 如果列表中还有一样的名字，就编号+1
-                    new_poco_dic = self.get_ui_tree(childs_dic, ui_path, new_poco_dic, poco_subscript)
-                    if now_name in children_name_list:#
-                        poco_subscript = poco_subscript+1
-                    else:
-                    # 如果列表里面没有了，就置零
-                        poco_subscript = 0
-        return new_poco_dic
+        return self.dumper.getRoot()
 
     def select(self, cond, multiple=False):
         """
         See Also: :py:meth:`select <poco.sdk.Selector.ISelector.select>` method in ``ISelector``.
         """
+
         return self.selectImpl(cond, multiple, self.getRoot(), 9999, True, True)
 
     def selectImpl(self, cond, multiple, root, maxDepth, onlyVisibleNode, includeRoot):
@@ -170,6 +105,7 @@ class Selector(ISelector):
             return result
 
         op, args = cond
+
         if op in ('>', '/'):
             # children or offsprings
             # 父子直系相对节点选择
@@ -197,22 +133,13 @@ class Selector(ISelector):
         elif op == 'index':
             cond, i = args
             try:
-                # set multiple=True, self.selectImpl will return a list
-                result = [self.selectImpl(cond, True, root, maxDepth, onlyVisibleNode, includeRoot)[i]]
+                result = [self.selectImpl(cond, multiple, root, maxDepth, onlyVisibleNode, includeRoot)[i]]
             except IndexError:
                 raise NoSuchTargetException(
                     u'Query results index out of range. Index={} condition "{}" from root "{}".'.format(i, cond, root))
-        elif op == '^':
-            # parent
-            # only select parent of the first matched UI element
-            query1, _ = args
-            result1 = self.selectImpl(query1, False, root, maxDepth, onlyVisibleNode, includeRoot)
-            if result1:
-                parent_node = result1[0].getParent()
-                if parent_node is not None:
-                    result = [parent_node]
         else:
             self._selectTraverse(cond, root, result, multiple, maxDepth, onlyVisibleNode, includeRoot)
+
         return result
 
     def _selectTraverse(self, cond, node, outResult, multiple, maxDepth, onlyVisibleNode, includeRoot):
