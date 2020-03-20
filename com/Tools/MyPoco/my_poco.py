@@ -75,15 +75,16 @@ class MyPoco:
         ffgr.first_function_go_run()
 
     # @err_close_game
-    def open_game(self, sever_name_input, game_account_input):
+    def open_game(self, sever_name_input, game_account_input,red_info = True):
         """
         功能向,启动游戏并到游戏主界面
         :param sever_name_input: 区服,读配置或新建账号
         :param game_account_input: 账号,读配置或新建账号
+        :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """
         entry = EntryGame(self.game_name)
-        entry.entry_game(sever_name_input, game_account_input)
+        entry.entry_game(sever_name_input, game_account_input,red_info)
         poco = self.my_poco_obj.new_poco_obj()
         return poco
 
@@ -387,14 +388,14 @@ class MyPoco:
         # self.gm.delete_resources(dic_input)
         self.rg.delete_resource(dic_input)
 
-    def get_sever_time(self, server_name):
+    def get_sever_time(self):
         """
         查询服务器时间
         :param server_name:str 服务器名
         :return:[int(ymd),int(hms),int(week)]
         """
-        return self.gm.select_server_time(server_name)
-
+        # return self.gm.select_server_time(server_name)
+        return self.rg.get_sever_time()
     def set_sever_time(self, dic_input):
         """
         修改服务器时间

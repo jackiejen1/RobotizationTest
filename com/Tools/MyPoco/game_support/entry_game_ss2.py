@@ -21,7 +21,7 @@ class EntryGameSs2:
         self.info = Information()
         self.my_poco_obj = MyPocoObject(self.game_name)
 
-    def entry_game_ss2(self, sever_name_input, game_account_input):
+    def entry_game_ss2(self, sever_name_input, game_account_input,red_info):
         """
         ss2的登录游戏，游戏已经启动，到游戏主界面的操作
         :param sever_name_input: 服务器名称，和ini一致
@@ -35,7 +35,10 @@ class EntryGameSs2:
         start_app(self.game_name)
         sleep(16)
         poco = self.my_poco_obj.new_poco_obj()
-        game_account = self.info.get_config(self.game_name, game_account_input)
+        if red_info:
+            game_account = self.info.get_config(self.game_name, game_account_input)
+        else:
+            game_account=game_account_input
         self.my_poco_obj.touch_poco("InputName")
         text(game_account)
         # self.poco("InputName").set_text(game_account)

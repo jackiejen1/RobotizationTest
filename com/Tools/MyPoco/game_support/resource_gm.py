@@ -64,8 +64,8 @@ class ResourceGm:
         :return:
         """
         if self.game_name == "com.youzu.test.qa":
-            time_list = self.rgss2.get_sever_time_ss2()
-            return time_list
+
+            return self.rgss2.get_sever_time_ss2()
         else:
             pass
 

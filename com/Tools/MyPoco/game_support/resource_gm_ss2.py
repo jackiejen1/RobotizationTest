@@ -130,7 +130,7 @@ class ResourceGmSs2:
         time.sleep(2)
         self.my_poco_obj.touch_poco("Comp_res3")
         self.my_poco_obj.touch_poco("自动测试")
-        game_time_str = self.poco("time").get_text()
+        game_time_str = self.my_poco_obj.get_game_number("未命名0/popup/AutoTestLayer/__view/time")
         time_list = self.info.get_time_str(game_time_str)
         time.sleep(4)
         self.my_poco_obj.touch_poco("未命名0/popup/AutoTestLayer/__view/close")
