@@ -135,6 +135,7 @@ class MyPocoObject():
         :return:
         """
         return self.make_poco_dic.get_poco_pos(poco_path)
+
     def is_exist_poco(self, poco_path):
         """
         先判断传入的对象是否存在

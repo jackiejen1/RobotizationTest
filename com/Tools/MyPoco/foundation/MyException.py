@@ -8,9 +8,9 @@
 #@Function:
 #@Method:
 #Reference:********************************
-
+from airtest.core.api import *
 class NoneException(Exception):
-    print("")
+    snapshot(msg="找不到控件")
 
 
 

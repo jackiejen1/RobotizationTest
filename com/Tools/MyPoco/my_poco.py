@@ -363,6 +363,14 @@ class MyPoco:
         """
         return self.my_poco_obj.is_exist_poco(poco_path)
 
+    def is_in_dic(self, poco_path):
+        """
+        判断节点是否在当前屏幕
+        :param poco_path:
+        :return:
+        """
+        return self.my_poco_obj.is_in_dic(poco_path)
+
     def add_resource(self, dic_input):
         """
         添加各种资源，协议向

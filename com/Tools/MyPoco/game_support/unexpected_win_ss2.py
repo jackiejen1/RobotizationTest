@@ -39,8 +39,8 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")
             time.sleep(1)
-        if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 首页广告
-            self.make_poco_dic.my_touch("未命名0/popup/HomeAdvPop/__view/Btn_close")
+        # if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 首页广告
+        #     self.make_poco_dic.my_touch("未命名0/popup/HomeAdvPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("RedPacketRainPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("RedPacketRainPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):
