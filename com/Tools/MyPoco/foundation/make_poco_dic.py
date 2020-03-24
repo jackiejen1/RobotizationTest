@@ -44,7 +44,11 @@ class MakePocoDic:
         :return: poco_dic
         """
         time.sleep(1)
-        self.poco("未命名").exists()
+        try:
+            self.poco("未命名").exists()
+        except Exception:#后续可能需要优化，修改整体框架
+            self.poco = StdPoco()
+            self.poco("未命名").exists()
         file_path = "D:\\poco_list_file\\" + self.thread_file_name + ".txt"
         with open(file_path) as f:
             poco_name_dic_str_list = f.readlines()
@@ -107,6 +111,7 @@ class MakePocoDic:
                 print("第" + str(i + 1) + "次未找到，再次查找" + poco_path)
                 self.renovate_and_get_poco_dic()
                 if i >= 2:
+                    snapshot(msg="poco未找到")
                     raise NoneException(poco_path)
 
     def my_touch(self, poco_path):
@@ -138,6 +143,7 @@ class MakePocoDic:
                 self.poco(text=self.complete_poco_path).click(click_list)
         else:
             print("未找到节点"+poco_path)
+            snapshot(msg="未找到节点"+poco_path)
             raise NoneException
         self.renovate_and_get_poco_dic()
 
@@ -159,6 +165,7 @@ class MakePocoDic:
             visible_value_bool = self.poco_dic[self.complete_poco_path]["getVisible"]
             return visible_value_bool
         else:
+            snapshot(msg="未找到节点")
             raise NoneException
 
     def get_poco_text(self, poco_path):
@@ -171,6 +178,7 @@ class MakePocoDic:
             visible_value_bool = self.poco_dic[self.complete_poco_path]["text"]
             return visible_value_bool
         else:
+            snapshot(msg="未找到节点")
             raise NoneException
 
     def get_poco_any_value(self, poco_path, value_name_str):
@@ -184,9 +192,11 @@ class MakePocoDic:
             visible_value_bool = self.poco_dic[self.complete_poco_path][value_name_str]
             # visible_value_str = visible_value_bool
             if visible_value_bool == "":
+                snapshot(msg=poco_path+"没有str属性")
                 raise NoneStrException
             return visible_value_bool
         else:
+            snapshot(msg="未找到节点")
             raise NoneException
 
     # def get_log_path(self, file_name):

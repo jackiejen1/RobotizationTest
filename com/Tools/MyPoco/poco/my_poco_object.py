@@ -64,8 +64,19 @@ class MyPocoObject():
         :param end_path:结束点路径
         :return:起、止点坐标
         """
+        start, end = None,None
         self.uw.unexpected_win()
-        start, end = self.make_poco_dic.my_swipe(start_path, end_path, duration=timein)
+        try:
+            start, end = self.make_poco_dic.my_swipe(start_path, end_path, duration=timein)
+        except RpcTimeoutError:
+            snapshot(msg="poco超时异常")
+            self.new_poco_obj()
+            start, end = self.make_poco_dic.my_swipe(start_path, end_path, duration=timein)
+        except ConnectionAbortedError:
+            start_app(self.game_name)
+            time.sleep(4)
+            snapshot(msg="10053异常")
+
         time.sleep(1)
         return start, end
     def touch(self,pos_list):
@@ -74,7 +85,9 @@ class MyPocoObject():
         :param pos_list: [123,123]
         :return:
         """
+
         self.make_poco_dic.touch(pos_list)
+
     def touch_poco(self, poco_path):
         """
         需要查找的控件路径
@@ -83,7 +96,16 @@ class MyPocoObject():
         raise：PocoNoSuchNodeException、RpcTimeoutError
         """
         self.uw.unexpected_win()
-        self.make_poco_dic.my_touch(poco_path)
+        try:
+            self.make_poco_dic.my_touch(poco_path)
+        except RpcTimeoutError:
+            snapshot(msg="poco超时异常")
+            self.new_poco_obj()
+            self.make_poco_dic.my_touch(poco_path)
+        except ConnectionAbortedError:
+            start_app(self.game_name)
+            time.sleep(4)
+            snapshot(msg="10053异常")
         time.sleep(1)
 
     def touch_poco_obj(self, poco_path, click_list):
@@ -94,7 +116,16 @@ class MyPocoObject():
         raise：PocoNoSuchNodeException、RpcTimeoutError
         """
         self.uw.unexpected_win()
-        self.make_poco_dic.touch_poco_obj(poco_path,click_list)
+        try:
+            self.make_poco_dic.touch_poco_obj(poco_path,click_list)
+        except RpcTimeoutError:
+            snapshot(msg="poco超时异常")
+            self.new_poco_obj()
+            self.make_poco_dic.touch_poco_obj(poco_path,click_list)
+        except ConnectionAbortedError:
+            start_app(self.game_name)
+            time.sleep(4)
+            snapshot(msg="10053异常")
         time.sleep(1)
 
 

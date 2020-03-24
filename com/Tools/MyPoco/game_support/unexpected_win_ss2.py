@@ -32,6 +32,7 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("内更新"):  # 点击完下载资源启动游戏
             self.make_poco_dic.my_touch("下载点2")
             time.sleep(30)
+            self.make_poco_dic.renovate_and_get_poco_dic()
             for i in range(5):
                 if self.make_poco_dic.is_in_dic("InputName"):
                     return
@@ -40,7 +41,7 @@ class UnexpectedWinSs2:
             self.make_poco_dic.my_touch("Btn_close/n4")
             time.sleep(1)
         # if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 首页广告
-        #     self.make_poco_dic.my_touch("未命名0/popup/HomeAdvPop/__view/Btn_close")
+        #     self.make_poco_dic.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("RedPacketRainPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("RedPacketRainPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):
