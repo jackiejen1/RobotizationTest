@@ -36,7 +36,7 @@ class MakePocoDic:
         self.renovate_and_get_poco_dic()
 
     # todo 这里会报错，断开连接的错误
-    def renovate_and_get_poco_dic(self):
+    def renovate_and_get_poco_dic(self):#逐渐废弃
         """
         基础方法
         根据线程ID，刷新并读取对应本地的poco_dic,调用此方法前需要先调用set_poco()
@@ -56,6 +56,10 @@ class MakePocoDic:
         print("本地poco数据刷新完成")
         return self.poco_dic
 
+        # g = GetPocoDic()# 新规则，还差指定手机名称
+        # self.poco_dic = g.get_poco_dic()
+        # return self.poco_dic
+
     def get_poco_dic(self):
         file_path = "D:\\poco_list_file\\" + self.thread_file_name + ".txt"
         with open(file_path) as f:
@@ -63,6 +67,10 @@ class MakePocoDic:
         self.poco_dic = eval(poco_name_dic_str_list[0])
         print("本地poco数据获取完成")
         return self.poco_dic
+
+        # g = GetPocoDic()# 新规则，还差指定手机名称
+        # self.poco_dic = g.get_poco_dic()
+        # return self.poco_dic
 
     def get_poco_name_path_list(self):
         print("获取列表，刷新poco")
