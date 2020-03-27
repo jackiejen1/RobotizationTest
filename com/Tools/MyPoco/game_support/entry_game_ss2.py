@@ -31,9 +31,9 @@ class EntryGameSs2:
         snapshot(msg="上个脚本结束画面")
         home()
         stop_app(self.game_name)
-        sleep(2)
+        time.sleep(2)
         start_app(self.game_name)
-        sleep(16)
+        time.sleep(16)
         poco = self.my_poco_obj.new_poco_obj()
         if red_info:
             game_account = self.info.get_config(self.game_name, game_account_input)
@@ -43,7 +43,7 @@ class EntryGameSs2:
         text(game_account)
         # self.poco("InputName").set_text(game_account)
         self.my_poco_obj.touch_poco("确 认")
-        sleep(1)
+        time.sleep(1)
         self.my_poco_obj.touch_poco("AnnoCloseBtn")
         self.my_poco_obj.touch_poco("点击选服")
         self.my_poco_obj.touch_poco("11 - 20区")  # todo 不同游戏可能要改
@@ -55,14 +55,14 @@ class EntryGameSs2:
             self.my_poco_obj.touch_poco("LoginLawPop/__view/btn_ok")
             self.my_poco_obj.touch_poco("Btn_login")  # 开始游戏
 
-        sleep(15)
+        time.sleep(15)
         if self.my_poco_obj.is_in_dic("RedPacketRainReceiveLayer/__view/Comp_effect"):  # 红包雨
             self.my_poco_obj.touch_poco("RedPacketRainReceiveLayer/__view/Comp_effect")
-            sleep(2)
+            time.sleep(2)
             stop_app(self.game_name)
-            sleep(2)
+            time.sleep(2)
             start_app(self.game_name)
-            sleep(20)
+            time.sleep(20)
             poco = self.my_poco_obj.new_poco_obj()
             game_account = self.info.get_config(self.game_name, game_account_input)
             self.my_poco_obj.touch_poco("InputName")
@@ -79,7 +79,7 @@ class EntryGameSs2:
             if self.my_poco_obj.is_in_dic("LoginLawPop/__view/btn_ok"):
                 self.my_poco_obj.touch_poco("LoginLawPop/__view/btn_ok")
                 self.my_poco_obj.touch_poco("Btn_login")  # 开始游戏
-            sleep(15)
+            time.sleep(15)
         for i in range(10):
             print("开始关闭广告")
             self.my_poco_obj.renovate_and_get_poco_dic()

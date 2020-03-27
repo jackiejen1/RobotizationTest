@@ -37,6 +37,7 @@ class NewAccountSs2:
         self.info.set_config(self.game_name, "new_game_account", newUser)  # 记录账号
         self.my_poco_obj.touch_poco("InputName")
         text(newUser)
+        self.info.set_config(self.game_name,"new_game_account",newUser)
         self.my_poco_obj.touch_poco("确 认")
         self.my_poco_obj.touch_poco("未命名0/popup/AnnoMainPop/__view/AnnoCloseBtn")
         self.my_poco_obj.touch_poco("点击选服")

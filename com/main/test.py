@@ -32,10 +32,11 @@ from MyPoco.poco.my_poco_object import MakePocoDic
 
 if __name__ == '__main__':
     # 少西
-    # url = "http://qa.test.snxyj.youzu.com/api/gm/resources/add"
+    # url = "http://qa.test.snxyj.youzu.com/api/gm/"
     # payload = {"account": "_mxq777","role_id":40001004231 ,"server": "2246440002","level":103}
     # response = requests.request("POST", url, data=payload)
     # print(response.text.encode('utf8'))
+    # url = "http://qa.test.snxyj.youzu.com/api/gm/resources/add"
     # data = {"type": 1, "id": 0, "num": 1}
     # data = {"data": [data]}
     # data = json.dumps(data, ensure_ascii=False)
@@ -49,16 +50,16 @@ if __name__ == '__main__':
     # print(response.text.encode('utf8'))
 
     # 少三
-    url = "http://192.168.240.179:8088/api/gm/role_id"
-    payload = {"account": "testls001", "role": "九天", "server": "2013440005"}
-    response = requests.request("POST", url, data=payload)
-    print(response.text.encode('utf8'))
-
-    # 少三
-    # url_add = "http://192.168.240.179:8088/api/gm/resources/add"
-    # data = {"type": 3, "id": 5777, "num": 1}
-    # data = {"data": [data]}
-    # data = json.dumps(data, ensure_ascii=False)
-    # payload = {"account": "_mxq777", "role_id": 40001004231, "server": "2246440002", "data": data}
+    # url = "http://10.3.39.187:8088/api/gm/role_id"
+    # payload = {"account": "testls001", "role": "九天", "server": "2013440005"}
     # response = requests.request("POST", url, data=payload)
     # print(response.text.encode('utf8'))
+
+    # 少三
+    url_add = "http://10.3.39.187:8088/api/gm/resources/add"
+    data = {"type": 3, "id": 5777, "num": 1}
+    data = {"data": [data]}
+    data = json.dumps(data, ensure_ascii=False)
+    payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
+    response = requests.request("POST", url_add, data=payload)
+    print(response.text.encode('utf8'))
