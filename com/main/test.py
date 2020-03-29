@@ -29,13 +29,20 @@ __desc__ = """ 1.
 import requests
 from MyPoco.poco.my_poco_object import MyPocoObject
 from MyPoco.poco.my_poco_object import MakePocoDic
-
+from MyPoco.my_poco import MyPoco
 if __name__ == '__main__':
+    my_poco = MyPoco("少西")
+    poco = my_poco.set_poco()
+    my_poco.set_account_information_gm("_15854", "QA1")
+    my_poco.set_level(7)
     # 少西
-    # url = "http://qa.test.snxyj.youzu.com/api/gm/"
-    # payload = {"account": "_mxq777","role_id":40001004231 ,"server": "2246440002","level":103}
+    # url = "http://qa.test.snxyj.youzu.com/api/gm/level"
+    # payload = {"account": "_15854","role_id":30001018283 ,"server": "2246440001","level":6}
     # response = requests.request("POST", url, data=payload)
     # print(response.text.encode('utf8'))
+    # a = response.json()
+    # print(a)
+    # print(type(a))
     # url = "http://qa.test.snxyj.youzu.com/api/gm/resources/add"
     # data = {"type": 1, "id": 0, "num": 1}
     # data = {"data": [data]}
@@ -45,9 +52,10 @@ if __name__ == '__main__':
     # print(response.text.encode('utf8'))
     # 少西
     # url = "http://qa.test.snxyj.youzu.com/api/gm/role_id"
-    # payload = {"account": "_mxq777", "server": "2246440002"}
+    # payload = {"account": "_15854", "server": "2246440001"}
     # response = requests.request("POST", url, data=payload)
     # print(response.text.encode('utf8'))
+    # print(response.json(encoding = "utf-8"))
 
     # 少三
     # url = "http://10.3.39.187:8088/api/gm/role_id"
@@ -56,10 +64,10 @@ if __name__ == '__main__':
     # print(response.text.encode('utf8'))
 
     # 少三
-    url_add = "http://10.3.39.187:8088/api/gm/resources/add"
-    data = {"type": 3, "id": 5777, "num": 1}
-    data = {"data": [data]}
-    data = json.dumps(data, ensure_ascii=False)
-    payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
-    response = requests.request("POST", url_add, data=payload)
-    print(response.text.encode('utf8'))
+    # url_add = "http://10.3.39.187:8088/api/gm/resources/add"
+    # data = {"type": 3, "id": 5777, "num": 1}
+    # data = {"data": [data]}
+    # data = json.dumps(data, ensure_ascii=False)
+    # payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
+    # response = requests.request("POST", url_add, data=payload)
+    # print(response.text.encode('utf8'))

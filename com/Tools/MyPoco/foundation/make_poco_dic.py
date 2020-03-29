@@ -32,7 +32,7 @@ class MakePocoDic:
     def set_poco(self, poco):
         self.poco = poco
         self.phone_size_list = self.poco.get_screen_size()
-        self.info.set_config("Phone_Size", self.thread_file_name, str(self.phone_size_list))
+        # self.info.set_config("Phone_Size", self.thread_file_name, str(self.phone_size_list))
         self.renovate_and_get_poco_dic()
 
     # todo 这里会报错，断开连接的错误
@@ -106,12 +106,12 @@ class MakePocoDic:
                 print(self.complete_poco_path)
                 pos_list = self.poco_dic[self.complete_poco_path]['pos']
                 # [宽,高]
-                phone_list_str = self.info.get_config("Phone_Size", self.thread_file_name)
-                phone_list = eval(phone_list_str)
+                # phone_list_str = self.info.get_config("Phone_Size", self.thread_file_name)
+                # phone_list = eval(phone_list_str)
                 # 取整
                 print(poco_path+"pos属性为"+str(pos_list))
-                x = int(phone_list[0] * pos_list[0])
-                y = int(phone_list[1] * pos_list[1])
+                x = int(self.phone_size_list[0] * pos_list[0])
+                y = int(self.phone_size_list[1] * pos_list[1])
                 print(poco_path+"坐标为"+str([x, y]))
                 return [x, y]
             else:

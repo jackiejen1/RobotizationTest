@@ -34,10 +34,9 @@ class NewAccountSs2:
         sleep(16)
         self.poco = self.my_poco_obj.new_poco_obj()
         newUser = str(int(time.time()))[3:]  # 时间戳截取账号
-        self.info.set_config(self.game_name, "new_game_account", newUser)  # 记录账号
+        self.info.set_config(self.game_name, "new_game_account1", newUser)  # 记录账号
         self.my_poco_obj.touch_poco("InputName")
         text(newUser)
-        self.info.set_config(self.game_name,"new_game_account",newUser)
         self.my_poco_obj.touch_poco("确 认")
         self.my_poco_obj.touch_poco("未命名0/popup/AnnoMainPop/__view/AnnoCloseBtn")
         self.my_poco_obj.touch_poco("点击选服")

@@ -377,8 +377,10 @@ class MyPoco:
         :param dic_input:dic {"资源名称":资源数量,"资源名称":资源数量,...}
         :return:
         """
-        # self.gm.add_resources(dic_input)
-        self.rg.add_resource(dic_input)
+        if self.game_name == "com.youzu.wgame2":
+            self.gm.add_resources(dic_input)
+        else:
+            self.rg.add_resource(dic_input)
     def get_resource_quantity(self, list_input):
         """
         根据传入的道具列表查询道具数量
@@ -436,11 +438,11 @@ class MyPoco:
         """
         self.gm.recharge_supplement(resource_name)
 
-    def start_protocol(self, server_name, protocol_name):
-        """
-        传入服务器名和协议名
-        :param server_name: 服务器名
-        :param protocol_name:
-        :return:
-        """
-        self.pf = ProtocolFunction(self.game_name, server_name, protocol_name)
+    # def start_protocol(self, server_name, protocol_name):#暂时不接入协议
+    #     """
+    #     传入服务器名和协议名
+    #     :param server_name: 服务器名
+    #     :param protocol_name:
+    #     :return:
+    #     """
+    #     self.pf = ProtocolFunction(self.game_name, server_name, protocol_name)

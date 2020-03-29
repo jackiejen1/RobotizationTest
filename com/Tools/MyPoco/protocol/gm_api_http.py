@@ -74,11 +74,14 @@ class GmApiHttp:
         :return:
         """
         url = self.construct_url(path_key)
-        r = requests.post(url, json=data)
-        data_json = r.json()
+        # r = requests.post(url, json=data)
+        # data_json = r.json(encoding = "utf-8")
         print('http post url : ' + url)
         print('http post data :' + json.dumps(data))
-        print('http post status_code : ' + str(r.status_code))
+        response = requests.request("POST", url, data=data)
+        print(response.text.encode('utf8'))
+        data_json = response.json()
+        print('http post status_code : ' + str(response.status_code))
         return data_json
 
     def get_role_id(self, payload):

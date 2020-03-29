@@ -44,8 +44,8 @@ class GmMethod:
         role_name_dic = eval(self.info.get_config(self.game_name,self.account))
         self.role_name = role_name_dic[server_name_input]
         # 获取角色ID
-        # self.role_id = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
-
+        role_id_dic = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
+        self.role_id = role_id_dic['data']['data']['role_id']
     def add_resources(self, resource_name_dic):
         """
         根据传入的道具列表添加道具
@@ -58,7 +58,9 @@ class GmMethod:
             resource_num = resource_name_dic[resource_name]
             data_value = self.mri.get_data_addordel(resource_name, resource_num)
             data_list.append(data_value)
-        body = {"account": self.account, "role_id": self.role_id, "sever": self.server_id, "data": {"data":data_list}}
+        data = {"data":data_list}
+        data = json.dumps(data, ensure_ascii=False)
+        body = {"account": self.account, "role_id": self.role_id, "sever": self.server_id, "data": data}
         log_dic = self.gah.add_resources(body)
         operation_description = "添加道具" + str(resource_name_list)
         self.dispose_log(operation_description, log_dic)
@@ -169,8 +171,8 @@ class GmMethod:
         role_dic["account"] = self.account
         role_dic["role_id"] = self.role_id
         role_dic["server"] = self.server_id
-        role_dic["checkpoint"] = level
-        log_dic = self.gah.set_checkpoint(role_dic)
+        role_dic["level"] = level
+        log_dic = self.gah.set_level(role_dic)
         self.dispose_log("设置等级", log_dic)
 
     def recharge_supplement(self, resource_name):
@@ -211,7 +213,7 @@ class GmMethod:
         """
         code = log_dic["code"]
         message = log_dic["message"]
-        if code == "":  # todo 返回码
+        if code == 0:
             description = "成功"
             print(operation_description + description)  # todo 加入报告中
         else:
