@@ -9,6 +9,7 @@
 # @Method:
 # Reference:********************************
 import json
+import time
 
 __author__ = "v.lidd"
 __title__ = '登录游戏'
@@ -31,10 +32,12 @@ from MyPoco.poco.my_poco_object import MyPocoObject
 from MyPoco.poco.my_poco_object import MakePocoDic
 from MyPoco.my_poco import MyPoco
 if __name__ == '__main__':
-    my_poco = MyPoco("少西")
-    poco = my_poco.set_poco()
-    my_poco.set_account_information_gm("_15854", "QA1")
-    my_poco.set_level(7)
+    juntuan_name = str(int(time.time()))[5:]
+    print(juntuan_name)
+    # my_poco = MyPoco("少西")
+    # poco = my_poco.set_poco()
+    # my_poco.set_account_information_gm("_15854", "QA1")
+    # my_poco.set_level(7)
     # 少西
     # url = "http://qa.test.snxyj.youzu.com/api/gm/level"
     # payload = {"account": "_15854","role_id":30001018283 ,"server": "2246440001","level":6}

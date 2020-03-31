@@ -13,4 +13,6 @@ from MyPoco.foundation.get_poco_dic import GetPocoDic
 if __name__ == '__main__':
     g = GetPocoDic()
     d = g.get_poco_dic()
+    # s = d["未命名0/popLayer/未命名0/未命名1/未命名4/未命名7/未命名1/未命名0"]
+    # print(s["pos"])
     print(d)

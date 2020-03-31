@@ -15,7 +15,7 @@ from airtest.core.helper import device_platform
 import six
 from poco.utils.simplerpc.transport.tcp.protocol import SimpleProtocolFilter
 from airtest.core.api import connect_device, device as current_device
-DEFAULT_TIMEOUT = 1
+DEFAULT_TIMEOUT = 10
 DEFAULT_SIZE = 4096
 
 class GetPocoDic(object):
@@ -75,7 +75,7 @@ class GetPocoDic(object):
 
     def recv(self, size=DEFAULT_SIZE):
         trunk = self.sock.recv(size)
-        if trunk == b"":
+        if trunk == b'':
             self._handle_close()
             raise socket.error("socket connection broken")
         return trunk
@@ -156,17 +156,21 @@ class GetPocoDic(object):
         self.connect()
         msg_bytes = self.prot.pack(b)
         self.send(msg_bytes)
-        ret1 = b""
+        self.buf = b''
         while True:
             try:
                 ret = self.recv()
             except Exception:
                 break
-            ret1 = ret1 + ret
-        ret = self.prot.unpack(ret1)
-        s = ret[1]
-        s = str(s, encoding="utf-8")
-        s = json.loads(s)
-        d = self.get_ui_tree(s["result"], {})
-        self.close()
-        return d
+            self.buf = self.buf + ret
+        if self.buf != b'':
+            ret = self.prot.unpack(self.buf)
+            s = ret[1]
+            print(ret[1])
+            s = str(s, encoding="utf-8")
+            s = json.loads(s)
+            d = self.get_ui_tree(s["result"], {})
+            self.close()
+            return d
+        else:
+            return {}

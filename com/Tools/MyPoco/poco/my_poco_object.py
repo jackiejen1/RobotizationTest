@@ -266,8 +266,6 @@ class MyPocoObject():
         """关闭游戏"""
         snapshot(msg="关闭游戏")
         stop_app(self.game_name)
-        thread_file_name = str(threading.get_ident())
-        self.info.remove_option("Phone_Size", thread_file_name)
 
     def get_poco_visible(self, poco_path):
         """

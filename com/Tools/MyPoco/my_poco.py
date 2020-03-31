@@ -106,6 +106,14 @@ class MyPoco:
         """
         return self.my_poco_obj.my_swipe(start_path, end_path, timein)
 
+    def renovate_and_get_poco_dic(self):
+        """
+        刷新UI信息并保存本地
+        :return: ui dic
+        """
+        return self.my_poco_obj.renovate_and_get_poco_dic()
+
+
     def my_swipe_pos(self, start_pos_list, end_pos_list,timein=3):
         """
         默认滑动时长3秒
