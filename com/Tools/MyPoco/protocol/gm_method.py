@@ -41,8 +41,9 @@ class GmMethod:
         server_id_dic = eval(self.info.get_config(self.game_name, server_name))
         self.server_id = server_id_dic["server_id"]
         # 角色名
-        role_name_dic = eval(self.info.get_config(self.game_name,self.account))
-        self.role_name = role_name_dic[server_name_input]
+        # role_name_dic = eval(self.info.get_config(self.game_name,self.account))
+        # self.role_name = role_name_dic[server_name_input]
+        self.role_name = ""
         # 获取角色ID
         role_id_dic = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
         self.role_id = role_id_dic['data']['data']['role_id']

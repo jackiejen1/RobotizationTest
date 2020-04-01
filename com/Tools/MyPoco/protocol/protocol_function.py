@@ -17,7 +17,7 @@ from foundation.information import Information
 
 
 class ProtocolFunction:
-    def __init__(self, game_name,server_name,protocol_name):
+    def __init__(self, game_name,server_name,protocol_name,username):
         """
         用于协议测试使用，创建账号的协议方法单独实现
         开局指定测试哪个游戏的哪条协议
@@ -25,12 +25,15 @@ class ProtocolFunction:
         :param server_name: 区服名
         :param game_name:
         """
+        self.game_name=game_name
         self.info = Information()
         self.pt = ProtocolTools(game_name)
-        self.username = self.info.get_config("Account_Number","new_game_account")
+        # self.username = self.info.get_config(self.game_name,"new_game_account1")
+        self.username = username
         self.protocol_name = protocol_name
         # self.protocol_ages_list= self.pt.get_args_list(protocol_name)  #  todo 可能有报错
         #开始连接
+        server_name = server_name+"_server_ages"
         socket_ages_dic = eval(self.info.get_config(game_name,server_name))
         host =socket_ages_dic["host"]   # host = "10.3.128.5"
         port =int(socket_ages_dic["port"])  # port = 16865
@@ -40,11 +43,12 @@ class ProtocolFunction:
         self.Login()#可以考虑单独启动
 
     def Login(self):
-        lg = LoginGame(self.socket,self.server_id,self.username)
+        lg = LoginGame(self.socket,self.server_id,self.game_name,self.username)
         flag, data = lg.MSG_C2G_Login()
         G2C_Login = cg_pb2.G2C_Login()
         G2C_Login.ParseFromString(data)
         print(G2C_Login)
+        print("账号登录成功")
         # self.uid = G2C_Login.uid
         # self.sid = G2C_Login.sid
         self.info.set_config("com.youzu.test.qa","uid",str(G2C_Login.uid))
@@ -52,6 +56,7 @@ class ProtocolFunction:
         # 如果ret等于3则需要创角协议
         print(G2C_Login.ret)
         if G2C_Login.ret == 3:
+            print("新账号，开始创建角色")
             flag, data = lg.MSG_C2G_Create()
 
     def send_protocol(self, arg_dic):

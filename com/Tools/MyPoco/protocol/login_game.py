@@ -17,10 +17,10 @@ from foundation.information import Information
 
 
 class LoginGame:
-    def __init__(self, socket, server_id, username=None):
+    def __init__(self, socket, server_id,game_name, username=None):
         self.info = Information()
         if username == None:
-            self.username = self.info.get_config("Account_Number", "new_game_account")
+            self.username = self.info.get_config(game_name, "new_game_account1")
         else:
             self.username = username
         self.socket = socket
@@ -70,4 +70,5 @@ class LoginGame:
                            'uid': int(float(uid)), 'sid': int(float(sid))}
         senddata = pack_data(C2G_Create, C2G_Create_attr)
         flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 32)
+        print("角色创建成功，账号："+self.username+"，区服id："+str(self.server_id)+"，角色名："+self.username)
         return flag, data

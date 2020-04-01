@@ -144,7 +144,7 @@ class DescriptorBase(six.with_metaclass(DescriptorMetaclass)):
     if self._options:
       return self._options
 
-    from google.protobuf import descriptor_pb2
+    from MyPoco.airtestide_lack_packages.google.protobuf import descriptor_pb2
     try:
       options_class = getattr(descriptor_pb2,
                               self._options_class_name)

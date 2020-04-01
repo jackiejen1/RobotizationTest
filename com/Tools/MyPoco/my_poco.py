@@ -35,6 +35,9 @@ class MyPoco:
         self.pp = PocoPos()
         self.rg = ResourceGm(self.game_name)
         self.newaccount = NewAccount(self.game_name)
+
+    def set_protocol(self,server_name,username,protocol_name=""):
+        self.protocol=ProtocolFunction(self.game_name,server_name,protocol_name,username)
     def set_poco(self):
         """
         编写脚本时使用

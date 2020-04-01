@@ -103,7 +103,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
                 return recvdata, recvtime
             s.settimeout(limittime)
             rev_data = s.recv(buffersize)
-            print("rev_data-------------->",len(rev_data))
+            # print("rev_data-------------->",len(rev_data))
             if len(rev_data) != buffersize:
                 recvtime = time.time()
                 recvdata = b'error'
@@ -116,7 +116,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
                 failure('socket', api_attr['name'], "len(rev_data) == 0")
                 return data, recv_time
             head_data = struct.unpack('>IIQQQ', rev_data)
-            print("消息头-->{}".format(head_data))
+            # print("消息头-->{}".format(head_data))
             s.settimeout(limittime)
             tmpdata = s.recv(head_data[0] - 32)
             while (len(tmpdata) < (head_data[0] - 32)):
