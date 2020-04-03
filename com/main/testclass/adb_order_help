@@ -1,0 +1,61 @@
+ADB常用命令https://blog.csdn.net/zhonglunshun/article/details/78362439
+
+# os.system("adb kill-server")
+# os.system("adb start-server")
+# os.system("adb devices")
+# 指定设备并打开app
+# os.system("adb -s 127.0.0.1:62001 shell am start -n 'com.youzu.test.qa/org.cocos2dx.lua.AppActivity'")
+# 点击手机x.y坐标
+# os.system("adb shell input tap 840 500")
+# 在输入框输入文本
+# os.system("adb shell input text 123456")
+# 执行安卓内部命令 代码见api（https://blog.csdn.net/zhonglunshun/article/details/78362439）
+# os.system("adb shell input keyevent 224")
+# 获取整体手机的cpu使用情况
+# adb shell dumpsys cpuinfo | findstr TOTAL
+# 获取单个APP的cpu使用情况
+# adb shell dumpsys cpuinfo |findstr com.youzu.test.qa
+# 使用adb shell top 会一直不断刷新，根据top用法可设置单次情况
+# adb shell top -m 100 -n 1 -s cpu
+# 获取设备的内存使用情况
+# list = os.system("adb shell cat /proc/meminfo")
+# 在控制台打印指定app内存使用情况
+# os.system("adb shell dumpsys meminfo com.youzu.test.qa")
+# 获取指定app的内存占用信息，
+# list = os.popen("adb shell dumpsys meminfo com.youzu.test.qa").readlines()
+# 获取手机屏幕分辨率
+# adb shell wm size
+# 设置手机屏幕分辨率
+# adb shell wm size 480x1024
+# 恢复原分辨率命令：
+# adb shell wm size reset
+# 获取电池电量 scale 代表最大电量，level 代表当前电量
+# adb shell dumpsys battery
+# 截图保存到电脑
+# adb exec-out screencap -p > sc.png
+# 重启手机
+# adb reboot
+# 所有应用
+# adb shell pm list packages
+# 随机操作指令
+# adb shell monkey -p com.youzu.test.qa -v 500（操作步数）
+# 查看手机中安装的apk列表
+# adb shell pm list package   os.popen返回一个列表
+# 查看当前启动中的应用信息
+# adb shell dumpsys window | findstr mCurrentFocus
+# 通过adb shell命令查看当前与用户交互的activity
+#  adb shell dumpsys activity | grep -i run
+# 禁用屏幕自动旋转 i：0（关闭旋转）,1（开启旋转）
+# adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
+# 旋转屏幕，需要先禁用屏幕自动旋转。i参数：0,1,2,3
+# adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
+# 获取手机系统信息（ CPU，厂商名称等）
+# adb shell "cat /system/build.prop | grep "product""
+# 获取手机型号
+# adb devices -l
+# adb shell getprop | grep product
+
+
+# Book
+# adb 启动Activity、Service，发送Broadcast以及Android常用的adb指令
+# https://blog.csdn.net/hanfengzqh/article/details/53519571
