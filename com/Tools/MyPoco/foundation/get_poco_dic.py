@@ -1,13 +1,13 @@
 # _*_coding:utf-8 _*_
-#!/usr/bin/python3
-#Reference:********************************
+# !/usr/bin/python3
+# Reference:********************************
 # encoding: utf-8
-#@Time: 2020/3/25  10:39
-#@Author: 洞洞
-#@File: get_poco_dic.py
-#@Function:
-#@Method:
-#Reference:********************************
+# @Time: 2020/3/25  10:39
+# @Author: 洞洞
+# @File: get_poco_dic.py
+# @Function:
+# @Method:
+# Reference:********************************
 import json
 import socket
 import uuid
@@ -15,11 +15,16 @@ from airtest.core.helper import device_platform
 import six
 from poco.utils.simplerpc.transport.tcp.protocol import SimpleProtocolFilter
 from airtest.core.api import connect_device, device as current_device
-DEFAULT_TIMEOUT = 10
+
+DEFAULT_TIMEOUT = 2
 DEFAULT_SIZE = 4096
+PORT = 15004 #需要区分端口号  cocoslua
+# PORT = 5001  # unity
+
 
 class GetPocoDic(object):
     """safe and exact recv & send"""
+
     def __init__(self, phone_name="", on_connect=None, on_close=None):
         """address is (host, port) tuple"""
         self.phone_name = phone_name
@@ -30,8 +35,9 @@ class GetPocoDic(object):
         self.sock = None
         self.buf = b""
         self.prot = SimpleProtocolFilter()
+
     def connect_phone(self):
-        self.port = 15004
+        self.port = PORT
         device = None or current_device()
         if not device:
             device = connect_device("Android:///" + self.phone_name)
@@ -166,7 +172,6 @@ class GetPocoDic(object):
         if self.buf != b'':
             ret = self.prot.unpack(self.buf)
             s = ret[1]
-            print(ret[1])
             s = str(s, encoding="utf-8")
             s = json.loads(s)
             d = self.get_ui_tree(s["result"], {})

@@ -123,6 +123,7 @@ class MakePocoDic:
                     raise NoneException(poco_path)
 
     def my_touch(self, poco_path):
+        self.renovate_and_get_poco_dic()
         touch_int_list = self.get_poco_pos(poco_path)
         touch(touch_int_list)
         print("点击坐标" + str(touch_int_list) + "完成")
@@ -137,6 +138,7 @@ class MakePocoDic:
         :param pos_list: [123,123]
         :return:
         """
+        self.renovate_and_get_poco_dic()
         touch(pos_list)
         print("点击坐标" + str(pos_list) + "完成")
         self.renovate_and_get_poco_dic()

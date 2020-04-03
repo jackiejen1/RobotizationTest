@@ -54,4 +54,5 @@ class UnityPoco(StdPoco):
             # can apply auto detection in the future
             dev = connect_device("Android:///")
 
+
         super(UnityPoco, self).__init__(addr[1], dev, **options)
