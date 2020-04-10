@@ -28,34 +28,35 @@ class GetPocoDic(object):
     def __init__(self, phone_name="", on_connect=None, on_close=None):
         """address is (host, port) tuple"""
         self.phone_name = phone_name
-        self.connect_phone()
-        self.address = (self.ip, self.port)
         self.on_connect = on_connect
         self.on_close = on_close
         self.sock = None
         self.buf = b""
         self.prot = SimpleProtocolFilter()
+        self.device = None or current_device()
+        if not self.device:
+            self.device = connect_device("Android:///" + self.phone_name)
+        self.phone_size = self.device.adb.get_display_info()
+        self.platform_name = device_platform(self.device)
+        self.connect_phone()
+        self.address = (self.ip, self.port)
 
     def connect_phone(self):
         self.port = PORT
-        device = None or current_device()
-        if not device:
-            device = connect_device("Android:///" + self.phone_name)
-        platform_name = device_platform(device)
-        if platform_name == 'Android':
+        if self.platform_name == 'Android':
             # always forward for android device to avoid network unreachable
-            local_port, _ = device.adb.setup_forward('tcp:{}'.format(self.port))
-            self.ip = device.adb.host or 'localhost'
+            local_port, _ = self.device.adb.setup_forward('tcp:{}'.format(self.port))
+            self.ip = self.device.adb.host or 'localhost'
             self.port = local_port
-        elif platform_name == 'IOS':
+        elif self.platform_name == 'IOS':
             # ip = device.get_ip_address()
             # use iproxy first
             self.ip = 'localhost'
-            local_port, _ = device.instruct_helper.setup_proxy(self.port)
+            local_port, _ = self.device.instruct_helper.setup_proxy(self.port)
             self.port = local_port
         else:
             try:
-                self.ip = device.get_ip_address()
+                self.ip = self.device.get_ip_address()
             except AttributeError:
                 try:
                     self.ip = socket.gethostbyname(socket.gethostname())
@@ -154,6 +155,8 @@ class GetPocoDic(object):
                 new_poco_dic = self.get_ui_tree(childs_dic, new_poco_dic)
 
         return new_poco_dic
+    def get_phone_size(self):
+        return self.phone_size
 
     def get_poco_dic(self):
         b = {"method": "Dump", "params": [True], "jsonrpc": "2.0", "id": ""}
@@ -171,11 +174,11 @@ class GetPocoDic(object):
             self.buf = self.buf + ret
         if self.buf != b'':
             ret = self.prot.unpack(self.buf)
-            s = ret[1]
-            s = str(s, encoding="utf-8")
-            s = json.loads(s)
-            d = self.get_ui_tree(s["result"], {})
+            poco_path_dic_byte = ret[1]
+            poco_path_dic_str = str(poco_path_dic_byte, encoding="utf-8")
+            poco_path_dic_list = json.loads(poco_path_dic_str)
+            poco_path_dic = self.get_ui_tree(poco_path_dic_list["result"], {})
             self.close()
-            return d
+            return poco_path_dic
         else:
             return {}

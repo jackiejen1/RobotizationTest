@@ -15,10 +15,11 @@ from game_support.entry_game_sx import EntryGameSx
 
 class EntryGame:
 
-    def __init__(self,game_name):
+    def __init__(self,game_name,phone_id):
 
         self.info = Information()
         self.game_name=game_name
+        self.phone_id = phone_id
 
     # 接口方法，后期拓展游戏使用
     def entry_game(self, sever_name_input, game_account_input,red_info):
@@ -27,7 +28,7 @@ class EntryGame:
         :return:poco
         """
         if self.game_name == "com.youzu.test.qa":  # ss2
-            egss2 = EntryGameSs2()
+            egss2 = EntryGameSs2(self.phone_id)
             egss2.entry_game_ss2(sever_name_input, game_account_input,red_info)
         elif self.game_name == "com.youzu.wgame2":
             egsx = EntryGameSx(self.game_name)

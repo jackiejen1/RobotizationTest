@@ -9,6 +9,8 @@
 # @Method:
 # Reference:********************************
 import json
+import os
+import re
 import time
 
 __author__ = "v.lidd"
@@ -30,10 +32,26 @@ __desc__ = """ 1.
 import requests
 from MyPoco.poco.my_poco_object import MyPocoObject
 from MyPoco.poco.my_poco_object import MakePocoDic
-from MyPoco.my_poco import MyPoco
+# from MyPoco.my_poco import MyPoco
 
 if __name__ == '__main__':
     pass
+    # s = os.popen("adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -i ; echo ---$?---")
+    # s = s.readlines()
+    # m = re.findall(r"{.*?}", str(s))
+    # s = str(m[0])
+    # width=re.findall(r"width.*?,", str(s))
+    # height = re.findall(r"height.*?,", str(s))
+    # width = '''{"'''+width[0][:-1]+"}"
+    # height = '''{"'''+height[0][:-1]+"}"
+    # width = json.loads(width)
+    # height= json.loads(height)
+    # print(width)
+    # print(height)
+
+    # print(str(m))
+    # print(re.findall(r"width:.*?,", str(m)))
+    # print(re.findall(r"height:.*?,", str(m)))
     # my_poco = MyPoco("少西")
     # poco = my_poco.set_poco()
     # my_poco.set_account_information_gm("_15854", "QA1")
@@ -46,8 +64,8 @@ if __name__ == '__main__':
 
     # url = "http://qa.test.snxyj.youzu.com/api/gm/resources/add"
     # data = {"type": 1, "id": 0, "num": 1}
-    # data = json.dumps(data, ensure_ascii=False)
     # data = [data,data,data]
+    # data = json.dumps(data, ensure_ascii=False)
     # payload = {"account": "_mxq777", "role_id": 40001004231, "server": "2246440002", "data": data}
     # response = requests.request("POST", url, data=payload)
     # print(response.text.encode('utf8'))
@@ -70,8 +88,8 @@ if __name__ == '__main__':
     # 少三
     # url_add = "http://10.3.39.187:8088/api/gm/resources/add"
     # data = {"type": 3, "id": 5777, "num": 1}
-    # data = json.dumps(data, ensure_ascii=False)
     # data = [data,data,data]
+    # data = json.dumps(data, ensure_ascii=False)
     # payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
     # response = requests.request("POST", url_add, data=payload)
     # print(response.text.encode('utf8'))

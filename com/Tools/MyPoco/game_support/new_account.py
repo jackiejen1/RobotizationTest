@@ -14,11 +14,11 @@ from game_support.new_account_ss2 import NewAccountSs2
 
 class NewAccount:
 
-    def __init__(self,game_name):
+    def __init__(self,game_name,phone_id):
         self.info = Information()
         self.game_name =game_name
         if self.game_name == "com.youzu.test.qa":
-            self.nas = NewAccountSs2()
+            self.nas = NewAccountSs2(phone_id)
         else:
             pass
 

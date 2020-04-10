@@ -13,11 +13,11 @@ from game_support.unexpected_win_ss2 import UnexpectedWinSs2
 from game_support.unexpected_win_sx import UnexpectedWinSx
 
 class UnexpectedWin:
-    def __init__(self, game_name):
+    def __init__(self, game_name,phone_id):
         self.info = Information()
         self.game_name = game_name
         self.uw = None
-
+        self.phone_id =phone_id
     def unexpected_win(self):
         """
         异常弹窗跳过，区分不同的游戏走不同的逻辑
@@ -26,10 +26,10 @@ class UnexpectedWin:
         """
         if self.uw == None:
             if self.game_name == "com.youzu.wgame2":
-                self.uw = UnexpectedWinSx()
+                self.uw = UnexpectedWinSx(self.phone_id)
                 self.uw.unexpected_win()
             elif self.game_name == "com.youzu.test.qa":
-                self.uw = UnexpectedWinSs2()
+                self.uw = UnexpectedWinSs2(self.phone_id)
                 self.uw.unexpected_win()
         else:
             print("开始查找异常窗口")

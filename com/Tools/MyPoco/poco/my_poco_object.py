@@ -21,41 +21,41 @@ from game_support.unexpected_win import UnexpectedWin
 
 class MyPocoObject():
 
-    def __init__(self,game_name):
+    def __init__(self,game_name,phone_id):
         """
         创建依赖对象，保存全局信息
         """
         self.game_name=game_name
-        self.make_poco_dic = MakePocoDic()
+        self.make_poco_dic = MakePocoDic(phone_id)
         self.info = Information()
-        self.uw = UnexpectedWin(game_name)
+        self.uw = UnexpectedWin(game_name,phone_id)
         self.poco = None
-    def renovate_and_get_poco_dic(self):
-        """
-        刷新UI信息并保存本地
-        :return: ui dic
-        """
-        return self.make_poco_dic.renovate_and_get_poco_dic()
+    # def renovate_and_get_poco_dic(self):
+    #     """
+    #     刷新UI信息并保存本地
+    #     :return: ui dic
+    #     """
+    #     return self.make_poco_dic.renovate_and_get_poco_dic()
 
     def get_poco_dic(self):
         """
-        获取本地UI信息
+        刷新并获取当前界面UI信息
         :return: ui dic
         """
         return  self.make_poco_dic.get_poco_dic()
 
-    def new_poco_obj(self):
-        """
-        游戏启动之后启动该方法
-        根据游戏不同创建不同的poco对象，用来刷新poco_dic数据
-        先运行此方法，然后才能使用其他方法
-        """
-        if self.game_name == "com.youzu.test.qa" or self.game_name == "com.youzu.wgame2":
-            self.poco = StdPoco()
-        elif self.game_name == "com.youzu.yztest_nosdk":
-            self.poco = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
-        self.make_poco_dic.set_poco(self.poco)
-        return self.poco
+    # def new_poco_obj(self):
+    #     """
+    #     游戏启动之后启动该方法
+    #     根据游戏不同创建不同的poco对象，用来刷新poco_dic数据
+    #     先运行此方法，然后才能使用其他方法
+    #     """
+    #     if self.game_name == "com.youzu.test.qa" or self.game_name == "com.youzu.wgame2":
+    #         self.poco = StdPoco()
+    #     elif self.game_name == "com.youzu.yztest_nosdk":
+    #         self.poco = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
+    #     self.make_poco_dic.set_poco(self.poco)
+    #     return self.poco
 
     def my_swipe(self, start_path, end_path, timein=2):
         """
@@ -70,13 +70,11 @@ class MyPocoObject():
             start, end = self.make_poco_dic.my_swipe(start_path, end_path, duration=timein)
         except RpcTimeoutError:
             snapshot(msg="poco超时异常")
-            self.new_poco_obj()
             start, end = self.make_poco_dic.my_swipe(start_path, end_path, duration=timein)
         except ConnectionAbortedError:
             start_app(self.game_name)
             time.sleep(4)
             snapshot(msg="10053异常")
-
         time.sleep(1)
         return start, end
     def touch(self,pos_list):
@@ -100,7 +98,6 @@ class MyPocoObject():
             self.make_poco_dic.my_touch(poco_path)
         except RpcTimeoutError:
             snapshot(msg="poco超时异常")
-            self.new_poco_obj()
             self.make_poco_dic.my_touch(poco_path)
         except ConnectionAbortedError:
             start_app(self.game_name)
@@ -120,7 +117,6 @@ class MyPocoObject():
             self.make_poco_dic.touch_poco_obj(poco_path,click_list)
         except RpcTimeoutError:
             snapshot(msg="poco超时异常")
-            self.new_poco_obj()
             self.make_poco_dic.touch_poco_obj(poco_path,click_list)
         except ConnectionAbortedError:
             start_app(self.game_name)
@@ -175,7 +171,7 @@ class MyPocoObject():
         :return: bool  True or False
         """
 
-        bool = self.make_poco_dic.get_poco_visible(poco_path)
+        bool = self.make_poco_dic.get_poco_any_value(poco_path,"getVisible")
         pos_list = self.make_poco_dic.get_poco_any_value(poco_path, 'pos')
         if bool and pos_list[0] < 1 and pos_list[1] < 1:
             is_exist = True
@@ -267,14 +263,14 @@ class MyPocoObject():
         snapshot(msg="关闭游戏")
         stop_app(self.game_name)
 
-    def get_poco_visible(self, poco_path):
-        """
-        获取游戏visible属性中的值
-        :param poco_path:poco路径
-        :return True/False
-        :raise
-        """
-        return self.make_poco_dic.get_poco_visible(poco_path)
+    # def get_poco_visible(self, poco_path):
+    #     """
+    #     获取游戏visible属性中的值
+    #     :param poco_path:poco路径
+    #     :return True/False
+    #     :raise
+    #     """
+    #     return self.make_poco_dic.get_poco_any_value(poco_path,"getVisible")
 
     def get_poco_any_value(self, poco_path, value_name_str):
         """

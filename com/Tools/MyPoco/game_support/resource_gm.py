@@ -16,14 +16,14 @@ from MyPoco.game_support.resource_gm_ss2 import ResourceGmSs2
 
 class ResourceGm:
 
-    def __init__(self,game_name):
+    def __init__(self,game_name,phone_id):
         """
         在if、elif结构中初始化对象
         """
         self.info = Information()
         self.game_name = game_name
         if self.game_name == "com.youzu.test.qa":
-            self.rgss2 = ResourceGmSs2("com.youzu.test.qa")
+            self.rgss2 = ResourceGmSs2("com.youzu.test.qa",phone_id)
         else:
             pass
     def add_resource(self, add_name_input_dic):

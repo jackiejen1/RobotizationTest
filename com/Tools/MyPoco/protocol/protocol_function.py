@@ -49,15 +49,16 @@ class ProtocolFunction:
         G2C_Login.ParseFromString(data)
         print(G2C_Login)
         print("账号登录成功")
-        # self.uid = G2C_Login.uid
-        # self.sid = G2C_Login.sid
         self.info.set_config("com.youzu.test.qa","uid",str(G2C_Login.uid))
         self.info.set_config("com.youzu.test.qa","sid",str(G2C_Login.sid))
         # 如果ret等于3则需要创角协议
-        print(G2C_Login.ret)
+        print(str(G2C_Login.uid))
         if G2C_Login.ret == 3:
             print("新账号，开始创建角色")
-            flag, data = lg.MSG_C2G_Create()
+            flag_Create, data_Create = lg.MSG_C2G_Create()
+            G2C_Create = cg_pb2.C2G_Create()
+            G2C_Create.ParseFromString(data_Create)
+            print(G2C_Create)
 
     def send_protocol(self, arg_dic):
         """

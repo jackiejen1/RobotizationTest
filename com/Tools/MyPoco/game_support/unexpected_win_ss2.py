@@ -16,10 +16,20 @@ from foundation.make_poco_dic import MakePocoDic
 
 
 class UnexpectedWinSs2:
-    def __init__(self):
-        self.make_poco_dic = MakePocoDic()
-        self.poco = StdPoco()
-        self.make_poco_dic.set_poco(self.poco)
+    def __init__(self, phone_id):
+        self.make_poco_dic = MakePocoDic(phone_id)
+        # self.poco = StdPoco()
+        # self.make_poco_dic.set_poco(self.poco)
+
+    # def get_poco_dic(self):
+    #     now_poco_dic = self.make_poco_dic.get_poco_dic()
+    #     self.now_poco_path_list = now_poco_dic.keys()
+    # 
+    # def is_in_dic(self, poco_path):
+    #     if poco_path in self.now_poco_path_list:
+    #         return True
+    #     else:
+    #         return False
 
     def unexpected_win(self):
         """
@@ -32,7 +42,6 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("内更新"):  # 点击完下载资源启动游戏
             self.make_poco_dic.my_touch("下载点2")
             time.sleep(30)
-            self.make_poco_dic.renovate_and_get_poco_dic()
             for i in range(5):
                 if self.make_poco_dic.is_in_dic("InputName"):
                     return
@@ -68,18 +77,20 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4002"):
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/4002")
             self.make_poco_dic.my_touch("Btn_return")
-        if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):#副本龙炮
+        # if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):#副本龙炮
+        if self.make_poco_dic.is_in_dic("巨兽-龙炮"):  # 副本龙炮
             self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
 
         # 断网
-        if self.make_poco_dic.is_in_dic("ComAssistPop"):
+        if self.make_poco_dic.is_in_dic("您的网络状况不佳"):
             for i in range(3):
-                if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_confirm"):
-                    s = self.make_poco_dic.get_poco_text("ComAssistPop/__view/Label_des")
-                    if "是否" in s:
-                        pass
-                    else:
-                        self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_confirm")
+                # if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_confirm"):
+                #     s = self.make_poco_dic.get_poco_any_value("ComAssistPop/__view/Label_des", "text")
+                #     if "是否" in s:
+                #         pass
+                #     else:
+                #         self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_confirm")
+                self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_confirm")
                 sleep(5)
                 if i == 2:  # 就当连不上，放弃重连
                     if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_cancel"):
@@ -91,4 +102,3 @@ class UnexpectedWinSs2:
             snapshot(msg="游戏报错")
             self.make_poco_dic.my_touch("Btn_ok")
             raise NotHaveGameException
-

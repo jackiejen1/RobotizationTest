@@ -16,10 +16,10 @@ from poco.my_poco_object import MyPocoObject
 
 
 class EntryGameSs2:
-    def __init__(self):
+    def __init__(self,phone_id):
         self.game_name="com.youzu.test.qa"
         self.info = Information()
-        self.my_poco_obj = MyPocoObject(self.game_name)
+        self.my_poco_obj = MyPocoObject(self.game_name,phone_id)
 
     def entry_game_ss2(self, sever_name_input, game_account_input,red_info):
         """
@@ -34,7 +34,6 @@ class EntryGameSs2:
         time.sleep(2)
         start_app(self.game_name)
         time.sleep(16)
-        poco = self.my_poco_obj.new_poco_obj()
         if red_info:
             game_account = self.info.get_config(self.game_name, game_account_input)
         else:
@@ -46,7 +45,7 @@ class EntryGameSs2:
         time.sleep(1)
         self.my_poco_obj.touch_poco("AnnoCloseBtn")
         self.my_poco_obj.touch_poco("点击选服")
-        self.my_poco_obj.touch_poco("11 - 20区")  # todo 不同游戏可能要改
+        self.my_poco_obj.touch_poco_obj("11 - 20区",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
         sever_name = self.info.get_config(self.game_name, sever_name_input)
         self.my_poco_obj.touch_poco(sever_name)
         self.my_poco_obj.touch_poco("Txt_guide")  # 关闭新手引导
@@ -63,15 +62,13 @@ class EntryGameSs2:
             time.sleep(2)
             start_app(self.game_name)
             time.sleep(20)
-            poco = self.my_poco_obj.new_poco_obj()
             game_account = self.info.get_config(self.game_name, game_account_input)
             self.my_poco_obj.touch_poco("InputName")
             text(game_account)
             self.my_poco_obj.touch_poco("确 认")
             self.my_poco_obj.touch_poco("AnnoCloseBtn")
             self.my_poco_obj.touch_poco("点击选服")
-            self.my_poco_obj.touch_poco_obj(poco("List_kind_server").child(text="11 - 20区"),
-                                            click_list=[0.95, 0.15])  # todo 不同游戏可能要改
+            self.my_poco_obj.touch_poco_obj("11 - 20区",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
             sever_name = self.info.get_config(self.game_name, sever_name_input)
             self.my_poco_obj.touch_poco(sever_name)
             self.my_poco_obj.touch_poco("Txt_guide")  # 关闭新手引导
@@ -82,7 +79,6 @@ class EntryGameSs2:
             time.sleep(15)
         for i in range(10):
             print("开始关闭广告")
-            self.my_poco_obj.renovate_and_get_poco_dic()
             if self.my_poco_obj.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 广告
                 print("关闭广告")# todo 没有进来
                 self.my_poco_obj.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close")

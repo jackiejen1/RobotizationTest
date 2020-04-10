@@ -22,7 +22,7 @@ from protocol.protocol_function import ProtocolFunction
 
 
 class MyPoco:
-    def __init__(self, game_name):
+    def __init__(self, game_name,phone_id):
         """
         :param game_name: 游戏名字，见ini文件App_Name项
         """
@@ -30,30 +30,35 @@ class MyPoco:
         my_poco_path = os.path.abspath(os.path.dirname(__file__))
         self.info.set_config("MyPocoPath", "MyPocoPath", my_poco_path)
         self.game_name = self.info.get_config("App_Name", game_name)
-        self.my_poco_obj = MyPocoObject(self.game_name)
+        self.my_poco_obj = MyPocoObject(self.game_name,phone_id)
         self.gm = GmMethod(self.game_name)
         self.pp = PocoPos()
-        self.rg = ResourceGm(self.game_name)
-        self.newaccount = NewAccount(self.game_name)
+        self.rg = ResourceGm(self.game_name,phone_id)
+        self.newaccount = NewAccount(self.game_name,phone_id)
+        self.phone_id=phone_id
 
     def set_protocol(self,server_name,username,protocol_name=""):
+        """
+        设置协议基本信息，目前只用于创建角色用，其他协议暂不使用
+        :param server_name: 服务器名
+        :param username: 账号
+        :param protocol_name: 协议名
+        :return:
+        """
         self.protocol=ProtocolFunction(self.game_name,server_name,protocol_name,username)
-    def set_poco(self):
+    # def set_poco(self):
+    #     """
+    #     编写脚本时使用
+    #     :param poco_path:
+    #     :return:
+    #     """
+    #     return self.my_poco_obj.new_poco_obj()
+    def get_poco_dic(self):
         """
-        编写脚本时使用
-        :param poco_path:
-        :return:
+        刷新并获取当前界面UI信息
+        :return: ui dic
         """
-        return self.my_poco_obj.new_poco_obj()
-
-    def test_touch(self, poco_path):
-        """
-        编写脚本时使用测试控件名正确性的方法
-        :param poco_path:
-        :return:
-        """
-        self.set_poco()
-        self.my_touch(poco_path)
+        return  self.my_poco_obj.get_poco_dic()
 
     def set_account_information_gm(self, account, server_name):
         """
@@ -65,7 +70,9 @@ class MyPoco:
         self.gm.set_account_information(account, server_name_input=server_name)
 
     def set_xn_test(self):
-        # 进行性能测试时需要先启动该方法
+        """
+        进行性能测试时需要先启动该方法
+        """
         self.xt = XnTest()
 
     # todo err_close_game
@@ -86,10 +93,10 @@ class MyPoco:
         :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """
-        entry = EntryGame(self.game_name)
+        entry = EntryGame(self.game_name,self.phone_id)
         entry.entry_game(sever_name_input, game_account_input,red_info)
-        poco = self.my_poco_obj.new_poco_obj()
-        return poco
+        # poco = self.my_poco_obj.new_poco_obj()
+        # return poco
 
     def close_game(self):
         """
@@ -109,12 +116,12 @@ class MyPoco:
         """
         return self.my_poco_obj.my_swipe(start_path, end_path, timein)
 
-    def renovate_and_get_poco_dic(self):
-        """
-        刷新UI信息并保存本地
-        :return: ui dic
-        """
-        return self.my_poco_obj.renovate_and_get_poco_dic()
+    # def renovate_and_get_poco_dic(self):
+    #     """
+    #     刷新UI信息并保存本地
+    #     :return: ui dic
+    #     """
+    #     return self.my_poco_obj.renovate_and_get_poco_dic()
 
 
     def my_swipe_pos(self, start_pos_list, end_pos_list,timein=3):
@@ -129,12 +136,13 @@ class MyPoco:
     def my_touch(self, poco_path,click_list=None):
         """
         :param poco_path:控件路径
+        :param click_list:控件点击偏移点[0,0]-[1,1]范围
         :return:Exception
         """
         if click_list ==None:
             self.my_poco_obj.touch_poco(poco_path)
         else:
-            self.touch_poco_obj(poco_path,click_list)
+            self.my_poco_obj.touch_poco_obj(poco_path, click_list)
 
     def my_touch_pos(self, pos_list_int):
         """
@@ -165,13 +173,6 @@ class MyPoco:
 
     # todo 报错刷新
     # @err_close_game
-    def touch_poco_obj(self, poco_path, click_list=[0.5, 0.5]):
-        """
-        :param find_poco:查找的poco对象的name(路径)
-        :param click_list:控件点击偏移点[0,0]-[1,1]范围
-        :raise:PocoNoSuchNodeException
-        """
-        self.my_poco_obj.touch_poco_obj(poco_path, click_list)
 
     def get_config(self, list_name, key):
         """
@@ -264,13 +265,13 @@ class MyPoco:
         """
         return self.my_poco_obj.get_game_number_instr(poco_path)
 
-    def get_poco_visible(self, poco_path):
-        """
-        获取游戏visible属性中的值
-        :param poco_path:poco路径
-        :return:True/False
-        """
-        return self.my_poco_obj.get_poco_visible(poco_path)
+    # def get_poco_visible(self, poco_path):
+    #     """
+    #     获取游戏visible属性中的值
+    #     :param poco_path:poco路径
+    #     :return:True/False
+    #     """
+    #     return self.my_poco_obj.get_poco_visible(poco_path)
 
     def get_poco_any_value(self, find_poco_path, value_name_str):
         """
@@ -317,8 +318,8 @@ class MyPoco:
         :return:poco对象
         """
         # todo
-        poco = self.my_poco_obj.new_poco_obj()
-        return poco
+
+        return
 
     def touch_tab_xn(self):
         """

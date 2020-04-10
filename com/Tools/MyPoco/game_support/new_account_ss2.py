@@ -13,11 +13,11 @@ from foundation.information import Information
 
 class NewAccountSs2:
 
-    def __init__(self):
+    def __init__(self,phone_id):
         self.info = Information()
         self.game_name = "com.youzu.test.qa"
-        self.my_poco_obj = MyPocoObject(self.game_name)
-        self.rg = ResourceGm(self.game_name)
+        self.my_poco_obj = MyPocoObject(self.game_name,phone_id)
+        self.rg = ResourceGm(self.game_name,phone_id)
 
     def new_account_ss2(self, resource_dic_input, sever_name_input,play_dic):
         """
@@ -32,7 +32,7 @@ class NewAccountSs2:
         sleep(2)
         start_app(self.game_name)
         sleep(16)
-        self.poco = self.my_poco_obj.new_poco_obj()
+        # self.poco = self.my_poco_obj.new_poco_obj()
         newUser = str(int(time.time()))[3:]  # 时间戳截取账号
         self.info.set_config(self.game_name, "new_game_account1", newUser)  # 记录账号
         self.my_poco_obj.touch_poco("InputName")
@@ -49,6 +49,14 @@ class NewAccountSs2:
         role_name = self.my_poco_obj.get_poco_any_value("未命名0/module/CreateLayer/__view/Input_name","text")
         self.my_poco_obj.touch_poco("进入游戏")  # 创建角色
         sleep(15)
+        self.my_poco_obj.get_poco_dic()
+        for i in range(5):
+            time.sleep(2)
+            try:
+                if self.my_poco_obj.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):
+                    self.my_poco_obj.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close")
+            except:
+                pass
         self.rg.add_resource(resource_dic_input)  # 添加资源
         if "副本"in play_dic.keys():
             self.rg.set_play_fuben_num(play_dic["副本"])
