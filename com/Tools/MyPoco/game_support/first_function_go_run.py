@@ -12,17 +12,17 @@ from game_support.first_function_go_run_ss2 import FirstFunctionGoRunSs2
 
 
 class FirstFunctionGoRun:
-    def __init__(self,game):
+    def __init__(self,game_name):
 
-        self.game_name = game
+        self.game_name = game_name
 
-    def first_function_go_run(self):
+    def first_function_go_run(self,phone_id):
         """
         用来跳过一些功能初次进入的引导动画
         :return:
         """
         if self.game_name == "com.youzu.test.qa":
             ffgrs2 = FirstFunctionGoRunSs2()
-            ffgrs2.first_function_go_run_ss2()
+            ffgrs2.first_function_go_run_ss2(phone_id)
         else:
             pass

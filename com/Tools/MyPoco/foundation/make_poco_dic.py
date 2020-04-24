@@ -12,7 +12,7 @@
 import threading
 
 from airtest.core.api import *
-
+from airtest.core.helper import (G)
 from airtest.report.report import simple_report
 
 from airtestide_lack_packages.compat import script_dir_name
@@ -20,22 +20,25 @@ from airtestide_lack_packages.compat import script_dir_name
 from foundation.MyException import *
 from foundation.information import Information
 
-
 class MakePocoDic:
-    def __init__(self, phone_id):
+    def __init__(self, game_name, phone_id):
+        self.game_name = game_name
         self.thread_file_name = str(threading.get_ident())
         self.info = Information()
         path, name = script_dir_name(__file__)
         self.logpath = path + "/" + name[:-3] + "/" + name
         self.complete_poco_path = None
-        self.gpd = GetPocoDic(phone_id)
-        self.phone_size_list = self.gpd.phone_size
-        # 处理一下横竖屏
-        if self.phone_size_list['orientation'] == 0 or 2 :
+        self.gpd = GetPocoDic(game_name, phone_id)
+        self.poco_dic = None
+        self.phone_size_list = None
+        self.sleep_time = None
+
+    def set_phone_size(self):
+        self.phone_size_list = self.gpd.get_phone_size()
+        if self.phone_size_list['orientation'] == 0 or self.phone_size_list['orientation'] == 2:
             self.phone_size_list = [self.phone_size_list["width"], self.phone_size_list["height"]]  # 竖屏[x,y]
         else:
             self.phone_size_list = [self.phone_size_list["height"], self.phone_size_list["width"]]  # 横屏[x,y]
-        self.poco_dic = None
 
     # def set_poco(self, poco):
     #     self.poco = poco
@@ -88,23 +91,53 @@ class MakePocoDic:
         poco_name_path_list = self.poco_dic.keys()
         return poco_name_path_list
 
+    def is_this_text(self, poco_path, text):
+        """
+        判断节点的文字
+        :param poco_path: 节点的绝对路径
+        :param text: 需要判断的文字
+        :return: bool
+        """
+        if self.poco_dic == None:
+            # 点击之后会清空，需要刷一下最新的UI树
+            self.get_poco_dic()
+        if poco_path in self.poco_dic.keys():
+            print("找到路径" + poco_path)
+            this_text = self.poco_dic[poco_path]["text"]
+            if this_text == text:
+                return True
+            else:
+                return False
+        else:
+            print(poco_path + "路径未找到")
+            raise NoneException("对比text属性时，" + poco_path)
+
     def is_in_dic(self, poco_path):
         # 先判断在不在地址表里面
         if self.poco_dic == None:
             # 点击之后会清空，unexpected会直接调用该方法，所以需要刷一下最新的UI树
             self.get_poco_dic()
         if poco_path in self.poco_dic.keys():
-            print("找到路径"+poco_path)
-            self.complete_poco_path = poco_path
-            return True
+            poco_path_pos = self.poco_dic[poco_path]["pos"]
+            if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
+                print(poco_path + "节点坐标在屏幕外，当做不存在")
+                return False
+            else:
+                print("找到路径" + poco_path)
+                self.complete_poco_path = poco_path
+                return True
         # 看看某些唯一路径存不存在简写
         for dic_key in self.poco_dic.keys():
             if poco_path in dic_key:
                 # 是简写路径的话就把完整路径传递出去
-                self.complete_poco_path = dic_key
-                # print("获取完整路径"+self.complete_poco_path+"完成")
-                print("获取完整路径完成")
-                return True
+                poco_path_pos = self.poco_dic[dic_key]["pos"]
+                if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
+                    print(dic_key + "节点坐标在屏幕外，当做不存在")
+                    return False
+                else:
+                    print("找到路径" + dic_key)
+                    self.complete_poco_path = dic_key
+                    return True
         return False
 
     def get_poco_pos(self, poco_path):
@@ -114,10 +147,12 @@ class MakePocoDic:
         :param poco_path:
         :return:[x, y]
         """
+        if self.phone_size_list == None:
+            self.set_phone_size()
         self.get_poco_dic()
-        for i in range(3):
+        for i in range(5):
             if self.is_in_dic(poco_path):
-                print("待点击路径："+self.complete_poco_path)
+                print("待点击路径：" + self.complete_poco_path)
                 pos_list = self.poco_dic[self.complete_poco_path]['pos']
                 # [宽,高]
                 # phone_list_str = self.info.get_config("Phone_Size", self.thread_file_name)
@@ -131,14 +166,76 @@ class MakePocoDic:
             else:
                 time.sleep(3)
                 print("第" + str(i + 1) + "次未找到，再次查找" + poco_path)
-                self.get_poco_dic()
-                if i >= 2:
+                if i >= 4:
+                    # 排除了游戏被切到后台导致找不到的情况
+                    # 切回游戏后，仍然还是找不到
                     snapshot(msg="poco节点未找到")
                     raise NoneException(poco_path)
+                if i >= 1:  # 第2次的时候判断一下
+                    # 开始检测是否是游戏不在了
+                    game_activity_str = self.gpd.get_device_adb_shell(
+                        "shell dumpsys window | findstr mCurrentFocus")  # 判断是否是被切到了后台
+                    if self.game_name in game_activity_str:  # 没有被切到后台
+                        # 游戏还在，确实找不到
+                        snapshot(msg="poco节点未找到")
+                        raise NoneException(poco_path)
+                    else:  # 切到了后台，或者疑似闪退
+                        game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
+                        if self.game_name in game_running_str:
+                            snapshot(msg="游戏还在,疑似切到后台")  # 可能被切到了后台
+                            # 重新切回到游戏
+                            start_app(self.game_name)
+                            time.sleep(3)
+                            snapshot(msg="切回游戏完毕")
+                            # 拉起后还有一次查找的机会
+                        else:
+                            snapshot(msg="游戏不在,疑似闪退")  # 可能闪退
+                            time.sleep(2)
+                            start_app(self.game_name)
+                            time.sleep(5)
+                            snapshot(msg="重启完毕")
+                            # 游戏闪退就直接终止了
+                            raise GameServerStopException("游戏闪退，终止脚本")
+            self.get_poco_dic()
 
     def my_touch(self, poco_path):
         touch_int_list = self.get_poco_pos(poco_path)
         self.touch(touch_int_list)
+
+    def touch_pos(self, pos_list_int):
+        """
+        点击方法
+        :param pos_list_int: 控件坐标，控件的pos属性
+        :return:
+        """
+        if self.phone_size_list == None:
+            self.set_phone_size()
+        if self.sleep_time == None:
+            self.sleep_time = int(self.info.get_config("com.youzu.yztest_nosdk", "allphnoe_poco_sleep_time"))
+        poco_path_pos = pos_list_int
+        x = int(poco_path_pos[0] * self.phone_size_list[0])
+        y = int(poco_path_pos[1] * self.phone_size_list[1])
+        touch([x, y])
+        sleep(self.sleep_time)
+
+    def swipe_pos(self, start_pos_list, end_pos_list, timein):
+        """
+        滑动方法
+        :param start_pos_list: 滑动起始控件坐标
+        :param end_pos_list: 滑动结束控件坐标
+        :param duration_input: 滑动过程持续时间
+        :return:
+        """
+        if self.phone_size_list == None:
+            self.set_phone_size()
+        if self.sleep_time == None:
+            self.sleep_time = int(self.info.get_config("com.youzu.yztest_nosdk", "allphnoe_poco_sleep_time"))
+        start_x = int(self.phone_size_list[0] * start_pos_list[0])
+        start_y = int(self.phone_size_list[1] * start_pos_list[1])
+        end_x = int(self.phone_size_list[0] * end_pos_list[0])
+        end_y = int(self.phone_size_list[1] * end_pos_list[1])
+        swipe([start_x, start_y], [end_x, end_y], duration=timein)
+        sleep(self.sleep_time)
 
     def touch(self, pos_list):
         """
@@ -147,28 +244,61 @@ class MakePocoDic:
         :return:
         """
         touch(pos_list)
-        print("点击坐标" + str(pos_list) + "完成")
+        print("点击坐标" + str(pos_list) + "完成", )
         self.poco_dic = None
 
     def touch_poco_obj(self, poco_path, click_list):
-
+        if self.phone_size_list == None:
+            self.set_phone_size()
         self.get_poco_dic()
-        if self.is_in_dic(poco_path):
-            shifting_x = click_list[0] - 0.5
-            shifting_y = click_list[1] - 0.5
-            poco_path_pos = self.poco_dic[poco_path]['pos']
-            poco_path_size = self.poco_dic[poco_path]['size']
-            posx = poco_path_pos[0] + poco_path_size[0] * shifting_x
-            posy = poco_path_pos[1] + poco_path_size[1] * shifting_y
-            phone_x = self.phone_size_list[0]
-            phone_y = self.phone_size_list[1]
-            x = int(posx * phone_x)
-            y = int(posy * phone_y)
-            self.touch([x, y])
-        else:
-            print("未找到节点" + poco_path)
-            snapshot(msg="未找到节点" + poco_path)
-            raise NoneException
+        for i in range(5):
+            if self.is_in_dic(poco_path):
+                shifting_x = click_list[0] - 0.5
+                shifting_y = click_list[1] - 0.5
+                poco_path_pos = self.poco_dic[self.complete_poco_path]['pos']
+                poco_path_size = self.poco_dic[self.complete_poco_path]['size']
+                posx = poco_path_pos[0] + poco_path_size[0] * shifting_x
+                posy = poco_path_pos[1] + poco_path_size[1] * shifting_y
+                phone_x = self.phone_size_list[0]
+                phone_y = self.phone_size_list[1]
+                x = int(posx * phone_x)
+                y = int(posy * phone_y)
+                self.touch([x, y])
+                break
+            else:
+                time.sleep(3)
+                print("第" + str(i + 1) + "次未找到，再次查找" + poco_path)
+                if i >= 4:
+                    # 排除了游戏被切到后台导致找不到的情况
+                    # 切回游戏后，仍然还是找不到
+                    snapshot(msg="poco节点未找到")
+                    raise NoneException(poco_path)
+                if i >= 1:  # 第2次的时候判断一下
+                    # 开始检测是否是游戏不在了
+                    game_activity_str = self.gpd.get_device_adb_shell(
+                        "shell dumpsys window | findstr mCurrentFocus")  # 判断是否是被切到了后台
+                    if self.game_name in game_activity_str:  # 没有被切到后台
+                        # 游戏还在，确实找不到
+                        snapshot(msg="poco节点未找到")
+                        raise NoneException(poco_path)
+                    else:  # 切到了后台，或者疑似闪退
+                        game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
+                        if self.game_name in game_running_str:
+                            snapshot(msg="游戏还在,疑似切到后台")  # 可能被切到了后台
+                            # 重新切回到游戏
+                            start_app(self.game_name)
+                            time.sleep(3)
+                            snapshot(msg="切回游戏完毕")
+                            # 拉起后还有一次查找的机会
+                        else:
+                            snapshot(msg="游戏不在,疑似闪退")  # 可能闪退
+                            time.sleep(2)
+                            start_app(self.game_name)
+                            time.sleep(5)
+                            snapshot(msg="重启完毕")
+                            # 游戏闪退就直接终止了
+                            raise GameServerStopException("游戏闪退，终止脚本")
+            self.get_poco_dic()
 
     def my_swipe(self, start_path, end_path, duration=2):
         start = self.get_poco_pos(start_path)
@@ -176,6 +306,11 @@ class MakePocoDic:
         swipe(start, end, duration=duration)
         print(str(start) + "滑动至" + str(end) + "完成")
         return start, end
+
+    def add_msg_in_log(self, msg):
+        name = "添加日志"
+        rizhi = {"name": name, "call_args": {"text": msg}}
+        G.LOGGER.log("function", rizhi, 1)
 
     # def get_poco_visible(self, poco_path):
     #     """
@@ -220,6 +355,7 @@ class MakePocoDic:
         else:
             snapshot(msg="未找到节点")
             raise NoneException
+
     def get_game_number_instr(self, poco_path):
         """
         只获取poco对象中text属性中的数字

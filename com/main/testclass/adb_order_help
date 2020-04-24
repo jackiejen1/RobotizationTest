@@ -54,7 +54,18 @@ ADB常用命令https://blog.csdn.net/zhonglunshun/article/details/78362439
 # 获取手机型号
 # adb devices -l
 # adb shell getprop | grep product
+adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
+adb shell dumpsys activity activities----------查看Activity组件信息
+adb shell dumpsys activity services-----------查看Service组件信息
+adb shell dumpsys activity providers----------产看ContentProvider组件信息
+adb shell dumpsys activity broadcasts--------查看BraodcastReceiver信息
+adb shell dumpsys activity intents--------------查看Intent信息
+adb shell dumpsys activity processes---------查看进程信息
 
+作者：喵叮当
+链接：https://www.jianshu.com/p/bb0f3df62501
+来源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 # Book
 # adb 启动Activity、Service，发送Broadcast以及Android常用的adb指令

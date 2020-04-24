@@ -8,13 +8,14 @@
 # @Function:开局指定测试哪个游戏的哪条协议，每个脚本只测试一条协议
 # @Method:
 # Reference:********************************
-
+import json
 from socket import create_connection
-from protocol_file import cs_pb2, cg_pb2, out_base_pb2
-from protocol.login_game import LoginGame
-from protocol.protocol_tools import ProtocolTools
-from foundation.information import Information
 
+from MyPoco.foundation.MyException import GameServerStopException
+from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
+from MyPoco.protocol.login_game import LoginGame
+from MyPoco.protocol.protocol_tools import ProtocolTools
+from MyPoco.foundation.information import Information
 
 class ProtocolFunction:
     def __init__(self, game_name,server_name,protocol_name,username):
@@ -34,7 +35,7 @@ class ProtocolFunction:
         # self.protocol_ages_list= self.pt.get_args_list(protocol_name)  #  todo 可能有报错
         #开始连接
         server_name = server_name+"_server_ages"
-        socket_ages_dic = eval(self.info.get_config(game_name,server_name))
+        socket_ages_dic = json.loads(self.info.get_config(game_name,server_name))
         host =socket_ages_dic["host"]   # host = "10.3.128.5"
         port =int(socket_ages_dic["port"])  # port = 16865
         self.server_id = int(socket_ages_dic["server_id"])
@@ -59,6 +60,8 @@ class ProtocolFunction:
             G2C_Create = cg_pb2.C2G_Create()
             G2C_Create.ParseFromString(data_Create)
             print(G2C_Create)
+        elif G2C_Login.ret == 2:
+            raise GameServerStopException("服务器维护中,创建账号失败")
 
     def send_protocol(self, arg_dic):
         """

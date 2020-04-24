@@ -26,10 +26,10 @@ class UnexpectedWin:
         """
         if self.uw == None:
             if self.game_name == "com.youzu.wgame2":
-                self.uw = UnexpectedWinSx(self.phone_id)
+                self.uw = UnexpectedWinSx(self.game_name,self.phone_id)
                 self.uw.unexpected_win()
             elif self.game_name == "com.youzu.test.qa":
-                self.uw = UnexpectedWinSs2(self.phone_id)
+                self.uw = UnexpectedWinSs2(self.game_name,self.phone_id)
                 self.uw.unexpected_win()
         else:
             print("开始查找异常窗口")

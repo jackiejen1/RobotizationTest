@@ -38,10 +38,10 @@ class GmMethod:
         self.account=account
         # 服务器ID
         server_name = server_name_input+"_server_ages"
-        server_id_dic = eval(self.info.get_config(self.game_name, server_name))
+        server_id_dic = json.loads(self.info.get_config(self.game_name, server_name))
         self.server_id = server_id_dic["server_id"]
         # 角色名
-        # role_name_dic = eval(self.info.get_config(self.game_name,self.account))
+        # role_name_dic =  json.loads(self.info.get_config(self.game_name,self.account))
         # self.role_name = role_name_dic[server_name_input]
         self.role_name = ""
         # 获取角色ID

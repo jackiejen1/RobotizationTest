@@ -35,7 +35,6 @@ from MyPoco.poco.my_poco_object import MakePocoDic
 # from MyPoco.my_poco import MyPoco
 
 if __name__ == '__main__':
-    pass
     # s = os.popen("adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -i ; echo ---$?---")
     # s = s.readlines()
     # m = re.findall(r"{.*?}", str(s))
@@ -93,3 +92,39 @@ if __name__ == '__main__':
     # payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
     # response = requests.request("POST", url_add, data=payload)
     # print(response.text.encode('utf8'))
+
+    # 少三2
+    # url_role_id = "http://10.3.39.187:8088/api/gm/role_id"
+    # payload = {"account": "6947763", "role": "", "server": "17"}
+    # response = requests.request("POST", url_role_id, data=payload)
+    # print(response.text.encode('utf8'))
+    # a = response.json(encoding = "utf-8")
+    # print(a)
+
+    # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/add"
+    # # data = {"type":999, "id": 0, "num": 1}
+    # data2 = {"type": 1, "id": 1, "num": 9999999}
+    # data = [data2]
+    # data = json.dumps(data, ensure_ascii=False)
+    # payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "data": data}
+    # response = requests.request("POST", url_add, data=payload)
+    # # print(response)
+    # print(response.text.encode('utf8'))
+
+    # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/query"
+    # data = {"type":999, "id": 0}
+    # data1 = {"type": 1, "id": 1}
+    # data2 = {"type": 1, "id": 3}
+    # data = [data,data1,data2]
+    # # data = [data1,data2]
+    # data = json.dumps(data, ensure_ascii=False)
+    # payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "data": data}
+    # response = requests.request("POST", url_add, data=payload)
+    # print(response.text.encode('utf8'))
+
+
+    url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/checkpoint"
+    payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "function": "1","checkpoint":10420}
+    response = requests.request("POST", url_add, data=payload)
+    print(response.text.encode('utf8'))
+    print(response.text.encode('gbk'))

@@ -8,23 +8,80 @@
 #@Function:
 #@Method:
 #Reference:********************************
-from airtest.core.api import *
+
 class NoneException(Exception):
-    snapshot(msg="找不到控件")
+    '''
+    没有节点
+    '''
+    def __init__(self,msg=""):
+        self.msg = msg
+        print(str(self.msg)+"节点没有找到")
+
+    def __str__(self):
+        return str(self.msg)
 
 
 
 class NoneStrException(Exception):
-    print("")
+    '''
+    poco没有str属性
+    '''
+    def __init__(self,msg=""):
+        self.my_msg = msg
+
+    def __str__(self):
+        return str("")
 
 
 class NotHaveGameException(Exception):
-    print("")
+    '''
+    游戏没有开启（包括闪退）
+    '''
+    def __init__(self,msg=""):
+        self.my_msg = msg
 
+    def __str__(self):
+        return str("")
 
 class NotPocoServeException(Exception):
-    print("")
+    '''
+    前端poco服务断开连接，重复了
+    '''
+    def __init__(self,msg=""):
+        self.my_msg = msg
+
+    def __str__(self):
+        return str("")
 
 
 class PocoVverstepBoundaryException(Exception):
-    print("")
+    '''
+    忘了
+    '''
+    def __init__(self,msg=""):
+        self.my_msg = msg
+
+    def __str__(self):
+        return str("")
+
+class GameServerStopException(Exception):
+    '''
+    前端poco服务断开连接
+    '''
+    def __init__(self,msg=""):
+        self.my_msg = msg
+        print(self.my_msg)
+
+    def __str__(self):
+        return str(self.my_msg)
+
+class GameServerMaintenanceException(Exception):
+    '''
+    服务器维护
+    '''
+    def __init__(self,msg=""):
+        self.my_msg = msg
+        print(self.my_msg)
+
+    def __str__(self):
+        return str(self.my_msg)

@@ -22,7 +22,7 @@ from protocol.protocol_function import ProtocolFunction
 
 
 class MyPoco:
-    def __init__(self, game_name,phone_id):
+    def __init__(self, game_name, phone_id):
         """
         :param game_name: 游戏名字，见ini文件App_Name项
         """
@@ -30,22 +30,23 @@ class MyPoco:
         my_poco_path = os.path.abspath(os.path.dirname(__file__))
         self.info.set_config("MyPocoPath", "MyPocoPath", my_poco_path)
         self.game_name = self.info.get_config("App_Name", game_name)
-        self.my_poco_obj = MyPocoObject(self.game_name,phone_id)
+        self.my_poco_obj = MyPocoObject(self.game_name, phone_id)
         self.gm = GmMethod(self.game_name)
-        self.pp = PocoPos()
-        self.rg = ResourceGm(self.game_name,phone_id)
-        self.newaccount = NewAccount(self.game_name,phone_id)
-        self.phone_id=phone_id
+        self.rg = ResourceGm(self.game_name, phone_id)
+        self.newaccount = NewAccount(self.game_name, phone_id)
+        self.phone_id = phone_id
 
-    def set_protocol(self,server_name,username,protocol_name=""):
+    def make_new_role(self, server_name, account, protocol_name=""):
         """
-        设置协议基本信息，目前只用于创建角色用，其他协议暂不使用
+        设置协议基本信息
+        目前只用于创建角色用，其他协议暂不使用
         :param server_name: 服务器名
         :param username: 账号
         :param protocol_name: 协议名
         :return:
         """
-        self.protocol=ProtocolFunction(self.game_name,server_name,protocol_name,username)
+        self.protocol = ProtocolFunction(self.game_name, server_name, protocol_name, account)
+
     # def set_poco(self):
     #     """
     #     编写脚本时使用
@@ -53,22 +54,30 @@ class MyPoco:
     #     :return:
     #     """
     #     return self.my_poco_obj.new_poco_obj()
-    def get_poco_dic(self):
-        """
-        刷新并获取当前界面UI信息
-        :return: ui dic
-        """
-        return  self.my_poco_obj.get_poco_dic()
 
     def set_account_information_gm(self, account, server_name):
         """
-        使用GM方法前需要调用该方法,来确定向哪个账号的哪个区下面的角色发送道具
+        使用GM方法前需要调用该方法,来确定对哪个账号的哪个区下面的角色进行操作
         :param account:账号
         :param server_name:如果不传，说明该账号只有一个区有角色
         :return:
         """
         self.gm.set_account_information(account, server_name_input=server_name)
 
+    def get_poco_dic(self):
+        """
+        刷新并获取当前界面UI信息
+        :return: ui dic
+        """
+        return self.my_poco_obj.get_poco_dic()
+    def is_this_text(self, poco_path,text):
+        """
+        判断节点的文字
+        :param poco_path: 节点的绝对路径
+        :param text: 需要判断的文字
+        :return: bool
+        """
+        return self.my_poco_obj.is_this_text(poco_path,text)
     def set_xn_test(self):
         """
         进行性能测试时需要先启动该方法
@@ -82,10 +91,10 @@ class MyPoco:
         :return:
         """
         ffgr = FirstFunctionGoRun(self.game_name)
-        ffgr.first_function_go_run()
+        ffgr.first_function_go_run(self.phone_id)
 
     # @err_close_game
-    def open_game(self, sever_name_input, game_account_input,red_info = True):
+    def open_game(self, sever_name_input, game_account_input, red_info=True):
         """
         功能向,启动游戏并到游戏主界面
         :param sever_name_input: 区服,读配置或新建账号
@@ -93,8 +102,8 @@ class MyPoco:
         :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """
-        entry = EntryGame(self.game_name,self.phone_id)
-        entry.entry_game(sever_name_input, game_account_input,red_info)
+        entry = EntryGame(self.game_name, self.phone_id)
+        entry.entry_game(sever_name_input, game_account_input, red_info)
         # poco = self.my_poco_obj.new_poco_obj()
         # return poco
 
@@ -123,23 +132,22 @@ class MyPoco:
     #     """
     #     return self.my_poco_obj.renovate_and_get_poco_dic()
 
-
-    def my_swipe_pos(self, start_pos_list, end_pos_list,timein=3):
+    def my_swipe_pos(self, start_pos_list, end_pos_list, timein=3):
         """
         默认滑动时长3秒
         :param pos_list_int:控件的pos属性
         :return:
         """
-        self.pp.swipe_pos(start_pos_list, end_pos_list,timein)
+        self.my_poco_obj.swipe_pos(start_pos_list, end_pos_list, timein)
 
     # @err_close_game
-    def my_touch(self, poco_path,click_list=None):
+    def my_touch(self, poco_path, click_list=None):
         """
         :param poco_path:控件路径
         :param click_list:控件点击偏移点[0,0]-[1,1]范围
         :return:Exception
         """
-        if click_list ==None:
+        if click_list == None:
             self.my_poco_obj.touch_poco(poco_path)
         else:
             self.my_poco_obj.touch_poco_obj(poco_path, click_list)
@@ -149,7 +157,7 @@ class MyPoco:
         :param pos_list_int:控件的pos属性
         :return:Exception
         """
-        self.pp.touch_pos(pos_list_int)
+        self.my_poco_obj.touch_pos(pos_list_int)
 
     def xn_touch(self, pos_list_int):
         """
@@ -249,7 +257,8 @@ class MyPoco:
         :return:int
         """
         return self.my_poco_obj.get_game_number(poco_path)
-    def get_poco_position(self,poco_path):
+
+    def get_poco_position(self, poco_path):
         """
         获取节点的绝对坐标，经过手机分辨率换算
         :param poco_path: poco_name
@@ -312,7 +321,7 @@ class MyPoco:
         :return:
         """
 
-    def start_test_xn(self,):
+    def start_test_xn(self, ):
         """
         性能，点击开始测试按钮，启动游戏并在游戏界面停止
         :return:poco对象
@@ -349,14 +358,14 @@ class MyPoco:
         self.my_poco_obj.text_str(input_str)
 
     # @err_close_game
-    def new_account(self, resource_dic_input, sever_name_input,play_dic):
+    def new_account(self, resource_dic_input, sever_name_input, play_dic):
         """
         根据输入的要求在sever_name区创建一个账号
         :param dic_input: 字典，需要添加的各种资源
         :param sever_name_input: 区服名和配置一致
         :return:
         """
-        self.newaccount.new_game_account( resource_dic_input, sever_name_input,play_dic)
+        self.newaccount.new_game_account(resource_dic_input, sever_name_input, play_dic)
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """
@@ -375,6 +384,9 @@ class MyPoco:
         """
         return self.my_poco_obj.is_exist_poco(poco_path)
 
+    def add_msg_in_log(self,msg):
+        self.my_poco_obj.add_msg_in_log(msg)
+
     def is_in_dic(self, poco_path):
         """
         判断节点是否在当前屏幕
@@ -391,8 +403,10 @@ class MyPoco:
         """
         if self.game_name == "com.youzu.wgame2":
             self.gm.add_resources(dic_input)
-        else:
+        elif self.game_name == "com.youzu.test.qa":
             self.rg.add_resource(dic_input)
+
+
     def get_resource_quantity(self, list_input):
         """
         根据传入的道具列表查询道具数量
@@ -418,6 +432,7 @@ class MyPoco:
         """
         # return self.gm.select_server_time(server_name)
         return self.rg.get_sever_time()
+
     def set_sever_time(self, dic_input):
         """
         修改服务器时间
@@ -429,7 +444,7 @@ class MyPoco:
     def set_checkpoint(self, checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
-        :param checkpoint:int 关卡数量
+        :param checkpoint:int 关卡数
         :return:
         """
         self.gm.set_checkpoint(checkpoint)
@@ -449,6 +464,13 @@ class MyPoco:
         :return:
         """
         self.gm.recharge_supplement(resource_name)
+
+    def get_random_account(self):
+        """
+        根据时间戳生成一个8位的纯数字字符串，可用于生成账号
+        :return: str 8位数字
+        """
+        return self.my_poco_obj.make_random_account()
 
     # def start_protocol(self, server_name, protocol_name):#暂时不接入协议
     #     """

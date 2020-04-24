@@ -79,9 +79,10 @@ class EntryGameSs2:
             time.sleep(15)
         for i in range(10):
             print("开始关闭广告")
+            self.my_poco_obj.get_poco_dic()
             if self.my_poco_obj.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 广告
                 print("关闭广告")# todo 没有进来
-                self.my_poco_obj.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close")
+                self.my_poco_obj.touch_poco("Btn_close")
             if self.my_poco_obj.is_in_dic("Comp_day1"):  # 签到
                 self.my_poco_obj.touch_poco("LoginRewardPop/__view/n3/img0")
             if self.my_poco_obj.is_in_dic("RedPacketRainPop/__view/Btn_close"):  # 红包雨锦鲤

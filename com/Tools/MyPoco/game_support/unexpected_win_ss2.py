@@ -16,8 +16,8 @@ from foundation.make_poco_dic import MakePocoDic
 
 
 class UnexpectedWinSs2:
-    def __init__(self, phone_id):
-        self.make_poco_dic = MakePocoDic(phone_id)
+    def __init__(self, game_name,phone_id):
+        self.make_poco_dic = MakePocoDic(game_name,phone_id)
         # self.poco = StdPoco()
         # self.make_poco_dic.set_poco(self.poco)
 
@@ -42,10 +42,11 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("内更新"):  # 点击完下载资源启动游戏
             self.make_poco_dic.my_touch("下载点2")
             time.sleep(30)
-            for i in range(5):
+            for i in range(20):
+                self.make_poco_dic.get_poco_dic()#这里会不停的刷新表
                 if self.make_poco_dic.is_in_dic("InputName"):
                     return
-                time.sleep(10)
+                time.sleep(15)
         if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")
             time.sleep(1)
@@ -81,16 +82,16 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("巨兽-龙炮"):  # 副本龙炮
             self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
 
+        if self.make_poco_dic.is_in_dic("将军抱歉，为了更好的体验，我们正在对服务器进行维护，请稍后重新登录哦~"):
+            self.make_poco_dic.my_touch("未命名0/未命名3/ComAssistPop/__view/Btn_cancel")
+            raise GameServerMaintenanceException("服务器维护")
+
         # 断网
         if self.make_poco_dic.is_in_dic("您的网络状况不佳"):
             for i in range(3):
-                # if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_confirm"):
-                #     s = self.make_poco_dic.get_poco_any_value("ComAssistPop/__view/Label_des", "text")
-                #     if "是否" in s:
-                #         pass
-                #     else:
-                #         self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_confirm")
                 self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_confirm")
+                if not self.make_poco_dic.is_in_dic("您的网络状况不佳"):
+                    break
                 sleep(5)
                 if i == 2:  # 就当连不上，放弃重连
                     if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_cancel"):

@@ -8,10 +8,8 @@
 # @Function:脚本基础类，用于实现各个辅助脚本的类，比如登录游戏，启动游戏后必须先调用new_poco_obj（）
 # @Method:
 # Reference:********************************
-import threading
+
 from airtest.core.api import *
-from poco.drivers.std import StdPoco
-from poco.drivers.android.uiautomation import AndroidUiautomationPoco
 
 import re, time
 from foundation.make_poco_dic import MakePocoDic
@@ -21,15 +19,16 @@ from game_support.unexpected_win import UnexpectedWin
 
 class MyPocoObject():
 
-    def __init__(self,game_name,phone_id):
+    def __init__(self, game_name, phone_id):
         """
         创建依赖对象，保存全局信息
         """
-        self.game_name=game_name
-        self.make_poco_dic = MakePocoDic(phone_id)
+        self.game_name = game_name
+        self.make_poco_dic = MakePocoDic(game_name, phone_id)
         self.info = Information()
-        self.uw = UnexpectedWin(game_name,phone_id)
+        self.uw = UnexpectedWin(game_name, phone_id)
         self.poco = None
+
     # def renovate_and_get_poco_dic(self):
     #     """
     #     刷新UI信息并保存本地
@@ -42,7 +41,7 @@ class MyPocoObject():
         刷新并获取当前界面UI信息
         :return: ui dic
         """
-        return  self.make_poco_dic.get_poco_dic()
+        return self.make_poco_dic.get_poco_dic()
 
     # def new_poco_obj(self):
     #     """
@@ -64,7 +63,7 @@ class MyPocoObject():
         :param end_path:结束点路径
         :return:起、止点坐标
         """
-        start, end = None,None
+        start, end = None, None
         self.uw.unexpected_win()
         try:
             start, end = self.make_poco_dic.my_swipe(start_path, end_path, duration=timein)
@@ -77,7 +76,17 @@ class MyPocoObject():
             snapshot(msg="10053异常")
         time.sleep(1)
         return start, end
-    def touch(self,pos_list):
+
+    def is_this_text(self, poco_path, text):
+        """
+        判断节点的文字
+        :param poco_path: 节点路径
+        :param text: 需要判断的文字
+        :return: bool
+        """
+        return self.make_poco_dic.is_this_text(poco_path, text)
+
+    def touch(self, pos_list):
         """
         输入坐标，使用airtest框架的touch点击
         :param pos_list: [123,123]
@@ -85,6 +94,24 @@ class MyPocoObject():
         """
 
         self.make_poco_dic.touch(pos_list)
+
+    def swipe_pos(self, start_pos_list, end_pos_list, timein):
+        """
+        滑动方法
+        :param start_pos_list: 滑动起始控件坐标
+        :param end_pos_list: 滑动结束控件坐标
+        :param duration_input: 滑动过程持续时间
+        :return:
+        """
+        self.make_poco_dic.swipe_pos(start_pos_list, end_pos_list, timein=timein)
+
+    def touch_pos(self, pos_list_int):
+        """
+        点击方法
+        :param pos_list_int: 控件坐标，控件的pos属性
+        :return:
+        """
+        self.make_poco_dic.touch_pos(pos_list_int)
 
     def touch_poco(self, poco_path):
         """
@@ -114,16 +141,15 @@ class MyPocoObject():
         """
         self.uw.unexpected_win()
         try:
-            self.make_poco_dic.touch_poco_obj(poco_path,click_list)
+            self.make_poco_dic.touch_poco_obj(poco_path, click_list)
         except RpcTimeoutError:
             snapshot(msg="poco超时异常")
-            self.make_poco_dic.touch_poco_obj(poco_path,click_list)
+            self.make_poco_dic.touch_poco_obj(poco_path, click_list)
         except ConnectionAbortedError:
             start_app(self.game_name)
             time.sleep(4)
             snapshot(msg="10053异常")
         time.sleep(1)
-
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """
@@ -155,7 +181,8 @@ class MyPocoObject():
         :return:
         """
         return self.make_poco_dic.is_in_dic(poco_path)
-    def get_poco_position(self,poco_path):
+
+    def get_poco_position(self, poco_path):
         """
         获取节点的绝对坐标，经过手机分辨率换算
         :param poco_path: poco_name
@@ -171,13 +198,7 @@ class MyPocoObject():
         :return: bool  True or False
         """
 
-        bool = self.make_poco_dic.get_poco_any_value(poco_path,"getVisible")
-        pos_list = self.make_poco_dic.get_poco_any_value(poco_path, 'pos')
-        if bool and pos_list[0] < 1 and pos_list[1] < 1:
-            is_exist = True
-        else:
-            is_exist = False
-        return is_exist
+        return self.make_poco_dic.is_in_dic(poco_path)
 
     def text_str(self, input_str):
         """
@@ -185,8 +206,14 @@ class MyPocoObject():
         :param input_str:需要输入的文本
         :return:
         """
-        text(input_str)
-        keyevent("DEL")
+        text(input_str, enter=False)
+        # keyevent("DEL")
+
+    def add_msg_in_log(self, msg):
+        # name = "添加日志"
+        # rizhi = {"name": name, "call_args": {"text": msg}}
+        # G.LOGGER.log("function", rizhi, 1)
+        self.make_poco_dic.add_msg_in_log(msg)
 
     def add_log(self, first, second, msg=""):
         """
@@ -259,7 +286,10 @@ class MyPocoObject():
         return int(number_list[0])
 
     def close_game(self):
-        """关闭游戏"""
+        """
+        关闭游戏
+        需要加入特定标识确认已经退到主界面
+        """
         snapshot(msg="关闭游戏")
         stop_app(self.game_name)
 
@@ -280,3 +310,14 @@ class MyPocoObject():
         :return: str value
         """
         return self.make_poco_dic.get_poco_any_value(poco_path, value_name_str)
+
+    def make_random_account(self):
+        """
+        根据时间戳生成一个8位的纯数字字符串，可用于生成账号
+        :return: str 8位数字
+        """
+        game_account_f = time.time()
+        first = str(int(int(game_account_f) / 86400))[-1:]
+        game_account_int = int(game_account_f * 1000000)
+        game_account = first + str(game_account_int)[-7:]
+        return game_account

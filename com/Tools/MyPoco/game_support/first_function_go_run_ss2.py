@@ -14,14 +14,14 @@ from MyPoco.poco.my_poco_object import MyPocoObject
 
 class FirstFunctionGoRunSs2:
 
-    def first_function_go_run_ss2(self):
+    def first_function_go_run_ss2(self,phone_id):
         """
         用来跳过一些功能初次进入的引导动画
         :return:
         """
         
-        my_poco = MyPocoObject("com.youzu.test.qa")
-        my_poco.new_poco_obj()
+        my_poco = MyPocoObject("com.youzu.test.qa",phone_id)
+
         my_poco.touch_poco("Comp_dungeon/Btn_dungeon") # 副本
         try:
             for i in range(2):
@@ -42,7 +42,11 @@ class FirstFunctionGoRunSs2:
             pass
 
         my_poco.touch_poco("Btn_pvp")
-        my_poco.touch_poco("竞技场")
+        if my_poco.is_this_text("未命名0/module/CampaignLayer/__view/CampainBgLayer/parallaxNode/pvpTitle/title","个人竞技"):
+            my_poco.touch_poco("pvpTitle")
+            my_poco.touch_poco("竞技场")
+        else:
+            my_poco.touch_poco("pvpTitle")
         try:
             for i in range(2):
                 time.sleep(5)
@@ -66,7 +70,7 @@ class FirstFunctionGoRunSs2:
         except:
             pass
         my_poco.touch_poco("Btn_pvp")
-        my_poco.my_swipe("讨伐巨兽","竞技场")
+        my_poco.my_swipe("rebelTitle","pvpTitle")
         my_poco.touch_poco("秘境寻宝")  # 秘境寻宝
         try:
             for i in range(2):
