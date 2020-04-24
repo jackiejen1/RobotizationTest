@@ -8,6 +8,8 @@ from foundation.information import Information
 from protocol.gm_api_http import GmApiHttp
 from protocol.make_resource_body import MakeResourceBody
 import time
+from MyPoco.foundation.MyException import *
+
 
 class GmMethod:
     def __init__(self, game_name):
@@ -15,13 +17,13 @@ class GmMethod:
         根据游戏名字和服务器确定账号
         :param game: 游戏客户端ID
         """
-        self.game_name=game_name
+        self.game_name = game_name
         self.info = Information()
         self.mri = MakeResourceBody(game_name)
         self.host = self.info.get_config(self.game_name, "gm_url")
         self.gah = GmApiHttp(self.host)
 
-    def set_account_information(self, account,server_name_input):
+    def set_account_information(self, account, server_name_input, role_id=""):
         """
         创建对象后需要调用该方法
         :param account:账号
@@ -35,9 +37,9 @@ class GmMethod:
         # self.port = socket_ages_dic["port"]  # port = 16865
         # self.server_id = socket_ages_dic["server_id"]
         # 账号
-        self.account=account
+        self.account = account
         # 服务器ID
-        server_name = server_name_input+"_server_ages"
+        server_name = server_name_input + "_server_ages"
         server_id_dic = json.loads(self.info.get_config(self.game_name, server_name))
         self.server_id = server_id_dic["server_id"]
         # 角色名
@@ -45,14 +47,18 @@ class GmMethod:
         # self.role_name = role_name_dic[server_name_input]
         self.role_name = ""
         # 获取角色ID
-        pull_dic = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
-        # role_id_dic = pull_dic['data']['data']
-        role_id_dic = pull_dic['data']
-        if 'role_id' in role_id_dic.keys():
-            self.role_id = role_id_dic['role_id']
+        if role_id == "":
+            pull_dic = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
+            # role_id_dic = pull_dic['data']['data']
+            role_id_dic = pull_dic['data']
+            if 'role_id' in role_id_dic.keys():
+                self.role_id = role_id_dic['role_id']
+            else:
+                print("未查到角色ID，请先登录")
+                raise Exception
         else:
-            print("未查到角色ID，请先登录")
-            raise Exception
+            self.role_id = role_id
+
     def add_resources(self, resource_name_dic):
         """
         根据传入的道具列表添加道具
@@ -65,9 +71,8 @@ class GmMethod:
             resource_num = resource_name_dic[resource_name]
             data_value = self.mri.get_data_addordel(resource_name, resource_num)
             data_list.append(data_value)
-        data = {"data":data_list}
-        data = json.dumps(data, ensure_ascii=False)
-        body = {"account": self.account, "role_id": self.role_id, "sever": self.server_id, "data": data}
+        data = json.dumps(data_list, ensure_ascii=False)
+        body = {"account": self.account, "role_id": self.role_id, "server": self.server_id, "data": data}
         log_dic = self.gah.add_resources(body)
         operation_description = "添加道具" + str(resource_name_list)
         self.dispose_log(operation_description, log_dic)
@@ -82,7 +87,8 @@ class GmMethod:
         for resource_name in resource_name_list:
             data_dic = self.mri.get_data_select(resource_name)
             data_list.append(data_dic)
-        body = {"account": self.account, "role_id": self.role_id, "sever": self.server_id, "data": data_list}
+        data = json.dumps(data_list, ensure_ascii=False)
+        body = {"account": self.account, "role_id": self.role_id, "server": self.server_id, "data": data}
         log_dic = self.gah.select_resources(body)
         operation_description = "查询道具" + str(resource_name_list)
         self.dispose_log(operation_description, log_dic)
@@ -116,7 +122,8 @@ class GmMethod:
             resource_num = resource_name_dic[resource_name]
             data_value = self.mri.get_data_addordel(resource_name, resource_num)
             data_list.append(data_value)
-        body = {"account": self.account, "role_id": self.role_id, "sever": self.server_id, "data": data_list}
+        data = json.dumps(data_list, ensure_ascii=False)
+        body = {"account": self.account, "role_id": self.role_id, "server": self.server_id, "data": data}
         log_dic = self.gah.delete_resources(body)
         operation_description = "删除道具" + str(resource_name_list)
         self.dispose_log(operation_description, log_dic)
@@ -164,7 +171,15 @@ class GmMethod:
         role_dic["account"] = self.account
         role_dic["role_id"] = self.role_id
         role_dic["server"] = self.server_id
-        role_dic["checkpoint"] = checkpoint
+        if "副本" in checkpoint:
+            role_dic["function"] = "1"
+        elif "列传" in checkpoint:
+            role_dic["function"] = "2"
+        elif "关隘" in checkpoint:
+            role_dic["function"] = "3"
+        else:
+            raise Exception
+        role_dic["checkpoint"] = self.mri.get_num_from_name(checkpoint)
         log_dic = self.gah.set_checkpoint(role_dic)
         self.dispose_log("设置关卡数", log_dic)
 
@@ -193,7 +208,7 @@ class GmMethod:
         data_value = self.mri.get_data_select_money(resource_name)  # todo 需要确定充值类型的字段
         body = {"account": self.account,
                 "role_id": self.role_id,
-                "sever": self.server_id,
+                "server": self.server_id,
                 "order_num": order_num,
                 "time": this_time,
                 "type": data_value["type"],
@@ -222,7 +237,7 @@ class GmMethod:
         message = log_dic["message"]
         if code == 0:
             description = "成功"
-            print(operation_description + description)  # todo 加入报告中
+            add_msg_in_log(operation_description + description)  # todo 加入报告中
         else:
             description = "失败"
             print(operation_description + description + "原因：" + message)

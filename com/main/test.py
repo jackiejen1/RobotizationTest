@@ -101,15 +101,23 @@ if __name__ == '__main__':
     # a = response.json(encoding = "utf-8")
     # print(a)
 
-    # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/add"
-    # # data = {"type":999, "id": 0, "num": 1}
+    url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/add"
+    data = {"type":999, "id": 0, "num": 1}
+    data1 = {"type": 999, "id": 0, "num": 1}
     # data2 = {"type": 1, "id": 1, "num": 9999999}
-    # data = [data2]
-    # data = json.dumps(data, ensure_ascii=False)
-    # payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "data": data}
-    # response = requests.request("POST", url_add, data=payload)
-    # # print(response)
-    # print(response.text.encode('utf8'))
+    data_list = []
+    data_list.append(data)
+    data_list.append(data1)
+    data = json.dumps(data_list, ensure_ascii=False)
+    print(type(data))
+    print(data)
+    payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "data": data}
+    print(payload)
+    print(type(payload))
+    response = requests.request("POST", url_add, data=payload)
+    data_json = response.json()
+    print(type(data_json))
+
 
     # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/query"
     # data = {"type":999, "id": 0}
@@ -121,10 +129,11 @@ if __name__ == '__main__':
     # payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "data": data}
     # response = requests.request("POST", url_add, data=payload)
     # print(response.text.encode('utf8'))
-
-
-    url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/checkpoint"
-    payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "function": "1","checkpoint":10420}
-    response = requests.request("POST", url_add, data=payload)
-    print(response.text.encode('utf8'))
-    print(response.text.encode('gbk'))
+    # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/checkpoint"
+    # payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "function": "2","checkpoint":3}
+    # response = requests.request("POST", url_add, data=payload)
+    # print(response.text.encode('utf8'))
+    # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/checkpoint"
+    # payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "function": "3","checkpoint":2}
+    # response = requests.request("POST", url_add, data=payload)
+    # print(response.text.encode('utf8'))

@@ -8,7 +8,7 @@
 #@Function:
 #@Method:
 #Reference:********************************
-
+from airtest.core.helper import G
 class NoneException(Exception):
     '''
     没有节点
@@ -21,6 +21,10 @@ class NoneException(Exception):
         return str(self.msg)
 
 
+def add_msg_in_log(msg):
+    name = "添加日志"
+    rizhi = {"name": name, "call_args": {"text": msg}}
+    G.LOGGER.log("function", rizhi, 1)
 
 class NoneStrException(Exception):
     '''

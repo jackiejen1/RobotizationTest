@@ -213,9 +213,9 @@ class MyPocoObject():
         # name = "添加日志"
         # rizhi = {"name": name, "call_args": {"text": msg}}
         # G.LOGGER.log("function", rizhi, 1)
-        self.make_poco_dic.add_msg_in_log(msg)
+        add_msg_in_log(msg)
 
-    def add_log(self, first, second, msg=""):
+    def contrast_first_second(self, first, second, msg=""):
         """
         在报告中添加日志信息，对比两个值，判断是否通过
         :param first: int、str

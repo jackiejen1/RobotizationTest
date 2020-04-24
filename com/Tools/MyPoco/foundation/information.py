@@ -161,3 +161,5 @@ class Information:
             shutil.rmtree(file_path)  # 若为文件夹，则直接删除
         elif os.path.isfile(file_path):# 判断该文件是否为文件
             pass
+
+

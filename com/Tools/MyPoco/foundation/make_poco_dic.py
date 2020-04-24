@@ -12,7 +12,6 @@
 import threading
 
 from airtest.core.api import *
-from airtest.core.helper import (G)
 from airtest.report.report import simple_report
 
 from airtestide_lack_packages.compat import script_dir_name
@@ -306,11 +305,6 @@ class MakePocoDic:
         swipe(start, end, duration=duration)
         print(str(start) + "滑动至" + str(end) + "完成")
         return start, end
-
-    def add_msg_in_log(self, msg):
-        name = "添加日志"
-        rizhi = {"name": name, "call_args": {"text": msg}}
-        G.LOGGER.log("function", rizhi, 1)
 
     # def get_poco_visible(self, poco_path):
     #     """

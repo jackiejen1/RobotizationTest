@@ -11,6 +11,10 @@
 import io
 import json
 import os
+import re
+
+import xlrd
+import xlwt as xlwt
 
 from MyPoco.airtestide_lack_packages.compat import script_dir_name
 from airtest.report.report import simple_report
@@ -22,6 +26,9 @@ import time
 from MyPoco.foundation.information import Information
 # from MyPoco.my_poco import MyPoco
 from airtest.core.api import *
+
+from MyPoco.my_poco import MyPoco
+
 exitFlag = 0
 
 class myThread(threading.Thread):
@@ -42,7 +49,7 @@ class myThread(threading.Thread):
 {'width': 1080, 'height': 2160, 'density': 3.0, 'orientation': 0, 'rotation': 0, 'max_x': 1079, 'max_y': 2159}
 {'width': 1080, 'height': 2160, 'density': 3.0, 'orientation': 1, 'rotation': 90, 'max_x': 1079, 'max_y': 2159}
 if __name__ == '__main__':
-    pass
+
     # com.youzu.g36.yz.qa 36计
     # thread1 = myThread(1, "Thread-1", "","com.youzu.test.qa")
     # thread2 = myThread(2, "Thread-2", "3e1a2b6","com.youzu.test.qa")
@@ -58,6 +65,8 @@ if __name__ == '__main__':
     # aa = ss.readlines()
     # print(aa)
 
-
+    my_poco = MyPoco("少三2", "")
+    my_poco.set_account_information_gm('6947763', "QA1", 68719487192)
+    my_poco.add_resource({"元宝":5})
 
 

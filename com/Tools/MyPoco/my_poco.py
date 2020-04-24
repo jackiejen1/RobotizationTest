@@ -55,14 +55,15 @@ class MyPoco:
     #     """
     #     return self.my_poco_obj.new_poco_obj()
 
-    def set_account_information_gm(self, account, server_name):
+    def set_account_information_gm(self, account, server_name,role_id=""):
         """
         使用GM方法前需要调用该方法,来确定对哪个账号的哪个区下面的角色进行操作
-        :param account:账号
-        :param server_name:如果不传，说明该账号只有一个区有角色
+        :param account:str  账号
+        :param server_name:str 如果不传，说明该账号只有一个区有角色
+        :param role_id: int 如果不传，则通过api获取
         :return:
         """
-        self.gm.set_account_information(account, server_name_input=server_name)
+        self.gm.set_account_information(account, server_name_input=server_name,role_id=role_id)
 
     def get_poco_dic(self):
         """
@@ -313,7 +314,7 @@ class MyPoco:
         :param msg:日志的描述，==/！=、正常/异常
         :return:
         """
-        self.my_poco_obj.add_log(first, second, msg)
+        self.my_poco_obj.contrast_first_second(first, second, msg)
 
     def first_open_yztest(self):
         """
@@ -401,11 +402,11 @@ class MyPoco:
         :param dic_input:dic {"资源名称":资源数量,"资源名称":资源数量,...}
         :return:
         """
-        if self.game_name == "com.youzu.wgame2":
-            self.gm.add_resources(dic_input)
-        elif self.game_name == "com.youzu.test.qa":
-            self.rg.add_resource(dic_input)
-
+        # if self.game_name == "com.youzu.wgame2":
+        #     self.gm.add_resources(dic_input)
+        # elif self.game_name == "com.youzu.test.qa":
+        #     self.rg.add_resource(dic_input)
+        self.gm.add_resources(dic_input)
 
     def get_resource_quantity(self, list_input):
         """
@@ -444,7 +445,7 @@ class MyPoco:
     def set_checkpoint(self, checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
-        :param checkpoint:int 关卡数
+        :param checkpoint:str 玩法名-章节数-小关卡数
         :return:
         """
         self.gm.set_checkpoint(checkpoint)

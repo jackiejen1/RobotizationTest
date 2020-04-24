@@ -18,9 +18,29 @@ class MakeResourceBody:
     def __init__(self, game_name):
         info = Information()
         excel_path = info.get_config(game_name, "protocolexcelpath")
+        checkpoint_excel_path = info.get_config(game_name, "protococheckpointlpath")
         MyPocoPath = info.get_config("MyPocoPath", "mypocopath")
         all_path=MyPocoPath+excel_path
+        all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
         self.xl = xlrd.open_workbook(all_path)
+        self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
+
+
+
+    def get_num_from_name(self, checkpoint_name):
+        """
+        根据玩法章节返回该资源在表中对应的id
+        :param resource_name: str 功能名+大章节数+小关卡数
+        """
+        table = self.checkpoint_xl.sheets()[0]
+        col = table.col_values(0)
+        if checkpoint_name in col:
+            row = table.row_values(col.index(checkpoint_name))
+            checkpoint_id = int(row[1])
+        else:
+            print(checkpoint_name + "关卡编号不存在")
+            raise Exception
+        return checkpoint_id
 
     def get_type_id_from_name(self, resource_name):
         """
@@ -110,7 +130,7 @@ class MakeResourceBody:
         """
         self.make_type_id(resource_name)
         data = {"type": self.this_type, "id": self.this_id, "num": num}
-        data = json.dumps(data,ensure_ascii=False)
+        # data = json.dumps(data,ensure_ascii=False)
         return data
 
     def get_data_select(self, resource_name):

@@ -79,8 +79,12 @@ class GmApiHttp:
         print('http post url : ' + url)
         print('http post data :' + json.dumps(data))
         response = requests.request("POST", url, data=data)
-        print(response.text.encode('utf8'))
-        data_json = response.json()
+        try:
+            data_json = response.json()
+            print(data_json)
+        except Exception:
+            print(response.text.encode('utf8'))
+            raise Exception
         print('http post status_code : ' + str(response.status_code))
         return data_json
 
