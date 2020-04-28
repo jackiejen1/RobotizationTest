@@ -10,15 +10,16 @@
 #         辅助脚本使用MyPocoObject类编写
 # Reference:********************************
 import os
-
-from foundation.information import Information
-from game_support.entry_game import EntryGame
-from game_support.first_function_go_run import FirstFunctionGoRun
-from poco.poco_pos import PocoPos
-from poco.xn_test_tools import XnTest
-from protocol.gm_method import GmMethod
-from poco.my_poco_object import MyPocoObject
-from protocol.protocol_function import ProtocolFunction
+from MyPoco.foundation.MyException import *
+from MyPoco.foundation.information import Information
+from MyPoco.game_support.entry_game import EntryGame
+from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
+from MyPoco.game_support.new_account import NewAccount
+from MyPoco.game_support.resource_gm import ResourceGm
+from MyPoco.poco.xn_test_tools import XnTest
+from MyPoco.protocol.gm_method import GmMethod
+from MyPoco.poco.my_poco_object import MyPocoObject
+from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
 
 
 class MyPoco:
@@ -36,7 +37,7 @@ class MyPoco:
         self.newaccount = NewAccount(self.game_name, phone_id)
         self.phone_id = phone_id
 
-    def make_new_role(self, server_name, account, protocol_name=""):
+    def make_new_role(self, server_name, username, protocol_name=""):
         """
         设置协议基本信息
         目前只用于创建角色用，其他协议暂不使用
@@ -45,7 +46,14 @@ class MyPoco:
         :param protocol_name: 协议名
         :return:
         """
-        self.protocol = ProtocolFunction(self.game_name, server_name, protocol_name, account)
+        self.protocol = ProtocolFunction(self.game_name, server_name, protocol_name, username)
+
+    def get_ss2_role_id(self):
+        """
+        再次调用登录方法获得角色id
+        :return:
+        """
+        return self.protocol.get_role_id()
 
     # def set_poco(self):
     #     """
@@ -71,6 +79,12 @@ class MyPoco:
         :return: ui dic
         """
         return self.my_poco_obj.get_poco_dic()
+    def my_touch_in_dic(self,poco_path,poco_dic,click_list=None):
+        if self.is_in_dic(poco_path,poco_dic):
+            self.my_touch(poco_path,click_list=click_list)
+        else:
+            raise NoneException(poco_path)
+
     def is_this_text(self, poco_path,text):
         """
         判断节点的文字
@@ -306,7 +320,7 @@ class MyPoco:
         """
         return self.info.get_phone_size()
 
-    def add_log(self, first, second, msg):
+    def contrast_first_second(self, first, second, msg):
         """
         对比结果值，并在报告连接中添加日志信息，比如资源变化前后的对比
         :param first:对比值one
@@ -359,14 +373,29 @@ class MyPoco:
         self.my_poco_obj.text_str(input_str)
 
     # @err_close_game
-    def new_account(self, resource_dic_input, sever_name_input, play_dic):
+    # def new_account(self, resource_dic_input, sever_name_input, play_dic):
+        # self.newaccount.new_game_account(resource_dic_input, sever_name_input, play_dic)
+    def new_account(self,sever_name_input,resource_dic,play_dic):
         """
-        根据输入的要求在sever_name区创建一个账号
-        :param dic_input: 字典，需要添加的各种资源
+        根据输入的要求在sever_name区创建一个账号,需要添加创建账号必备的资源
         :param sever_name_input: 区服名和配置一致
+        :param resource_dic: 字典，需要添加的各种资源
+        :param play_dic: 字典，需要添加的各种资源
         :return:
         """
-        self.newaccount.new_game_account(resource_dic_input, sever_name_input, play_dic)
+        self.set_config(self.game_name, "new_game_account1", "")#进入之后重置账号
+        account = self.get_random_account()
+        self.make_new_role(sever_name_input, account)
+        role_id = self.get_ss2_role_id()
+        self.set_account_information_gm(account, sever_name_input, role_id)#设置GM需要的信息
+        self.add_resource(resource_dic)
+        if "副本"in play_dic.keys():
+            self.set_checkpoint(play_dic["副本"])
+        if "列传"in play_dic.keys():
+            self.open_game(sever_name_input,account,red_info=False)
+            self.rg.set_play_liezhuan_num(play_dic["列传"])
+        self.set_config(self.game_name,"new_game_account1",account)
+        return account
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """
@@ -385,16 +414,22 @@ class MyPoco:
         """
         return self.my_poco_obj.is_exist_poco(poco_path)
 
-    def add_msg_in_log(self,msg):
-        self.my_poco_obj.add_msg_in_log(msg)
+    def add_msg_in_log(self,msg,is_pass=True):
+        """
+        将打印信息添加到报告中
+        :param msg: 日志描述
+        :param is_pass: 改变该条打印的是否通过状态
+        :return:
+        """
+        self.my_poco_obj.add_msg_in_log(msg,is_pass=is_pass)
 
-    def is_in_dic(self, poco_path):
+    def is_in_dic(self, poco_path,poco_dic_input=None):
         """
         判断节点是否在当前屏幕
         :param poco_path:
         :return:
         """
-        return self.my_poco_obj.is_in_dic(poco_path)
+        return self.my_poco_obj.is_in_dic(poco_path,poco_dic_input=poco_dic_input)
 
     def add_resource(self, dic_input):
         """
@@ -465,6 +500,10 @@ class MyPoco:
         :return:
         """
         self.gm.recharge_supplement(resource_name)
+
+
+    def game_is_die(self):
+        return self.my_poco_obj.game_is_die()
 
     def get_random_account(self):
         """

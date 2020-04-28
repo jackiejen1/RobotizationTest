@@ -24,7 +24,7 @@ import threading
 import time
 
 from MyPoco.foundation.information import Information
-# from MyPoco.my_poco import MyPoco
+
 from airtest.core.api import *
 
 from MyPoco.my_poco import MyPoco
@@ -48,6 +48,8 @@ class myThread(threading.Thread):
 
 {'width': 1080, 'height': 2160, 'density': 3.0, 'orientation': 0, 'rotation': 0, 'max_x': 1079, 'max_y': 2159}
 {'width': 1080, 'height': 2160, 'density': 3.0, 'orientation': 1, 'rotation': 90, 'max_x': 1079, 'max_y': 2159}
+from airtest.core.api import device
+auto_setup(__file__)
 if __name__ == '__main__':
 
     # com.youzu.g36.yz.qa 36计
@@ -64,9 +66,13 @@ if __name__ == '__main__':
     # ss = os.system("adb -s 3e1a2b6 logcat -v time")
     # aa = ss.readlines()
     # print(aa)
-
-    my_poco = MyPoco("少三2", "")
-    my_poco.set_account_information_gm('6947763', "QA1", 68719487192)
-    my_poco.add_resource({"元宝":5})
-
+    #
+    # my_poco = MyPoco("少三2", "")
+    # # my_poco.set_account_information_gm('6947763', "QA1", 68719487192)
+    # # my_poco.add_resource({"元宝":5})
+    # print(my_poco.my_poco_obj.make_poco_dic.gpd.device())
+    # print(device().uuid)
+    from poco.drivers.std import StdPoco
+    poco=StdPoco()
+    poco()
 

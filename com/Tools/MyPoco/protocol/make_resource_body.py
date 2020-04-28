@@ -38,8 +38,7 @@ class MakeResourceBody:
             row = table.row_values(col.index(checkpoint_name))
             checkpoint_id = int(row[1])
         else:
-            print(checkpoint_name + "关卡编号不存在")
-            raise Exception
+            raise GmException(checkpoint_name + "关卡编号不存在")
         return checkpoint_id
 
     def get_type_id_from_name(self, resource_name):
@@ -58,8 +57,7 @@ class MakeResourceBody:
             resource_type = int(row[1])
             resource_id = int(row[2])
         else:
-            print(resource_name + "道具不存在")
-            raise Exception
+            raise GmException(resource_name + "道具不存在")
         return resource_type, resource_id
     def get_type_id_from_name_money(self, resource_name):
         """
@@ -80,8 +78,7 @@ class MakeResourceBody:
             resource_id = int(row[2])
             resource_money = int(row[3])
         else:
-            print(resource_name + "道具不存在")
-            raise Exception
+            raise GmException(resource_name + "道具不存在")
         return resource_type, resource_id,resource_money
     def get_name_from_type_id(self,type_id_dic):
         """
@@ -100,8 +97,7 @@ class MakeResourceBody:
                 if id == int(row[2]):
                     resource_name = row[0]
         if resource_name=="":
-            print("type:"+str(type_num)+",id:"+str(id)+"的道具不存在")
-            raise Exception
+            raise GmException("type:"+str(type_num)+",id:"+str(id)+"的道具不存在")
         else:
             return resource_name
 

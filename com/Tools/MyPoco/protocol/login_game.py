@@ -17,7 +17,7 @@ from foundation.information import Information
 
 
 class LoginGame:
-    def __init__(self, socket, server_id,game_name, username=None):
+    def __init__(self, socket, server_id, game_name, username=None):
         self.info = Information()
         if username == None:
             self.username = self.info.get_config(game_name, "new_game_account1")
@@ -58,17 +58,21 @@ class LoginGame:
         return flag, data
 
     # 创建角色
-    def MSG_C2G_Create(self):
+    def MSG_C2G_Create(self, uid, sid):
         C2G_Create = cg_pb2.C2G_Create()
         C2G_Create.name = str(self.username)
         C2G_Create.type = 210000
-        uid = self.info.get_config("com.youzu.test.qa", "uid")
-        sid = self.info.get_config("com.youzu.test.qa", "sid")
+        # uid = self.info.get_config("com.youzu.test.qa", "uid")
+        # sid = self.info.get_config("com.youzu.test.qa", "sid")
         C2G_Create.server_id = self.server_id
         C2G_Create = C2G_Create.SerializeToString()
+        # C2G_Create_attr = {'name': "C2G_Create", 'protocol': 'protobuf-ss', 'send_cmd': 10004, 'recv_cmd': 10005,
+        #                    'uid': int(float(uid)), 'sid': int(float(sid))}
         C2G_Create_attr = {'name': "C2G_Create", 'protocol': 'protobuf-ss', 'send_cmd': 10004, 'recv_cmd': 10005,
-                           'uid': int(float(uid)), 'sid': int(float(sid))}
+                           'uid': uid, 'sid': sid}
         senddata = pack_data(C2G_Create, C2G_Create_attr)
         flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 32)
-        print("角色创建成功，账号："+self.username+"，区服id："+str(self.server_id)+"，角色名："+self.username)
+        msg="角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + self.username
+        print(msg)
+        add_msg_in_log(msg)
         return flag, data

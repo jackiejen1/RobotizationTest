@@ -240,5 +240,5 @@ class GmMethod:
             add_msg_in_log(operation_description + description)  # todo 加入报告中
         else:
             description = "失败"
-            print(operation_description + description + "原因：" + message)
-            raise Exception("操作失败，退出")
+            print(operation_description + description + "原因：" + message+",大概率是资源超过上限")
+            raise Exception(message)

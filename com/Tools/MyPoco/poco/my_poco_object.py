@@ -12,9 +12,11 @@
 from airtest.core.api import *
 
 import re, time
-from foundation.make_poco_dic import MakePocoDic
-from foundation.information import Information
-from game_support.unexpected_win import UnexpectedWin
+from MyPoco.foundation.MyException import *
+from MyPoco.airtestide_lack_packages.poco.utils.simplerpc.simplerpc import RpcTimeoutError
+from MyPoco.foundation.make_poco_dic import MakePocoDic
+from MyPoco.foundation.information import Information
+from MyPoco.game_support.unexpected_win import UnexpectedWin
 
 
 class MyPocoObject():
@@ -155,32 +157,32 @@ class MyPocoObject():
         """
         判断传入的控件是否处于显示状态,在报告中体现，用来验证按钮点击后的状态
         :param poco_path: 需要验证的控件
-        :param is_exist_str:"显示"or"隐藏"
+        :param is_exist_str:控件应该是"显示"or"隐藏"
         :return: bool  True or False
         """
         bool = self.is_exist_poco(poco_path)
-        poco_name = self.make_poco_dic.get_poco_any_value(poco_path, "name")
-        if bool:
-            isit = 1
-        else:
-            isit = 0
-
         if is_exist_str == "隐藏":
-            miaoshu = "按钮" + poco_name + "隐藏"
-            self.add_log(isit, 0, msg=miaoshu)
-
+            miaoshu = "按钮" + poco_path + "隐藏"
+            if bool :
+                isbool = False
+            else:
+                isbool = True
         else:
-            miaoshu = "按钮" + poco_name + "显示"
-            self.add_log(isit, 1, msg=miaoshu)
+            miaoshu = "按钮" + poco_path + "显示"
+            if bool:
+                isbool =True
+            else:
+                isbool = False
+        self.add_msg_in_log(miaoshu,isbool)
         return bool
 
-    def is_in_dic(self, poco_path):
+    def is_in_dic(self, poco_path,poco_dic_input=None):
         """
         判断节点是否在当前屏幕
         :param poco_path:
         :return:
         """
-        return self.make_poco_dic.is_in_dic(poco_path)
+        return self.make_poco_dic.is_in_dic(poco_path,poco_dic_input=poco_dic_input)
 
     def get_poco_position(self, poco_path):
         """
@@ -209,11 +211,11 @@ class MyPocoObject():
         text(input_str, enter=False)
         # keyevent("DEL")
 
-    def add_msg_in_log(self, msg):
+    def add_msg_in_log(self, msg,is_pass):
         # name = "添加日志"
         # rizhi = {"name": name, "call_args": {"text": msg}}
         # G.LOGGER.log("function", rizhi, 1)
-        add_msg_in_log(msg)
+        add_msg_in_log(msg,is_pass=is_pass)
 
     def contrast_first_second(self, first, second, msg=""):
         """
@@ -223,14 +225,13 @@ class MyPocoObject():
         :param msg: 描述
         :return:
         """
-        try:
-            if first == second:
-                st = msg + "正常"
-            else:
-                st = msg + "异常"
-            assert_equal(first, second, st)
-        except AssertionError:
-            pass
+
+        if first == second:
+            st = msg + "正常"
+            add_msg_in_log(st, is_pass=True)
+        else:
+            st = msg + "异常"
+            add_msg_in_log(st,is_pass=False)
 
     def get_game_number_l(self, poco_path, subscript):
         """
@@ -243,6 +244,15 @@ class MyPocoObject():
         number_list = number_str.split("/")
         number = number_list[subscript]
         return int(number)
+
+    def game_is_die(self):
+        """
+        查看游戏有没有闪退
+        :return:
+        """
+        return self.make_poco_dic.game_is_die()
+
+
 
     def get_game_number(self, poco_path):
         """

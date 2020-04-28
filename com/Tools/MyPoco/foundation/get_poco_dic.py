@@ -11,6 +11,7 @@
 import json
 import os
 import socket
+import time
 import uuid
 from airtest.core.helper import device_platform
 import six
@@ -186,6 +187,7 @@ class GetPocoDic(object):
         return new_poco_dic
 
     def get_poco_dic(self):
+        start_time = time.time()
         b = {"method": "Dump", "params": [True], "jsonrpc": "2.0", "id": ""}
         b["id"] = six.text_type(uuid.uuid4())
         b = json.dumps(b)
@@ -207,6 +209,9 @@ class GetPocoDic(object):
             poco_path_dic_list = json.loads(poco_path_dic_str)
             poco_path_dic = self.get_ui_tree(poco_path_dic_list["result"], {})
             self.close()
+            end_time = time.time()
+            print("获取节点数据用时" + str(end_time - start_time))
             return poco_path_dic
         else:
             return {}
+

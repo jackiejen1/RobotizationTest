@@ -102,21 +102,15 @@ if __name__ == '__main__':
     # print(a)
 
     url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/add"
-    data = {"type":999, "id": 0, "num": 1}
-    data1 = {"type": 999, "id": 0, "num": 1}
-    # data2 = {"type": 1, "id": 1, "num": 9999999}
-    data_list = []
-    data_list.append(data)
-    data_list.append(data1)
+    data_list = [{"type": 3, "id": 1, "num": 1000}, {"type": 999, "id": 0, "num": 500000},  {"type": 1, "id": 33, "num": 10}, {"type": 1, "id": 2, "num": 9999}]
     data = json.dumps(data_list, ensure_ascii=False)
     print(type(data))
     print(data)
-    payload = {"account": "6947763", "role_id": 68719487192, "server": "1652440001", "data": data}
-    print(payload)
-    print(type(payload))
+    payload = {"account": "93499947", "role_id": 206158440283, "server": "1652440002", "data": data}
     response = requests.request("POST", url_add, data=payload)
     data_json = response.json()
     print(type(data_json))
+    print(data_json)
 
 
     # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/query"

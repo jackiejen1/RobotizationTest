@@ -18,6 +18,7 @@ class UnexpectedWin:
         self.game_name = game_name
         self.uw = None
         self.phone_id =phone_id
+        self.game_list = ["com.youzu.wgame2","com.youzu.test.qa"]
     def unexpected_win(self):
         """
         异常弹窗跳过，区分不同的游戏走不同的逻辑
@@ -27,11 +28,10 @@ class UnexpectedWin:
         if self.uw == None:
             if self.game_name == "com.youzu.wgame2":
                 self.uw = UnexpectedWinSx(self.game_name,self.phone_id)
-                self.uw.unexpected_win()
+
             elif self.game_name == "com.youzu.test.qa":
                 self.uw = UnexpectedWinSs2(self.game_name,self.phone_id)
-                self.uw.unexpected_win()
-        else:
+        if self.game_name in self.game_list :
             print("开始查找异常窗口")
             self.uw.unexpected_win()
             print("异常窗口排查完毕")

@@ -14,10 +14,11 @@ import threading
 from airtest.core.api import *
 from airtest.report.report import simple_report
 
-from airtestide_lack_packages.compat import script_dir_name
+from MyPoco.airtestide_lack_packages.compat import script_dir_name
+from MyPoco.foundation.get_poco_dic import GetPocoDic
+from MyPoco.foundation.information import Information
+from MyPoco.foundation.MyException import *
 
-from foundation.MyException import *
-from foundation.information import Information
 
 class MakePocoDic:
     def __init__(self, game_name, phone_id):
@@ -111,8 +112,10 @@ class MakePocoDic:
             print(poco_path + "路径未找到")
             raise NoneException("对比text属性时，" + poco_path)
 
-    def is_in_dic(self, poco_path):
+    def is_in_dic(self, poco_path,poco_dic_input = None):
         # 先判断在不在地址表里面
+        if poco_dic_input != None:
+            self.poco_dic = poco_dic_input
         if self.poco_dic == None:
             # 点击之后会清空，unexpected会直接调用该方法，所以需要刷一下最新的UI树
             self.get_poco_dic()
@@ -148,7 +151,8 @@ class MakePocoDic:
         """
         if self.phone_size_list == None:
             self.set_phone_size()
-        self.get_poco_dic()
+        if self.poco_dic == None:
+            self.get_poco_dic()
         for i in range(5):
             if self.is_in_dic(poco_path):
                 print("待点击路径：" + self.complete_poco_path)
@@ -215,7 +219,7 @@ class MakePocoDic:
         x = int(poco_path_pos[0] * self.phone_size_list[0])
         y = int(poco_path_pos[1] * self.phone_size_list[1])
         touch([x, y])
-        sleep(self.sleep_time)
+        time.sleep(self.sleep_time)
 
     def swipe_pos(self, start_pos_list, end_pos_list, timein):
         """
@@ -272,33 +276,66 @@ class MakePocoDic:
                     # 切回游戏后，仍然还是找不到
                     snapshot(msg="poco节点未找到")
                     raise NoneException(poco_path)
-                if i >= 1:  # 第2次的时候判断一下
+                if i == 1:  # 第2次的时候判断一下
                     # 开始检测是否是游戏不在了
-                    game_activity_str = self.gpd.get_device_adb_shell(
-                        "shell dumpsys window | findstr mCurrentFocus")  # 判断是否是被切到了后台
-                    if self.game_name in game_activity_str:  # 没有被切到后台
-                        # 游戏还在，确实找不到
-                        snapshot(msg="poco节点未找到")
+                    if self.game_is_die():
+                        raise GameServerStopException("游戏闪退，终止脚本")
+                    else:#游戏没死也没后台，确实找不到
                         raise NoneException(poco_path)
-                    else:  # 切到了后台，或者疑似闪退
-                        game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
-                        if self.game_name in game_running_str:
-                            snapshot(msg="游戏还在,疑似切到后台")  # 可能被切到了后台
-                            # 重新切回到游戏
-                            start_app(self.game_name)
-                            time.sleep(3)
-                            snapshot(msg="切回游戏完毕")
-                            # 拉起后还有一次查找的机会
-                        else:
-                            snapshot(msg="游戏不在,疑似闪退")  # 可能闪退
-                            time.sleep(2)
-                            start_app(self.game_name)
-                            time.sleep(5)
-                            snapshot(msg="重启完毕")
-                            # 游戏闪退就直接终止了
-                            raise GameServerStopException("游戏闪退，终止脚本")
+                    # game_activity_str = self.gpd.get_device_adb_shell(
+                    #     "shell dumpsys window | findstr mCurrentFocus")  # 判断是否是被切到了后台
+                    # if self.game_name in game_activity_str:  # 没有被切到后台
+                    #     # 游戏还在，确实找不到
+                    #     snapshot(msg="poco节点未找到")
+                    #     raise NoneException(poco_path)
+                    # else:  # 切到了后台，或者疑似闪退
+                    #     game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
+                    #     if self.game_name in game_running_str:
+                    #         snapshot(msg="游戏还在,疑似切到后台")  # 可能被切到了后台
+                    #         # 重新切回到游戏
+                    #         start_app(self.game_name)
+                    #         time.sleep(3)
+                    #         snapshot(msg="切回游戏完毕")
+                    #         # 拉起后还有一次查找的机会
+                    #     else:
+                    #         snapshot(msg="游戏不在,疑似闪退")  # 可能闪退
+                    #         time.sleep(2)
+                    #         start_app(self.game_name)
+                    #         time.sleep(5)
+                    #         snapshot(msg="重启完毕")
+                    #         # 游戏闪退就直接终止了
+                    #         raise GameServerStopException("游戏闪退，终止脚本")
             self.get_poco_dic()
+    def game_is_die(self):
+        """
 
+        :return:
+        """
+        game_activity_str = self.gpd.get_device_adb_shell(
+            "shell dumpsys window | findstr mCurrentFocus")  # 判断是否是被切到了后台
+        if self.game_name in game_activity_str:  # 没有被切到后台
+            # 游戏还在，确实找不到
+            snapshot(msg="游戏还在")
+            return False
+        else:  # 切到了后台，或者疑似闪退
+            game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
+            if self.game_name in game_running_str:
+                snapshot(msg="游戏还在,疑似切到后台")  # 可能被切到了后台
+                # 重新切回到游戏
+                start_app(self.game_name)
+                time.sleep(3)
+                snapshot(msg="切回游戏完毕")
+                return False
+                # 拉起后还有一次查找的机会
+            else:
+                snapshot(msg="游戏不在,疑似闪退")  # 可能闪退
+                time.sleep(2)
+                start_app(self.game_name)
+                time.sleep(5)
+                snapshot(msg="重启完毕")
+                stop_app(self.game_name)
+                # 游戏闪退就直接终止了
+                return True
     def my_swipe(self, start_path, end_path, duration=2):
         start = self.get_poco_pos(start_path)
         end = self.get_poco_pos(end_path)
