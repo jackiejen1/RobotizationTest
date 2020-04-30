@@ -54,8 +54,18 @@ class UnexpectedWinSs2:
         #     self.make_poco_dic.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("RedPacketRainPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("RedPacketRainPop/__view/Btn_close")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):#邮件
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/4001")
+            self.make_poco_dic.my_touch("List_mail/未命名0")
+            if self.make_poco_dic.is_in_dic("List_mail/未命名1"):#如果存在第二封
+                self.make_poco_dic.my_touch("List_mail/未命名1")
+            self.make_poco_dic.my_touch("rewardComp/receiveBtn")# 领取
+            self.make_poco_dic.my_touch("rewardComp/receiveBtn")# 删除
+            if self.make_poco_dic.is_in_dic("List_mail/未命名1"):# 如果存在第二封，一键领取
+                self.make_poco_dic.my_touch("__view/receiveBtn")
+                self.make_poco_dic.my_touch("点击屏幕继续")
+                self.make_poco_dic.my_touch("removeBtn")# 一键删除
+                self.make_poco_dic.my_touch("ok")
             self.make_poco_dic.my_touch("MailLayer/__view/n0/btn0")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1001"):
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1001")

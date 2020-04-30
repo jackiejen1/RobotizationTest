@@ -15,24 +15,25 @@ import time
 import uuid
 from airtest.core.helper import device_platform
 import six
+import struct
 from poco.utils.simplerpc.transport.tcp.protocol import SimpleProtocolFilter
 from airtest.core.api import connect_device, device as current_device
-
 from MyPoco.airtestide_lack_packages.ftfy import fix_text
 from MyPoco.foundation.information import Information
 
+HEADER_SIZE = 4
 DEFAULT_TIMEOUT = 2
 DEFAULT_SIZE = 4096
-COCOSLUA_PORT = 15004 #需要区分端口号  cocoslua
+COCOSLUA_PORT = 15004  # 需要区分端口号  cocoslua
 UNITY_PORT = 5001  # unity
 
 
 class GetPocoDic(object):
     """safe and exact recv & send"""
 
-    def __init__(self, game_name,phone_name="", on_connect=None, on_close=None):
+    def __init__(self, game_name, phone_name="", on_connect=None, on_close=None):
         """address is (host, port) tuple"""
-        self.game_name=game_name
+        self.game_name = game_name
         self.info = Information()
         self.phone_name = phone_name
         self.on_connect = on_connect
@@ -41,11 +42,12 @@ class GetPocoDic(object):
         self.buf = b""
         self.prot = SimpleProtocolFilter()
         self.device = None or current_device()
-        if not self.device:
+        if not self.device and self.phone_name != None:
             self.device = connect_device("Android:///" + self.phone_name)
         self.platform_name = device_platform(self.device)
         self.connect_phone()
         self.address = (self.ip, self.port)
+
     def get_phone_size(self):
         '''
         获取手机分辨率和其他信息
@@ -53,25 +55,26 @@ class GetPocoDic(object):
         '''
         phone_size = self.device.adb.get_display_info()
         return phone_size
-    def get_device_adb_shell(self,cmd):
+
+    def get_device_adb_shell(self, cmd):
         """
         读取手机cmd数据，加入了指定设备号
         :param cmd:
         :return:
         """
-        if self.phone_name=="":
-            cmd_in = "adb "+cmd
+        if self.phone_name == "":
+            cmd_in = "adb " + cmd
         else:
-            cmd_in  = "adb -s "+self.phone_name+" "+cmd
+            cmd_in = "adb -s " + self.phone_name + " " + cmd
         game_activity_list = os.popen(cmd_in)
         game_activity_str = str(game_activity_list.readlines())
         return game_activity_str
 
     def connect_phone(self):
-        sever_poco = self.info.get_config(self.game_name,"sever_poco")
-        if sever_poco =="cocos-lua":
+        sever_poco = self.info.get_config(self.game_name, "sever_poco")
+        if sever_poco == "cocos-lua":
             self.port = COCOSLUA_PORT
-        elif sever_poco =="unity":
+        elif sever_poco == "unity":
             self.port = UNITY_PORT
         if self.platform_name == 'Android':
             # always forward for android device to avoid network unreachable
@@ -183,7 +186,6 @@ class GetPocoDic(object):
             for i in range(len(childs_list)):
                 childs_dic = childs_list[i]
                 new_poco_dic = self.get_ui_tree(childs_dic, new_poco_dic)
-
         return new_poco_dic
 
     def get_poco_dic(self):
@@ -195,17 +197,24 @@ class GetPocoDic(object):
         msg_bytes = self.prot.pack(b)
         self.send(msg_bytes)
         self.buf = b''
+        recv_length = 0
         while True:
             try:
                 ret = self.recv()
+                self.buf = self.buf + ret
+                length = struct.unpack('i', self.buf[0:HEADER_SIZE])
+                if recv_length == 0:
+                    recv_length =recv_length + length[0]
+                if (len(self.buf)-HEADER_SIZE) ==  recv_length:
+                    break
             except Exception:
                 break
-            self.buf = self.buf + ret
+            # self.buf = self.buf + ret
         if self.buf != b'':
             ret = self.prot.unpack(self.buf)
             poco_path_dic_byte = ret[1]
             poco_path_dic_str = str(poco_path_dic_byte, encoding="utf-8")
-            # poco_path_dic_str = fix_text(poco_path_dic_str)
+            poco_path_dic_str = fix_text(poco_path_dic_str)
             poco_path_dic_list = json.loads(poco_path_dic_str)
             poco_path_dic = self.get_ui_tree(poco_path_dic_list["result"], {})
             self.close()
@@ -214,4 +223,3 @@ class GetPocoDic(object):
             return poco_path_dic
         else:
             return {}
-

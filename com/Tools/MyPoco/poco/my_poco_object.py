@@ -79,14 +79,14 @@ class MyPocoObject():
         time.sleep(1)
         return start, end
 
-    def is_this_text(self, poco_path, text):
+    def is_this_text(self, poco_path, text,is_in = False):
         """
         判断节点的文字
         :param poco_path: 节点路径
         :param text: 需要判断的文字
         :return: bool
         """
-        return self.make_poco_dic.is_this_text(poco_path, text)
+        return self.make_poco_dic.is_this_text(poco_path, text,is_in=is_in)
 
     def touch(self, pos_list):
         """

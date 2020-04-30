@@ -64,7 +64,6 @@ class ProtocolFunction:
         # 如果ret等于3则需要创角协议
         self.uid = G2C_Login.uid
         print(self.uid)
-        add_msg_in_log(self.username+str(self.server_id)+"的角色id为："+str(G2C_Login.uid))
         if G2C_Login.ret == 3:
             print("新账号，开始创建角色")
             flag_Create, data_Create = lg.MSG_C2G_Create(G2C_Login.uid,G2C_Login.sid)

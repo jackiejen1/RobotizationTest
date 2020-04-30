@@ -85,14 +85,15 @@ class MyPoco:
         else:
             raise NoneException(poco_path)
 
-    def is_this_text(self, poco_path,text):
+    def is_this_text(self, poco_path,text,is_in = False):
         """
         判断节点的文字
         :param poco_path: 节点的绝对路径
         :param text: 需要判断的文字
+        :param text: 是否包含
         :return: bool
         """
-        return self.my_poco_obj.is_this_text(poco_path,text)
+        return self.my_poco_obj.is_this_text(poco_path,text,is_in=is_in)
     def set_xn_test(self):
         """
         进行性能测试时需要先启动该方法
@@ -121,6 +122,9 @@ class MyPoco:
         entry.entry_game(sever_name_input, game_account_input, red_info)
         # poco = self.my_poco_obj.new_poco_obj()
         # return poco
+
+    def get_account_info(self,game_account_input):
+        return self.get_config(self.game_name,game_account_input)
 
     def close_game(self):
         """
@@ -389,11 +393,8 @@ class MyPoco:
         role_id = self.get_ss2_role_id()
         self.set_account_information_gm(account, sever_name_input, role_id)#设置GM需要的信息
         self.add_resource(resource_dic)
-        if "副本"in play_dic.keys():
-            self.set_checkpoint(play_dic["副本"])
-        if "列传"in play_dic.keys():
-            self.open_game(sever_name_input,account,red_info=False)
-            self.rg.set_play_liezhuan_num(play_dic["列传"])
+        if "副本"in play_dic.keys() or "列传"in play_dic.keys():
+            self.set_checkpoint(sever_name_input,account,play_dic)
         self.set_config(self.game_name,"new_game_account1",account)
         return account
 
@@ -477,13 +478,19 @@ class MyPoco:
         """
         self.gm.set_server_time(dic_input)
 
-    def set_checkpoint(self, checkpoint):
+    # def set_checkpoint(self, checkpoint):
+    def set_checkpoint(self, sever_name_input,account,checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
         :param checkpoint:str 玩法名-章节数-小关卡数
         :return:
         """
-        self.gm.set_checkpoint(checkpoint)
+        if "副本"in checkpoint.keys():
+            self.gm.set_checkpoint(checkpoint["副本"])
+        if "列传"in checkpoint.keys():
+            self.open_game(sever_name_input,account,red_info=False)
+            self.rg.set_play_liezhuan_num(checkpoint["列传"])
+        # self.gm.set_checkpoint(checkpoint)
 
     def set_level(self, level):
         """

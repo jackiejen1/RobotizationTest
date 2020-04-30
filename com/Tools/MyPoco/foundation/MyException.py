@@ -26,8 +26,8 @@ class NoneException(Exception):
     '''
 
     def __init__(self, msg=""):
-        self.msg = msg
-        print(str(self.msg) + "节点没有找到")
+        self.msg = str(msg) + "节点没有找到"
+
 
     def __str__(self):
         return str(self.msg)
