@@ -56,7 +56,6 @@ class NotHaveGameException(Exception):
     def __str__(self):
         return str("")
 
-
 class NotPocoServeException(Exception):
     '''
     前端poco服务断开连接，重复了

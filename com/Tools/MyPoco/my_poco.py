@@ -26,6 +26,7 @@ class MyPoco:
     def __init__(self, game_name, phone_id):
         """
         :param game_name: 游戏名字，见ini文件App_Name项
+        :param phone_id: 设备号，如果为None，表示不链接设备
         """
         self.info = Information()
         my_poco_path = os.path.abspath(os.path.dirname(__file__))
@@ -80,6 +81,13 @@ class MyPoco:
         """
         return self.my_poco_obj.get_poco_dic()
     def my_touch_in_dic(self,poco_path,poco_dic,click_list=None):
+        """
+        传入缓存的poco节点字典，直接去点击字典里面缓存的节点
+        :param poco_path: poco name
+        :param poco_dic: 缓存的字典
+        :param click_list: 点击节点偏移量
+        :return:
+        """
         if self.is_in_dic(poco_path,poco_dic):
             self.my_touch(poco_path,click_list=click_list)
         else:
@@ -166,10 +174,9 @@ class MyPoco:
         :param click_list:控件点击偏移点[0,0]-[1,1]范围
         :return:Exception
         """
-        if click_list == None:
-            self.my_poco_obj.touch_poco(poco_path)
-        else:
-            self.my_poco_obj.touch_poco_obj(poco_path, click_list)
+
+        self.my_poco_obj.touch_poco(poco_path,click_list=click_list)
+
 
     def my_touch_pos(self, pos_list_int):
         """

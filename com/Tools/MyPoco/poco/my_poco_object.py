@@ -115,7 +115,7 @@ class MyPocoObject():
         """
         self.make_poco_dic.touch_pos(pos_list_int)
 
-    def touch_poco(self, poco_path):
+    def touch_poco(self, poco_path,click_list=None):
         """
         需要查找的控件路径
         :param find_name:需要查找的控件路径
@@ -124,34 +124,34 @@ class MyPocoObject():
         """
         self.uw.unexpected_win()
         try:
-            self.make_poco_dic.my_touch(poco_path)
+            self.make_poco_dic.my_touch(poco_path,click_list=click_list)
         except RpcTimeoutError:
             snapshot(msg="poco超时异常")
-            self.make_poco_dic.my_touch(poco_path)
+            self.make_poco_dic.my_touch(poco_path,click_list=click_list)
         except ConnectionAbortedError:
             start_app(self.game_name)
             time.sleep(4)
             snapshot(msg="10053异常")
         time.sleep(1)
 
-    def touch_poco_obj(self, poco_path, click_list):
-        """
-        :param find_poco:查找的poco对象的name(路径)
-        :param click_list:控件点击偏移点[0,0]-[1,1]范围
-        :return:
-        raise：PocoNoSuchNodeException、RpcTimeoutError
-        """
-        self.uw.unexpected_win()
-        try:
-            self.make_poco_dic.touch_poco_obj(poco_path, click_list)
-        except RpcTimeoutError:
-            snapshot(msg="poco超时异常")
-            self.make_poco_dic.touch_poco_obj(poco_path, click_list)
-        except ConnectionAbortedError:
-            start_app(self.game_name)
-            time.sleep(4)
-            snapshot(msg="10053异常")
-        time.sleep(1)
+    # def touch_poco_obj(self, poco_path, click_list):
+    #     """
+    #     :param find_poco:查找的poco对象的name(路径)
+    #     :param click_list:控件点击偏移点[0,0]-[1,1]范围
+    #     :return:
+    #     raise：PocoNoSuchNodeException、RpcTimeoutError
+    #     """
+    #     self.uw.unexpected_win()
+    #     try:
+    #         self.make_poco_dic.touch_poco_obj(poco_path, click_list)
+    #     except RpcTimeoutError:
+    #         snapshot(msg="poco超时异常")
+    #         self.make_poco_dic.touch_poco_obj(poco_path, click_list)
+    #     except ConnectionAbortedError:
+    #         start_app(self.game_name)
+    #         time.sleep(4)
+    #         snapshot(msg="10053异常")
+    #     time.sleep(1)
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """
@@ -228,10 +228,11 @@ class MyPocoObject():
 
         if first == second:
             st = msg + "正常"
-            add_msg_in_log(st, is_pass=True)
+            add_msg_in_log(st+","+str(first)+","+str(second), is_pass=True)
         else:
             st = msg + "异常"
-            add_msg_in_log(st,is_pass=False)
+            add_msg_in_log(st+","+str(first)+","+str(second),is_pass=False)
+            snapshot(st)
 
     def get_game_number_l(self, poco_path, subscript):
         """
@@ -265,13 +266,15 @@ class MyPocoObject():
 
     def get_game_number_instr(self, poco_path):
         """
-        只获取poco对象中text属性中的数字
+        只获取poco对象中text属性文字中包含的数字
         :param poco_path:
         :return:
         """
         number_str = self.make_poco_dic.get_poco_any_value(poco_path, "text")
-        number = filter(str.isdigit, number_str)
-        return int(number.__next__())
+        # number = filter(str.isdigit, number_str)
+        number = re.findall(r'\d+', number_str)
+        # return int(number.__next__())
+        return int(number[0])
 
     def get_game_number_c(self, poco_path):
         """

@@ -101,10 +101,10 @@ class GmMethod:
                 select_resource_dic["type"] = data_dic["type"]
                 select_resource_dic["id"] = data_dic["id"]
                 # 根据type和id查询道具的名字
-                resource_name_select = self.mri.get_data_select(select_resource_dic)
+                resource_name_select = self.mri.get_resource_name(select_resource_dic)
                 resource_num = data_dic["num"]
                 # 合成{"道具名":道具数量}
-                resource_num_dic[resource_name_select] = resource_num
+                resource_num_dic[resource_name_select] = int(resource_num)
             return resource_num_dic
         else:
             print("没有查到道具数量信息")

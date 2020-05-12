@@ -45,7 +45,7 @@ class EntryGameSs2:
         time.sleep(1)
         self.my_poco_obj.touch_poco("AnnoCloseBtn")
         self.my_poco_obj.touch_poco("点击选服")
-        self.my_poco_obj.touch_poco_obj("11 - 20区",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
+        self.my_poco_obj.touch_poco("11 - 20区",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
         sever_name = self.info.get_config(self.game_name, sever_name_input)
         self.my_poco_obj.touch_poco(sever_name)
         self.my_poco_obj.touch_poco("Txt_guide")  # 关闭新手引导
@@ -68,7 +68,7 @@ class EntryGameSs2:
             self.my_poco_obj.touch_poco("确 认")
             self.my_poco_obj.touch_poco("AnnoCloseBtn")
             self.my_poco_obj.touch_poco("点击选服")
-            self.my_poco_obj.touch_poco_obj("11 - 20区",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
+            self.my_poco_obj.touch_poco("11 - 20区",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
             sever_name = self.info.get_config(self.game_name, sever_name_input)
             self.my_poco_obj.touch_poco(sever_name)
             self.my_poco_obj.touch_poco("Txt_guide")  # 关闭新手引导

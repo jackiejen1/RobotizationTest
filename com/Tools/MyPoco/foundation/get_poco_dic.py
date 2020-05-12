@@ -20,7 +20,7 @@ from poco.utils.simplerpc.transport.tcp.protocol import SimpleProtocolFilter
 from airtest.core.api import connect_device, device as current_device
 from MyPoco.airtestide_lack_packages.ftfy import fix_text
 from MyPoco.foundation.information import Information
-
+from MyPoco.foundation.MyException import *
 HEADER_SIZE = 4
 DEFAULT_TIMEOUT = 2
 DEFAULT_SIZE = 4096
@@ -197,15 +197,13 @@ class GetPocoDic(object):
         msg_bytes = self.prot.pack(b)
         self.send(msg_bytes)
         self.buf = b''
-        recv_length = 0
+
         while True:
             try:
                 ret = self.recv()
                 self.buf = self.buf + ret
                 length = struct.unpack('i', self.buf[0:HEADER_SIZE])
-                if recv_length == 0:
-                    recv_length =recv_length + length[0]
-                if (len(self.buf)-HEADER_SIZE) ==  recv_length:
+                if (len(self.buf)-HEADER_SIZE) ==  length[0]:
                     break
             except Exception:
                 break
@@ -214,9 +212,13 @@ class GetPocoDic(object):
             ret = self.prot.unpack(self.buf)
             poco_path_dic_byte = ret[1]
             poco_path_dic_str = str(poco_path_dic_byte, encoding="utf-8")
-            poco_path_dic_str = fix_text(poco_path_dic_str)
+            # poco_path_dic_str = fix_text(poco_path_dic_str)
             poco_path_dic_list = json.loads(poco_path_dic_str)
-            poco_path_dic = self.get_ui_tree(poco_path_dic_list["result"], {})
+            if 'error' in poco_path_dic_list.keys():
+                print("前端获取节点信息时报错")
+                raise NotPocoServeException(poco_path_dic_list["error"])
+            else:
+                poco_path_dic = self.get_ui_tree(poco_path_dic_list["result"], {})
             self.close()
             end_time = time.time()
             print("获取节点数据用时" + str(end_time - start_time))

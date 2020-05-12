@@ -23,6 +23,9 @@ from MyPoco.foundation.get_poco_dic import GetPocoDic
 import threading
 import time
 from poco.drivers.std import StdPoco
+
+from MyPoco.protocol.make_resource_body import MakeResourceBody
+
 poco = StdPoco()
 
 from MyPoco.foundation.information import Information
@@ -53,14 +56,17 @@ class myThread(threading.Thread):
 from airtest.core.api import device
 # auto_setup(__file__)
 if __name__ == '__main__':
-
+    i = 1
+    find_name = "Chapter_" + str(i) + "/n16"
+    print(find_name)
+    pass
     # com.youzu.g36.yz.qa 36计
-    thread1 = myThread(1, "Thread-1", "","com.youzu.test.qa")
+    # thread1 = myThread(1, "Thread-1", "","com.youzu.test.qa")
     # thread2 = myThread(2, "Thread-2", "3e1a2b6","com.youzu.test.qa")
     # # 开启新线程
-    thread1.start()
+    # thread1.start()
     # thread2.start()
-    thread1.join()
+    # thread1.join()
     # thread2.join()
     # print("退出主线程")
     # my_poco = MyPoco("少三2","")

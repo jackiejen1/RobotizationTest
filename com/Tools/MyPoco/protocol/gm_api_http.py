@@ -12,7 +12,7 @@ PATH_DICT = {
     "COMMON": '/api/gm',
     'GET_ROLE_ID': '/role_id',
     'ADD_RESOURCES': '/resources/add',
-    'QUERY_RESOURCES': '/resources/query',
+    'SELECT_RESOURCES': '/resources/query',
     'DELETE_RESOURCES': '/resources/delete',
     'QUERY_SERVER_TIME': '/server_time',
     'MOD_SERVER_TIME': '/server_time/mod',

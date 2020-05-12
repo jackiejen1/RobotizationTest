@@ -112,4 +112,4 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("ErrorMessagePop"):
             snapshot(msg="游戏报错")
             self.make_poco_dic.my_touch("Btn_ok")
-            raise NotHaveGameException
+            raise NotHaveGameException("游戏报错")
