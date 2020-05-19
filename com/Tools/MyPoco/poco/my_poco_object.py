@@ -26,11 +26,12 @@ class MyPocoObject():
         创建依赖对象，保存全局信息
         """
         self.game_name = game_name
+        self.phone_id = phone_id
         self.make_poco_dic = MakePocoDic(game_name, phone_id)
         self.info = Information()
         self.uw = UnexpectedWin(game_name, phone_id)
         self.poco = None
-
+        self.is_pass =0
     # def renovate_and_get_poco_dic(self):
     #     """
     #     刷新UI信息并保存本地
@@ -79,14 +80,14 @@ class MyPocoObject():
         time.sleep(1)
         return start, end
 
-    def is_this_text(self, poco_path, text,is_in = False):
+    def is_this_text(self, poco_path, text, is_in=False):
         """
         判断节点的文字
         :param poco_path: 节点路径
         :param text: 需要判断的文字
         :return: bool
         """
-        return self.make_poco_dic.is_this_text(poco_path, text,is_in=is_in)
+        return self.make_poco_dic.is_this_text(poco_path, text, is_in=is_in)
 
     def touch(self, pos_list):
         """
@@ -96,7 +97,15 @@ class MyPocoObject():
         """
 
         self.make_poco_dic.touch(pos_list)
-
+    def swipe(self, pos1 ,pos2,duration):
+        """
+        根据传入的坐标进行滑动，调用的airtest自带的滑动方法
+        :param pos1: 开始
+        :param pos2: 结束
+        :param duration: 滑动持续时间
+        :return:
+        """
+        swipe(pos1, pos2, duration=duration)
     def swipe_pos(self, start_pos_list, end_pos_list, timein):
         """
         滑动方法
@@ -115,7 +124,7 @@ class MyPocoObject():
         """
         self.make_poco_dic.touch_pos(pos_list_int)
 
-    def touch_poco(self, poco_path,click_list=None):
+    def touch_poco(self, poco_path, click_list=None):
         """
         需要查找的控件路径
         :param find_name:需要查找的控件路径
@@ -124,10 +133,10 @@ class MyPocoObject():
         """
         self.uw.unexpected_win()
         try:
-            self.make_poco_dic.my_touch(poco_path,click_list=click_list)
+            self.make_poco_dic.my_touch(poco_path, click_list=click_list)
         except RpcTimeoutError:
             snapshot(msg="poco超时异常")
-            self.make_poco_dic.my_touch(poco_path,click_list=click_list)
+            self.make_poco_dic.my_touch(poco_path, click_list=click_list)
         except ConnectionAbortedError:
             start_app(self.game_name)
             time.sleep(4)
@@ -163,26 +172,34 @@ class MyPocoObject():
         bool = self.is_exist_poco(poco_path)
         if is_exist_str == "隐藏":
             miaoshu = "按钮" + poco_path + "隐藏"
-            if bool :
+            if bool:
                 isbool = False
             else:
                 isbool = True
         else:
             miaoshu = "按钮" + poco_path + "显示"
             if bool:
-                isbool =True
+                isbool = True
             else:
                 isbool = False
-        self.add_msg_in_log(miaoshu,isbool)
+        self.add_msg_in_log(miaoshu, isbool)
         return bool
 
-    def is_in_dic(self, poco_path,poco_dic_input=None):
+    def is_in_dic(self, poco_path, poco_dic_input=None):
         """
         判断节点是否在当前屏幕
         :param poco_path:
         :return:
         """
-        return self.make_poco_dic.is_in_dic(poco_path,poco_dic_input=poco_dic_input)
+        return self.make_poco_dic.is_in_dic(poco_path, poco_dic_input=poco_dic_input)
+
+    def is_visible(self, poco_path):
+        """
+        判断节点能不能点击,一般用作点击之后的状态判断
+        :param poco_path:
+        :return:
+        """
+        return self.make_poco_dic.is_visible(poco_path)
 
     def get_poco_position(self, poco_path):
         """
@@ -208,14 +225,22 @@ class MyPocoObject():
         :param input_str:需要输入的文本
         :return:
         """
-        text(input_str, enter=False)
+        if self.phone_id != None and self.phone_id != "":
+            os.system("adb -s " + self.phone_id + " shell input text " + input_str)
+        else:
+            os.system("adb shell input text " + input_str)
+        self.add_msg_in_log("输入" + input_str, True)
+        # text(input_str, enter=False)
         # keyevent("DEL")
 
-    def add_msg_in_log(self, msg,is_pass):
+    def add_msg_in_log(self, msg, is_pass):
         # name = "添加日志"
         # rizhi = {"name": name, "call_args": {"text": msg}}
         # G.LOGGER.log("function", rizhi, 1)
-        add_msg_in_log(msg,is_pass=is_pass)
+        add_msg_in_log(msg, is_pass=is_pass)
+        if not is_pass:
+            self.is_pass = self.is_pass+1
+
 
     def contrast_first_second(self, first, second, msg=""):
         """
@@ -228,10 +253,11 @@ class MyPocoObject():
 
         if first == second:
             st = msg + "正常"
-            add_msg_in_log(st+","+str(first)+","+str(second), is_pass=True)
+            add_msg_in_log(st + "," + str(first) + "," + str(second), is_pass=True)
         else:
-            st = msg + "异常"
-            add_msg_in_log(st+","+str(first)+","+str(second),is_pass=False)
+            self.is_pass = self.is_pass + 1
+            st = msg + "异常" + "," + str(first) + "," + str(second)
+            add_msg_in_log(st, is_pass=False)
             snapshot(st)
 
     def get_game_number_l(self, poco_path, subscript):
@@ -252,8 +278,6 @@ class MyPocoObject():
         :return:
         """
         return self.make_poco_dic.game_is_die()
-
-
 
     def get_game_number(self, poco_path):
         """
@@ -304,16 +328,20 @@ class MyPocoObject():
         需要加入特定标识确认已经退到主界面
         """
         snapshot(msg="关闭游戏")
-        stop_app(self.game_name)
-
-    # def get_poco_visible(self, poco_path):
-    #     """
-    #     获取游戏visible属性中的值
-    #     :param poco_path:poco路径
-    #     :return True/False
-    #     :raise
-    #     """
-    #     return self.make_poco_dic.get_poco_any_value(poco_path,"getVisible")
+        try:  # 忘记配置会报错
+            #从配置表中读取主界面唯一元素
+            close_game_poco_name = self.info.get_config(self.game_name, "close_game_poco_name")
+        except Exception:
+            close_game_poco_name = "None"
+        if close_game_poco_name == "None":
+            stop_app(self.game_name)
+        else:
+            if self.is_in_dic(close_game_poco_name):
+                stop_app(self.game_name)
+                if self.is_pass>0:
+                    raise GameNotPassException("数值判定部分未通过")
+            else:
+                raise NoneException("最后一步异常")
 
     def get_poco_any_value(self, poco_path, value_name_str):
         """

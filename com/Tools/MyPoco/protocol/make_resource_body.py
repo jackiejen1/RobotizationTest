@@ -17,15 +17,14 @@ class MakeResourceBody:
 
     def __init__(self, game_name):
         info = Information()
-        excel_path = info.get_config(game_name, "protocolexcelpath")
-        checkpoint_excel_path = info.get_config(game_name, "protococheckpointlpath")
+        excel_path = info.get_config(game_name, "resource_excelpath")
         MyPocoPath = info.get_config("MyPocoPath", "mypocopath")
         all_path=MyPocoPath+excel_path
-        all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
         self.xl = xlrd.open_workbook(all_path)
-        self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
-
-
+        if game_name == "com.youzu.test.qa":
+            checkpoint_excel_path = info.get_config(game_name, "checkpointl_excelpath")
+            all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
+            self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
 
     def get_num_from_name(self, checkpoint_name):
         """

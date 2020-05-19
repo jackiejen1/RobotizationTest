@@ -74,7 +74,7 @@ class GmMethod:
         data = json.dumps(data_list, ensure_ascii=False)
         body = {"account": self.account, "role_id": self.role_id, "server": self.server_id, "data": data}
         log_dic = self.gah.add_resources(body)
-        operation_description = "添加道具" + str(resource_name_list)
+        operation_description = str(self.role_id) + "添加道具" + str(resource_name_list)
         self.dispose_log(operation_description, log_dic)
 
     def select_resources(self, resource_name_list):

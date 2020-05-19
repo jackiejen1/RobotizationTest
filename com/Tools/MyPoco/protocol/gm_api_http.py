@@ -63,7 +63,8 @@ class GmApiHttp:
         url = r.url
         data_json = r.json()
         print('http get url : ' + url)
-        print('http get status_code : ' + str(r.status_code))
+        if r.status_code!=200:
+            print('http get status_code : ' + str(r.status_code))
         return data_json
 
     def __do_http_post(self, path_key, data=None):

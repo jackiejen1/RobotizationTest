@@ -118,8 +118,46 @@ class MakePocoDic:
             print(poco_path + "路径未找到")
             raise NoneException("对比text属性时，" + poco_path)
 
+    def is_visible(self, poco_path):
+        """
+        判断节点能不能点击,一般用作点击之后的状态判断
+        :param poco_path:
+        :return:
+        """
+        if self.poco_dic == None:
+            # 点击之后会清空，unexpected会直接调用该方法，所以需要刷一下最新的UI树
+            self.get_poco_dic()
+        if poco_path in self.poco_dic.keys():
+            poco_path_pos = self.poco_dic[poco_path]["pos"]
+            poco_path_Visible = self.poco_dic[poco_path]["getVisible"]
+            if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
+                print(poco_path + "-节点坐标在屏幕外，无法点击")
+                return False
+            elif not poco_path_Visible:
+                print(poco_path + "-getVisible属性为False，无法点击")
+                return False
+            else:
+                print(poco_path + "-节点坐标在屏幕内，getVisible属性为True，可以点击")
+                return True
+        # 看看某些唯一路径存不存在简写
+        for dic_key in self.poco_dic.keys():
+            if poco_path in dic_key:
+                # 是简写路径的话就把完整路径传递出去
+                poco_path_pos = self.poco_dic[dic_key]["pos"]
+                poco_path_Visible = self.poco_dic[dic_key]["getVisible"]
+                if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
+                    print(dic_key + "-节点坐标在屏幕外，当做不存在")
+                    return False
+                elif not poco_path_Visible:
+                    print(poco_path + "-getVisible属性为False，无法点击")
+                    return False
+                else:
+                    print(poco_path + "-节点坐标在屏幕内，getVisible属性为True，可以点击")
+                    return True
+        return False
+
     def is_in_dic(self, poco_path, poco_dic_input=None):
-        # 先判断在不在地址表里面
+
         if poco_dic_input != None:
             self.poco_dic = poco_dic_input
         if self.poco_dic == None:
@@ -128,7 +166,7 @@ class MakePocoDic:
         if poco_path in self.poco_dic.keys():
             poco_path_pos = self.poco_dic[poco_path]["pos"]
             if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
-                print(poco_path + "节点坐标在屏幕外，当做不存在")
+                print(poco_path + "-节点坐标在屏幕外，当做不存在")
                 return False
             else:
                 print("找到路径" + poco_path)
@@ -140,7 +178,7 @@ class MakePocoDic:
                 # 是简写路径的话就把完整路径传递出去
                 poco_path_pos = self.poco_dic[dic_key]["pos"]
                 if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
-                    print(dic_key + "节点坐标在屏幕外，当做不存在")
+                    print(dic_key + "-节点坐标在屏幕外，当做不存在")
                     return False
                 else:
                     print("找到路径" + dic_key)
@@ -148,7 +186,7 @@ class MakePocoDic:
                     return True
         return False
 
-    def get_poco_pos(self, poco_path,click_list=None):  # todo 闪退检测机制需要优化
+    def get_poco_pos(self, poco_path, click_list=None):  # todo 闪退检测机制需要优化
         """
         基础方法
         识别手机分辨率，换算ui控件的坐标
@@ -163,7 +201,7 @@ class MakePocoDic:
         for i in range(5):
             if self.is_in_dic(poco_path):
                 print("待点击路径：" + self.complete_poco_path)
-                #这里获取的是锚点坐标，当anchorPoint属性为[0,0]时，也是点击的左上角，需要做一个转换，直接点击中心点
+                # 这里获取的是锚点坐标，当anchorPoint属性为[0,0]时，也是点击的左上角，需要做一个转换，直接点击中心点
                 pos_list = self.poco_dic[self.complete_poco_path]['pos']
                 pos_anchorPoint = self.poco_dic[self.complete_poco_path]['anchorPoint']
                 pos_size = self.poco_dic[self.complete_poco_path]['size']
@@ -171,33 +209,33 @@ class MakePocoDic:
                 # phone_list_str = self.info.get_config("Phone_Size", self.thread_file_name)
                 # phone_list = eval(phone_list_str)
                 # 取整
-                if pos_anchorPoint[0]==0.5 and pos_anchorPoint[1] == 0.5:
-                    pos_x =  pos_list[0]
-                    pos_y =  pos_list[1]
+                if pos_anchorPoint[0] == 0.5 and pos_anchorPoint[1] == 0.5:
+                    pos_x = pos_list[0]
+                    pos_y = pos_list[1]
                 elif pos_anchorPoint[0] == 0 and pos_anchorPoint[1] == 0:
-                    pos_x =  pos_list[0]+pos_size[0]*0.5
-                    pos_y =  pos_list[1]+pos_size[1]*0.5
-                elif pos_anchorPoint[0]==1 and pos_anchorPoint[1] == 0.5:
-                    pos_x = pos_list[0]-pos_size[0]*0.5
-                    pos_y =  pos_list[1]
+                    pos_x = pos_list[0] + pos_size[0] * 0.5
+                    pos_y = pos_list[1] + pos_size[1] * 0.5
+                elif pos_anchorPoint[0] == 1 and pos_anchorPoint[1] == 0.5:
+                    pos_x = pos_list[0] - pos_size[0] * 0.5
+                    pos_y = pos_list[1]
                 elif pos_anchorPoint[0] == 0.5 and pos_anchorPoint[1] == 1:
                     pos_x = pos_list[0]
-                    pos_y = pos_list[1]-pos_size[1]*0.5
+                    pos_y = pos_list[1] - pos_size[1] * 0.5
                 elif pos_anchorPoint[0] == 1 and pos_anchorPoint[1] == 1:
-                    pos_x = pos_list[0]-pos_size[0]*0.5
-                    pos_y = pos_list[1]-pos_size[1]*0.5
+                    pos_x = pos_list[0] - pos_size[0] * 0.5
+                    pos_y = pos_list[1] - pos_size[1] * 0.5
                 elif pos_anchorPoint[0] == 0 and pos_anchorPoint[1] == 0.5:
-                    pos_x = pos_list[0]+pos_size[0]*0.5
+                    pos_x = pos_list[0] + pos_size[0] * 0.5
                     pos_y = pos_list[1]
-                else:# [0.5,0]
+                else:  # [0.5,0]
                     pos_x = pos_list[0]
-                    pos_y = pos_list[1]+pos_size[1]*0.5
-                #上面已经把pos_x和pos_y都换算到中心点的pos了
-                #正常是直接点击
-                if click_list == None :
+                    pos_y = pos_list[1] + pos_size[1] * 0.5
+                # 上面已经把pos_x和pos_y都换算到中心点的pos了
+                # 正常是直接点击
+                if click_list == None:
                     x = int(self.phone_size_list[0] * pos_x)
                     y = int(self.phone_size_list[1] * pos_y)
-                else:#需要偏移量的话就点击这里
+                else:  # 需要偏移量的话就点击这里
                     shifting_x = click_list[0] - 0.5
                     shifting_y = click_list[1] - 0.5
                     pos_x = pos_x + pos_size[0] * shifting_x
@@ -241,8 +279,8 @@ class MakePocoDic:
                             raise GameServerStopException("游戏闪退，终止脚本")
             self.get_poco_dic()
 
-    def my_touch(self, poco_path,click_list=None):
-        touch_int_list = self.get_poco_pos(poco_path,click_list)
+    def my_touch(self, poco_path, click_list=None):
+        touch_int_list = self.get_poco_pos(poco_path, click_list)
         self.touch(touch_int_list)
 
     def touch_pos(self, pos_list_int):

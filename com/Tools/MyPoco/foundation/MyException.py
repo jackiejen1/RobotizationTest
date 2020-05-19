@@ -44,6 +44,18 @@ class NoneStrException(Exception):
     def __str__(self):
         return str("")
 
+class GameNotPassException(Exception):
+    '''
+    脚本用例最终判定不通过
+    '''
+
+    def __init__(self, msg=""):
+        self.my_msg = msg
+
+    def __str__(self):
+        return str("")
+
+
 
 class NotHaveGameException(Exception):
     '''

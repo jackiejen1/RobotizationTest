@@ -41,7 +41,10 @@ class ProtocolFunction:
         self.host =socket_ages_dic["host"]   # host = "10.3.128.5"
         self.port =int(socket_ages_dic["port"])  # port = 16865
         self.server_id = int(socket_ages_dic["server_id"])
-        self.socket = create_connection((self.host, self.port))
+        try:
+            self.socket = create_connection((self.host, self.port))
+        except Exception:
+            raise GmException("服务器可能在维护")
         # 启动登陆
         self.uid=0
         self.Login()#可以考虑单独启动
@@ -50,6 +53,7 @@ class ProtocolFunction:
             self.socket = create_connection((self.host, self.port))
             return self.Login()
         else:
+            add_msg_in_log("role_id:"+str(self.uid))
             return self.uid
 
     def Login(self):
@@ -63,7 +67,8 @@ class ProtocolFunction:
         # self.info.set_config("com.youzu.test.qa","sid",str(G2C_Login.sid))
         # 如果ret等于3则需要创角协议
         self.uid = G2C_Login.uid
-        print(self.uid)
+        if self.uid!=0:
+            add_msg_in_log("role_id:" + str(self.uid))
         if G2C_Login.ret == 3:
             print("新账号，开始创建角色")
             flag_Create, data_Create = lg.MSG_C2G_Create(G2C_Login.uid,G2C_Login.sid)

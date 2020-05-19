@@ -18,7 +18,6 @@ import six
 import struct
 from poco.utils.simplerpc.transport.tcp.protocol import SimpleProtocolFilter
 from airtest.core.api import connect_device, device as current_device
-from MyPoco.airtestide_lack_packages.ftfy import fix_text
 from MyPoco.foundation.information import Information
 from MyPoco.foundation.MyException import *
 HEADER_SIZE = 4
@@ -26,7 +25,6 @@ DEFAULT_TIMEOUT = 2
 DEFAULT_SIZE = 4096
 COCOSLUA_PORT = 15004  # 需要区分端口号  cocoslua
 UNITY_PORT = 5001  # unity
-
 
 class GetPocoDic(object):
     """safe and exact recv & send"""
@@ -212,7 +210,6 @@ class GetPocoDic(object):
             ret = self.prot.unpack(self.buf)
             poco_path_dic_byte = ret[1]
             poco_path_dic_str = str(poco_path_dic_byte, encoding="utf-8")
-            # poco_path_dic_str = fix_text(poco_path_dic_str)
             poco_path_dic_list = json.loads(poco_path_dic_str)
             if 'error' in poco_path_dic_list.keys():
                 print("前端获取节点信息时报错")

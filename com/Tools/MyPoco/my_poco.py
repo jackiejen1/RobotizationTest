@@ -55,6 +55,18 @@ class MyPoco:
         :return:
         """
         return self.protocol.get_role_id()
+    def swipe(self,pos1 ,pos2,duration =3):
+
+        """
+        根据传入的坐标进行滑动，调用的airtest自带的滑动方法
+        :param pos1: 开始
+        :param pos2: 结束
+        :param duration: 滑动持续时间
+        :return:
+        """
+        self.my_poco_obj.swipe(pos1, pos2, duration=duration)
+
+
 
     # def set_poco(self):
     #     """
@@ -64,7 +76,7 @@ class MyPoco:
     #     """
     #     return self.my_poco_obj.new_poco_obj()
 
-    def set_account_information_gm(self, account, server_name,role_id=""):
+    def set_account_information_gm(self, account, server_name, role_id=""):
         """
         使用GM方法前需要调用该方法,来确定对哪个账号的哪个区下面的角色进行操作
         :param account:str  账号
@@ -72,7 +84,7 @@ class MyPoco:
         :param role_id: int 如果不传，则通过api获取
         :return:
         """
-        self.gm.set_account_information(account, server_name_input=server_name,role_id=role_id)
+        self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
 
     def get_poco_dic(self):
         """
@@ -80,7 +92,8 @@ class MyPoco:
         :return: ui dic
         """
         return self.my_poco_obj.get_poco_dic()
-    def my_touch_in_dic(self,poco_path,poco_dic,click_list=None):
+
+    def my_touch_in_dic(self, poco_path, poco_dic, click_list=None):
         """
         传入缓存的poco节点字典，直接去点击字典里面缓存的节点
         :param poco_path: poco name
@@ -88,12 +101,12 @@ class MyPoco:
         :param click_list: 点击节点偏移量
         :return:
         """
-        if self.is_in_dic(poco_path,poco_dic):
-            self.my_touch(poco_path,click_list=click_list)
+        if self.is_in_dic(poco_path, poco_dic):
+            self.my_touch(poco_path, click_list=click_list)
         else:
             raise NoneException(poco_path)
 
-    def is_this_text(self, poco_path,text,is_in = False):
+    def is_this_text(self, poco_path, text, is_in=False):
         """
         判断节点的文字
         :param poco_path: 节点的绝对路径
@@ -101,7 +114,8 @@ class MyPoco:
         :param text: 是否包含
         :return: bool
         """
-        return self.my_poco_obj.is_this_text(poco_path,text,is_in=is_in)
+        return self.my_poco_obj.is_this_text(poco_path, text, is_in=is_in)
+
     def set_xn_test(self):
         """
         进行性能测试时需要先启动该方法
@@ -131,8 +145,8 @@ class MyPoco:
         # poco = self.my_poco_obj.new_poco_obj()
         # return poco
 
-    def get_account_info(self,game_account_input):
-        return self.get_config(self.game_name,game_account_input)
+    def get_account_info(self, game_account_input):
+        return self.get_config(self.game_name, game_account_input)
 
     def close_game(self):
         """
@@ -175,8 +189,7 @@ class MyPoco:
         :return:Exception
         """
 
-        self.my_poco_obj.touch_poco(poco_path,click_list=click_list)
-
+        self.my_poco_obj.touch_poco(poco_path, click_list=click_list)
 
     def my_touch_pos(self, pos_list_int):
         """
@@ -300,14 +313,6 @@ class MyPoco:
         """
         return self.my_poco_obj.get_game_number_instr(poco_path)
 
-    # def get_poco_visible(self, poco_path):
-    #     """
-    #     获取游戏visible属性中的值
-    #     :param poco_path:poco路径
-    #     :return:True/False
-    #     """
-    #     return self.my_poco_obj.get_poco_visible(poco_path)
-
     def get_poco_any_value(self, find_poco_path, value_name_str):
         """
         获取游戏poco对象value_name_str属性中的值，需要自行判断类型
@@ -385,8 +390,8 @@ class MyPoco:
 
     # @err_close_game
     # def new_account(self, resource_dic_input, sever_name_input, play_dic):
-        # self.newaccount.new_game_account(resource_dic_input, sever_name_input, play_dic)
-    def new_account(self,sever_name_input,resource_dic,play_dic):
+    # self.newaccount.new_game_account(resource_dic_input, sever_name_input, play_dic)
+    def new_account(self, sever_name_input, resource_dic, play_dic):
         """
         根据输入的要求在sever_name区创建一个账号,需要添加创建账号必备的资源
         :param sever_name_input: 区服名和配置一致
@@ -394,15 +399,15 @@ class MyPoco:
         :param play_dic: 字典，需要添加的各种资源
         :return:
         """
-        self.set_config(self.game_name, "new_game_account1", "")#进入之后重置账号
+        self.set_config(self.game_name, "new_game_account1", "")  # 进入之后重置账号
         account = self.get_random_account()
         self.make_new_role(sever_name_input, account)
         role_id = self.get_ss2_role_id()
-        self.set_account_information_gm(account, sever_name_input, role_id)#设置GM需要的信息
+        self.set_account_information_gm(account, sever_name_input, role_id)  # 设置GM需要的信息
         self.add_resource(resource_dic)
-        if "副本"in play_dic.keys() or "列传"in play_dic.keys():
-            self.set_checkpoint(sever_name_input,account,play_dic)
-        self.set_config(self.game_name,"new_game_account1",account)
+        if "副本" in play_dic.keys() or "列传" in play_dic.keys():
+            self.set_checkpoint(sever_name_input, account, play_dic)
+        self.set_config(self.game_name, "new_game_account1", account)
         return account
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
@@ -422,22 +427,32 @@ class MyPoco:
         """
         return self.my_poco_obj.is_exist_poco(poco_path)
 
-    def add_msg_in_log(self,msg,is_pass=True):
+    def add_msg_in_log(self, msg, is_pass=True):
         """
         将打印信息添加到报告中
         :param msg: 日志描述
         :param is_pass: 改变该条打印的是否通过状态
         :return:
         """
-        self.my_poco_obj.add_msg_in_log(msg,is_pass=is_pass)
+        self.my_poco_obj.add_msg_in_log(msg, is_pass=is_pass)
 
-    def is_in_dic(self, poco_path,poco_dic_input=None):
+    def is_in_dic(self, poco_path, poco_dic_input=None):
         """
         判断节点是否在当前屏幕
-        :param poco_path:
-        :return:
+        :param poco_path: 节点名字
+        :return: Ture/False
         """
-        return self.my_poco_obj.is_in_dic(poco_path,poco_dic_input=poco_dic_input)
+        return self.my_poco_obj.is_in_dic(poco_path, poco_dic_input=poco_dic_input)
+
+
+
+    def is_visible(self, poco_path):
+        """
+        判断节点能不能点击,一般用作点击之后的状态判断
+        :param poco_path: 节点名字
+        :return: Ture/False
+        """
+        return self.my_poco_obj.is_visible(poco_path)
 
     def add_resource(self, dic_input):
         """
@@ -486,16 +501,16 @@ class MyPoco:
         self.gm.set_server_time(dic_input)
 
     # def set_checkpoint(self, checkpoint):
-    def set_checkpoint(self, sever_name_input,account,checkpoint):
+    def set_checkpoint(self, sever_name_input, account, checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
         :param checkpoint:str 玩法名-章节数-小关卡数
         :return:
         """
-        if "副本"in checkpoint.keys():
+        if "副本" in checkpoint.keys():
             self.gm.set_checkpoint(checkpoint["副本"])
-        if "列传"in checkpoint.keys():
-            self.open_game(sever_name_input,account,red_info=False)
+        if "列传" in checkpoint.keys():
+            self.open_game(sever_name_input, account, red_info=False)
             self.rg.set_play_liezhuan_num(checkpoint["列传"])
         # self.gm.set_checkpoint(checkpoint)
 
@@ -514,7 +529,6 @@ class MyPoco:
         :return:
         """
         self.gm.recharge_supplement(resource_name)
-
 
     def game_is_die(self):
         return self.my_poco_obj.game_is_die()

@@ -212,7 +212,7 @@ class ProtocolTools:
         self.game_name = game_name
         self.info = Information()
         # 通过游戏名字获取表格路径
-        excel_path = self.info.get_config(game_name, "protocolexcelpath")
+        excel_path = self.info.get_config(game_name, "resource_excelpath")
         obj_path = self.info.get_config("MyPocoPath", "mypocopath") + excel_path
         self.excel = xlrd.open_workbook(obj_path)
         # 协议文件路径，需要将后端给的协议文件从proto类型改为txt

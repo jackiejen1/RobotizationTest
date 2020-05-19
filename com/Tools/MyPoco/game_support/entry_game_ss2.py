@@ -39,7 +39,8 @@ class EntryGameSs2:
         else:
             game_account=game_account_input
         self.my_poco_obj.touch_poco("InputName")
-        text(game_account)
+        # text(game_account)
+        self.my_poco_obj.text_str(game_account)
         # self.poco("InputName").set_text(game_account)
         self.my_poco_obj.touch_poco("确 认")
         time.sleep(1)
@@ -64,7 +65,8 @@ class EntryGameSs2:
             time.sleep(20)
             game_account = self.info.get_config(self.game_name, game_account_input)
             self.my_poco_obj.touch_poco("InputName")
-            text(game_account)
+            # text(game_account)
+            self.my_poco_obj.text_str(game_account)
             self.my_poco_obj.touch_poco("确 认")
             self.my_poco_obj.touch_poco("AnnoCloseBtn")
             self.my_poco_obj.touch_poco("点击选服")

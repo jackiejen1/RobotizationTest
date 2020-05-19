@@ -39,7 +39,7 @@ class UnexpectedWinSs2:
         # todo 算法有问题，异常窗口排列顺序影响，需要改成完全排除所有窗口后才算排查完毕
         # ComLoading 转菊花的name
         self.make_poco_dic.get_poco_dic()
-        if self.make_poco_dic.is_in_dic("内更新"):  # 点击完下载资源启动游戏
+        if self.make_poco_dic.is_in_dic("下载点2"):  # 点击完下载资源启动游戏
             self.make_poco_dic.my_touch("下载点2")
             time.sleep(30)
             for i in range(20):

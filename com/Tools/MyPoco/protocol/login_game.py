@@ -16,6 +16,7 @@ import random
 from foundation.information import Information
 
 
+
 class LoginGame:
     def __init__(self, socket, server_id, game_name, username=None):
         self.info = Information()
@@ -60,7 +61,8 @@ class LoginGame:
     # 创建角色
     def MSG_C2G_Create(self, uid, sid):
         C2G_Create = cg_pb2.C2G_Create()
-        C2G_Create.name = str(self.username)
+        username = str(self.username)[2:]
+        C2G_Create.name = username
         C2G_Create.type = 210000
         # uid = self.info.get_config("com.youzu.test.qa", "uid")
         # sid = self.info.get_config("com.youzu.test.qa", "sid")
@@ -72,7 +74,7 @@ class LoginGame:
                            'uid': uid, 'sid': sid}
         senddata = pack_data(C2G_Create, C2G_Create_attr)
         flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 32)
-        msg="角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + self.username
+        msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + username
         print(msg)
         add_msg_in_log(msg)
         return flag, data
