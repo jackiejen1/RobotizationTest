@@ -8,9 +8,9 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from foundation.information import Information
-from game_support.entry_game_ss2 import EntryGameSs2
-from game_support.entry_game_sx import EntryGameSx
+from MyPoco.foundation.information import Information
+from MyPoco.game_support.entry_game_ss2 import EntryGameSs2
+from MyPoco.game_support.entry_game_sx import EntryGameSx
 
 
 class EntryGame:

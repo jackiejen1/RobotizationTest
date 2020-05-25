@@ -7,7 +7,6 @@
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/my_err" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/yztest" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/Tools" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

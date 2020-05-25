@@ -54,8 +54,8 @@ end, function()
     socket = cc.exports.socket
 end)
 local VERSION = import('.POCO_SDK_VERSION')
---local Dumper = import('.Cocos2dxFrozenDumper') --这里使用poco原生
-local Dumper = import(".FguiDumper") --这里区分使用Fgui
+local Dumper = import('.Cocos2dxFrozenDumper') --这里使用poco原生
+--local Dumper = import(".FguiDumper") --这里区分使用Fgui
 local Screen = import('.Cocos2dxScreen')
 local ClientConnection = import('.ClientConnection')
 

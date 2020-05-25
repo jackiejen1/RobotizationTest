@@ -9,9 +9,8 @@
 # @Method:
 # Reference:********************************
 from poco.drivers.std import StdPoco
-from time import sleep
-from foundation.make_poco_dic import MakePocoDic
-
+import time
+from MyPoco.foundation.make_poco_dic import MakePocoDic
 
 class UnexpectedWinSx:
     def __init__(self,game_name,phone_id):

@@ -97,8 +97,8 @@ function Node:getAttr(attrName)
 
     elseif attrName == 'name' then
         local name = self.node:getName()
-        if name == '' or string.match(attrName,"unknown") then
-            name = "未命名"
+        if name == '' or  string.match(name, "unknown") then
+            name = "未命名"--self.node:getDescription()
         end
         return name
 
@@ -121,11 +121,47 @@ function Node:getAttr(attrName)
 
     elseif attrName == 'pos' then
         -- 转换成归一化坐标系，原点左上角
-        local pos = self.node:convertToWorldSpaceAR(cc.p(0, 0))
+		local anchor = self.node:getAnchorPoint() 
+		local x = 0.5 - anchor.x 
+		local y  = 0.5 - anchor.y
+		
+		
+        local pos = self.node:convertToWorldSpaceAR(cc.p(x, y))
         pos.x = pos.x / self.screenWidth
         pos.y = pos.y / self.screenHeight
         pos.y = 1 - pos.y
         return {pos.x, pos.y}
+
+        --local size = self.node:getContentSize()
+        -- 有些版本的engine对于某类特殊节点会没有这个值，所以要判断
+        --if size ~= nil then
+            --如果锚点不是中心点
+           -- local anchor = self.node:getAnchorPoint() 
+            --if anchor.x == 0 then
+           --     pos.x = pos.x + 0.5*size.width
+          --  end
+
+         --   if anchor.x == 1 then
+                --pos.x = pos.x - 0.5*size.width
+        --    end
+
+          --  if anchor.y == 0 then
+         --       pos.y = pos.y + 0.5*size.height
+         --   end
+
+         --   if anchor.y == 1 then
+           --     pos.y = pos.y - 0.5*size.height
+           -- end
+
+       -- end
+
+       -- pos.x = pos.x / self.screenWidth
+      --  pos.y = pos.y / self.screenHeight
+
+      --  pos.x = math.min(1,math.max(0,pos.x))
+      --  pos.y = math.min(1,math.max(0,pos.y))
+      --  pos.y = 1 - pos.y
+      --  return {pos.x, pos.y}
 
     elseif attrName == 'size' then
         -- 转换成归一化坐标系
@@ -143,7 +179,8 @@ function Node:getAttr(attrName)
     elseif attrName == 'anchorPoint' then
         local anchor = self.node:getAnchorPoint()
         anchor.y = 1 - anchor.y
-        return {anchor.x, anchor.y}
+        -- return {anchor.x, anchor.y}
+        return {0.5, 0.5}
 
     elseif attrName == 'zOrders' then
         local zOrders = {

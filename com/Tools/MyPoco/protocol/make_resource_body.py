@@ -6,10 +6,10 @@
 # @function : 生成GM后台接口所需的信息
 import json
 
-from foundation.information import Information
+from MyPoco.foundation.information import Information
 import time
-from airtestide_lack_packages import xlrd
-
+from MyPoco.airtestide_lack_packages import xlrd
+from MyPoco.foundation.MyException import *
 class MakeResourceBody:
     """
     根据资源名获取资源对应type和id，用于辅助GM后台

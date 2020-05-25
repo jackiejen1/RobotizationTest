@@ -8,8 +8,13 @@
 #@Function:使用协议登录游戏创建账号
 #@Method:
 #Reference:********************************
-from foundation.information import Information
+import time
 
+from MyPoco.foundation.information import Information
+from airtest.core.api import *
+from MyPoco.foundation.information import Information
+from MyPoco.game_support.resource_gm import ResourceGm
+from MyPoco.poco.my_poco_object import MyPocoObject
 
 class NewAccountSs2:
 

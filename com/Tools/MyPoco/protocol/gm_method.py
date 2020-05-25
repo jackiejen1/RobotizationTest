@@ -4,9 +4,11 @@
 # @Author : 洞洞
 # @File : gm_method.py 
 # @function :
-from foundation.information import Information
-from protocol.gm_api_http import GmApiHttp
-from protocol.make_resource_body import MakeResourceBody
+import json
+
+from MyPoco.foundation.information import Information
+from MyPoco.protocol.gm_api_http import GmApiHttp
+from MyPoco.protocol.make_resource_body import MakeResourceBody
 import time
 from MyPoco.foundation.MyException import *
 
