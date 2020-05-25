@@ -55,7 +55,8 @@ class MyPoco:
         :return:
         """
         return self.protocol.get_role_id()
-    def swipe(self,pos1 ,pos2,duration =3):
+
+    def swipe(self, pos1, pos2, duration=3):
 
         """
         根据传入的坐标进行滑动，调用的airtest自带的滑动方法
@@ -65,8 +66,6 @@ class MyPoco:
         :return:
         """
         self.my_poco_obj.swipe(pos1, pos2, duration=duration)
-
-
 
     # def set_poco(self):
     #     """
@@ -217,9 +216,6 @@ class MyPoco:
         :return:
         """
         self.xt.xn_swipe(start, end)
-
-    # todo 报错刷新
-    # @err_close_game
 
     def get_config(self, list_name, key):
         """
@@ -406,7 +402,7 @@ class MyPoco:
         self.set_account_information_gm(account, sever_name_input, role_id)  # 设置GM需要的信息
         self.add_resource(resource_dic)
         if "副本" in play_dic.keys() or "列传" in play_dic.keys():
-            self.set_checkpoint( account, sever_name_input,play_dic)
+            self.set_checkpoint(account, sever_name_input, play_dic)
         self.set_config(self.game_name, "new_game_account1", account)
         return account
 
@@ -443,8 +439,6 @@ class MyPoco:
         :return: Ture/False
         """
         return self.my_poco_obj.is_in_dic(poco_path, poco_dic_input=poco_dic_input)
-
-
 
     def is_visible(self, poco_path):
         """
@@ -501,7 +495,7 @@ class MyPoco:
         self.gm.set_server_time(dic_input)
 
     # def set_checkpoint(self, checkpoint):
-    def set_checkpoint(self, account,sever_name_input,  checkpoint):
+    def set_checkpoint(self, account, sever_name_input, checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
         :param checkpoint:str 玩法名-章节数-小关卡数
