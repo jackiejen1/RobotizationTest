@@ -58,6 +58,7 @@ class GmMethod:
                 raise Exception
         else:
             self.role_id = role_id
+        add_msg_in_log("角色ID为：" + str(role_id))
 
     def add_resources(self, resource_name_dic):
         """

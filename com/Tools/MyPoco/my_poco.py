@@ -145,15 +145,15 @@ class MyPoco:
         # poco = self.my_poco_obj.new_poco_obj()
         # return poco
 
-    def get_account_info(self, game_account_input):
-        return self.get_config(self.game_name, game_account_input)
-
     def close_game(self):
         """
         关闭游戏，不区分功能或者性能
         :return:
         """
         self.my_poco_obj.close_game()
+
+    def get_account_info(self, game_account_input):
+        return self.get_config(self.game_name, game_account_input)
 
     # @err_close_game
     def my_swipe(self, start_path, end_path, timein=3):
@@ -406,7 +406,7 @@ class MyPoco:
         self.set_account_information_gm(account, sever_name_input, role_id)  # 设置GM需要的信息
         self.add_resource(resource_dic)
         if "副本" in play_dic.keys() or "列传" in play_dic.keys():
-            self.set_checkpoint(sever_name_input, account, play_dic)
+            self.set_checkpoint( account, sever_name_input,play_dic)
         self.set_config(self.game_name, "new_game_account1", account)
         return account
 
@@ -501,7 +501,7 @@ class MyPoco:
         self.gm.set_server_time(dic_input)
 
     # def set_checkpoint(self, checkpoint):
-    def set_checkpoint(self, sever_name_input, account, checkpoint):
+    def set_checkpoint(self, account,sever_name_input,  checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
         :param checkpoint:str 玩法名-章节数-小关卡数

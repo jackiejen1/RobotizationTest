@@ -8,9 +8,9 @@
 # @Function:
 # @Method:
 # Reference:********************************
+from airtest.core.api import *
 import re
 import time
-
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.message_ss2 import MessageSs2
 from MyPoco.game_support.unexpected_win_ss2 import UnexpectedWinSs2
@@ -80,7 +80,9 @@ class ResourceGmSs2:
         self.my_poco_obj.touch_poco("Comp_res3")  # 点击元宝进入gm
         self.my_poco_obj.touch_poco("自动测试")
         self.my_poco_obj.touch_poco("input1")
-        self.my_poco_obj.text_str(order_str)
+        # self.my_poco_obj.text_str(order_str)
+        text(order_str, enter=False)
+
         self.my_poco_obj.touch_poco("btn1")
         time.sleep(4)
         self.my_poco_obj.touch_poco("未命名0/popup/AutoTestLayer/__view/close")
@@ -130,6 +132,7 @@ class ResourceGmSs2:
         time.sleep(2)
         self.my_poco_obj.touch_poco("Comp_res3")
         self.my_poco_obj.touch_poco("自动测试")
+        time.sleep(2)
         game_time_str = self.my_poco_obj.get_game_number("未命名0/popup/AutoTestLayer/__view/time")
         time_list = self.info.get_time_str(game_time_str)
         time.sleep(4)

@@ -444,7 +444,7 @@ class MakePocoDic:
                 raise NoneStrException
             return visible_value_bool
         else:
-            snapshot(msg="未找到节点")
+            snapshot(msg=poco_path +"未找到节点")
             raise NoneException
 
     def get_game_number_instr(self, poco_path):

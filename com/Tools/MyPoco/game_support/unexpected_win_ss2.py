@@ -39,6 +39,11 @@ class UnexpectedWinSs2:
         # todo 算法有问题，异常窗口排列顺序影响，需要改成完全排除所有窗口后才算排查完毕
         # ComLoading 转菊花的name
         self.make_poco_dic.get_poco_dic()
+        # 报错
+        if self.make_poco_dic.is_in_dic("ErrorMessagePop"):
+            snapshot(msg="游戏报错")
+            self.make_poco_dic.my_touch("Btn_ok")
+            raise NotHaveGameException("游戏报错")
         if self.make_poco_dic.is_in_dic("下载点2"):  # 点击完下载资源启动游戏
             self.make_poco_dic.my_touch("下载点2")
             time.sleep(30)
@@ -54,7 +59,7 @@ class UnexpectedWinSs2:
         #     self.make_poco_dic.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("RedPacketRainPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("RedPacketRainPop/__view/Btn_close")
-        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):#邮件
+        if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):#邮件,在这里对邮件模块进行测试
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/4001")
             self.make_poco_dic.my_touch("List_mail/未命名0")
             if self.make_poco_dic.is_in_dic("List_mail/未命名1"):#如果存在第二封
@@ -106,10 +111,4 @@ class UnexpectedWinSs2:
                 if i == 2:  # 就当连不上，放弃重连
                     if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_cancel"):
                         self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_cancel")
-            # todo 异常弹窗的后续操作
 
-        # 报错
-        if self.make_poco_dic.is_in_dic("ErrorMessagePop"):
-            snapshot(msg="游戏报错")
-            self.make_poco_dic.my_touch("Btn_ok")
-            raise NotHaveGameException("游戏报错")
