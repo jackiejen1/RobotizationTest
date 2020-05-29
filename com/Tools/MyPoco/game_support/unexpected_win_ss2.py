@@ -10,7 +10,6 @@
 # Reference:********************************
 from time import sleep
 from airtest.core.api import *
-from poco.drivers.std import StdPoco
 from MyPoco.foundation.MyException import *
 from MyPoco.foundation.make_poco_dic import MakePocoDic
 
@@ -50,7 +49,7 @@ class UnexpectedWinSs2:
             for i in range(20):
                 self.make_poco_dic.get_poco_dic()#这里会不停的刷新表
                 if self.make_poco_dic.is_in_dic("InputName"):
-                    return
+                    break
                 time.sleep(15)
         if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")

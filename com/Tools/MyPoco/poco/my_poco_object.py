@@ -279,6 +279,15 @@ class MyPocoObject():
         """
         return self.make_poco_dic.game_is_die()
 
+    def get_game_text(self, poco_path):
+        """
+        获取游戏poco_path-text属性中的str数字
+        :param poco_path:poco对象
+        :return:int
+        """
+        poco_path_str = self.make_poco_dic.get_poco_any_value(poco_path, "text")
+        return poco_path_str
+
     def get_game_number(self, poco_path):
         """
         只获取poco对象中text属性中的数字

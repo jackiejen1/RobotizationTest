@@ -140,7 +140,7 @@ class MyPoco:
         :return:返回StdPoco().poco对象，可使用原生框架
         """
         entry = EntryGame(self.game_name, self.phone_id)
-        entry.entry_game(sever_name_input, game_account_input, red_info)
+        entry.entry_game(sever_name_input, game_account_input, red_info=red_info)
         # poco = self.my_poco_obj.new_poco_obj()
         # return poco
 
@@ -292,6 +292,14 @@ class MyPoco:
         :return:int
         """
         return self.my_poco_obj.get_game_number(poco_path)
+
+    def get_game_text(self, poco_path):
+        """
+        获取游戏poco_path-text属性中的str数字
+        :param poco_path:poco对象
+        :return:int
+        """
+        return self.my_poco_obj.get_game_text(poco_path)
 
     def get_poco_position(self, poco_path):
         """
@@ -504,7 +512,7 @@ class MyPoco:
         if "副本" in checkpoint.keys():
             self.gm.set_checkpoint(checkpoint["副本"])
         if "列传" in checkpoint.keys():
-            self.open_game(sever_name_input, account, red_info=False)
+            self.open_game(sever_name_input=sever_name_input, game_account_input=account, red_info=False)
             self.rg.set_play_liezhuan_num(checkpoint["列传"])
         # self.gm.set_checkpoint(checkpoint)
 

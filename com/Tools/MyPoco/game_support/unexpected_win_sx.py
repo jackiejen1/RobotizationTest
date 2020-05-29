@@ -8,8 +8,9 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from poco.drivers.std import StdPoco
-import time
+from time import sleep
+from airtest.core.api import *
+from MyPoco.foundation.MyException import *
 from MyPoco.foundation.make_poco_dic import MakePocoDic
 
 class UnexpectedWinSx:
@@ -29,7 +30,7 @@ class UnexpectedWinSx:
                 if self.make_poco_dic.is_in_dic("我知道了"):
                     return
                 time.sleep(15)
-            self.make_poco_dic.add_msg_in_log("更新完成")
+            add_msg_in_log("更新完成")
             self.make_poco_dic.get_poco_dic()
         # 战斗结束会出现等级礼包
         if self.make_poco_dic.is_in_dic("少年，我们为你准备了丰富的等级礼包，是否前往购买？"):

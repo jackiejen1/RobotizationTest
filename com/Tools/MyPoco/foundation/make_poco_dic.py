@@ -22,6 +22,7 @@ from MyPoco.foundation.MyException import *
 
 class MakePocoDic:
     def __init__(self, game_name, phone_id):
+        self.phone_id = phone_id
         self.game_name = game_name
         self.thread_file_name = str(threading.get_ident())
         self.info = Information()
@@ -251,7 +252,7 @@ class MakePocoDic:
                     # 排除了游戏被切到后台导致找不到的情况
                     # 切回游戏后，仍然还是找不到
                     snapshot(msg="poco节点未找到")
-                    raise NoneException(poco_path)
+                    raise NoneException(self.phone_id +":"+ poco_path)
                 if i >= 1:  # 第2次的时候判断一下
                     # 开始检测是否是游戏不在了
                     game_activity_str = self.gpd.get_device_adb_shell(
