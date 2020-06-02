@@ -131,7 +131,7 @@ class MyPoco:
         ffgr.first_function_go_run(self.phone_id)
 
     # @err_close_game
-    def open_game(self, sever_name_input, game_account_input, red_info=True):
+    def open_game(self, sever_name_input, game_account_input):
         """
         功能向,启动游戏并到游戏主界面
         :param sever_name_input: 区服,读配置或新建账号
@@ -140,7 +140,7 @@ class MyPoco:
         :return:返回StdPoco().poco对象，可使用原生框架
         """
         entry = EntryGame(self.game_name, self.phone_id)
-        entry.entry_game(sever_name_input, game_account_input, red_info=red_info)
+        entry.entry_game(sever_name_input, game_account_input)
         # poco = self.my_poco_obj.new_poco_obj()
         # return poco
 
@@ -190,12 +190,12 @@ class MyPoco:
 
         self.my_poco_obj.touch_poco(poco_path, click_list=click_list)
 
-    def my_touch_pos(self, pos_list_int):
+    def my_touch_pos(self, pos_list_int,is_sleep = True):
         """
         :param pos_list_int:控件的pos属性
         :return:Exception
         """
-        self.my_poco_obj.touch_pos(pos_list_int)
+        self.my_poco_obj.touch_pos(pos_list_int,is_sleep = is_sleep)
 
     def xn_touch(self, pos_list_int):
         """
@@ -512,7 +512,7 @@ class MyPoco:
         if "副本" in checkpoint.keys():
             self.gm.set_checkpoint(checkpoint["副本"])
         if "列传" in checkpoint.keys():
-            self.open_game(sever_name_input=sever_name_input, game_account_input=account, red_info=False)
+            self.open_game(sever_name_input=sever_name_input, game_account_input=account)
             self.rg.set_play_liezhuan_num(checkpoint["列传"])
         # self.gm.set_checkpoint(checkpoint)
 

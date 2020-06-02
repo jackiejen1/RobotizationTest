@@ -252,7 +252,7 @@ class MakePocoDic:
                     # 排除了游戏被切到后台导致找不到的情况
                     # 切回游戏后，仍然还是找不到
                     snapshot(msg="poco节点未找到")
-                    raise NoneException(self.phone_id +":"+ poco_path)
+                    raise NoneException(self.phone_id + ":" + poco_path)
                 if i >= 1:  # 第2次的时候判断一下
                     # 开始检测是否是游戏不在了
                     game_activity_str = self.gpd.get_device_adb_shell(
@@ -284,7 +284,7 @@ class MakePocoDic:
         touch_int_list = self.get_poco_pos(poco_path, click_list)
         self.touch(touch_int_list)
 
-    def touch_pos(self, pos_list_int):
+    def touch_pos(self, pos_list_int, is_sleep=True):
         """
         点击方法
         :param pos_list_int: 控件坐标，控件的pos属性
@@ -298,7 +298,10 @@ class MakePocoDic:
         x = int(poco_path_pos[0] * self.phone_size_list[0])
         y = int(poco_path_pos[1] * self.phone_size_list[1])
         self.touch([x, y])
-        time.sleep(self.sleep_time)
+        if is_sleep:
+            time.sleep(self.sleep_time)
+        else:
+            pass
 
     def swipe_pos(self, start_pos_list, end_pos_list, timein):
         """
@@ -445,7 +448,7 @@ class MakePocoDic:
                 raise NoneStrException
             return visible_value_bool
         else:
-            snapshot(msg=poco_path +"未找到节点")
+            snapshot(msg=poco_path + "未找到节点")
             raise NoneException
 
     def get_game_number_instr(self, poco_path):

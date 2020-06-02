@@ -22,16 +22,16 @@ class EntryGame:
         self.phone_id = phone_id
 
     # 接口方法，后期拓展游戏使用
-    def entry_game(self, sever_name_input, game_account_input,red_info):
+    def entry_game(self, sever_name_input, game_account_input):
         """
         登录游戏，从游戏启动到进入游戏主界面的一系列操作
         :return:poco
         """
         if self.game_name == "com.youzu.test.qa":  # ss2
             egss2 = EntryGameSs2(self.phone_id)
-            egss2.entry_game_ss2(sever_name_input, game_account_input,red_info)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
         elif self.game_name == "com.youzu.wgame2":
             egsx = EntryGameSx(self.game_name)
-            egsx.entry_game_sx(sever_name_input, game_account_input,red_info)
+            egsx.entry_game_sx(sever_name_input,game_account_input)
         else:
             pass

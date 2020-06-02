@@ -20,14 +20,12 @@ class EntryGameSx:
         self.my_poco = MyPocoObject(self.game_name)
 
 
-    def entry_game_sx(self, sever_name_input, game_account_input,red_info):
+    def entry_game_sx(self, sever_name_input, game_account_input):
         """
         sx的登录游戏，游戏已经启动，到游戏主界面的操作
         :param sever_name_input: 服务器名称，和ini中一致
         :param game_account_input: 需要登录的账号，和ini中一致
         :return:
         """
-        if red_info:
-            game_account = self.info.get_config(self.game_name, game_account_input)
-        else:
-            game_account = game_account_input
+
+        game_account = game_account_input

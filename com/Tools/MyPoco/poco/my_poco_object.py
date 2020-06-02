@@ -116,13 +116,13 @@ class MyPocoObject():
         """
         self.make_poco_dic.swipe_pos(start_pos_list, end_pos_list, timein=timein)
 
-    def touch_pos(self, pos_list_int):
+    def touch_pos(self, pos_list_int,is_sleep = True):
         """
         点击方法
         :param pos_list_int: 控件坐标，控件的pos属性
         :return:
         """
-        self.make_poco_dic.touch_pos(pos_list_int)
+        self.make_poco_dic.touch_pos(pos_list_int,is_sleep = is_sleep)
 
     def touch_poco(self, poco_path, click_list=None):
         """
