@@ -269,6 +269,15 @@ class MyPoco:
         """
         return self.my_poco_obj.get_game_number_l(poco_path, subscript)
 
+    def get_game_text_l(self, poco_path, subscript):
+        """
+        不同游戏不同实现，获取poco对象中text属性中的文字 one/two
+        :param poco_path:poco对象
+        :param subscript:0/1
+        :return:str
+        """
+        return self.my_poco_obj.get_game_text_l(poco_path, subscript)
+
     def get_game_number_c(self, poco_path):
         """
         不同游戏不同实现，获取游戏text属性中的数字 ]int[

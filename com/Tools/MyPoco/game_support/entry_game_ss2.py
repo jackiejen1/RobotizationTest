@@ -20,6 +20,7 @@ class EntryGameSs2:
         self.game_name="com.youzu.test.qa"
         self.info = Information()
         self.my_poco_obj = MyPocoObject(self.game_name,phone_id)
+        self.phone_id = phone_id
 
     def entry_game_ss2(self, sever_name_input, game_account_input):
         """
@@ -33,10 +34,13 @@ class EntryGameSs2:
         stop_app(self.game_name)
         time.sleep(2)
         start_app(self.game_name)
-        time.sleep(16)
+        if "emulator" in self.phone_id:
+            time.sleep(30)
+        else:
+            time.sleep(16)
         self.my_poco_obj.touch_poco("InputName")
-        # text(game_account)
-        self.my_poco_obj.text_str(game_account_input)
+        text(game_account_input)
+        # self.my_poco_obj.text_str(game_account_input)
         self.my_poco_obj.touch_poco("确 认")
         time.sleep(1)
         self.my_poco_obj.touch_poco("AnnoCloseBtn")
@@ -58,8 +62,8 @@ class EntryGameSs2:
             start_app(self.game_name)
             time.sleep(20)
             self.my_poco_obj.touch_poco("InputName")
-            # text(game_account)
-            self.my_poco_obj.text_str(game_account_input)
+            text(game_account_input)
+            #self.my_poco_obj.text_str(game_account_input)
             self.my_poco_obj.touch_poco("确 认")
             self.my_poco_obj.touch_poco("AnnoCloseBtn")
             self.my_poco_obj.touch_poco("点击选服")

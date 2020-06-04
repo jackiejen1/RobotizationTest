@@ -272,6 +272,18 @@ class MyPocoObject():
         number = number_list[subscript]
         return int(number)
 
+    def get_game_text_l(self, poco_path, subscript):
+        """
+        获取poco对象中text属性中的文字
+        :param poco_path:
+        :param subscript: 0/1
+        :return:
+        """
+        number_str = self.make_poco_dic.get_poco_any_value(poco_path, "text")
+        number_list = number_str.split("/")
+        number = number_list[subscript]
+        return number
+
     def game_is_die(self):
         """
         查看游戏有没有闪退
