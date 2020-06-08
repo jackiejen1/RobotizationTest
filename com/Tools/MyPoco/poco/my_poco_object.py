@@ -258,7 +258,7 @@ class MyPocoObject():
             self.is_pass = self.is_pass + 1
             st = msg + "异常" + "," + str(first) + "," + str(second)
             add_msg_in_log(st, is_pass=False)
-            snapshot(st)
+            snapshot()
 
     def get_game_number_l(self, poco_path, subscript):
         """

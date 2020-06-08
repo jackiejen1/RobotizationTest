@@ -99,6 +99,8 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("将军抱歉，为了更好的体验，我们正在对服务器进行维护，请稍后重新登录哦~"):
             self.make_poco_dic.my_touch("未命名0/未命名3/ComAssistPop/__view/Btn_cancel")
             raise GameServerMaintenanceException("服务器维护")
+        # if self.make_poco_dic.is_in_dic("推荐[color=#FFE71A]普通月卡[/color]"):
+        #     self.make_poco_dic.my_touch("未命名0/popup/FirstChargeMainPop/__view/btn3")
 
         # 断网
         if self.make_poco_dic.is_in_dic("您的网络状况不佳"):
@@ -110,4 +112,5 @@ class UnexpectedWinSs2:
                 if i == 2:  # 就当连不上，放弃重连
                     if self.make_poco_dic.is_in_dic("ComAssistPop/__view/Btn_cancel"):
                         self.make_poco_dic.my_touch("ComAssistPop/__view/Btn_cancel")
+                        raise GameServerMaintenanceException("掉线连不上")
 
