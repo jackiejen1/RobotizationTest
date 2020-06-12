@@ -115,9 +115,22 @@ class MakePocoDic:
                     return True
                 else:
                     return False
-        else:
-            print(poco_path + "路径未找到")
-            raise NoneException("对比text属性时，" + poco_path)
+        for dic_key in self.poco_dic.keys():
+            if poco_path in dic_key:
+                print("找到路径" + dic_key)
+                this_text = self.poco_dic[dic_key]["text"]
+                if is_in:
+                    if text in this_text:
+                        return True
+                    else:
+                        return False
+                else:
+                    if this_text == text:
+                        return True
+                    else:
+                        return False
+        add_msg_in_log("对比text属性时，" + poco_path+"节点未找到",is_pass=False)
+        return False
 
     def is_visible(self, poco_path):
         """
