@@ -21,9 +21,9 @@ class ResourceGm:
         在if、elif结构中初始化对象
         """
         self.info = Information()
-        self.game_name = game_name
+        self.game_name = self.info.get_config(game_name, "app_name")
         if self.game_name == "com.youzu.test.qa":
-            self.rgss2 = ResourceGmSs2("com.youzu.test.qa",phone_id)
+            self.rgss2 = ResourceGmSs2(game_name,phone_id)
         else:
             pass
     def add_resource(self, add_name_input_dic):

@@ -11,15 +11,15 @@
 from MyPoco.foundation.information import Information
 from MyPoco.poco.my_poco_object import MyPocoObject
 
-class EntryGameSx:
+class EntryGameSs:
 
     def __init__(self,phone_id):
-        self.game_name="com.youzu.wgame2"
+        self.game_name="com.youzu.android.snsgz"
         self.info = Information()
-        self.my_poco = MyPocoObject("少西",phone_id)
+        self.my_poco = MyPocoObject("少三",phone_id)
         self.phone_id = phone_id
 
-    def entry_game_sx(self, sever_name_input, game_account_input):
+    def entry_game_ss(self, sever_name_input, game_account_input):
         """
         sx的登录游戏，游戏已经启动，到游戏主界面的操作
         :param sever_name_input: 服务器名称，和ini中一致

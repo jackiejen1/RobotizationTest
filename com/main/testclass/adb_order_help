@@ -8,7 +8,7 @@ ADB常用命令https://blog.csdn.net/zhonglunshun/article/details/78362439
 # 点击手机x.y坐标
 # os.system("adb shell input tap 840 500")
 # 在输入框输入文本
-# os.system("adb -s 127.0.0.1:62001 shell input text 123456")
+# os.system("adb -s 127.0.0.1:62001 shell input text  123456")
 # 执行安卓内部命令 代码见api（https://blog.csdn.net/zhonglunshun/article/details/78362439）
 # os.system("adb shell input keyevent 224")
 # 获取整体手机的cpu使用情况

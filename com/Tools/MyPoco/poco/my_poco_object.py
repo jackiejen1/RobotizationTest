@@ -8,6 +8,7 @@
 # @Function:脚本基础类，用于实现各个辅助脚本的类，比如登录游戏，启动游戏后必须先调用new_poco_obj（）
 # @Method:
 # Reference:********************************
+import datetime
 
 from airtest.core.api import *
 
@@ -25,10 +26,10 @@ class MyPocoObject():
         """
         创建依赖对象，保存全局信息
         """
-        self.game_name = game_name
+        self.info = Information()
+        self.game_name = self.info.get_config(game_name, "app_name")
         self.phone_id = phone_id
         self.make_poco_dic = MakePocoDic(game_name, phone_id)
-        self.info = Information()
         self.uw = UnexpectedWin(game_name, phone_id)
         self.poco = None
         self.is_pass =0
@@ -105,7 +106,7 @@ class MyPocoObject():
         :param duration: 滑动持续时间
         :return:
         """
-        swipe(pos1, pos2, duration=duration)
+        self.make_poco_dic.swipe(pos1, pos2, duration=duration)
     def swipe_pos(self, start_pos_list, end_pos_list, timein):
         """
         滑动方法
@@ -379,7 +380,8 @@ class MyPocoObject():
         :return: str 8位数字
         """
         game_account_f = time.time()
-        first = str(int(int(game_account_f) / 86400))[-1:]
+        dateArray = datetime.datetime.fromtimestamp(game_account_f)
+        hms = dateArray.strftime("%Y%m%d")
         game_account_int = int(game_account_f * 1000000)
-        game_account = first + str(game_account_int)[-7:]
+        game_account = hms[-1:] + str(game_account_int)[-7:]
         return game_account

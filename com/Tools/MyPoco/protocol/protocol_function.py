@@ -28,8 +28,8 @@ class ProtocolFunction:
         :param protocol_name: 协议名，默认空，只走登录
         :param username: 账号
         """
-        self.game_name=game_name
         self.info = Information()
+        self.game_name = self.info.get_config(game_name, "app_name")
         self.pt = ProtocolTools(game_name)
         # self.username = self.info.get_config(self.game_name,"new_game_account1")
         self.username = username
@@ -37,7 +37,7 @@ class ProtocolFunction:
         # self.protocol_ages_list= self.pt.get_args_list(protocol_name)  #  todo 可能有报错
         #开始连接
         server_name = server_name+"_server_ages"
-        socket_ages_dic = json.loads(self.info.get_config(game_name,server_name))
+        socket_ages_dic = self.info.get_config(game_name,server_name)
         self.host =socket_ages_dic["host"]   # host = "10.3.128.5"
         self.port =int(socket_ages_dic["port"])  # port = 16865
         self.server_id = int(socket_ages_dic["server_id"])

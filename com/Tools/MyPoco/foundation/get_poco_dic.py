@@ -31,8 +31,9 @@ class GetPocoDic(object):
 
     def __init__(self, game_name, phone_name="", on_connect=None, on_close=None):
         """address is (host, port) tuple"""
-        self.game_name = game_name
         self.info = Information()
+        self.game_name_key = game_name
+        self.game_name = self.info.get_config(game_name, "app_name")
         self.phone_name = phone_name
         self.on_connect = on_connect
         self.on_close = on_close
@@ -69,7 +70,7 @@ class GetPocoDic(object):
         return game_activity_str
 
     def connect_phone(self):
-        sever_poco = self.info.get_config(self.game_name, "sever_poco")
+        sever_poco = self.info.get_config(self.game_name_key, "sever_poco")
         if sever_poco == "cocos-lua":
             self.port = COCOSLUA_PORT
         elif sever_poco == "unity":

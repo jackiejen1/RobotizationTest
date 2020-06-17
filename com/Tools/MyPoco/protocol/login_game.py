@@ -12,7 +12,6 @@ from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
 from MyPoco.protocol.protocol_tools import pack_data, send_receive
 import hashlib, json, base64
 # from locust.exception import StopLocust
-import random
 from MyPoco.foundation.information import Information
 from MyPoco.foundation.MyException import *
 

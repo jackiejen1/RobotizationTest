@@ -19,10 +19,11 @@ class GmMethod:
         根据游戏名字和服务器确定账号
         :param game: 游戏客户端ID
         """
-        self.game_name = game_name
         self.info = Information()
+        self.game_name_key = game_name
+        self.game_name = self.info.get_config(game_name, "app_name")
         self.mri = MakeResourceBody(game_name)
-        self.host = self.info.get_config(self.game_name, "gm_url")
+        self.host = self.info.get_config(game_name, "gm_url")
         self.gah = GmApiHttp(self.host)
 
     def set_account_information(self, account, server_name_input, role_id=""):
@@ -42,7 +43,7 @@ class GmMethod:
         self.account = account
         # 服务器ID
         server_name = server_name_input + "_server_ages"
-        server_id_dic = json.loads(self.info.get_config(self.game_name, server_name))
+        server_id_dic = self.info.get_config(self.game_name_key, server_name)
         self.server_id = server_id_dic["server_id"]
         # 角色名
         # role_name_dic =  json.loads(self.info.get_config(self.game_name,self.account))
@@ -133,8 +134,7 @@ class GmMethod:
         :param server_name:str 服务器名
         :return:[int(ymd),int(hms),int(week)]
         """
-        server_id = self.info.get_config("Game_ServerId_List", server_name)
-        log_dic = self.gah.select_server_time(server_id)
+        log_dic = self.gah.select_server_time(self.server_id)
         self.dispose_log("查询服务器时间", log_dic)
         if "data" in log_dic.keys():
             data_dic = log_dic["data"]
@@ -153,9 +153,8 @@ class GmMethod:
         """
         server_name_list = server_time_dic.keys()
         server_name = server_name_list[0]
-        server_id = self.info.get_config("Game_ServerId_List", server_name)
         server_id_dic = {}
-        server_id_dic["server"] = server_id
+        server_id_dic["server"] = self.server_id
         server_id_dic["timestamp"] = server_time_dic[server_name]
         log_dic = self.gah.set_server_time(server_id_dic)
         self.dispose_log("修改服务器时间", log_dic)

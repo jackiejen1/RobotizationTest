@@ -8,6 +8,7 @@
 # @Function:
 # @Method:
 # Reference:********************************
+import datetime
 import io
 import json
 import os
@@ -25,8 +26,6 @@ import time
 from poco.drivers.std import StdPoco
 
 from MyPoco.protocol.make_resource_body import MakeResourceBody
-
-poco = StdPoco()
 
 from MyPoco.foundation.information import Information
 
@@ -61,24 +60,18 @@ from airtest.core.api import device
 if __name__ == '__main__':
     # pass
     # com.youzu.g36.yz.qa 36计
-    thread1 = myThread(1, "Thread-1", "98895a4246334e414d", "com.youzu.test.qa")
+    # thread1 = myThread(1, "Thread-1", "98895a4246334e414d", "com.youzu.test.qa")
     # thread2 = myThread(2, "Thread-2", "3e1a2b6","com.youzu.test.qa")
     # # 开启新线程
-    thread1.start()
+    # thread1.start()
     # thread2.start()
-    thread1.join()
+    # thread1.join()
     # thread2.join()
     # print("退出主线程")
-    # my_poco = MyPoco("少三2","")
-    # my_poco.my_touch("InputName")
-    # ss = os.system("adb -s 3e1a2b6 logcat -v time")
-    # aa = ss.readlines()
-    # print(aa)
-    #
-    # my_poco = MyPoco("少三2", "")
-    # # my_poco.set_account_information_gm('6947763', "QA1", 68719487192)
-    # # my_poco.add_resource({"元宝":5})
-    # print(my_poco.my_poco_obj.make_poco_dic.gpd.device())
-    # print(device().uuid)
-    # s = b''
-    # print(type(s))
+    game_account_f = time.time()
+    dateArray = datetime.datetime.fromtimestamp(game_account_f)
+    hms = dateArray.strftime("%Y%m%d")
+    game_account_int = int(game_account_f * 1000000)
+    game_account = hms[-1:] + str(game_account_int)[-7:]
+    print(game_account)
+

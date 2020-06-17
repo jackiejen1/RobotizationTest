@@ -19,7 +19,7 @@ class EntryGameSs2:
     def __init__(self,phone_id):
         self.game_name="com.youzu.test.qa"
         self.info = Information()
-        self.my_poco_obj = MyPocoObject(self.game_name,phone_id)
+        self.my_poco_obj = MyPocoObject("少三2",phone_id)
         self.phone_id = phone_id
 
     def entry_game_ss2(self, sever_name_input, game_account_input):

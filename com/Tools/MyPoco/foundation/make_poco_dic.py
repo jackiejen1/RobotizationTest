@@ -22,10 +22,10 @@ from MyPoco.foundation.MyException import *
 
 class MakePocoDic:
     def __init__(self, game_name, phone_id):
-        self.phone_id = phone_id
-        self.game_name = game_name
-        self.thread_file_name = str(threading.get_ident())
         self.info = Information()
+        self.phone_id = phone_id
+        self.game_name = self.info.get_config(game_name, "app_name")
+        self.thread_file_name = str(threading.get_ident())
         path, name = script_dir_name(__file__)
         self.logpath = path + "/" + name[:-3] + "/" + name
         self.complete_poco_path = None
@@ -345,6 +345,18 @@ class MakePocoDic:
         touch(pos_list)
         print("点击坐标" + str(pos_list) + "完成", )
         self.poco_dic = None
+
+
+
+    def swipe(self, pos1 ,pos2,duration):
+        """
+        根据传入的坐标进行滑动，调用的airtest自带的滑动方法
+        :param pos1: 开始
+        :param pos2: 结束
+        :param duration: 滑动持续时间
+        :return:
+        """
+        swipe(pos1, pos2, duration=duration)
 
     # def touch_poco_obj(self, poco_path, click_list):  # todo 闪退检测机制需要优化
     #     self.game_is_die()

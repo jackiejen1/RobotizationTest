@@ -208,11 +208,11 @@ def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=30
 
 class ProtocolTools:
     def __init__(self, game_name):
-        self.game_name = game_name
         self.info = Information()
+        self.game_name = self.info.get_config(game_name, "app_name")
         # 通过游戏名字获取表格路径
         excel_path = self.info.get_config(game_name, "resource_excelpath")
-        obj_path = self.info.get_config("MyPocoPath", "mypocopath") + excel_path
+        obj_path = self.info.get_config("设置", "my_poco_path") + excel_path
         self.excel = xlrd.open_workbook(obj_path)
         # 协议文件路径，需要将后端给的协议文件从proto类型改为txt
         self.protocol_file_path = self.info.get_config(game_name, "protocolfilepath")
