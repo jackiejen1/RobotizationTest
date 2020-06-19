@@ -22,7 +22,7 @@ class EntryGame:
         self.phone_id = phone_id
 
     # 接口方法，后期拓展游戏使用
-    def entry_game(self, sever_name_input, game_account_input):
+    def entry_game(self, sever_name_input, game_account_input,password=None):
         """
         登录游戏，从游戏启动到进入游戏主界面的一系列操作
         :return:poco
@@ -35,6 +35,6 @@ class EntryGame:
             egsx.entry_game_sx(sever_name_input,game_account_input)
         elif self.game_name == "com.youzu.android.snsgz":
             egsx = EntryGameSs(self.phone_id)
-            egsx.entry_game_ss(sever_name_input,game_account_input)
+            egsx.entry_game_ss(sever_name_input,game_account_input,password)
         else:
             pass

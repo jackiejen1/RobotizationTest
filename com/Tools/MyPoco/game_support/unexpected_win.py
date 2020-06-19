@@ -11,14 +11,15 @@
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.unexpected_win_ss2 import UnexpectedWinSs2
 from MyPoco.game_support.unexpected_win_sx import UnexpectedWinSx
-
+from MyPoco.game_support.unexpected_win_ss import UnexpectedWinSs
 class UnexpectedWin:
     def __init__(self, game_name,phone_id):
         self.info = Information()
-        self.game_name = game_name
+        self.game_name_key=game_name
+        self.game_name = self.info.get_config(game_name, "app_name")
         self.uw = None
         self.phone_id =phone_id
-        self.game_list = ["com.youzu.wgame2","com.youzu.test.qa"]
+
     def unexpected_win(self):
         """
         异常弹窗跳过，区分不同的游戏走不同的逻辑
@@ -27,11 +28,13 @@ class UnexpectedWin:
         """
         if self.uw == None:
             if self.game_name == "com.youzu.wgame2":
-                self.uw = UnexpectedWinSx(self.game_name,self.phone_id)
-
+                self.uw = UnexpectedWinSx(self.game_name_key,self.phone_id)
             elif self.game_name == "com.youzu.test.qa":
-                self.uw = UnexpectedWinSs2(self.game_name,self.phone_id)
-        if self.game_name in self.game_list :
-            print("开始查找异常窗口")
-            self.uw.unexpected_win()
-            print("异常窗口排查完毕")
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.youzu.android.snsgz":
+                self.uw = UnexpectedWinSs(self.game_name_key,self.phone_id)
+            else:
+                pass
+        print("开始查找异常窗口")
+        self.uw.unexpected_win()
+        print("异常窗口排查完毕")

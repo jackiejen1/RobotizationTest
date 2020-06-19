@@ -13,8 +13,6 @@ import os
 from MyPoco.foundation.MyException import *
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.entry_game import EntryGame
-from MyPoco.game_support.first_function_go_run import FirstFunctionGoRun
-from MyPoco.game_support.new_account import NewAccount
 from MyPoco.game_support.resource_gm import ResourceGm
 from MyPoco.poco.xn_test_tools import XnTest
 from MyPoco.protocol.gm_method import GmMethod
@@ -69,14 +67,6 @@ class MyPoco:
         """
         self.my_poco_obj.swipe(pos1, pos2, duration=duration)
 
-    # def set_poco(self):
-    #     """
-    #     编写脚本时使用
-    #     :param poco_path:
-    #     :return:
-    #     """
-    #     return self.my_poco_obj.new_poco_obj()
-
     def set_account_information_gm(self, account, server_name, role_id=""):
         """
         使用GM方法前需要调用该方法,来确定对哪个账号的哪个区下面的角色进行操作
@@ -124,7 +114,7 @@ class MyPoco:
         self.xt = XnTest()
 
     # @err_close_game
-    def open_game(self, sever_name_input, game_account_input):
+    def open_game(self, sever_name_input, game_account_input,password=None):
         """
         功能向,启动游戏并到游戏主界面
         :param sever_name_input: 区服,读配置或新建账号
@@ -133,9 +123,7 @@ class MyPoco:
         :return:返回StdPoco().poco对象，可使用原生框架
         """
         entry = EntryGame(self.game_name_key, self.phone_id)
-        entry.entry_game(sever_name_input, game_account_input)
-        # poco = self.my_poco_obj.new_poco_obj()
-        # return poco
+        entry.entry_game(sever_name_input, game_account_input,password)
 
     def close_game(self):
         """

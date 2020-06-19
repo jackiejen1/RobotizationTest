@@ -34,7 +34,7 @@ class EntryGameSs2:
         stop_app(self.game_name)
         time.sleep(2)
         start_app(self.game_name)
-        if "emulator" in self.phone_id:
+        if ("emulator" in self.phone_id) or ("127.0.0.1:"in self.phone_id):
             time.sleep(30)
         else:
             time.sleep(16)
