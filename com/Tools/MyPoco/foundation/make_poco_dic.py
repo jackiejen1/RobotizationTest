@@ -179,8 +179,9 @@ class MakePocoDic:
             self.get_poco_dic()
         if poco_path in self.poco_dic.keys():
             poco_path_pos = self.poco_dic[poco_path]["pos"]
-            if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
+            if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:#todo 这里需要优化
                 print(poco_path + "-节点坐标在屏幕外，当做不存在")
+                self.complete_poco_path = poco_path
                 return False
             else:
                 print("找到路径" + poco_path)
@@ -193,6 +194,7 @@ class MakePocoDic:
                 poco_path_pos = self.poco_dic[dic_key]["pos"]
                 if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:
                     print(dic_key + "-节点坐标在屏幕外，当做不存在")
+                    self.complete_poco_path = dic_key
                     return False
                 else:
                     print("找到路径" + dic_key)
@@ -466,7 +468,8 @@ class MakePocoDic:
         :return: str value
         """
         self.get_poco_dic()
-        if self.is_in_dic(poco_path):
+        self.is_in_dic(poco_path)
+        if self.complete_poco_path in self.poco_dic.keys():
             visible_value_bool = self.poco_dic[self.complete_poco_path][value_name_str]
             if visible_value_bool == "":
                 snapshot(msg=poco_path + "没有" + value_name_str + "属性")

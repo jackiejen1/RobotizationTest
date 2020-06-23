@@ -8,6 +8,8 @@
 # @Function:
 # @Method:
 # Reference:********************************
+import time
+
 from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
 from MyPoco.protocol.protocol_tools import pack_data, send_receive
 import hashlib, json, base64
@@ -63,12 +65,8 @@ class LoginGame:
         username = str(self.username)[2:]
         C2G_Create.name = username
         C2G_Create.type = 210000
-        # uid = self.info.get_config("com.youzu.test.qa", "uid")
-        # sid = self.info.get_config("com.youzu.test.qa", "sid")
         C2G_Create.server_id = self.server_id
         C2G_Create = C2G_Create.SerializeToString()
-        # C2G_Create_attr = {'name': "C2G_Create", 'protocol': 'protobuf-ss', 'send_cmd': 10004, 'recv_cmd': 10005,
-        #                    'uid': int(float(uid)), 'sid': int(float(sid))}
         C2G_Create_attr = {'name': "C2G_Create", 'protocol': 'protobuf-ss', 'send_cmd': 10004, 'recv_cmd': 10005,
                            'uid': uid, 'sid': sid}
         senddata = pack_data(C2G_Create, C2G_Create_attr)
@@ -76,4 +74,14 @@ class LoginGame:
         msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + username
         print(msg)
         add_msg_in_log(msg)
+        return flag, data
+
+    def MSG_C2S_SyncTime(self, uid, sid):
+        C2S_SyncTime = cs_pb2.C2S_SyncTime()#创建发送协议对象
+        C2S_SyncTime.client_time = int(time.time())#参数赋值
+        C2S_SyncTime = C2S_SyncTime.SerializeToString()#序列化
+        C2S_SyncTime_attr = {'name': "C2S_SyncTime", 'protocol': 'protobuf-ss', 'send_cmd': 10145, 'recv_cmd': 10146,
+                           'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_SyncTime, C2S_SyncTime_attr)#装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_SyncTime_attr, 32)#发送协议
         return flag, data

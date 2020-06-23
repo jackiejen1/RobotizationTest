@@ -38,7 +38,7 @@ class MyPoco:
         self.phone_id = phone_id
         self.xt = None
 
-    def make_new_role(self, server_name, username, protocol_name=""):
+    def make_new_role(self, server_name, username="", protocol_name=""):
         """
         设置协议基本信息
         目前只用于创建角色用，其他协议暂不使用
@@ -47,36 +47,34 @@ class MyPoco:
         :param protocol_name: 协议名
         :return:
         """
+        if username=="":
+            username = self.get_random_account()
         self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username)
+        return self.protocol.sever_time
 
-    def get_ss2_role_id(self):
-        """
-        再次调用登录方法获得角色id
-        :return:
-        """
-        return self.protocol.get_role_id()
-
-    def swipe(self, pos1, pos2, duration=3):
-
-        """
-        根据传入的坐标进行滑动，调用的airtest自带的滑动方法
-        :param pos1: 开始
-        :param pos2: 结束
-        :param duration: 滑动持续时间
-        :return:
-        """
-        self.my_poco_obj.swipe(pos1, pos2, duration=duration)
+    # def get_ss2_role_id(self):
+    #     """
+    #     再次调用登录方法获得角色id
+    #     :return:
+    #     """
+    #     return self.protocol.get_role_id()
 
     def set_account_information_gm(self, account, server_name, role_id=""):
         """
         使用GM方法前需要调用该方法,来确定对哪个账号的哪个区下面的角色进行操作
         :param account:str  账号
-        :param server_name:str 如果不传，说明该账号只有一个区有角色
+        :param server_name:str
         :param role_id: int 如果不传，则通过api获取
-        :return:
+        :return:role_id
         """
-        self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
-
+        if role_id != "":
+            return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
+        else:
+            if self.game_name_key == "少三2":
+                role_id = self.protocol.get_role_id()
+                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
+            else:
+                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
     def get_poco_dic(self):
         """
         刷新并获取当前界面UI信息
@@ -132,8 +130,19 @@ class MyPoco:
         """
         self.my_poco_obj.close_game()
 
-    def get_account_info(self, game_account_input):
-        return self.get_config(self.game_name_key, game_account_input)
+    # def get_account_info(self, game_account_input):
+    #     return self.get_config(self.game_name_key, game_account_input)
+
+    def swipe(self, pos1, pos2, duration=3):
+
+        """
+        根据传入的坐标进行滑动，调用的airtest自带的滑动方法
+        :param pos1: 开始
+        :param pos2: 结束
+        :param duration: 滑动持续时间
+        :return:
+        """
+        self.my_poco_obj.swipe(pos1, pos2, duration=duration)
 
     # @err_close_game
     def my_swipe(self, start_path, end_path, timein=3):
@@ -493,14 +502,14 @@ class MyPoco:
         # self.gm.delete_resources(dic_input)
         self.rg.delete_resource(dic_input)
 
-    def get_sever_time(self):
-        """
-        查询服务器时间
-        :param server_name:str 服务器名
-        :return:[int(ymd),int(hms),int(week)]
-        """
-        # return self.gm.select_server_time(server_name)
-        return self.rg.get_sever_time()
+    # def get_sever_time(self):
+    #     """
+    #     查询服务器时间
+    #     :param server_name:str 服务器名
+    #     :return:[int(ymd),int(hms),int(week)]
+    #     """
+    #     # return self.gm.select_server_time(server_name)
+    #     return self.rg.get_sever_time()
 
     def set_sever_time(self, dic_input):
         """

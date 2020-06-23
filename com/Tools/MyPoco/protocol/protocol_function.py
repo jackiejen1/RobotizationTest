@@ -47,6 +47,7 @@ class ProtocolFunction:
             raise GmException("服务器可能在维护")
         # 启动登陆
         self.uid=0
+        self.sever_time = 0
         self.Login()#可以考虑单独启动
     def get_role_id(self):
         if self.uid ==0:
@@ -54,9 +55,12 @@ class ProtocolFunction:
             return self.Login()
         else:
             add_msg_in_log("role_id:"+str(self.uid))
-            return self.uid
+            return self.uid,self.sever_time
 
     def Login(self):
+        """
+        :return: 角色ID和服务器时间
+        """
         lg = LoginGame(self.socket,self.server_id,self.game_name,self.username)
         flag, data = lg.MSG_C2G_Login()
         G2C_Login = cg_pb2.G2C_Login()
@@ -74,10 +78,16 @@ class ProtocolFunction:
             flag_Create, data_Create = lg.MSG_C2G_Create(G2C_Login.uid,G2C_Login.sid)
             G2C_Create = cg_pb2.C2G_Create()
             G2C_Create.ParseFromString(data_Create)
-            print(G2C_Create)
+            # print(G2C_Create)
         elif G2C_Login.ret == 2:
             raise GameServerStopException("服务器维护中,创建账号失败")
-        return self.uid
+        #获取服务器时间
+        if self.sever_time ==0:
+            flag_SyncTime, data_SyncTime = lg.MSG_C2S_SyncTime(G2C_Login.uid,G2C_Login.sid)#发送协议
+            S2C_SyncTime = cs_pb2.S2C_SyncTime()#创建返回协议对象
+            S2C_SyncTime.ParseFromString(data_SyncTime)#解析协议返回值
+            self.sever_time = S2C_SyncTime.server_time#拿取返回值参数
+        return self.uid,self.sever_time
 
     def send_protocol(self, arg_dic):
         """

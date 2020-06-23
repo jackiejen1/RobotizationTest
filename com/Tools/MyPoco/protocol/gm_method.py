@@ -62,7 +62,7 @@ class GmMethod:
         else:
             self.role_id = role_id
         # add_msg_in_log("角色ID为：" + str(role_id))
-
+        return self.role_id
     def add_resources(self, resource_name_dic):
         """
         根据传入的道具列表添加道具

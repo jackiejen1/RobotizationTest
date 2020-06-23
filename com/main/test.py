@@ -85,13 +85,13 @@ if __name__ == '__main__':
     # print(a)
 
     # 少三
-    # url_add = "http://10.3.39.187:8088/api/gm/resources/add"
-    # data = {"type": 3, "id": 5777, "num": 1}
-    # data = [data,data,data]
-    # data = json.dumps(data, ensure_ascii=False)
-    # payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
-    # response = requests.request("POST", url_add, data=payload)
-    # print(response.text.encode('utf8'))
+    url_add = "http://10.3.39.187:8088/api/gm/resources/add"
+    data = {"type": 3, "id": 5777, "num": 1}
+    data = [data,data,data]
+    data = json.dumps(data, ensure_ascii=False)
+    payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
+    response = requests.request("POST", url_add, data=payload)
+    print(response.text.encode('utf8'))
 
     # 少三2
     # url_role_id = "http://10.3.39.187:8088/api/gm/role_id"
@@ -101,16 +101,16 @@ if __name__ == '__main__':
     # a = response.json(encoding = "utf-8")
     # print(a)
 
-    url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/add"
-    data_list = [{"type": 3, "id": 1, "num": 1000}, {"type": 999, "id": 0, "num": 500000},  {"type": 1, "id": 33, "num": 10}, {"type": 1, "id": 2, "num": 9999}]
-    data = json.dumps(data_list, ensure_ascii=False)
-    print(type(data))
-    print(data)
-    payload = {"account": "93499947", "role_id": 206158440283, "server": "1652440002", "data": data}
-    response = requests.request("POST", url_add, data=payload)
-    data_json = response.json()
-    print(type(data_json))
-    print(data_json)
+    # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/add"
+    # data_list = [{"type": 3, "id": 1, "num": 1000}, {"type": 999, "id": 0, "num": 500000},  {"type": 1, "id": 33, "num": 10}, {"type": 1, "id": 2, "num": 9999}]
+    # data = json.dumps(data_list, ensure_ascii=False)
+    # print(type(data))
+    # print(data)
+    # payload = {"account": "93499947", "role_id": 206158440283, "server": "1652440002", "data": data}
+    # response = requests.request("POST", url_add, data=payload)
+    # data_json = response.json()
+    # print(type(data_json))
+    # print(data_json)
 
 
     # url_add = "http://gmapi.qa.ngame2.youzu.com/api/gm/resources/query"

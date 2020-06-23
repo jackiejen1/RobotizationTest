@@ -22,10 +22,13 @@ class MakeResourceBody:
         MyPocoPath = info.get_config("设置", "my_poco_path")
         all_path=MyPocoPath+excel_path
         self.xl = xlrd.open_workbook(all_path)
-        if self.game_name == "com.youzu.test.qa":
-            checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
-            all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
-            self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
+        # if self.game_name == "com.youzu.test.qa":
+        #     checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
+        #     all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
+        #     self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
+        checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
+        all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
+        self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
 
     def get_num_from_name(self, checkpoint_name):
         """

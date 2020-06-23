@@ -127,8 +127,6 @@ class ResourceGmSs2:
         从开始到结束都在当前界面,服务器时间
         :return: int [日期，时间，星期]
         """
-
-
         time.sleep(2)
         self.my_poco_obj.touch_poco("Comp_res3")
         self.my_poco_obj.touch_poco("自动测试")
