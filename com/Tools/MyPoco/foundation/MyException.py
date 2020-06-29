@@ -128,3 +128,15 @@ class GmException(Exception):
 
     def __str__(self):
         return str(self.my_msg)
+
+class ValueException(Exception):
+    '''
+    传入参数异常
+    '''
+
+    def __init__(self, msg=""):
+        self.my_msg = msg
+        print(self.my_msg)
+
+    def __str__(self):
+        return str(self.my_msg)

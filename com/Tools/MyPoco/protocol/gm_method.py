@@ -240,3 +240,11 @@ class GmMethod:
             description = "失败"
             message = operation_description + description + "原因：" + message+",大概率是资源超过上限"
             raise Exception(message)
+
+    def get_resource_id(self, resource_name):
+        """
+        根据资源名称查询id
+        :param resource_name:资源名称
+        :return:int id
+        """
+        return self.mri.get_resource_id(resource_name)

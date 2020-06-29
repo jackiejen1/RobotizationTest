@@ -92,7 +92,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
     recvcmd = api_attr['recv_cmd']
     print("当前接收接口:--{} cmd: {}".format(api_attr['name'], recvcmd))
     rst = int(time.time())
-    while True:
+    while True:#这里是一直接收数据的
         try:
             ct = int(time.time())
             if ct - rst > limittime:
@@ -101,7 +101,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
                 failure('socket', api_attr['name'], "ct - rst > limittime")
                 return recvdata, recvtime
             s.settimeout(limittime)
-            rev_data = s.recv(buffersize)
+            rev_data = s.recv(buffersize)#第一次接收数据，获取消息头
             # print("rev_data-------------->",len(rev_data))
             if len(rev_data) != buffersize:
                 recvtime = time.time()
@@ -118,13 +118,15 @@ def _recv_data(s, api_attr, buffersize, limittime):
             # print("消息头-->{}".format(head_data))
             s.settimeout(limittime)
             tmpdata = s.recv(head_data[0] - 32)
-            while (len(tmpdata) < (head_data[0] - 32)):
+            while (len(tmpdata) < (head_data[0] - 32)):#消息没收完就继续收
                 tmpdata += s.recv(head_data[0] - 32 - len(tmpdata))
+            #收完完整的一条后进行校验
             recvtime = time.time()
-            if head_data[1] == recvcmd:
+            if head_data[1] == recvcmd:#这里对返回数据进行校验，只返回要求协议ID的数据
                 recvtime = time.time()
                 recvdata = tmpdata
                 return recvdata, recvtime
+            #如果不是指定的协议，就继续接收下一条协议内容
         except Exception as e:
             print("socket接收数据时发生错误")
             print("具体错误 {}".format(e))
@@ -161,7 +163,7 @@ def recv_data(sock, api_attr, headsize, norecv=False, limitime=30):
     recv_time = recv_time * 1000
     # 将毫秒规整，不然统计数据太多，不利于统计
     usedtime = int(recv_time - send_time)
-    print("-----发送时间:{} 接收时间:{} 用时: {:.3f} ms-----".format(send_time, recv_time, usedtime))
+    # print("-----发送时间:{} 接收时间:{} 用时: {:.3f} ms-----".format(send_time, recv_time, usedtime))
     if receive_data != b'error':
         success('socket', workname, usedtime, len(receive_data))
         flag = True
@@ -197,7 +199,7 @@ def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=30
     recv_time = recv_time * 1000
     # 将毫秒规整，不然统计数据太多，不利于统计
     usedtime = int(recv_time - send_time)
-    print("-----发送时间:{} 接收时间:{} 用时: {:.3f} ms-----".format(send_time, recv_time, usedtime))
+    # print("-----发送时间:{} 接收时间:{} 用时: {:.3f} ms-----".format(send_time, recv_time, usedtime))
     if receive_data != b'error':
         success('socket', workname, usedtime, len(receive_data))
         flag = True

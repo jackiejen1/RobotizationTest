@@ -37,6 +37,7 @@ class MyPoco:
         # self.newaccount = NewAccount(game_name, phone_id)
         self.phone_id = phone_id
         self.xt = None
+        self.Flush_body = None
 
     def make_new_role(self, server_name, username="", protocol_name=""):
         """
@@ -45,19 +46,12 @@ class MyPoco:
         :param server_name: 服务器名
         :param username: 账号
         :param protocol_name: 协议名
-        :return:
+        :return:时间戳
         """
-        if username=="":
+        if username == "":
             username = self.get_random_account()
         self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username)
         return self.protocol.sever_time
-
-    # def get_ss2_role_id(self):
-    #     """
-    #     再次调用登录方法获得角色id
-    #     :return:
-    #     """
-    #     return self.protocol.get_role_id()
 
     def set_account_information_gm(self, account, server_name, role_id=""):
         """
@@ -71,10 +65,32 @@ class MyPoco:
             return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
         else:
             if self.game_name_key == "少三2":
-                role_id = self.protocol.get_role_id()
+                role_id, sever_time = self.protocol.get_role_id()
                 return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
             else:
                 return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
+
+    def Flush(self, find_name):
+        """
+        上阵武将
+        :param find_name:
+        :return:
+        """
+        return self.protocol.Flush(find_name)
+
+    def shangzhenwujiang(self, pos, name):
+        """
+        上阵武将
+        :param pos: 坑位，2-6
+        :param id: 武将的道具ID
+        :return:
+        """
+        wujiang_id = self.get_resource_id(name)
+        if (self.Flush_body == None) or (str(wujiang_id) not in self.Flush_body.keys()):
+            self.Flush_body = self.Flush("武将")
+        only_id = self.Flush_body[str(wujiang_id)]
+        self.protocol.shangzhenwujiang(pos, only_id)
+
     def get_poco_dic(self):
         """
         刷新并获取当前界面UI信息
@@ -112,7 +128,7 @@ class MyPoco:
         self.xt = XnTest()
 
     # @err_close_game
-    def open_game(self, sever_name_input, game_account_input,password=None):
+    def open_game(self, sever_name_input, game_account_input, password=None):
         """
         功能向,启动游戏并到游戏主界面
         :param sever_name_input: 区服,读配置或新建账号
@@ -121,7 +137,7 @@ class MyPoco:
         :return:返回StdPoco().poco对象，可使用原生框架
         """
         entry = EntryGame(self.game_name_key, self.phone_id)
-        entry.entry_game(sever_name_input, game_account_input,password)
+        entry.entry_game(sever_name_input, game_account_input, password)
 
     def close_game(self):
         """
@@ -129,9 +145,6 @@ class MyPoco:
         :return:
         """
         self.my_poco_obj.close_game()
-
-    # def get_account_info(self, game_account_input):
-    #     return self.get_config(self.game_name_key, game_account_input)
 
     def swipe(self, pos1, pos2, duration=3):
 
@@ -155,13 +168,6 @@ class MyPoco:
         """
         return self.my_poco_obj.my_swipe(start_path, end_path, timein)
 
-    # def renovate_and_get_poco_dic(self):
-    #     """
-    #     刷新UI信息并保存本地
-    #     :return: ui dic
-    #     """
-    #     return self.my_poco_obj.renovate_and_get_poco_dic()
-
     def my_swipe_pos(self, start_pos_list, end_pos_list, timein=3):
         """
         默认滑动时长3秒
@@ -180,13 +186,12 @@ class MyPoco:
 
         self.my_poco_obj.touch_poco(poco_path, click_list=click_list)
 
-    def my_touch_pos(self, pos_list_int,is_sleep = True):
+    def my_touch_pos(self, pos_list_int, is_sleep=True):
         """
         :param pos_list_int:控件的pos属性
         :return:Exception
         """
-        self.my_poco_obj.touch_pos(pos_list_int,is_sleep = is_sleep)
-
+        self.my_poco_obj.touch_pos(pos_list_int, is_sleep=is_sleep)
 
     def touch(self, pos_list_int):
         """
@@ -204,7 +209,7 @@ class MyPoco:
         :param pos_list_int:控件的pos属性
         :return:
         """
-        if self.xt==None:
+        if self.xt == None:
             self.set_xn_test()
         self.xt.xn_touch(pos_list_int)
 
@@ -216,36 +221,20 @@ class MyPoco:
         :param end: 结束控件pos
         :return:
         """
-        if self.xt==None:
+        if self.xt == None:
             self.set_xn_test()
         self.xt.xn_swipe(start, end)
 
-    def get_config(self, dic_name ,key):
+    def get_config(self, dic_name, key):
         """
         获取配置文件信息
         :param dic_name:游戏代号
         :param key:键
         :return:value
         """
-        return self.info.get_config(dic_name ,key)
+        return self.info.get_config(dic_name, key)
 
-    # def add_section(self, section_name):
-    #     '''
-    #     在配置文件中添加项
-    #     :param section_name:项名称
-    #     :return:
-    #     '''
-    #     self.info.add_section(section_name)
-
-    # def remove_section(self, section_name):
-    #     '''
-    #     删除配置文件中的项
-    #     :param section_name:项名称
-    #     :return:
-    #     '''
-    #     self.info.remove_section(section_name)
-
-    def set_config(self, dic_name ,key, value):
+    def set_config(self, dic_name, key, value):
         """
         设置配置文件信息
         :param dic_name:游戏代号
@@ -253,7 +242,7 @@ class MyPoco:
         :param value:值
         :return:
         """
-        self.info.set_config(dic_name ,key, value)
+        self.info.set_config(dic_name, key, value)
 
     def get_time_str(self, str_time_input):
         """
@@ -374,7 +363,7 @@ class MyPoco:
         :return:poco对象
         """
         # todo
-        if self.xt==None:
+        if self.xt == None:
             self.set_xn_test()
         return
 
@@ -383,7 +372,7 @@ class MyPoco:
         点击标记按钮
         :return:
         """
-        if self.xt==None:
+        if self.xt == None:
             self.set_xn_test()
 
     def end_tab_xn(self):
@@ -392,15 +381,17 @@ class MyPoco:
         结束测试并上传报告，在开始测试界面结束
         :return:
         """
-        if self.xt==None:
+        if self.xt == None:
             self.set_xn_test()
+
     def close_test_xn(self):
         """
         停止性能测试，关闭性能软件和游戏
         :return:
         """
-        if self.xt==None:
+        if self.xt == None:
             self.set_xn_test()
+
     def text_str(self, input_str):
         """
         输入文本，没有回车键
@@ -408,28 +399,6 @@ class MyPoco:
         :return:
         """
         self.my_poco_obj.text_str(input_str)
-
-    # @err_close_game
-    # def new_account(self, resource_dic_input, sever_name_input, play_dic):
-    # self.newaccount.new_game_account(resource_dic_input, sever_name_input, play_dic)
-    # def new_account(self, sever_name_input, resource_dic, play_dic):
-    #     """
-    #     根据输入的要求在sever_name区创建一个账号,需要添加创建账号必备的资源
-    #     :param sever_name_input: 区服名和配置一致
-    #     :param resource_dic: 字典，需要添加的各种资源
-    #     :param play_dic: 字典，需要添加的各种资源
-    #     :return:
-    #     """
-    #     self.set_config(self.game_name, "new_game_account1", "")  # 进入之后重置账号
-    #     account = self.get_random_account()
-    #     self.make_new_role(sever_name_input, account)
-    #     role_id = self.get_ss2_role_id()
-    #     self.set_account_information_gm(account, sever_name_input, role_id)  # 设置GM需要的信息
-    #     self.add_resource(resource_dic)
-    #     if "副本" in play_dic.keys() or "列传" in play_dic.keys():
-    #         self.set_checkpoint(account, sever_name_input, play_dic)
-    #     self.set_config(self.game_name, "new_game_account1", account)
-    #     return account
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """
@@ -479,10 +448,6 @@ class MyPoco:
         :param dic_input:dic {"资源名称":资源数量,"资源名称":资源数量,...}
         :return:
         """
-        # if self.game_name == "com.youzu.wgame2":
-        #     self.gm.add_resources(dic_input)
-        # elif self.game_name == "com.youzu.test.qa":
-        #     self.rg.add_resource(dic_input)
         self.gm.add_resources(dic_input)
 
     def get_resource_quantity(self, list_input):
@@ -501,6 +466,14 @@ class MyPoco:
         """
         # self.gm.delete_resources(dic_input)
         self.rg.delete_resource(dic_input)
+
+    def get_resource_id(self, resource_name):
+        """
+        根据资源名称查询id
+        :param resource_name:资源名称
+        :return:int id
+        """
+        return self.gm.get_resource_id(resource_name)
 
     # def get_sever_time(self):
     #     """

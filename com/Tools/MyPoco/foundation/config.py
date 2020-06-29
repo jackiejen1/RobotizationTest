@@ -74,10 +74,32 @@ class Config:
         "my_poco_path": None,
         "allphnoe_poco_sleep_time": 1
     }
+    ceshi = {
+        "app_name": "com.yoozoo.kr.snsgz2",
+        "uid": None,
+        "sid": None,
+        "c2sname": "MSG_C2S",
+        "s2cname": "MSG_S2C",
+        "protocolfilepath": "\protocol_file\cs.txt",
+        "resource_excelpath": "\info_tab\少三2道具类型表.xlsx",
+        "checkpointl_excelpath": "\info_tab\少三2关卡类型表.xlsx",
+        "gm_url": "gmapi.qa.ngame2.youzu.com",
+        "QA1_server_ages": {"server_id": "1652440001", "host": "10.3.128.5", "port": 16865},
+        "QA2_server_ages": {"server_id": "1652440002", "host": "ft0.n.m.uuzuonline.net", "port": 16865},
+        "QA3_server_ages": {"server_id": "1652440003", "host": "ft0.n.m.uuzuonline.net", "port": 16865},
+        "QA4_server_ages": {"server_id": "1652440004", "host": "ft0.n.m.uuzuonline.net", "port": 16865},
+        "QA5_server_ages": {"server_id": "1652440005", "host": "ft0.n.m.uuzuonline.net", "port": 16865},
+        "QA6_server_ages": {"server_id": "1652440006", "host": "ft0.n.m.uuzuonline.net", "port": 16865},
+        "QA7_server_ages": {"server_id": "1652440007", "host": "ft0.n.m.uuzuonline.net", "port": 16865},
+        "xn_account": "lidong1234",
+        "sever_poco": "cocos-lua",
+        "close_game_poco_name": "HomeLayer"
+    }
     Information = {
         "少三2": shaosan2,
         "性能": xn,
         "少西": shaoxi,
         "少三": shaosan,
-        "设置":sys_set
+        "设置":sys_set,
+        "测试": ceshi
     }

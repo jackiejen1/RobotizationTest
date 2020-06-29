@@ -25,6 +25,7 @@ import threading
 import time
 from poco.drivers.std import StdPoco
 
+from MyPoco.my_poco import MyPoco
 from MyPoco.protocol.make_resource_body import MakeResourceBody
 
 from MyPoco.foundation.information import Information
@@ -58,7 +59,7 @@ from airtest.core.api import device
 
 # auto_setup(__file__)
 if __name__ == '__main__':
-    # pass
+    pass
     # com.youzu.g36.yz.qa 36计
     # thread1 = myThread(1, "Thread-1", "98895a4246334e414d", "com.youzu.test.qa")
     # thread2 = myThread(2, "Thread-2", "3e1a2b6","com.youzu.test.qa")
@@ -68,10 +69,5 @@ if __name__ == '__main__':
     # thread1.join()
     # thread2.join()
     # print("退出主线程")
-    game_account_f = time.time()
-    dateArray = datetime.datetime.fromtimestamp(game_account_f)
-    hms = dateArray.strftime("%Y%m%d")
-    game_account_int = int(game_account_f * 1000000)
-    game_account = hms[-1:] + str(game_account_int)[-7:]
-    print(game_account)
+
 

@@ -77,11 +77,50 @@ class LoginGame:
         return flag, data
 
     def MSG_C2S_SyncTime(self, uid, sid):
-        C2S_SyncTime = cs_pb2.C2S_SyncTime()#创建发送协议对象
-        C2S_SyncTime.client_time = int(time.time())#参数赋值
-        C2S_SyncTime = C2S_SyncTime.SerializeToString()#序列化
+        C2S_SyncTime = cs_pb2.C2S_SyncTime()  # 创建发送协议对象
+        C2S_SyncTime.client_time = int(time.time())  # 参数赋值
+        C2S_SyncTime = C2S_SyncTime.SerializeToString()  # 序列化
         C2S_SyncTime_attr = {'name': "C2S_SyncTime", 'protocol': 'protobuf-ss', 'send_cmd': 10145, 'recv_cmd': 10146,
-                           'uid': uid, 'sid': sid}
-        senddata = pack_data(C2S_SyncTime, C2S_SyncTime_attr)#装包，需要学习
-        flag, data = send_receive(self.socket, senddata, C2S_SyncTime_attr, 32)#发送协议
+                             'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_SyncTime, C2S_SyncTime_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_SyncTime_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Flush(self, uid, sid,recv_cmd_id):
+        C2S_Flush = cs_pb2.C2S_Flush()  # 创建发送协议对象
+        C2S_Flush.user = True
+        C2S_Flush.red_point = True
+        C2S_Flush.knight = True
+        C2S_Flush.fragment = True
+        C2S_Flush.item = True
+        C2S_Flush.resource = True
+        C2S_Flush.formation = True
+        C2S_Flush.unite_token = True
+        C2S_Flush.advance_equipment = True
+        C2S_Flush.equipment = True
+        C2S_Flush.treasure = True
+        C2S_Flush.dress = True
+        C2S_Flush.red_packet = True
+        C2S_Flush.random_player = True  # 随机玩家
+        C2S_Flush.biography_item = True  # 名将传道具
+        C2S_Flush.skin = True
+        C2S_Flush.privilege = True  # 特权
+        C2S_Flush = C2S_Flush.SerializeToString()  # 序列化
+        # ID10101的协议可以不接收，不是实际需要的内容
+        C2S_Flush_attr = {'name': "C2S_Flush", 'protocol': 'protobuf-ss', 'send_cmd': 10100,
+                          'recv_cmd': int(recv_cmd_id),'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Flush, C2S_Flush_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Flush_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Formation_ChangeFormation(self, tp, pos, id, uid, sid):
+        C2S_Formation_ChangeFormation = cs_pb2.C2S_Formation_ChangeFormation()
+        C2S_Formation_ChangeFormation.tp = tp
+        C2S_Formation_ChangeFormation.pos = pos
+        C2S_Formation_ChangeFormation.id = id
+        C2S_Formation_ChangeFormation = C2S_Formation_ChangeFormation.SerializeToString()
+        C2S_Formation_ChangeFormation_attr = {'name': "C2S_Formation_ChangeFormation", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 10162, 'recv_cmd': 10163, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Formation_ChangeFormation, C2S_Formation_ChangeFormation_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Formation_ChangeFormation_attr, 32)  # 发送协议
         return flag, data

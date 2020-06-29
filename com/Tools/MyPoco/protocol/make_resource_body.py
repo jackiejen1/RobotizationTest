@@ -10,6 +10,8 @@ from MyPoco.foundation.information import Information
 import time
 from MyPoco.airtestide_lack_packages import xlrd
 from MyPoco.foundation.MyException import *
+
+
 class MakeResourceBody:
     """
     根据资源名获取资源对应type和id，用于辅助GM后台
@@ -20,15 +22,15 @@ class MakeResourceBody:
         self.game_name = info.get_config(game_name_into, "app_name")
         excel_path = info.get_config(game_name_into, "resource_excelpath")
         MyPocoPath = info.get_config("设置", "my_poco_path")
-        all_path=MyPocoPath+excel_path
+        all_path = MyPocoPath + excel_path
         self.xl = xlrd.open_workbook(all_path)
         # if self.game_name == "com.youzu.test.qa":
         #     checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
         #     all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
         #     self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
         checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
-        all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
-        self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
+        all_checkpoint_excel_path = MyPocoPath + checkpoint_excel_path
+        self.checkpoint_xl = xlrd.open_workbook(all_checkpoint_excel_path)
 
     def get_num_from_name(self, checkpoint_name):
         """
@@ -62,6 +64,7 @@ class MakeResourceBody:
         else:
             raise GmException(resource_name + "道具不存在")
         return resource_type, resource_id
+
     def get_type_id_from_name_money(self, resource_name):
         """
         根据资源名返回该资源在表中对应的type、id、金额
@@ -82,8 +85,9 @@ class MakeResourceBody:
             resource_money = int(row[3])
         else:
             raise GmException(resource_name + "道具不存在")
-        return resource_type, resource_id,resource_money
-    def get_name_from_type_id(self,type_id_dic):
+        return resource_type, resource_id, resource_money
+
+    def get_name_from_type_id(self, type_id_dic):
         """
         根据传入的道具type和id，查询道具的名字
         :param type_id_dic: {"type":,"id":}
@@ -99,8 +103,8 @@ class MakeResourceBody:
                 row = table.row_values(i)
                 if id == int(row[2]):
                     resource_name = row[0]
-        if resource_name=="":
-            raise GmException("type:"+str(type_num)+",id:"+str(id)+"的道具不存在")
+        if resource_name == "":
+            raise GmException("type:" + str(type_num) + ",id:" + str(id) + "的道具不存在")
         else:
             return resource_name
 
@@ -120,6 +124,15 @@ class MakeResourceBody:
         """
         resource_name = self.get_name_from_type_id(type_id_dic)
         return resource_name
+
+    def get_resource_id(self, resource_name):
+        """
+        根据资源名称查询id
+        :param resource_name:资源名称
+        :return:int id
+        """
+        this_type, this_id = self.get_type_id_from_name(resource_name)
+        return int(this_id)
 
     def get_data_addordel(self, resource_name, num):
         """
