@@ -26,7 +26,7 @@ class GmMethod:
         self.host = self.info.get_config(game_name, "gm_url")
         self.gah = GmApiHttp(self.host)
 
-    def set_account_information(self, account, server_name_input, role_id=""):
+    def set_account_information(self, account, server_name_input, role_id="",role=""):
         """
         创建对象后需要调用该方法
         :param account:账号
@@ -48,7 +48,7 @@ class GmMethod:
         # 角色名
         # role_name_dic =  json.loads(self.info.get_config(self.game_name,self.account))
         # self.role_name = role_name_dic[server_name_input]
-        self.role_name = ""
+        self.role_name = role
         # 获取角色ID
         if role_id == "":
             pull_dic = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})

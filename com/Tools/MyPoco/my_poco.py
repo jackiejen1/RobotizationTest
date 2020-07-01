@@ -53,7 +53,7 @@ class MyPoco:
         self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username)
         return self.protocol.sever_time
 
-    def set_account_information_gm(self, account, server_name, role_id=""):
+    def set_account_information_gm(self, account, server_name, role_id="",role=""):
         """
         使用GM方法前需要调用该方法,来确定对哪个账号的哪个区下面的角色进行操作
         :param account:str  账号
@@ -62,13 +62,13 @@ class MyPoco:
         :return:role_id
         """
         if role_id != "":
-            return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
+            return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,role=role)
         else:
             if self.game_name_key == "少三2":
                 role_id, sever_time = self.protocol.get_role_id()
-                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
+                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,role=role)
             else:
-                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id)
+                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,role=role)
 
     def Flush(self, find_name):
         """
@@ -131,8 +131,9 @@ class MyPoco:
     def open_game(self, sever_name_input, game_account_input, password=None):
         """
         功能向,启动游戏并到游戏主界面
-        :param sever_name_input: 区服,读配置或新建账号
-        :param game_account_input: 账号,读配置或新建账号
+        :param sever_name_input: 区服
+        :param game_account_input: 账号
+        :param game_account_input: 密码，可选
         :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """

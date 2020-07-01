@@ -76,22 +76,22 @@ if __name__ == '__main__':
     # print(response.text.encode('utf8'))
     # print(response.json(encoding = "utf-8"))
 
-    # 少三
-    # url = "http://10.3.39.187:8088/api/gm/role_id"
-    # payload = {"account": "testls001", "role": "九天", "server": "2013440005"}
-    # response = requests.request("POST", url, data=payload)
-    # print(response.text.encode('utf8'))
-    # a = response.json(encoding = "utf-8")
-    # print(a)
+    #少三
+    url = "http://10.3.39.187:8088/api/gm/role_id"
+    payload = {"account": "testls001", "role": "九天", "server": "2013440005"}
+    response = requests.request("POST", url, data=payload)
+    print(response.text.encode('utf8'))
+    a = response.json(encoding = "utf-8")
+    print(a)
 
     # 少三
-    url_add = "http://10.3.39.187:8088/api/gm/resources/add"
-    data = {"type": 3, "id": 5777, "num": 1}
-    data = [data,data,data]
-    data = json.dumps(data, ensure_ascii=False)
-    payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
-    response = requests.request("POST", url_add, data=payload)
-    print(response.text.encode('utf8'))
+    # url_add = "http://10.3.39.187:8088/api/gm/resources/add"
+    # data = {"type": 3, "id": 5777, "num": 1}
+    # data = [data,data,data]
+    # data = json.dumps(data, ensure_ascii=False)
+    # payload = {"account": "testls001", "role_id": 10000, "server": "2013440005", "data": data}
+    # response = requests.request("POST", url_add, data=payload)
+    # print(response.text.encode('utf8'))
 
     # 少三2
     # url_role_id = "http://10.3.39.187:8088/api/gm/role_id"

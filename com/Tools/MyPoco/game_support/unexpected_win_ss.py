@@ -23,4 +23,12 @@ class UnexpectedWinSs:
         少三2，识别：更新、天公福利、断网、报错
         :return:
         """
-        pass
+        self.make_poco_dic.get_poco_dic()
+        if self.make_poco_dic.is_in_dic("下载点2"):  # 点击完下载资源启动游戏
+            self.make_poco_dic.my_touch("下载点2")
+            time.sleep(30)
+            for i in range(20):
+                self.make_poco_dic.get_poco_dic()#这里会不停的刷新表
+                if self.make_poco_dic.is_in_dic("账号登录"):
+                    break
+                time.sleep(15)

@@ -28,9 +28,10 @@ class MakeResourceBody:
         #     checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
         #     all_checkpoint_excel_path = MyPocoPath+checkpoint_excel_path
         #     self.checkpoint_xl= xlrd.open_workbook(all_checkpoint_excel_path)
-        checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
-        all_checkpoint_excel_path = MyPocoPath + checkpoint_excel_path
-        self.checkpoint_xl = xlrd.open_workbook(all_checkpoint_excel_path)
+        if game_name_into == "少三2":#少三2特有需求
+            checkpoint_excel_path = info.get_config(game_name_into, "checkpointl_excelpath")
+            all_checkpoint_excel_path = MyPocoPath + checkpoint_excel_path
+            self.checkpoint_xl = xlrd.open_workbook(all_checkpoint_excel_path)
 
     def get_num_from_name(self, checkpoint_name):
         """

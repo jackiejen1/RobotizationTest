@@ -13,7 +13,6 @@ from airtest.core.api import *
 from MyPoco.foundation.MyException import *
 from MyPoco.foundation.make_poco_dic import MakePocoDic
 
-
 class UnexpectedWinSs2:
     def __init__(self, game_name,phone_id):
         self.make_poco_dic = MakePocoDic(game_name,phone_id)
