@@ -28,6 +28,12 @@ message BattleUnit {
     optional uint32 advance_level = 12; //进阶大等级
     optional uint32 skin = 13; //变装
     optional uint32 skin_ts = 14; //变装失效时间
+    optional uint32 artifactId = 15; //神器baseId
+    optional uint32 skill_level4 = 16;//神器星级
+    optional uint32 cardId = 17;//穿戴幻化卡
+    optional uint32 dress_num = 18;//时装数量
+    optional uint32 wingId = 19;//穿戴翅膀
+		optional uint32 energy_skill_id = 20;//必杀技能
 }
 
 message BattleTeam {
@@ -44,6 +50,15 @@ message BattleTeam {
     optional uint32 monster_team_id = 11; //怪物组id
     optional uint32 rebel_id = 12; //叛军id
     repeated TokenKnightShow  shows = 13; //兵符对应武将显示信息
+    repeated uint32 pets = 14; // 神兽id
+    repeated uint32 passive_skills = 15; //被动技能
+    optional DemonBossTeamMultiple demon_boss_multiple = 16; //讨伐魔将阵营伤害倍数
+}
+
+// 讨伐魔将阵营伤害倍数
+message DemonBossTeamMultiple {
+  required uint32 team = 1; // 阵营
+  required uint32 multiple = 2; // 伤害倍数
 }
 
 // 战斗数据，会有多波战斗
@@ -94,6 +109,7 @@ message BattleResult{
     optional string enemy_name = 12;
     repeated BattleUnitResult own_teams = 13;
     repeated BattleUnitResult enemy_teams = 14;
+    optional uint64 attack_total_damage = 15; //攻击方造成总伤害
 }
 
 // 战斗单位伤害信息--用于展示
@@ -102,6 +118,8 @@ message BattleUnitResult {
     optional uint32 id = 2;
     optional uint32 avartar_id = 3; //头像id
     optional uint64 dam = 4;  //伤害--数值
+    optional uint64 recover = 5;  //治疗--数值
+    optional uint64 take_dam = 6;  //受到伤害--数值
 }
 
 message BriefReport {

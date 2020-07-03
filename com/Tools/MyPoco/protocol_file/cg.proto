@@ -33,6 +33,8 @@ enum ID{
   MSG_G2C_Broadcast = 10012;
   MSG_C2G_Activate = 10013;
   MSG_G2C_Activate = 10014;
+  MSG_C2G_OfflineNew = 10015;
+  MSG_G2C_OfflineNew = 10016;
 }
 
 message C2G_Login {
@@ -89,6 +91,14 @@ message C2G_Offline {
 }
 
 message G2C_Offline {
+  optional uint32 reason = 1;
+}
+
+message C2G_OfflineNew {
+}
+
+message G2C_OfflineNew {
+  optional uint32 reason = 1;
 }
 
 message G2C_Broadcast {

@@ -131,16 +131,23 @@ enum AWARD_TYPE {
 	KNIGHT            = 4; //武将
 	UNITETOKEN        = 5; //合击兵符
 	ADVANCE_EQUIPMENT = 6; //进阶材料
-	EQUIPMENT 				= 7; //装备
-	TREASURE 					= 8; //宝物
-	TITLE						  = 9; //称号
-	RED_PACKET 				= 10; //红包
-	DRESS 						= 11; //时装
-  BIOGRAPHY_ITEM    = 12; //名将传道具
-  SKIN    = 13; //变装
-
-  GOLD              = 999; //元宝
-  DROP							= 1000; //掉落
+	EQUIPMENT 		  = 7; //装备
+	TREASURE 		  = 8; //宝物
+	TITLE			  = 9; //称号
+	RED_PACKET 		  = 10; //红包
+	DRESS 			  = 11; //时装
+    BIOGRAPHY_ITEM    = 12; //名将传道具
+    SKIN              = 13; //变装
+    ARTIFACT          = 14; //神器
+    ARTIFACT_COIN     = 28; //神器货币
+    ARTIFACT_RC       = 29; //神器精华
+    CARD              = 15; //化身卡
+    WING              = 16; //翅膀
+    PET               = 17; // 神兽
+    PET_EQUIPMENT     = 18; // 神兽装备
+    KSOUL             = 19; // 将灵
+    GOLD              = 999; //元宝
+    DROP							= 1000; //掉落
 	LIMIT 						= 10000;//所有定义不能超过这个值，所有type+LIMIT代表对于这个type的特殊处理
 }
 
@@ -154,17 +161,28 @@ enum AWARD_VALUE_TYPE {
   CONTEND_TREASURE_TIMES          = 9; //夺宝次数
   CONTEND_TREASURE_SCORE          = 10; //夺宝积分
   GUILD_CONTRIBUTE = 11; //军团贡献
-	REBEL_ATTACK = 12;	// 叛军攻打次数
-	REBEL_SCORE = 13;	// 战功
+  REBEL_ATTACK = 12;	// 叛军攻打次数
+  REBEL_SCORE = 13;	// 战功
   GUILD_DUNGEON_SCORE = 14; //军团副本挑战积分
   GUILD_DUNGEON_COUNT = 15; //军团副本挑战次数
-	ACHIEVEMENT_POINT = 19; //成就点
-	BUCKET = 21; //水桶
-	COURAGE = 22; //勇气1(14日活动)
-	FATIGUE = 24; //疲劳值
-	STORM_SCORE = 25; //攻城略地积分:军功
-	COURAGE2 = 27; //勇气2(14日活动)
-  ESSENCE           = 35; //兵符精华
+  ACHIEVEMENT_POINT = 19; //成就点
+  BUCKET = 21; //水桶
+  COURAGE = 22; //勇气1(14日活动)
+  FATIGUE = 24; //疲劳值
+  STORM_SCORE = 25; //攻城略地积分:军功
+  STORM_SKILL = 26; //akuantodo,技能点，临时加的，要找洛哥确认
+  COURAGE2 = 27; //勇气2(14日活动)
+  BIOGRAPHY_NUM = 33; // 名将传传记次数
+  MINE_RICE    = 34;//傲视天下粮草
+  MINE_JUNLING = 35;//傲视天下军令
+  MINE_POWER = 36;//傲视天下兵力
+  STORM_LORD_POINT = 38;//霸主成就
+  PDD_SCORE = 39;//拼多多额度
+  GROUP_BATTLE_SCORE = 44; // 积分
+  DEMON_BOSS_TIMES = 45; // 讨伐魔将攻击次数
+  MONTH_CARD_ACTIVE_POINT = 46; // 月卡活跃点
+  ATTR_TEST_POINT = 1001; //战斗属性
+
 }
 
 enum RANK_ID_TYPE {
@@ -184,6 +202,42 @@ enum RANK_ID_TYPE {
   STORM_PROGRESS = 14;//攻城略地进度排行
   KNIGHTBOOK_SCORE_NEW = 15;//武将图鉴积分活动
   RECRUIT_KNIGHT = 16; //限时神将排行榜
+  GUILD_BOSS_USER_LOCAL = 17; //军团boss玩家本服排行榜
+  GUILD_BOSS_GUILD_LOCAL = 18; //军团boss军团本服排行榜
+  GUILD_BOSS_USER_CROSS = 19; //军团boss玩家跨服排行榜
+  GUILD_BOSS_GUILD_CROSS = 20; //军团boss军团跨服排行榜 
+  RECRUIT_KNIGHT_GM = 21; //限时神将gm排行榜
+  MINE_BATTLE_LOCAL = 22;//傲视天下本服战神榜
+  MINE_GOLD_LOCAL = 23;//傲视天下本服财神榜
+  MINE_BATTLE_CROSS = 24;//傲视天下跨服战神榜
+  MINE_GOLD_CROSS = 25;//傲视天下跨服财神榜
+  BIOGRAPHY_PROGRESS =26;//名将传关卡进度排行榜
+  ORDER_WORLD_SCORE_LOCAL =27;//号令天下积分本服排行榜
+  ORDER_WORLD_SCORE_CROSS =28;//号令天下积分跨服排行榜
+  RECRUIT_RICHEST = 29; //富家天下积分排行榜
+  RECRUIT_RICHEST_GM = 30; //GM富家天下积分排行榜
+  GROUP_BATTLE_HONOR_CROSS = 31; //王者荣耀荣誉跨服排行榜
+  GROUP_BATTLE_HONOR_ALL_SERVER = 32; //王者荣耀荣誉全服排行榜
+  PEAK_ARENA_SCORE_LOCAL = 33; //王者竞技个人排行
+  PEAK_ARENA_SCORE_CROSS = 34; //王者竞技战区排行
+  PEAK_ARENA_SCORE_ALL_SERVER = 35; //王者竞技全服排行
+  WREST_BATTLE_CROSS = 36;//攻城新赛季跨服战神榜
+  WREST_GOLD_CROSS = 37;//攻城新赛季跨服财神榜
+  WREST_GUILD_SCORE_CROSS = 38;// 攻城新赛季跨服公会排行榜
+  WREST_BATTLE_UNION_CROSS = 39;//攻城新赛季跨服战神榜第二阶段
+  WREST_GOLD_UNION_CROSS = 40;//攻城新赛季跨服财神榜第二阶段
+  KSOUL_HONOR_LOCAL= 41;//将灵荣誉本服排行
+  KSOUL_HONOR_CROSS= 42;//将灵荣誉跨服排行
+  GUILD_BATTLE_SCORE_CROSS = 43;//军团支柱玩法积分战区排行
+  DEMON_BOSS_HONOR_CROSS_WEI = 44; // 讨伐魔将荣誉战区排行魏国
+  DEMON_BOSS_HONOR_CROSS_SHU = 45; // 讨伐魔将荣誉战区排行蜀国
+  DEMON_BOSS_HONOR_CROSS_WU = 46; // 讨伐魔将荣誉战区排行吴国
+  DEMON_BOSS_HONOR_CROSS_QUN = 47; // 讨伐魔将荣誉战区排行群国
+  DEMON_BOSS_TOTAL_HONOR_CROSS_WEI = 48; // 讨伐魔将累计荣誉战区排行魏国
+  DEMON_BOSS_TOTAL_HONOR_CROSS_SHU = 49; // 讨伐魔将累计荣誉战区排行蜀国
+  DEMON_BOSS_TOTAL_HONOR_CROSS_WU = 50; // 讨伐魔将累计荣誉战区排行吴国
+  DEMON_BOSS_TOTAL_HONOR_CROSS_QUN = 51; // 讨伐魔将累计荣誉战区排行群国
+  DEMON_BOSS_GUILD_HONOR_CROSS = 52; // 讨伐魔将军团荣誉战区排行
 }
 
 enum HANDBOOK_TYPE {
@@ -191,6 +245,8 @@ enum HANDBOOK_TYPE {
 	DRESS_HB = 2;
 	BIOBOSS_HB = 3;
 	SKIN_HB = 4;
+	ARTIFACT_HB  = 5;
+  PET_HB = 6;
 }
 
 enum ACTION_TYPE {
@@ -199,6 +255,10 @@ enum ACTION_TYPE {
   STATUS_DAILY_TASK = 3;
   STATUS_SEVENDAYS = 4;	//七日活动
   STATUS_GUIDE_TASK = 5;	//功能引导
+  STATUS_FOURTEEN = 6;	//十四日活动
+  STATUS_HOLIDAY = 7;	//欢庆佳节
+  STATUS_ORDER = 8; // 号令天下
+  STATUS_BACK_REWARD = 9; // 老玩家回归
 }
 
 enum REBORN_SYS_TYPE {
@@ -207,6 +267,10 @@ enum REBORN_SYS_TYPE {
   R_EQUIPMENT = 3;
   R_TREASURE = 4;
   R_DRESS = 5;
+  R_ARTIFACT = 6;
+  R_PET_EQUIPMENT = 7;
+  R_PET = 8;
+  R_KSOUL_BOOK = 9;
 }
  
 enum REBORN_OP_TYPE {
@@ -217,6 +281,7 @@ enum REBORN_OP_TYPE {
 enum USER_INFO_TYPE {
   FRAME = 0x1; //头像框
   NAME = 0x2; //角色名
+  TALK = 0x4; //气泡框和聊天表情
 }
 
 enum SCROLL_TYPE {
@@ -242,4 +307,24 @@ enum RECHARGE_INFO_TYPE {
   RIT_RECHARGE_DAILY_TOTAL = 1; //每日总充值金额
   RIT_RECHARGE_FUND_ACTIVE = 2; //基金购买人数
   RIT_RECHARGE_MAX = 3;
+}
+
+
+enum WING_WEAR_OP_TYPE {
+	WING_UNWEAR = 0; //翅膀脱
+	WING_WEAR = 1; //翅膀穿
+}
+
+//精英副本的三个难度
+enum ELITE_DUNGEON_TYPE {
+  EDT_EASY = 1;    //简单
+  EDT_NORMAL = 2;  //一般
+  EDT_HIDE = 3;    //困难
+}
+
+//精英副本录像类型
+enum ELITE_DUNGEON_RECORD_TYPE {
+  EDRT_QUICK = 1;  //最快通关（时间最早的）
+  EDRT_BEST = 2;   //极限通关（战力最低的）
+  EDRT_NEAR = 3;   //最近通关（时间最近的）
 }

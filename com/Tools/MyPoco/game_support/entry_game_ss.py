@@ -41,12 +41,14 @@ class EntryGameSs:
         self.my_poco_obj.touch_poco("未命名0/未命名1/default/Panel_20/Panel_login/Button_selectServer/Label_titleServer")#点击服务器，尝试打开服务器界面
         self.my_poco_obj.touch_poco("未命名0/未命名1/未命名0/default/Panel_root/Image_bg/Panel_rangeList/default1/Panel_35/Image_bg1/Label_name")#选择服务器页签
         self.my_poco_obj.touch_poco(sever_name_input)#服务器汉字
-        self.my_poco_obj.touch_poco("InputName")#需要连续点击两次“已登陆”，用于注销已有账号
+        # self.my_poco_obj.touch_poco("InputName")#需要连续点击两次“已登陆”，用于注销已有账号
         self.my_poco_obj.touch_poco("未命名0/未命名1/default/Panel_20/Panel_login/Button_inputUser/Label_userName")#需要连续点击两次“已登陆”，用于注销已有账号
         sleep(3)
-        self.my_poco_obj.touch_poco("未命名0/未命名1/default/Panel_20/Panel_login/Button_inputUser/Label_userName")#再次点击“已登陆”，弹出注销提示框
-        sleep(3)
-        anpoco(text="确认").click()#确认注销
+        if not anpoco(text="其他账号登录").exists():
+            self.my_poco_obj.touch_poco(
+                "未命名0/未命名1/default/Panel_20/Panel_login/Button_inputUser/Label_userName")  # 再次点击“已登陆”，弹出注销提示框
+            sleep(3)
+            anpoco(text="确认").click()  # 确认注销
         anpoco(text="其他账号登录").click()#弹出登陆框，切换账号
         anpoco(text="游族账号").click()#使用 游族账号 进行登陆
         anpoco("android.widget.FrameLayout").offspring("android:id/content").child("android.widget.RelativeLayout").child("android.widget.LinearLayout").child("android.widget.LinearLayout").child("android.widget.RelativeLayout")[0].offspring("android.widget.ImageView").click()

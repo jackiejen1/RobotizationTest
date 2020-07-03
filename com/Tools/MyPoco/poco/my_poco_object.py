@@ -96,7 +96,6 @@ class MyPocoObject():
         :param pos_list: [123,123]
         :return:
         """
-
         self.make_poco_dic.touch(pos_list)
     def swipe(self, pos1 ,pos2,duration):
         """
@@ -132,6 +131,7 @@ class MyPocoObject():
         :return:
         raise：PocoNoSuchNodeException、RpcTimeoutError
         """
+        time.sleep(1)
         self.uw.unexpected_win()
         try:
             self.make_poco_dic.my_touch(poco_path, click_list=click_list)
@@ -142,7 +142,7 @@ class MyPocoObject():
             start_app(self.game_name)
             time.sleep(4)
             snapshot(msg="10053异常")
-        time.sleep(1)
+
 
     # def touch_poco_obj(self, poco_path, click_list):
     #     """
