@@ -881,7 +881,7 @@ message CityTroubleFriend {
 }
 
 message CityOneKeyPatrol {
-  required uint32 city_id = 1;
+  required uint32 city_id = 1;  //todo
   required uint32 model_id = 2;
   optional uint64 knight_id = 3; //武将的唯一ID
   optional out_base.City city = 4;

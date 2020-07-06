@@ -58,16 +58,12 @@ class myThread(threading.Thread):
 from airtest.core.api import device
 
 # auto_setup(__file__)
+__phone_id__ = ""
 if __name__ == '__main__':
-    pass
-    # com.youzu.g36.yz.qa 36计
-    # thread1 = myThread(1, "Thread-1", "98895a4246334e414d", "com.youzu.test.qa")
-    # thread2 = myThread(2, "Thread-2", "3e1a2b6","com.youzu.test.qa")
-    # # 开启新线程
-    # thread1.start()
-    # thread2.start()
-    # thread1.join()
-    # thread2.join()
-    # print("退出主线程")
+    my_poco = MyPoco("少三2",__phone_id__)
+    sever_name = "QA1"
+    account = my_poco.get_random_account()
+    sever_time = my_poco.make_new_role(sever_name, account)
+    my_poco.set_account_information_gm(account, sever_name)
 
 
