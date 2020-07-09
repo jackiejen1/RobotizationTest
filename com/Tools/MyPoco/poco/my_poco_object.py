@@ -363,6 +363,7 @@ class MyPocoObject():
                 if self.is_pass>0:
                     raise GameNotPassException("数值判定部分未通过")
             else:
+                stop_app(self.game_name)
                 raise NoneException("最后一步异常,"+close_game_poco_name)
 
     def get_poco_any_value(self, poco_path, value_name_str):

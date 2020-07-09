@@ -1,0 +1,91 @@
+
+package battle;
+
+// 战报数据
+message BattleReport {
+	repeated BattleMember attack_members = 1;	//攻击方队伍
+	repeated BattleMember defense_members = 2;	//防守方队伍
+	optional uint32 pk_type = 3;    			//战斗类型 1 pve 2 pvp
+	optional uint32 combo_value	= 7;			//合击值
+	repeated uint32 combo_skills = 8;			//合击技能列表，里面存放的是合击技能id
+	optional uint32 combo_max = 9;				//合击最大值
+}
+
+// 每个武将的行动单元
+message BattleAction {
+	optional uint32 knight_serial_id = 1;	//武将流水id
+	optional uint32 knight_action_time = 2;	//武将的行动值
+}
+
+// 行动队列
+message BattleActionTime {
+	repeated BattleAction action_times = 1;	// 行动队列
+}
+
+// 出战的武将数据
+message BattleMember {
+	optional uint32 knight_serial_id = 1;	//武将流水id，从1-20，前十位为攻击方，后十位为敌方。目前上阵仅适用1-6，后面几位为扩展用
+	optional string name = 1;				//武将名字（主角）
+	optional uint32 pos = 2;				//武将位置
+	optional uint32 knight_id = 3;			//武将id
+	optional uint64 max_hp = 4;				//最大血量
+	optional uint64 hp = 5;					//当前血量
+	optional uint32 anger = 6;				//怒气值
+	optional uint32 action_time = 7;		//行动值
+}
+
+// 一次出手
+message BattleOneAttack {
+	optional uint32 attack_serial_id = 1;    		//攻击方流水id
+	optional uint32 attack_type = 2;    			//攻击类型 1 技能攻击 2 其他攻击（可选）
+	optional uint32 attack_id = 3;   				//配合攻击类型 攻击类型为1时，为技能id，以后有其他的再扩展（可选）
+	optional BattleBeforeAttack attack_before = 4;	//战斗前消息
+	repeated BattleAttackInfo attack_infos = 5; 	//战斗中消息，攻击事件列表
+	optional BattleAfterAttack attack_after = 6;	//战斗后消息
+	optional bool is_dead = 7;						//是否死亡，这里是攻击方自己
+	optional BattleActionTime action_times = 8;		//出手后全员的行动值
+}
+
+// 战斗前
+message BattleBeforeAttack {
+	optional BattleBuff buff = 1;		//出手前的buff效果，主要是针对攻击者自己的
+	repeated BattleEffect effect = 2;	//出手前的战斗效果，这里主要是针对被动触发类技能，比如每回合开始前回怒的这类效果做准备
+}
+
+// 战斗中（具体出手情况）
+message BattleAttackInfo {
+	optional uint32 victim_serial_id = 1;		//受击方，规则同武将流水id
+	optional BattleEffect effect_normal = 2;	//攻击效果，产生的效果同战斗效果类型里的，这里是技能的第一重效果
+	optional BattleEffect effect_extra = 3;		//攻击额外效果，可选，这里对应的是技能的第二重效果
+	optional BattleEffect effect_special = 4;	//攻击特殊效果，可选，这里对应的是技能特殊效果和被动触发技能效果。其中被动触发的只包含技能释放后的，技能释放前的（回合出手前）放在别的地方
+	optional bool is_dead = 5;  				//是否死亡，这里是这个受击角色
+}
+
+// 战斗后
+message BattleAfterAttack {
+	optional BattleBuff buff = 1;			//出手后的buff效果，主要是针对受击者的，由技能触发带来的
+	repeated BattleEffect effect = 2;		//战斗后怒气扣除等效果
+}
+
+// 战斗效果类型
+message BattleEffect {
+	optional uint32 effect_type = 1;			//效果类型 1 扣血 2 加血 3 扣怒气 4 加怒气 5 扣合击值 6 加合击值 7 扣行动值 8 加行动值
+	optional uint64 effect_value = 2;			//加减具体的值
+	repeated BattleAdditionInfo add_infos = 3;	//附加修正效果
+}
+
+// 附加修正效果
+message BattleAdditionInfo {
+	optional uint32 add_type = 1; 	//1 暴击 2 闪避 3 吸血 4 反弹
+	optional uint64 add_value = 2;  //附带的值，如吸血，反弹
+}
+
+// buff效果
+message BattleBuff {
+	optional uint32 buff_id = 1;			//buffid，对应buff_info表中的id
+	optional uint32 buff_serial_id = 2;		//buff流水id，每次新添加的唯一的id
+	optional uint32 knight_serial_id = 3;	//武将流水id，表示对应到哪个武将
+	optional uint32 buff_action = 4;		//buff动作，1 添加 2 删除 3 生效
+	optional BattleEffect buff_effect = 5;	//这里buff的效果直接引用BattleEffect的，理论上buff都可能修改列出来的效果
+	optional bool is_resist = 6;			//buff是否被免疫
+}

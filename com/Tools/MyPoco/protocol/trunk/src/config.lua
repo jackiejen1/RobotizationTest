@@ -1,0 +1,6 @@
+
+-- 客户端还是服务器
+CLIENT = 1
+SERVER = 2
+
+BATTLE_PLATFORM = SERVER

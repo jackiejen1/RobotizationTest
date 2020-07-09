@@ -1,0 +1,123 @@
+
+package battle;
+
+message BattleReport {
+    required uint64 battle_id = 1; // 战斗唯一id
+    required uint32 atk_type = 2; // 战斗类型 1 pve 2 pvp
+    optional bool is_auto = 3; // 是否自动战斗
+    optional uint32 random_seed = 4; // 随机数种子(废弃)
+    repeated BattleTeam own_teams = 5; // 己方阵容,会有多个的情况
+    repeated BattleTeam enemy_teams = 6; // 敌方阵容,会有多个的情况
+    optional uint32 win_condition = 7; // 胜利条件
+    repeated uint32 random_seeds = 8; // 随机数种子序列
+    optional uint32 reward_id = 9;	// daily_dungeon_reward_preview表id
+    optional uint32 assistance_id = 10; //助战id
+}
+
+message BattleTeam {
+    repeated BattleUnit units = 1; // 武将
+    required BattleCombo combo = 2; // 合击数据
+    optional uint64 fight_value = 3; // 总战力，pvp时需要
+    optional uint32 wave = 4; //第几波
+    optional bool is_boss = 5; //是否是boss
+    repeated out_base.Award drops = 6; //掉落
+    optional out_base.UserSnapshot user = 7; //玩家显示数据
+    optional uint64 total_hp = 8;	// 总血量
+    optional int32 multiple = 9;	// 最终伤害倍数，千分比
+    optional uint32 rebel_talent = 10;	// 叛军天赋技能
+    optional uint32 monster_team_id = 11; //怪物组id
+    optional uint32 rebel_id = 12; //叛军id
+    repeated TokenKnightShow  shows = 13; //兵符对应武将显示信息
+    repeated uint32 pets = 14; //宠物
+    repeated uint32 skills = 15; // 队伍的被动技能
+}
+
+// 战斗数据，会有多波战斗
+message BattleUnit {
+    required uint32 id = 1; // 武将id,对应knight_info
+    required uint32 pos = 2; // 武将位置,1-6
+    repeated Attr attrs = 3; // 战斗属性
+    repeated uint32 skills = 4; // 武将的被动技能
+    optional uint32 star = 5; // 武将星级
+    optional uint32 skill_level1 = 6;//普攻等级
+    optional uint32 skill_level2 = 7;//技能等级
+    optional string name = 8; //名字
+	optional uint32 common_skill_id = 9;//普通攻击 
+	optional uint32 active_skill_id = 10;//特殊技能
+    optional uint64 hp = 11;	// 最大血量
+    optional uint32 advance_level = 12; //进阶大等级
+    optional uint32 skin = 13; //变装
+    optional uint32 skin_ts = 14; //变装失效时间
+    optional uint32 artifactId = 15; //神器baseId
+    optional uint32 skill_level4 = 16;//神器星级
+    optional uint32 cardId = 17;//穿戴幻化卡
+    optional uint32 dress_num = 18;//时装数量
+    optional uint32 wingId = 19;//穿戴翅膀
+}
+
+// 一次出手
+message BattleOneAttack {
+	optional uint32 attack_serial_id = 1;    		//攻击方流水id
+	optional uint32 attack_type = 2;    			//攻击类型 1 技能攻击 2 合击技能 3 变身召唤
+	optional uint32 attack_id = 3;   				//配合攻击类型 攻击类型为1时，为技能id，以后有其他的再扩展（可选）
+	optional BattleBeforeAttack attack_before = 4;	//战斗前消息
+	repeated BattleAttackInfo attack_infos = 5; 	//战斗中消息，攻击事件列表
+	optional BattleAfterAttack attack_after = 6;	//战斗后消息
+	optional bool is_dead = 7;						//是否死亡，这里是攻击方自己
+	optional bool is_game_over = 8;					//本次出手后战斗是否结束
+	optional uint32 winner = 9;					//胜者，1表示攻击方，2表示防守方
+	optional RoundStart round_start = 10;			//如果是回合开始，放开始时的数据，合击恢复等
+	optional bool is_wave_over = 11;				// 标示一波结束
+	repeated BattleKnight knights = 12;				// 变身召唤生成武将
+	optional bool assist = 13;						// 援助出场
+	repeated BattleOneAttack passive_infos = 14;	// 触发技能序列，需要一起生成
+}
+
+// 战斗前
+message BattleBeforeAttack {
+	repeated BattleBuff buff = 1;		//出手前的buff效果，主要是针对攻击者自己的
+	repeated BattleEffect effect = 2;	//出手前的战斗效果，这里主要是针对被动触发类技能，比如每回合开始前回怒的这类效果做准备;
+	现在战斗后怒气扣除等放前面了
+}
+
+// 战斗中（具体出手情况）
+message BattleAttackInfo {
+	optional uint32 victim_serial_id = 1;		//受击方，规则同武将流水id
+	optional BattleEffect effect = 2;	//攻击效果，产生的效果同战斗效果类型里的
+	optional bool is_dead = 3;  				//是否死亡，这里是这个受击角色
+}
+
+// 战斗后
+message BattleAfterAttack {
+	repeated BattleBuff buff = 1;			//出手后的buff效果，主要是针对受击者的，由技能触发带来的
+	repeated BattleEffect effect = 2;		//附加效果,吸血,反弹
+}
+
+// 战斗效果类型
+message BattleEffect {
+	optional uint32 effect_type = 1;			//效果类型 1 扣血 2 加血 3 扣怒气 4 加怒气 5 扣合击值 6 加合击值
+	optional uint64 effect_value = 2;			//加减具体的值
+	repeated BattleAddInfo add_effects = 3;		//附加修正效果
+}
+
+// 附加修正效果
+message BattleAddInfo {
+	optional uint32 add_type = 1; 	//1 暴击 2 闪避 3 格挡 4 吸血 5 反弹 6清buff 7无敌
+	optional uint64 add_value = 2;  //附带的值
+}
+
+// buff效果
+message BattleBuff {
+	optional uint32 buff_id = 1;			//buffid，对应buff_info表中的id
+	optional uint32 buff_serial_id = 2;		//buff流水id，每次新添加的唯一的id
+	optional uint32 knight_serial_id = 3;	//武将流水id，表示对应到哪个武将
+	optional uint32 buff_action = 4;		//buff动作，1 添加 2 删除 3 生效
+	optional BattleEffect buff_effect = 5;	//这里buff的效果直接引用BattleEffect的，理论上buff都可能修改列出来的效果
+	optional bool is_resist = 6;			//buff是否被免疫
+}
+
+// 回合开始
+message RoundStart {
+	repeated uint32 combo_value = 1; //回复的合击值
+	repeated CDList cd_list = 2; // 合击cd回复列表
+}

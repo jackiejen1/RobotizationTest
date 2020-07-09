@@ -1,0 +1,25 @@
+lib为附带的库，需要加到lua里
+proto为战斗相关协议，仅用作记录
+
+src下为战斗核心代码
+
+
+用法：
+
+-- 初始化数据，data为BattleReport结构的字节流
+initBattle(data)
+
+-- 检查结果，输入为BattleResult结构的字节流，输出为CheckResult结构的字节流和字节长度
+checkBattleResult(data)
+
+-- 战斗重置
+resetBattle()
+
+--------------------------------------
+
+-- 用table来初始化战斗，data为BattleReport结构的table
+initBattleTable(data）
+
+-- 检查结果，输入为BattleResult结构的table，输出为CheckResult结构的table
+checkBattleResultTable(data)
+

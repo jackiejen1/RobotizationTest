@@ -157,18 +157,18 @@ enum ID {
     MSG_C2S_ClientTestBattle = 20003;
     MSG_S2C_ClientTestBattle = 20004;
 }
-
 message S2C_ReplyBattleReport {
     required bytes report = 1;
+    //report就是setInitData的入参
 }
-
 message C2S_CheckBattleResult {
     required bytes result = 1;
+    //客户端跑完战斗结果发送服务器
 }
-
 message S2C_CheckBattleResult {
     required uint32 ret = 1;
     optional bytes result = 2;
+    //服务器校验后返回结果
 }
 
 message C2S_ClientTestBattle {

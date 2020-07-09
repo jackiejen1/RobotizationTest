@@ -15,10 +15,9 @@ from MyPoco.foundation.information import Information
 import struct
 import time
 from socket import error
-
 def protobuf_protocol(data, api_attr):
     msg_data_str = data
-    pack_length = len(msg_data_str) + 32#24
+    pack_length = len(msg_data_str) + 32#24 包体对象
     cmd = api_attr['send_cmd']
     uid = api_attr['uid']
     sid = api_attr['sid']
@@ -27,26 +26,23 @@ def protobuf_protocol(data, api_attr):
     msg_data_str = head_data + msg_data_str
     return msg_data_str
 
-
 # 全部协议打包函数字典
 all_protocol = {
     'protobuf-ss': protobuf_protocol,
 }
 
-
 # 给外部调用的函数
-def pack_varint(val):
-    total = b''
-    if val < 0:
-        val = (1 << 32) + val
-    while val >= 0x80:
-        bits = val & 0x7F
-        val >>= 7
-        total += struct.pack('B', (0x80 | bits))
-    bits = val & 0x7F
-    total += struct.pack('B', bits)
-    return total
-
+# def pack_varint(val):
+#     total = b''
+#     if val < 0:
+#         val = (1 << 32) + val
+#     while val >= 0x80:
+#         bits = val & 0x7F
+#         val >>= 7
+#         total += struct.pack('B', (0x80 | bits))
+#     bits = val & 0x7F
+#     total += struct.pack('B', bits)
+#     return total
 
 # 给外部调用的主函数
 def pack_data(data, api_attr=None):
@@ -59,26 +55,6 @@ def pack_data(data, api_attr=None):
         print("not found protocol process")
         return msg_data_str
 
-def success(restype, workname, response_time, content_size):
-    pass
-
-
-
-def failure(restype, workname, errormsg):
-    pass
-
-
-def _send_data(s, socketdata):
-
-    flag = True
-    send_time = time.time()
-    try:
-        s.send(socketdata)
-    except error:
-        flag = False
-    return flag, send_time
-
-
 def _recv_data(s, api_attr, buffersize, limittime):
     # 不同的游戏可以自行修改此接收数据的处理方法，以实现不同的游戏规则
     """
@@ -90,6 +66,9 @@ def _recv_data(s, api_attr, buffersize, limittime):
         :return: 接收标志与接收到的数据，出错时返回的数据为 b'error'
         """
     recvcmd = api_attr['recv_cmd']
+    # if len(recvcmd) > 1:
+    recvdata_dic = {}
+    then_len = 0
     print("当前接收接口:--{} cmd: {}".format(api_attr['name'], recvcmd))
     rst = int(time.time())
     while True:#这里是一直接收数据的
@@ -98,80 +77,77 @@ def _recv_data(s, api_attr, buffersize, limittime):
             if ct - rst > limittime:
                 recvtime = time.time()
                 recvdata = b'error'
-                failure('socket', api_attr['name'], "ct - rst > limittime")
                 return recvdata, recvtime
             s.settimeout(limittime)
             rev_data = s.recv(buffersize)#第一次接收数据，获取消息头
-            # print("rev_data-------------->",len(rev_data))
             if len(rev_data) != buffersize:
                 recvtime = time.time()
                 recvdata = b'error'
-                failure('socket', api_attr['name'], "len(rev_data) != buffersize")
                 return recvdata, recvtime
                 # continue
             if len(rev_data) == 0:
                 data = b'error'
                 recv_time = time.time()
-                failure('socket', api_attr['name'], "len(rev_data) == 0")
                 return data, recv_time
             head_data = struct.unpack('>IIQQQ', rev_data)
-            # print("消息头-->{}".format(head_data))
             s.settimeout(limittime)
             tmpdata = s.recv(head_data[0] - 32)
             while (len(tmpdata) < (head_data[0] - 32)):#消息没收完就继续收
                 tmpdata += s.recv(head_data[0] - 32 - len(tmpdata))
             #收完完整的一条后进行校验
             recvtime = time.time()
-            if head_data[1] == recvcmd:#这里对返回数据进行校验，只返回要求协议ID的数据
-                recvtime = time.time()
-                recvdata = tmpdata
-                return recvdata, recvtime
+            if isinstance(recvcmd,list):
+                for rec in recvcmd:
+                    if head_data[1] == rec:  # 这里对返回数据进行校验，只返回要求协议ID的数据
+                        recvtime = time.time()
+                        recvdata = tmpdata
+                        recvdata_dic[str(rec)] = recvdata
+                        then_len =then_len + 1
+                if then_len == len(recvcmd):
+                    return recvdata_dic,recvtime
+            else:
+                if head_data[1] == recvcmd:#这里对返回数据进行校验，只返回要求协议ID的数据
+                    recvtime = time.time()
+                    recvdata = tmpdata
+                    return recvdata, recvtime
+            # if head_data[1] == recvcmd:#这里对返回数据进行校验，只返回要求协议ID的数据
+            #     recvtime = time.time()
+            #     recvdata = tmpdata
+            #     return recvdata, recvtime
             #如果不是指定的协议，就继续接收下一条协议内容
         except Exception as e:
             print("socket接收数据时发生错误")
             print("具体错误 {}".format(e))
             recvtime = time.time()
             recvdata = b'error'
-            failure('socket', api_attr['name'], "具体错误 {}".format(e))
             return recvdata, recvtime
 
-
-def recv_data(sock, api_attr, headsize, norecv=False, limitime=30):
-    """
-    发送并接收socket数据，并返回给调用函数
-    :param sock: 使用的socket
-    :param socketdata: 要发送的数据，已经pack好的数据
-    :param api_attr: 属性参数字典
-    :param headsize: 数据包大小
-    :param norecv: 是否需要接收返回，不需要接收返回时，发送完数据后就直接返回，发送的标志和 b'norecv'
-    :param limitime: 发送与接收timeout时长
-    :return: 发送或者接收标志 ，接收到的数据或者 b'norecv' b'error'
-    """
-    workname = api_attr['name']
-    print("当前发送接口:--{}".format(workname))
-    send_time = time.time()
-    flag = True
-    if not flag:
-        failure('socket', workname, "send socket data error")
-        return flag, b'error'
-    else:
-        print("send data success")
-    if norecv:
-        return flag, b'norecv'
-    receive_data, recv_time = _recv_data(sock, api_attr, headsize, limitime)
-    send_time = send_time * 1000
-    recv_time = recv_time * 1000
-    # 将毫秒规整，不然统计数据太多，不利于统计
-    usedtime = int(recv_time - send_time)
-    # print("-----发送时间:{} 接收时间:{} 用时: {:.3f} ms-----".format(send_time, recv_time, usedtime))
-    if receive_data != b'error':
-        success('socket', workname, usedtime, len(receive_data))
-        flag = True
-    else:
-        #failure('socket', workname, "recv_data recv socket data errror")
-        flag = False
-    return flag, receive_data
-
+# def recv_data(sock, api_attr, headsize, norecv=False, limitime=30):
+#     """
+#     发送并接收socket数据，并返回给调用函数
+#     :param sock: 使用的socket
+#     :param socketdata: 要发送的数据，已经pack好的数据
+#     :param api_attr: 属性参数字典
+#     :param headsize: 数据包大小
+#     :param norecv: 是否需要接收返回，不需要接收返回时，发送完数据后就直接返回，发送的标志和 b'norecv'
+#     :param limitime: 发送与接收timeout时长
+#     :return: 发送或者接收标志 ，接收到的数据或者 b'norecv' b'error'
+#     """
+#     workname = api_attr['name']
+#     print("当前发送接口:--{}".format(workname))
+#     flag = True
+#     if not flag:
+#         return flag, b'error'
+#     else:
+#         print("send data success")
+#     if norecv:
+#         return flag, b'norecv'
+#     receive_data, recv_time = _recv_data(sock, api_attr, headsize, limitime)
+#     if receive_data != b'error':
+#         flag = True
+#     else:
+#         flag = False
+#     return flag, receive_data
 
 def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=30):
     """
@@ -186,25 +162,21 @@ def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=30
     """
     workname = api_attr['name']
     print("当前发送接口:--{}".format(workname))
-    flag, send_time = _send_data(sock, socketdata)
+    flag = True
+    try:
+        sock.send(socketdata)
+    except error:
+        flag = False
     if not flag:
-        failure('socket', workname, "send socket data error")
         return flag, b'error'
     else:
         print("send data success")
     if norecv:
         return flag, b'norecv'
     receive_data, recv_time = _recv_data(sock, api_attr, headsize, limitime)
-    send_time = send_time * 1000
-    recv_time = recv_time * 1000
-    # 将毫秒规整，不然统计数据太多，不利于统计
-    usedtime = int(recv_time - send_time)
-    # print("-----发送时间:{} 接收时间:{} 用时: {:.3f} ms-----".format(send_time, recv_time, usedtime))
     if receive_data != b'error':
-        success('socket', workname, usedtime, len(receive_data))
         flag = True
     else:
-        #failure('socket', workname, "recv socket data errror")
         flag = False
     return flag, receive_data
 

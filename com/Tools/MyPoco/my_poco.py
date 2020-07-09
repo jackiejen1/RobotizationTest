@@ -53,7 +53,7 @@ class MyPoco:
         self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username)
         return self.protocol.sever_time
 
-    def set_account_information_gm(self, account, server_name, role_id="",role=""):
+    def set_account_information_gm(self, account, server_name, role_id="", role=""):
         """
         使用GM方法前需要调用该方法,来确定对哪个账号的哪个区下面的角色进行操作
         :param account:str  账号
@@ -62,13 +62,15 @@ class MyPoco:
         :return:role_id
         """
         if role_id != "":
-            return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,role=role)
+            return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id, role=role)
         else:
             if self.game_name_key == "少三2":
                 role_id, sever_time = self.protocol.get_role_id()
-                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,role=role)
+                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,
+                                                       role=role)
             else:
-                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,role=role)
+                return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,
+                                                       role=role)
 
     def Flush(self, find_name):
         """
@@ -90,6 +92,57 @@ class MyPoco:
             self.Flush_body = self.Flush("武将")
         only_id = self.Flush_body[str(wujiang_id)]
         self.protocol.shangzhenwujiang(pos, only_id)
+
+    def add_friend(self, name):
+        """
+        添加好友，只能添加本服好友
+        :param name: 好友的名字
+        :return:
+        """
+        self.protocol.add_friend(name)
+
+    def fuben_Battle(self, fuben_id):
+        """
+        副本战斗
+        :param fuben_id: 副本关卡ID
+        :return:
+        """
+        return self.protocol.Dungeon_ChallengeStageBegin(fuben_id)
+
+    def GM_fengkuangfuben(self, fuben_id, num):
+        """
+        指定战斗某一关，必须是可以直接打的关卡，目前仅限于少三2
+        :param checkpoint:str 玩法名-章节数-小关卡数  副本-80-10
+        :param num:int 战斗次数
+        :return:有些战斗有次数限制，不能多打
+        """
+        self.protocol.GM_fengkuangfuben(fuben_id, num)
+
+    def Create_Guild(self, Guild_name):
+        """
+        创建军团
+        :param Guild_name: string 军团名字
+        :return:
+        """
+        return self.protocol.Create_Guild(Guild_name)
+
+    def add_Guild(self, Guild_name):
+        """
+        查询并加入军团
+        :param Guild_name: string 军团名字
+        :return:
+        """
+        self.protocol.search_Guild(Guild_name)
+
+    def GM_fengkuanghaoling(self, Guild_name, num):
+        """
+        疯狂给军团-号令天下活动捐旗子
+        会先创建军团，然后捐旗子
+        :param Guild_name: 军团名称
+        :param num: 捐献的数量
+        :return:
+        """
+        self.protocol.GM_fengkuanghaoling(Guild_name, num)
 
     def get_poco_dic(self):
         """

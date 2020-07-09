@@ -28,10 +28,8 @@ class NoneException(Exception):
     def __init__(self, msg=""):
         self.msg = str(msg) + "节点没有找到"
 
-
     def __str__(self):
         return str(self.msg)
-
 
 class NoneStrException(Exception):
     '''
@@ -54,7 +52,6 @@ class GameNotPassException(Exception):
 
     def __str__(self):
         return str("")
-
 
 
 class NotHaveGameException(Exception):

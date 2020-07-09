@@ -329,7 +329,7 @@ class MakePocoDic:
         if self.phone_size_list == None:
             self.set_phone_size()
         if self.sleep_time == None:
-            self.sleep_time = int(self.info.get_config("com.youzu.yztest_nosdk", "allphnoe_poco_sleep_time"))
+            self.sleep_time = int(self.info.get_config("设置", "allphnoe_poco_sleep_time"))
         start_x = int(self.phone_size_list[0] * start_pos_list[0])
         start_y = int(self.phone_size_list[1] * start_pos_list[1])
         end_x = int(self.phone_size_list[0] * end_pos_list[0])

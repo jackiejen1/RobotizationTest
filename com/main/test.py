@@ -70,19 +70,19 @@ if __name__ == '__main__':
     # print(response.text.encode('utf8'))
 
     # 少西
-    # url = "http://qa.test.snxyj.youzu.com/api/gm/role_id"
-    # payload = {"account": "_1585721665", "server": "2246440002"}
-    # response = requests.request("POST", url, data=payload)
-    # print(response.text.encode('utf8'))
-    # print(response.json(encoding = "utf-8"))
+    url = "http://qa.test.snxyj.youzu.com/api/gm/role_id"
+    payload = {"account": "_1585721665", "server": "2246440002"}
+    response = requests.request("POST", url, data=payload)
+    print(response.json(encoding = "utf-8")['data'])
+    print(response.text.encode('utf8'))
 
     #少三
-    url = "http://10.3.39.187:8088/api/gm/role_id"
-    payload = {"account": "testls001", "role": "九天", "server": "2013440005"}
-    response = requests.request("POST", url, data=payload)
-    print(response.text.encode('utf8'))
-    a = response.json(encoding = "utf-8")
-    print(a)
+    # url = "http://10.3.39.187:8088/api/gm/role_id"
+    # payload = {"account": "testls001", "role": "九天", "server": "2013440005"}
+    # response = requests.request("POST", url, data=payload)
+    # print(response.text.encode('utf8'))
+    # a = response.json(encoding = "utf-8")
+    # print(a)
 
     # 少三
     # url_add = "http://10.3.39.187:8088/api/gm/resources/add"
