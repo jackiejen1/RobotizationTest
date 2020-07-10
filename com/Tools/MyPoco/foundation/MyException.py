@@ -31,6 +31,17 @@ class NoneException(Exception):
     def __str__(self):
         return str(self.msg)
 
+class ProtocolException(Exception):
+    '''
+    协议异常，一般ret=3的时候会用到
+    '''
+
+    def __init__(self, msg=""):
+        self.msg = str(msg)
+
+    def __str__(self):
+        return str(self.msg)
+
 class NoneStrException(Exception):
     '''
     poco没有str属性

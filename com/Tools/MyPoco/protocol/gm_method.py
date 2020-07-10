@@ -23,8 +23,8 @@ class GmMethod:
         self.game_name_key = game_name
         self.game_name = self.info.get_config(game_name, "app_name")
         self.mri = MakeResourceBody(game_name)
-        self.host = self.info.get_config(game_name, "gm_url")
-        self.gah = GmApiHttp(self.host)
+        # self.host = self.info.get_config(game_name, "gm_url")
+        # self.gah = GmApiHttp(self.host)
 
     def set_account_information(self, account, server_name_input, role_id="",role=""):
         """
@@ -40,10 +40,12 @@ class GmMethod:
         # self.port = socket_ages_dic["port"]  # port = 16865
         # self.server_id = socket_ages_dic["server_id"]
         # 账号
-        self.account = account
-        # 服务器ID
         server_name = server_name_input + "_server_ages"
         server_id_dic = self.info.get_config(self.game_name_key, server_name)
+        self.account = account
+        self.host=server_id_dic["gm_url"]
+        self.gah = GmApiHttp(self.host)
+        # 服务器ID
         self.server_id = server_id_dic["server_id"]
         # 角色名
         # role_name_dic =  json.loads(self.info.get_config(self.game_name,self.account))

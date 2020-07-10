@@ -62,13 +62,14 @@ import lupa
 __phone_id__ = ""
 if __name__ == '__main__':
     my_poco = MyPoco("少三2",__phone_id__)
-    sever_name = "QA2"
-    account = my_poco.get_random_account()
-    sever_time = my_poco.make_new_role(sever_name, account)
-    my_poco.set_account_information_gm(account, sever_name)
-    my_poco.add_resource({"角色经验": 49909990,"测试属性":999999999 ,"贵族经验":500000,"元宝":500000})
-    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-80-10"})
-    my_poco.Create_Guild("红红火火")
+    sever_name = "新马QA2"
+    # account = my_poco.get_random_account()
+    # sever_time = my_poco.make_new_role(sever_name, account)
+    # my_poco.set_account_information_gm(account, sever_name)
+    # my_poco.add_resource({"角色经验": 49909990,"测试属性":999999999 ,"贵族经验":500000,"元宝":500000})
+    # my_poco.set_checkpoint(account, sever_name, {"副本": "副本-80-10"})
+    my_poco.GM_fengkuanghaoyou(sever_name,50)
+
 
 
 

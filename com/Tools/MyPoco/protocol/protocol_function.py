@@ -52,9 +52,23 @@ class ProtocolFunction:
         except Exception:
             raise GmException("服务器可能在维护")
         # 启动登陆
+        if "韩国" in server_name:
+            region = "韩国"
+        elif "日本" in server_name:
+            region = "日本"
+        elif "新马" in server_name:
+            region = "新马"
+        elif "台湾" in server_name:
+            region = "台湾"
+        else:
+            region = "国内"
         self.uid = 0
         self.sever_time = 0
-        self.Login()  # 可以考虑单独启动
+        self.Login(region)
+        # 这里做一个新账号的判断，如果是新账号就自动再登录一次获取一下UID
+        if self.uid == 0:
+            self.socket = create_connection((self.host, self.port))
+            self.Login(region)
 
     def send_protocol(self, arg_dic):
         """
@@ -67,20 +81,21 @@ class ProtocolFunction:
         return flag, data
 
     def get_role_id(self):
-        if self.uid == 0:
-            self.socket = create_connection((self.host, self.port))
-            self.Login()
-            return self.uid, self.sever_time
-        else:
-            add_msg_in_log("role_id:" + str(self.uid))
-            return self.uid, self.sever_time
+        # if self.uid == 0:
+        #     self.socket = create_connection((self.host, self.port))
+        #     self.Login()
+        #     return self.uid, self.sever_time
+        # else:
+        #     add_msg_in_log("role_id:" + str(self.uid))
+        #     return self.uid, self.sever_time
+        return self.uid, self.sever_time
 
-    def Login(self):
+    def Login(self, region):
         """
         :return: 角色ID和服务器时间
         """
         self.protocol = LoginGame(self.socket, self.server_id, self.game_name, self.username)
-        flag, data = self.protocol.MSG_C2G_Login()
+        flag, data = self.protocol.MSG_C2G_Login(region)
         G2C_Login = cg_pb2.G2C_Login()
         G2C_Login.ParseFromString(data)
         print(G2C_Login)
@@ -209,8 +224,43 @@ class ProtocolFunction:
                 print("上阵成功")
             else:
                 print("上阵失败" + str(S2C_ChangeFormation.ret))
+                raise ProtocolException("上阵失败")
         else:
             raise ValueException("武将坑位数值超出范围")
+
+    def do_Battle(self, data_into, battle_id_into):
+        """
+        战斗效验
+        :param data_into: 开始战斗协议的返回值，里面是两个，需要取id=20000协议的返回值
+        :param battle_id_into: 开始战斗协议的返回值，用于校验是否是同一个战斗
+        :return:
+        """
+        S2C_ReplyBattleReport = bs_pb2.S2C_ReplyBattleReport()
+        S2C_ReplyBattleReport.ParseFromString(data_into["20000"])
+        BattleReport = bs_pb2.BattleReport()
+        BattleReport.ParseFromString(S2C_ReplyBattleReport.report)
+        BattleReport_str = battle_tools.pb2dict(BattleReport)  # proto转dict，传给lua
+        jsonStr = json.dumps(BattleReport_str)
+        if BattleReport.battle_id == battle_id_into:
+            lua = lupa.LuaRuntime()
+            lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/protobuf/?.lua;\" .. package.path")
+            lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/?.lua;\" .. package.path")
+            lua.execute("require(\"battle\")")
+            autoBattleResult = lua.eval("autoBattleResult")
+            resultJson = autoBattleResult(jsonStr)  # 执行战斗
+            result = json.loads(resultJson)
+            BattleResult = bs_pb2.BattleResult()  # 数据对象
+            battle_tools.dict_to_protobuf(result, BattleResult)  # 把dict数据赋值给proto数据对象
+            BattleResult_bytes = BattleResult.SerializeToString()
+            flag_CheckBattleResult, data_CheckBattleResult = self.protocol.MSG_C2S_CheckBattleResult(BattleResult_bytes,
+                                                                                                     self.uid, self.sid)
+            S2C_CheckBattleResult = bs_pb2.S2C_CheckBattleResult()  # 创建返回协议对象
+            S2C_CheckBattleResult.ParseFromString(data_CheckBattleResult)  # 解析协议返回值
+            if S2C_CheckBattleResult.ret == 1:
+                print("战斗成功")
+            else:
+                print("战斗失败" + str(S2C_CheckBattleResult.ret))
+                raise ProtocolException("战斗失败")
 
     def add_friend(self, name):
         self.get_role_id()
@@ -218,9 +268,10 @@ class ProtocolFunction:
         S2C_ChangeFormation = cs_pb2.S2C_Friend_AddFriend()  # 创建返回协议对象
         S2C_ChangeFormation.ParseFromString(data_Friend_AddFriend)  # 解析协议返回值
         if S2C_ChangeFormation.ret == 1:
-            print("添加成功")
+            print("添加好友成功")
         else:
-            print("添加失败" + str(S2C_ChangeFormation.ret))
+            print("添加好友失败" + str(S2C_ChangeFormation.ret))
+            raise ProtocolException("添加好友失败")
 
     def Dungeon_ChallengeStageBegin(self, fuben_id):
         """
@@ -233,31 +284,22 @@ class ProtocolFunction:
             fuben_id, self.uid, self.sid)
         S2C_Dungeon_ChallengeStageBegin = cs_pb2.S2C_Dungeon_ChallengeStageBegin()  # 创建返回协议对象
         S2C_Dungeon_ChallengeStageBegin.ParseFromString(data_Dungeon_ChallengeStageBegin["10403"])  # 解析协议返回值
-        S2C_ReplyBattleReport = bs_pb2.S2C_ReplyBattleReport()
-        S2C_ReplyBattleReport.ParseFromString(data_Dungeon_ChallengeStageBegin["20000"])
-        BattleReport = bs_pb2.BattleReport()
-        BattleReport.ParseFromString(S2C_ReplyBattleReport.report)
-        BattleReport_str = battle_tools.pb2dict(BattleReport)
-        jsonStr = json.dumps(BattleReport_str)
-        if BattleReport.battle_id == S2C_Dungeon_ChallengeStageBegin.battle_id:
-            lua = lupa.LuaRuntime()
-            lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/protobuf/?.lua;\" .. package.path")
-            lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/?.lua;\" .. package.path")
-            lua.execute("require(\"battle\")")
-            autoBattleResult = lua.eval("autoBattleResult")
-            resultJson = autoBattleResult(jsonStr)
-            result = json.loads(resultJson)
-            BattleResult = bs_pb2.BattleResult()
-            battle_tools.dict_to_protobuf(result, BattleResult)
-            BattleResult_bytes = BattleResult.SerializeToString()
-            flag_CheckBattleResult, data_CheckBattleResult = self.protocol.MSG_C2S_CheckBattleResult(BattleResult_bytes,
-                                                                                                     self.uid, self.sid)
-            S2C_CheckBattleResult = bs_pb2.S2C_CheckBattleResult()  # 创建返回协议对象
-            S2C_CheckBattleResult.ParseFromString(data_CheckBattleResult)  # 解析协议返回值
-            if S2C_CheckBattleResult.ret == 1:
-                print("战斗成功")
-            else:
-                print("战斗失败" + str(S2C_CheckBattleResult.ret))
+        battle_id = S2C_Dungeon_ChallengeStageBegin.battle_id
+        self.do_Battle(data_Dungeon_ChallengeStageBegin, battle_id)
+
+    def Biography_ExecuteMission(self, mingjiangzhuan_id):
+        """
+        名将传战斗
+        :param name:
+        :return:
+        """
+        self.get_role_id()
+        flag_Biography_ExecuteMission, data_Biography_ExecuteMission = self.protocol.MSG_C2S_Biography_ExecuteMission(
+            mingjiangzhuan_id, self.uid, self.sid)
+        S2C_Biography_ExecuteMission = cs_pb2.S2C_Biography_ExecuteMission()  # 创建返回协议对象
+        S2C_Biography_ExecuteMission.ParseFromString(data_Biography_ExecuteMission["10703"])  # 解析协议返回值
+        battle_id = S2C_Biography_ExecuteMission.battle_id
+        self.do_Battle(data_Biography_ExecuteMission, battle_id)
 
     def Create_Guild(self, name):
         """
@@ -270,9 +312,10 @@ class ProtocolFunction:
         C2S_Guild_Create = cs_pb2.S2C_Guild_Create()  # 创建返回协议对象
         C2S_Guild_Create.ParseFromString(data_Guild_Create)  # 解析协议返回值
         if C2S_Guild_Create.ret == 1:
-            print("创建成功")
+            print("创建军团成功")
         else:
-            print("创建失败" + str(C2S_Guild_Create.ret))
+            print("创建军团失败" + str(C2S_Guild_Create.ret))
+            raise ProtocolException("创建军团失败")
 
     def search_Guild(self, Guild_name):
         """
@@ -290,7 +333,7 @@ class ProtocolFunction:
             print("查询成功")
         else:
             print("查询失败" + str(S2C_search_Guild.ret))
-            raise NoneException("军团不存在")
+            raise ProtocolException("军团不存在")
         flag_Guild_ReqJoin, data_Guild_ReqJoin = self.protocol.MSG_C2S_Guild_ReqJoin(guild_id, self.uid, self.sid)
         S2C_Guild_ReqJoin = cs_pb2.S2C_Guild_ReqJoin()  # 创建返回协议对象
         S2C_Guild_ReqJoin.ParseFromString(data_Guild_ReqJoin)  # 解析协议返回值
@@ -298,7 +341,8 @@ class ProtocolFunction:
             print("加入成功")
         else:
             print("加入失败" + str(S2C_Guild_ReqJoin.ret))
-            raise NoneException("军团加入失败")
+            raise ProtocolException("军团加入失败")
+
 
     def OrderWorld_Donate(self, num):
         """
@@ -307,41 +351,76 @@ class ProtocolFunction:
         :return:
         """
         self.get_role_id()
-        flag_C2S_OrderWorld_Donate, data_C2S_OrderWorld_Donate = self.protocol.MSG_C2S_OrderWorld_Donate(num, self.uid, self.sid)
+        flag_C2S_OrderWorld_Donate, data_C2S_OrderWorld_Donate = self.protocol.MSG_C2S_OrderWorld_Donate(num, self.uid,
+                                                                                                         self.sid)
         S2C_OrderWorld_Donate = cs_pb2.S2C_OrderWorld_Donate()  # 创建返回协议对象
         S2C_OrderWorld_Donate.ParseFromString(data_C2S_OrderWorld_Donate)  # 解析协议返回值
         if S2C_OrderWorld_Donate.ret == 1:
             print("捐献成功")
         else:
             print("捐献失败" + str(S2C_OrderWorld_Donate.ret))
+            raise ProtocolException("捐献失败")
 
-    def GM_fengkuanghaoling(self, Guild_name, num):
+    def Friend_ConfirmFriend(self, ):
+        """
+        同意添加好友，全部同意
+        :param uid:
+        :param sid:
+        :return:
+        """
+        self.get_role_id()
+        flag_C2S_Friend_ConfirmFriend, data_C2S_Friend_ConfirmFriend = self.protocol.MSG_C2S_Friend_ConfirmFriend(
+            self.uid, self.sid)
+        C2S_Friend_ConfirmFriend = cs_pb2.S2C_Friend_ConfirmFriend()  # 创建返回协议对象
+        C2S_Friend_ConfirmFriend.ParseFromString(data_C2S_Friend_ConfirmFriend)  # 解析协议返回值
+        if C2S_Friend_ConfirmFriend.ret == 1:
+            print("全部同意成功")
+        else:
+            print("全部同意失败" + str(C2S_Friend_ConfirmFriend.ret))
+            raise ProtocolException("全部同意失败")
+
+    def add_resource_pb(self, type_into, value_into, size_into):
+        """
+        添加或消耗道具，目前只用做添加，消耗待定 #todo
+        :param type_into: int 道具类型
+        :param value_into: int 道具ID
+        :param size_into: int 道具数量
+        :param uid:
+        :param sid:
+        :return:
+        """
+        self.get_role_id()
+        flag_C2S_Test, data_C2S_Test = self.protocol.MSG_C2S_Test(type_into, value_into, size_into, self.uid, self.sid)
+        S2C_Test = cs_pb2.S2C_Test()  # 创建返回协议对象
+        S2C_Test.ParseFromString(data_C2S_Test)  # 解析协议返回值
+        if S2C_Test.ret == 1:
+            print("添加道具成功")
+        else:
+            print("添加道具失败" + str(S2C_Test.ret))
+            raise ProtocolException("添加道具失败")
+
+    def GM_fengkuanghaoling(self, Guild_name, num, join):
         """
         疯狂给军团-号令天下活动捐旗子
         会先创建军团，然后捐旗子
         :param Guild_name: 军团名称
         :param num: 捐献的数量
+        :join bool: 加入/创建军团
         :return:
         """
-        self.Create_Guild(Guild_name)
+        if join:
+            # 查询并加入军团
+            self.search_Guild(Guild_name)
+        else:
+            # 创建军团
+            self.Create_Guild(Guild_name)
         self.OrderWorld_Donate(num)
 
-
-
-
-
-
-
-
-
-
-    def GM_fengkuangfuben(self, checkpoint_name, num):
+    def GM_fengkuangfuben(self, fuben_id):
         """
         指定战斗某一关，必须是可以直接打的关卡，目前仅限于少三2
-        :param checkpoint:str 玩法名-章节数-小关卡数  副本-80-10
-        :param num:int 战斗次数
+        :param fuben_id:int 副本ID，读配置表
+
         :return:
         """
-        fuben_id = self.mri.get_num_from_name(checkpoint_name)
-        for i in range(num):
-            self.Dungeon_ChallengeStageBegin(fuben_id)
+        self.Dungeon_ChallengeStageBegin(fuben_id)

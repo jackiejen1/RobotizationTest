@@ -16,7 +16,7 @@ from MyPoco.game_support.entry_game import EntryGame
 from MyPoco.game_support.resource_gm import ResourceGm
 from MyPoco.poco.xn_test_tools import XnTest
 from MyPoco.protocol.gm_method import GmMethod
-from MyPoco.poco.my_poco_object import MyPocoObject
+from MyPoco.poco.my_poco_object import MyPocoObject,time
 from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
 
 
@@ -41,8 +41,9 @@ class MyPoco:
 
     def make_new_role(self, server_name, username="", protocol_name=""):
         """
-        设置协议基本信息
-        目前只用于创建角色用，其他协议暂不使用
+        登录或创建角色协议，协议和GM的init方法
+        如果是新账号就创角并登录，并二次记录记录uid
+        老账号就直接登录
         :param server_name: 服务器名
         :param username: 账号
         :param protocol_name: 协议名
@@ -101,6 +102,14 @@ class MyPoco:
         """
         self.protocol.add_friend(name)
 
+    def pass_friend(self):
+        """
+        添加好友，只能添加本服好友
+        :param name: 好友的名字
+        :return:
+        """
+        self.protocol.Friend_ConfirmFriend()
+
     def fuben_Battle(self, fuben_id):
         """
         副本战斗
@@ -109,21 +118,13 @@ class MyPoco:
         """
         return self.protocol.Dungeon_ChallengeStageBegin(fuben_id)
 
-    def GM_fengkuangfuben(self, fuben_id, num):
-        """
-        指定战斗某一关，必须是可以直接打的关卡，目前仅限于少三2
-        :param checkpoint:str 玩法名-章节数-小关卡数  副本-80-10
-        :param num:int 战斗次数
-        :return:有些战斗有次数限制，不能多打
-        """
-        self.protocol.GM_fengkuangfuben(fuben_id, num)
-
     def Create_Guild(self, Guild_name):
         """
         创建军团
         :param Guild_name: string 军团名字
         :return:
         """
+        self.add_resource({"贵族经验": 500000, "元宝": 200})
         return self.protocol.Create_Guild(Guild_name)
 
     def add_Guild(self, Guild_name):
@@ -133,16 +134,6 @@ class MyPoco:
         :return:
         """
         self.protocol.search_Guild(Guild_name)
-
-    def GM_fengkuanghaoling(self, Guild_name, num):
-        """
-        疯狂给军团-号令天下活动捐旗子
-        会先创建军团，然后捐旗子
-        :param Guild_name: 军团名称
-        :param num: 捐献的数量
-        :return:
-        """
-        self.protocol.GM_fengkuanghaoling(Guild_name, num)
 
     def get_poco_dic(self):
         """
@@ -594,3 +585,76 @@ class MyPoco:
     #     :return:
     #     """
     #     self.pf = ProtocolFunction(self.game_name, server_name, protocol_name)
+
+    def GM_fengkuangfuben(self, checkpoint_name, num):
+        """
+        指定战斗某一关，必须是可以直接打的关卡，目前仅限于少三2
+        :param checkpoint:str 玩法名-章节数-小关卡数  副本-80-10
+        :param num:int 战斗次数
+        :return:有些战斗有次数限制，不能多打
+        """
+        tilizhi = self.get_resource_quantity(["体力值"])
+        add_tilizhi_num = 1000-tilizhi["体力值"]
+        if add_tilizhi_num==0:
+            pass
+        else:
+            #初始化体力值到1000
+            self.add_resource({"体力值":add_tilizhi_num})
+        fuben_id = self.protocol.mri.get_num_from_name(checkpoint_name)
+        for i in range(num+1)[1:]:
+            self.protocol.GM_fengkuangfuben(fuben_id)
+            print("战斗"+str(i)+"次")
+            if (i % 200) == 0:
+                self.add_resource({"体力值": 1000})
+
+    def GM_fengkuanghaoling(self, Guild_name, num, join=False):
+        """
+        疯狂给军团-号令天下活动捐旗子
+        会先创建军团，然后捐旗子
+        :param Guild_name: 军团名称
+        :param num: 捐献的数量
+        :join bool: 加入/创建军团
+        :return:
+        """
+        # 先把消耗的道具加进去
+        self.add_resource({"军旗": num})
+        if not join:
+            # 如果是创建军团，就需要加一些道具
+            self.add_resource({"贵族经验": 500000, "元宝": 200})
+        self.protocol.GM_fengkuanghaoling(Guild_name, num, join)
+
+    def GM_yijianmingjiangzhuan(self, checkpoint_name):
+        """
+        一键通关名将传，目前仅限于少三2
+        :param checkpoint_name:int 副本ID，读配置表
+
+        :return:
+        """
+        #todo 差个名将传ID
+        mingjiangzhuan_id = self.protocol.mri.get_num_from_name(checkpoint_name)
+        self.protocol.Biography_ExecuteMission(mingjiangzhuan_id)
+
+    def GM_fengkuanghaoyou(self,sever_name,num):
+        """
+        指定服务器，创建一个拥有N个好友的账号
+        :param sever_name: 服务器
+        :param num: 拥有好友数
+        :return:
+        """
+        account1 = self.get_random_account()
+        self.make_new_role(sever_name, account1)
+        self.set_account_information_gm(account1, sever_name)
+        self.protocol.add_resource_pb(1,1,499990)
+        # self.add_resource({"角色经验": 49909990})
+        for i in range(num):
+            account = self.get_random_account()
+            self.make_new_role(sever_name, account)
+            self.set_account_information_gm(account, sever_name)
+            # self.add_resource({"角色经验": 499990,})
+            self.protocol.add_resource_pb(1,1,499990)
+            self.add_friend(account1[2:])
+        self.make_new_role(sever_name, account1)
+        self.pass_friend()
+        print("账号"+account1+"上有"+str(num)+"个好友")
+
+
