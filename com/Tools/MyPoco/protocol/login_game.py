@@ -192,7 +192,7 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_Dungeon_ChallengeStageBegin_attr, 32)  # 发送协议
         return flag, data
 
-    def MSG_C2S_Biography_ExecuteMission(self, id, uid, sid):
+    def MSG_C2S_Biography_ExecuteMission(self, id, type_num, uid, sid):
         """
         发起名将传战斗
         :param id:
@@ -200,13 +200,112 @@ class LoginGame:
         :param sid:
         :return:
         """
+        if type_num == 2:
+            recv_cmd = 10703
+        else:
+            recv_cmd = [10703, 20000]
         C2S_Biography_ExecuteMission = cs_pb2.C2S_Biography_ExecuteMission()
         C2S_Biography_ExecuteMission.id = id
         C2S_Biography_ExecuteMission = C2S_Biography_ExecuteMission.SerializeToString()
         C2S_Biography_ExecuteMission_attr = {'name': "C2S_Biography_ExecuteMission", 'protocol': 'protobuf-ss',
-                                             'send_cmd': 10702, 'recv_cmd': [10703, 20000], 'uid': uid, 'sid': sid}
+                                             'send_cmd': 10702, 'recv_cmd': recv_cmd, 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Biography_ExecuteMission, C2S_Biography_ExecuteMission_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Biography_ExecuteMission_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Storm_ChallengeBegin(self, storm_id, cell_id, uid, sid):
+        """
+        发起攻城掠地战斗，todo 未完成，战斗ID太难了
+        :param id:
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Storm_ChallengeBegin = cs_pb2.C2S_Storm_ChallengeBegin()
+        C2S_Storm_ChallengeBegin.storm_id = storm_id
+        C2S_Storm_ChallengeBegin.cell_id = cell_id
+        C2S_Storm_ChallengeBegin = C2S_Storm_ChallengeBegin.SerializeToString()
+        C2S_Storm_ChallengeBegin_attr = {'name': "C2S_Storm_ChallengeBegin", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 12304, 'recv_cmd': [12305, 20000], 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Storm_ChallengeBegin, C2S_Storm_ChallengeBegin_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Storm_ChallengeBegin_attr, 32)  # 发送协议
+        return flag, data
+    def MSG_C2S_DeadBattle_GetInfo(self,uid, sid):
+        """
+        获取无双试炼的关卡信息
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_DeadBattle_GetInfo = cs_pb2.C2S_DeadBattle_GetInfo()
+        C2S_DeadBattle_GetInfo = C2S_DeadBattle_GetInfo.SerializeToString()
+        C2S_DeadBattle_GetInfo_attr = {'name': "C2S_DeadBattle_GetInfo", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 10510, 'recv_cmd': 10511, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_DeadBattle_GetInfo, C2S_DeadBattle_GetInfo_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_DeadBattle_GetInfo_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Formation_ChangePosition(self,pos_list,uid, sid):
+        """
+        更改上阵位置
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Formation_ChangePosition = cs_pb2.C2S_Formation_ChangePosition()
+        C2S_Formation_ChangePosition.position.extend(pos_list)
+        C2S_Formation_ChangePosition = C2S_Formation_ChangePosition.SerializeToString()
+        C2S_Formation_ChangePosition_attr = {'name': "C2S_Formation_ChangePosition", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 10160, 'recv_cmd': 10161, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Formation_ChangePosition, C2S_Formation_ChangePosition_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Formation_ChangePosition_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_DeadBattle_ChallengeBegin(self,uid, sid):
+        """
+        发起无双试炼战斗
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_DeadBattle_ChallengeBegin = cs_pb2.C2S_DeadBattle_ChallengeBegin()
+        C2S_DeadBattle_ChallengeBegin.index = 2#这有这一关能打，所以直接传难度即可
+        C2S_DeadBattle_ChallengeBegin = C2S_DeadBattle_ChallengeBegin.SerializeToString()
+        C2S_DeadBattle_ChallengeBegin_attr = {'name': "C2S_DeadBattle_ChallengeBegin", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 10519, 'recv_cmd': [10520, 20000], 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_DeadBattle_ChallengeBegin, C2S_DeadBattle_ChallengeBegin_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_DeadBattle_ChallengeBegin_attr, 32)  # 发送协议
+        return flag, data
+
+
+    def MSG_C2S_DeadBattle_BoxAward(self,uid, sid):
+        """
+        无双试炼领取通关宝箱
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_DeadBattle_BoxAward = cs_pb2.C2S_DeadBattle_BoxAward()
+        C2S_DeadBattle_BoxAward = C2S_DeadBattle_BoxAward.SerializeToString()
+        C2S_DeadBattle_BoxAward_attr = {'name': "C2S_DeadBattle_BoxAward", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 10522, 'recv_cmd': 10523, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_DeadBattle_BoxAward, C2S_DeadBattle_BoxAward_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_DeadBattle_BoxAward_attr, 32)  # 发送协议
+        return flag, data
+    def MSG_C2S_DeadBattle_PickBuff(self,buff_id,uid, sid):
+        """
+        无双试炼领取通关buff
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_DeadBattle_PickBuff = cs_pb2.C2S_DeadBattle_PickBuff()
+        C2S_DeadBattle_PickBuff.id = buff_id
+        C2S_DeadBattle_PickBuff = C2S_DeadBattle_PickBuff.SerializeToString()
+        C2S_DeadBattle_PickBuff_attr = {'name': "C2S_DeadBattle_BoxAward", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 10512, 'recv_cmd': 10513, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_DeadBattle_PickBuff, C2S_DeadBattle_PickBuff_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_DeadBattle_PickBuff_attr, 32)  # 发送协议
         return flag, data
 
     def MSG_C2S_CheckBattleResult(self, result_into, uid, sid):
@@ -324,9 +423,6 @@ class LoginGame:
         :return:
         """
         C2S_Test = cs_pb2.C2S_Test()
-        # C2S_Test.awards.type = type_into
-        # C2S_Test.awards.value = value_into
-        # C2S_Test.awards.size = size_into
         award = C2S_Test.awards.add()
         award.type = type_into
         award.value = value_into
@@ -336,4 +432,63 @@ class LoginGame:
                          'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Test, C2S_Test_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Test_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Activity_Common_Draw(self,activity_id, uid, sid):
+        """
+        化身10连抽
+        :param activity_id:  int 活动ID，GM后台配置
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Activity_Common_Draw = cs_pb2.C2S_Activity_Common_Draw()
+        C2S_Activity_Common_Draw.activity_id = activity_id
+        C2S_Activity_Common_Draw.activity_type = 15
+        C2S_Activity_Common_Draw.type = 2
+        C2S_Activity_Common_Draw = C2S_Activity_Common_Draw.SerializeToString()
+        C2S_Activity_Common_Draw_attr = {'name': "C2S_Activity_Common_Draw", 'protocol': 'protobuf-ss',
+                                         'send_cmd': 12816, 'recv_cmd': 12817, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Activity_Common_Draw, C2S_Activity_Common_Draw_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Activity_Common_Draw_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_GoldEquip_Draw(self,activity_id, uid, sid):
+        """
+        横扫千军10连抽
+        :param activity_id:  int 活动ID，GM后台配置
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_GoldEquip_Draw = cs_pb2.C2S_GoldEquip_Draw()
+        C2S_GoldEquip_Draw.activity_id = activity_id
+        C2S_GoldEquip_Draw.type = 2
+        C2S_GoldEquip_Draw = C2S_GoldEquip_Draw.SerializeToString()
+        C2S_GoldEquip_Draw_attr = {'name': "C2S_GoldEquip_Draw", 'protocol': 'protobuf-ss',
+                                         'send_cmd': 12702, 'recv_cmd': 12703, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_GoldEquip_Draw, C2S_GoldEquip_Draw_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_GoldEquip_Draw_attr, 32)  # 发送协议
+        return flag, data
+
+
+
+    def MSG_C2S_Recruit_RecruitKnight(self,activity_id,id_into, uid, sid):
+        """
+        限时神将10连抽
+        :param activity_id:  int 活动ID，GM后台配置
+        :param id_into: int 用于区分阵营
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Recruit_RecruitKnight = cs_pb2.C2S_Recruit_RecruitKnight()
+        C2S_Recruit_RecruitKnight.activity_id = activity_id
+        C2S_Recruit_RecruitKnight.id = id_into
+        C2S_Recruit_RecruitKnight.draw_type = 2
+        C2S_Recruit_RecruitKnight = C2S_Recruit_RecruitKnight.SerializeToString()
+        C2S_Recruit_RecruitKnight_attr = {'name': "C2S_Recruit_RecruitKnight", 'protocol': 'protobuf-ss',
+                                         'send_cmd': 12250, 'recv_cmd': 12251, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Recruit_RecruitKnight, C2S_Recruit_RecruitKnight_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Recruit_RecruitKnight_attr, 32)  # 发送协议
         return flag, data

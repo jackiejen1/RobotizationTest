@@ -127,7 +127,7 @@ class GameServerMaintenanceException(Exception):
 
 class GmException(Exception):
     '''
-    服务器维护
+    用于GM指令的报错
     '''
 
     def __init__(self, msg=""):

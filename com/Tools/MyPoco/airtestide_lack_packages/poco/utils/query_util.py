@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
-import poco.utils.six as six
+import MyPoco.airtestide_lack_packages.poco.utils.six as six
 
 
 __all__ = ['query_expr']

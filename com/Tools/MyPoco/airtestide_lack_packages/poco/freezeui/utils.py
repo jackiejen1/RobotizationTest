@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from poco.freezeui.hierarchy import FrozenUIDumper, FrozenUIHierarchy
+from MyPoco.airtestide_lack_packages.poco.freezeui.hierarchy import FrozenUIDumper, FrozenUIHierarchy
 
 
 __all__ = ['create_immutable_hierarchy', 'create_immutable_dumper']

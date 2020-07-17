@@ -787,7 +787,8 @@ enum ID {
 
   //技能树
   MSG_C2S_Storm_SkillLvUp = 12325; //技能树升级
-  MSG_S2C_Storm_SkillLvUp = 12326;
+  MSG_S2C_
+  Storm_SkillLvUp = 12326;
   MSG_C2S_Storm_SkillReset = 12327; //技能书手动重置
   MSG_S2C_Storm_SkillReset = 12328;
   MSG_C2S_Storm_GetSkillInfo = 12329; //获取技能树信息

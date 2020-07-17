@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import math
-from poco.utils.track import MotionTrack
+from MyPoco.airtestide_lack_packages.poco.utils.track import MotionTrack
 
 
 def make_pinching(direction, center, size, percent, dead_zone, duration):

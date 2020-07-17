@@ -3,15 +3,15 @@ from __future__ import unicode_literals, division
 
 import math
 import copy
-import poco.utils.six as six
+import MyPoco.airtestide_lack_packages.poco.utils.six as six
 import time
 from functools import wraps
 
-from poco.gesture import PendingGestureAction
-from poco.exceptions import PocoTargetTimeout, InvalidOperationException, PocoNoSuchNodeException, PocoTargetRemovedException
-from poco.sdk.exceptions import UnableToSetAttributeException
-from poco.utils.query_util import query_expr, build_query
-from poco.utils.multitouch_gesture import make_pinching
+from MyPoco.airtestide_lack_packages.poco.gesture import PendingGestureAction
+from MyPoco.airtestide_lack_packages.poco.exceptions import PocoTargetTimeout, InvalidOperationException, PocoNoSuchNodeException, PocoTargetRemovedException
+from MyPoco.airtestide_lack_packages.poco.sdk.exceptions import UnableToSetAttributeException
+from MyPoco.airtestide_lack_packages.poco.utils.query_util import query_expr, build_query
+from MyPoco.airtestide_lack_packages.poco.utils.multitouch_gesture import make_pinching
 
 __all__ = ['UIObjectProxy']
 

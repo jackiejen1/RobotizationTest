@@ -27,6 +27,7 @@ class MyPocoObject():
         创建依赖对象，保存全局信息
         """
         self.info = Information()
+        self.game_name_key = game_name
         self.game_name = self.info.get_config(game_name, "app_name")
         self.phone_id = phone_id
         self.make_poco_dic = MakePocoDic(game_name, phone_id)
@@ -308,7 +309,12 @@ class MyPocoObject():
         :return:
         """
         number_str = self.make_poco_dic.get_poco_any_value(poco_path, "text")
-        return int(number_str)
+        try:
+            number_int = int(number_str)
+        except:
+            snapshot("数据类型转换异常")
+            raise NoneException("数据类型转换异常")
+        return number_int
 
     def get_game_number_instr(self, poco_path):
         """
@@ -350,13 +356,12 @@ class MyPocoObject():
         需要加入特定标识确认已经退到主界面
         """
         snapshot(msg="关闭游戏")
-        try:  # 忘记配置会报错
-            #从配置表中读取主界面唯一元素
-            close_game_poco_name = self.info.get_config(self.game_name, "close_game_poco_name")
-        except Exception:
-            close_game_poco_name = "None"
-        if close_game_poco_name == "None":
+        #从配置表中读取主界面唯一元素
+        close_game_poco_name = self.info.get_config(self.game_name_key, "close_game_poco_name")
+        if close_game_poco_name == None:
             stop_app(self.game_name)
+            if self.is_pass > 0:
+                raise GameNotPassException("数值判定部分未通过")
         else:
             if self.is_in_dic(close_game_poco_name):
                 stop_app(self.game_name)

@@ -16,7 +16,7 @@ from MyPoco.game_support.entry_game import EntryGame
 from MyPoco.game_support.resource_gm import ResourceGm
 from MyPoco.poco.xn_test_tools import XnTest
 from MyPoco.protocol.gm_method import GmMethod
-from MyPoco.poco.my_poco_object import MyPocoObject,time
+from MyPoco.poco.my_poco_object import MyPocoObject, time
 from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
 
 
@@ -49,6 +49,7 @@ class MyPoco:
         :param protocol_name: 协议名
         :return:时间戳
         """
+        self.GM_server_name = server_name
         if username == "":
             username = self.get_random_account()
         self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username)
@@ -73,13 +74,13 @@ class MyPoco:
                 return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,
                                                        role=role)
 
-    def Flush(self, find_name):
+    def get_resource_pb(self, find_name):
         """
-        上阵武将
+        获取资源数量
         :param find_name:
         :return:
         """
-        return self.protocol.Flush(find_name)
+        return self.protocol.get_resource_pb(find_name)
 
     def shangzhenwujiang(self, pos, name):
         """
@@ -90,7 +91,7 @@ class MyPoco:
         """
         wujiang_id = self.get_resource_id(name)
         if (self.Flush_body == None) or (str(wujiang_id) not in self.Flush_body.keys()):
-            self.Flush_body = self.Flush("武将")
+            self.Flush_body = self.protocol.Flush("武将")
         only_id = self.Flush_body[str(wujiang_id)]
         self.protocol.shangzhenwujiang(pos, only_id)
 
@@ -104,7 +105,7 @@ class MyPoco:
 
     def pass_friend(self):
         """
-        添加好友，只能添加本服好友
+        通过好友申请，只能通过本服好友
         :param name: 好友的名字
         :return:
         """
@@ -547,9 +548,7 @@ class MyPoco:
         if "副本" in checkpoint.keys():
             self.gm.set_checkpoint(checkpoint["副本"])
         if "列传" in checkpoint.keys():
-            self.open_game(sever_name_input=sever_name_input, game_account_input=account)
-            self.rg.set_play_liezhuan_num(checkpoint["列传"])
-        # self.gm.set_checkpoint(checkpoint)
+            self.GM_yijian_mingjiangzhuan(checkpoint["列传"])
 
     def set_level(self, level):
         """
@@ -586,28 +585,110 @@ class MyPoco:
     #     """
     #     self.pf = ProtocolFunction(self.game_name, server_name, protocol_name)
 
-    def GM_fengkuangfuben(self, checkpoint_name, num):
+    def GM_fengkuang_fuben(self, checkpoint_name, num):
         """
         指定战斗某一关，必须是可以直接打的关卡，目前仅限于少三2
         :param checkpoint:str 玩法名-章节数-小关卡数  副本-80-10
         :param num:int 战斗次数
         :return:有些战斗有次数限制，不能多打
         """
-        tilizhi = self.get_resource_quantity(["体力值"])
-        add_tilizhi_num = 1000-tilizhi["体力值"]
-        if add_tilizhi_num==0:
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        self.shangzhenwujiang(2, "陆逊")
+        # tilizhi = self.get_resource_quantity(["体力值"])# todo 获取体力值
+        tilizhi = self.get_resource_pb("体力值")
+        add_tilizhi_num = 1000 - tilizhi
+        if add_tilizhi_num == 0:
             pass
         else:
-            #初始化体力值到1000
-            self.add_resource({"体力值":add_tilizhi_num})
+            # 初始化体力值到1000
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
+            self.protocol.add_resource_pb(add_type, add_value, add_tilizhi_num)
         fuben_id = self.protocol.mri.get_num_from_name(checkpoint_name)
-        for i in range(num+1)[1:]:
+        for i in range(num + 1)[1:]:
             self.protocol.GM_fengkuangfuben(fuben_id)
-            print("战斗"+str(i)+"次")
+            print("战斗" + str(i) + "次")
             if (i % 200) == 0:
-                self.add_resource({"体力值": 1000})
+                add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
+                self.protocol.add_resource_pb(add_type, add_value, 1000)
 
-    def GM_fengkuanghaoling(self, Guild_name, num, join=False):
+    def GM_yijian_account_haiwai_v1(self, account):
+        """
+        一键制作账号，1. 创建帐号（名字字数无具体要求）
+                    2. 新手引导结束
+                    3. 角色等级>30
+                    4. 通关主线副本>30章
+                    5. 通关名将传>7章
+                    6. 通关无双试练>20关
+                    7. 好友数量>50个
+                    8. 武将上阵5个（小乔，貂蝉，马超，刘备，典韦）
+        :param account:str 账号 给添加好友功能使用
+        :return:
+        """
+        # 加资源，等级
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 409909990)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("测试属性")
+        self.protocol.add_resource_pb(add_type, add_value, 999999999)
+        # 上阵武将
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("刘备")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(2, "刘备")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("小乔")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(3, "小乔")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("貂蝉")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(4, "貂蝉")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("马超")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(5, "马超")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("典韦")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(6, "典韦")
+        self.protocol.Formation_ChangePosition([6,1,2,3,4,5])
+        # 开始一键通关副本，海外后续使用GMAPI
+        tilizhi = self.get_resource_pb("体力值")
+        add_tilizhi_num = 1000 - tilizhi
+        if add_tilizhi_num == 0:
+            pass
+        else:
+            # 初始化体力值到1000
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
+            self.protocol.add_resource_pb(add_type, add_value, add_tilizhi_num)
+        for i in range(32)[1:]:  # 副本通关数
+            for ii in range(15)[1:]:  # 关卡数可以多一点，适配小关卡数量不确定性
+                checkpoint_name = "副本-" + str(i) + "-" + str(ii)
+                try:
+                    fuben_id = self.protocol.mri.get_num_from_name(checkpoint_name)
+                except Exception:  # 找不到关卡说明打完了，就终止
+                    self.protocol.add_resource_pb(add_type, add_value, 50)
+                    break
+                self.protocol.GM_fengkuangfuben(fuben_id)
+        self.GM_yijian_mingjiangzhuan(7)  # 通关名将传
+        self.GM_fengkuang_haoyou(50, account_into=account)  # 加好友
+        self.GM_yijian_wushaungshilian(20)  # 通关无双试炼
+        self.shangzhenwujiang(2, "刘备")
+
+    def GM_yijian_wushaungshilian(self, checkpoint_num_into):
+        """
+        一键通关无双试炼,不能重复使用
+        :param checkpoint_num:
+        :return:
+        """
+        history_id, is_award = self.protocol.DeadBattle_GetInfo()
+        history_id = history_id + 1
+        checkpoint_num = checkpoint_num_into + 1
+        if history_id >= checkpoint_num:
+            raise GmException(str(checkpoint_num_into) + "关已打过")
+        for i in range(checkpoint_num)[history_id:]:
+            #先判断能不能领奖，然后再战斗领奖，会出现打完奖励没领的情况
+            if (i % 3 == 0) or (i % 7 == 0) and not is_award:  # 关底或者boss战领取宝箱和buff
+                buff_id = self.protocol.DeadBattle_BoxAward()
+                self.protocol.DeadBattle_PickBuff(buff_id)
+            self.protocol.DeadBattle()
+
+    def GM_fengkuang_haoling(self, Guild_name, num, join=False):
         """
         疯狂给军团-号令天下活动捐旗子
         会先创建军团，然后捐旗子
@@ -617,44 +698,176 @@ class MyPoco:
         :return:
         """
         # 先把消耗的道具加进去
-        self.add_resource({"军旗": num})
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("军旗")
+        self.protocol.add_resource_pb(add_type, add_value, num)
         if not join:
             # 如果是创建军团，就需要加一些道具
-            self.add_resource({"贵族经验": 500000, "元宝": 200})
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("贵族经验")
+            self.protocol.add_resource_pb(add_type, add_value, 500000)
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
+            self.protocol.add_resource_pb(add_type, add_value, 200)
         self.protocol.GM_fengkuanghaoling(Guild_name, num, join)
 
-    def GM_yijianmingjiangzhuan(self, checkpoint_name):
+    def GM_yijian_mingjiangzhuan(self, checkpoint_num):
         """
         一键通关名将传，目前仅限于少三2
-        :param checkpoint_name:int 副本ID，读配置表
+        :param checkpoint_num:int 大章节代号1.2.3
 
         :return:
         """
-        #todo 差个名将传ID
-        mingjiangzhuan_id = self.protocol.mri.get_num_from_name(checkpoint_name)
-        self.protocol.Biography_ExecuteMission(mingjiangzhuan_id)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        self.shangzhenwujiang(2, "陆逊")
+        num_lists = self.protocol.mri.get_num_list_from_name(checkpoint_num)
+        for num_list in num_lists:
+            mingjiangzhuan_id = num_list[0]
+            type_num = num_list[1]
+            self.protocol.Biography_ExecuteMission(mingjiangzhuan_id, type_num)
+            if type_num == 1:
+                add_type, add_value = self.protocol.mri.get_type_id_from_name("列传次数")
+                self.protocol.add_resource_pb(add_type, add_value, 1)
+                add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
+                self.protocol.add_resource_pb(add_type, add_value, 5)
 
-    def GM_fengkuanghaoyou(self,sever_name,num):
+    # def GM_yijianmingguanai(self, checkpoint_num):
+    #     """
+    #     一键通关关隘，目前仅限于少三2 todo 没做，战斗id不好搞
+    #     :param checkpoint_num:
+    #     :return:
+    #     """
+    #     add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
+    #     self.protocol.add_resource_pb(add_type, add_value, 1)
+    #     self.shangzhenwujiang(2, "陆逊")
+    #     num_lists = self.protocol.mri.get_num_list_from_name(checkpoint_num)
+    #     # print(num_lists)
+    #     for num_list in num_lists:
+    #         storm_id = num_list[0]
+    #         cell_id = num_list[1]
+    #         self.protocol.Storm_ChallengeBegin(storm_id, cell_id, )
+
+    def GM_fengkuang_haoyou(self, num, account_into=None, sever_name_into=None):
         """
         指定服务器，创建一个拥有N个好友的账号
-        :param sever_name: 服务器
-        :param num: 拥有好友数
+        :param sever_name: str 服务器
+        :param num: int 拥有好友数
+        :param account_into: str 拥有好友数
         :return:
         """
-        account1 = self.get_random_account()
-        self.make_new_role(sever_name, account1)
-        self.set_account_information_gm(account1, sever_name)
-        self.protocol.add_resource_pb(1,1,499990)
-        # self.add_resource({"角色经验": 49909990})
+        if sever_name_into != None:
+            sever_name = sever_name_into
+        else:
+            sever_name = self.GM_server_name
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        if account_into != None:
+            account1 = account_into
+        else:
+            account1 = self.get_random_account()
+            self.make_new_role(sever_name, account1)
+            self.protocol.add_resource_pb(add_type, add_value, 4899990)
         for i in range(num):
             account = self.get_random_account()
             self.make_new_role(sever_name, account)
-            self.set_account_information_gm(account, sever_name)
-            # self.add_resource({"角色经验": 499990,})
-            self.protocol.add_resource_pb(1,1,499990)
+            self.protocol.add_resource_pb(add_type, add_value, 4899990)
             self.add_friend(account1[2:])
         self.make_new_role(sever_name, account1)
         self.pass_friend()
-        print("账号"+account1+"上有"+str(num)+"个好友")
+        print("账号" + account1 + "上有" + str(num) + "个好友")
+        return account1
 
+    def GM_fengkuang_huashen(self, activity_id, resource_name, resource_num, is_stop=True):
+        """
+        十连抽化身，检测是否抽到指定的东西,默认抽到一次后就停止
+        :param activity_id: int 活动ID，GM后台配置
+        :param resource_name: str 道具名字
+        :param resource_num: int 道具数量（元宝6666个）
+        :param is_stop: bool 是否抽到后就马上停止
+        :return:
+        """
+        cishu = 1000  # 默认抽1000次十连
+        resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("化身灵力")
+        self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
+        for i in range(cishu):
+            try:
+                self.protocol.GM_fengkuanghuashen(resource_type, resource_value, resource_num, activity_id, is_stop)
+            except GmException:
+                print(resource_name + "抽到了")
+                break
 
+    def GM_fengkuang_hengsaoqianjun(self, activity_id, resource_name, resource_num=1, is_stop=True):
+        """
+        横扫千军10连抽，检测是否抽到指定的东西,默认抽到一次后就停止
+        :param activity_id: int 活动ID，GM后台配置
+        :param resource_name: str 道具名字
+        :param resource_num: int 道具数量（元宝6666个）
+        :param is_stop: bool 是否抽到后就马上停止
+        :return:
+        """
+        cishu = 1000  # 默认抽1000次十连
+        resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("千军令")
+        self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
+        for i in range(cishu):
+            try:
+                self.protocol.GM_fengkuanghengsaoqianjun(resource_type, resource_value, resource_num, activity_id,
+                                                         is_stop)
+            except GmException:
+                print(resource_name + "抽到了")
+                break
+
+    def GM_fengkuang_xianshijinjiang(self, activity_id, id_name_into, camps_name, resource_name, is_stop=True):
+        """
+        限时神将10连抽，检测是否抽到指定的东西,默认抽到一次后就停止
+        :param activity_id: int 活动ID，GM后台配置
+        :param id_name_into: str 第几期活动的名字，GM后台配置
+        :param camps_name: str 阵营 魏蜀吴群
+        :param resource_name: str 道具名字
+        :param is_stop: bool 是否抽到后就马上停止
+        :return:
+        """
+        # "GM后台汉字名字": "配置对应的期数ID"
+        id_name_dic = {"限时金将第一期": "100000",
+                       "限时金将第二期": "100001",
+                       "限时金将第三期": "100002",
+                       "第四期金1-金3": "100003",
+                       "限时金将(开服金1)": "100004",
+                       "限时金将(开服金2)": "100005",
+                       "第五期金1-金4": "100006",
+                       "金1(2.2.0)": "100007",
+                       "金2(2.2.0)": "100008",
+                       "金3(2.2.0)": "100009",
+                       "第六期金1-金5": "100010"}
+        # "配置对应的期数ID": "实际协议传输的ID",
+        id_into_dic = {"100000": 1,
+                       "100001": 5,
+                       "100002": 9,
+                       "100003": 13,
+                       "100004": 17,
+                       "100005": 21,
+                       "100006": 25,
+                       "100007": 29,
+                       "100008": 33,
+                       "100009": 37,
+                       "100010": 41,
+                       }
+        resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
+        id_into_key = id_name_dic[id_name_into]
+        if camps_name == "魏":
+            id_into = id_into_dic[id_into_key]
+        elif camps_name == "蜀":
+            id_into = id_into_dic[id_into_key] + 1
+        elif camps_name == "吴":
+            id_into = id_into_dic[id_into_key] + 2
+        elif camps_name == "群":
+            id_into = id_into_dic[id_into_key] + 3
+        else:
+            raise GmException("阵营不存在")
+        cishu = 1000  # 默认抽10000次十连
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("金将令")
+        self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)
+        for i in range(cishu):
+            try:
+                self.protocol.GM_fengkuangxianshijinjiang(resource_type, resource_value, activity_id, id_into, is_stop)
+            except GmException:
+                print(resource_name + "抽到了")
+                break

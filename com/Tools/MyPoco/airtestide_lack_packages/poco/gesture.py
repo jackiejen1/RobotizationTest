@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from poco.utils.track import MotionTrack
+from MyPoco.airtestide_lack_packages.poco.utils.track import MotionTrack
 
 __all__ = ['PendingGestureAction']
 

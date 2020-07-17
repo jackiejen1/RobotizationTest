@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from poco.utils.vector import Vec2
+from MyPoco.airtestide_lack_packages.poco.utils.vector import Vec2
 
 __all__ = ['MotionTrack', 'MotionTrackBatch']
 

@@ -2,7 +2,7 @@
 
 import struct
 
-from poco.utils import six
+from MyPoco.airtestide_lack_packages.poco.utils import six
 
 
 HEADER_SIZE = 4

@@ -9,8 +9,10 @@
 # @Method:
 # Reference:********************************
 import json
+import os
 import time
 from socket import create_connection
+
 from MyPoco.foundation.MyException import *
 from MyPoco.protocol import battle_tools
 from MyPoco.protocol.make_resource_body import MakeResourceBody
@@ -92,6 +94,8 @@ class ProtocolFunction:
 
     def Login(self, region):
         """
+        登录协议
+        :param region: 用来确定是登陆国内还是海外
         :return: 角色ID和服务器时间
         """
         self.protocol = LoginGame(self.socket, self.server_id, self.game_name, self.username)
@@ -127,7 +131,6 @@ class ProtocolFunction:
         获取基础数据
         :return:
         """
-        self.get_role_id()
         protocol_name_dic = {"红点": "S2C_FlushRedPoint",
                              "武将": "S2C_FlushKnight",
                              "碎片": "S2C_FlushFragment",
@@ -204,6 +207,13 @@ class ProtocolFunction:
             for knight in obj.knights:
                 body[str(knight.base_id)] = int(knight.id)
             return body
+        if find_name == "资源":
+            resource_list = []
+            for resource in obj.resources:
+                resource_dic = {}
+                resource_dic[str(resource.id)] = resource.num
+                resource_list.append(resource_dic)
+            return resource_list
 
     def shangzhenwujiang(self, pos, id):
         """
@@ -213,7 +223,6 @@ class ProtocolFunction:
         :return:
         """
         if pos in [2, 3, 4, 5, 6]:
-            self.get_role_id()
             flag_ChangeFormation, data_ChangeFormation = self.protocol.MSG_C2S_Formation_ChangeFormation(1, pos, id,
                                                                                                          self.uid,
                                                                                                          self.sid)
@@ -241,11 +250,15 @@ class ProtocolFunction:
         BattleReport.ParseFromString(S2C_ReplyBattleReport.report)
         BattleReport_str = battle_tools.pb2dict(BattleReport)  # proto转dict，传给lua
         jsonStr = json.dumps(BattleReport_str)
+        root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+        root_dir = root_dir.replace("\\", "/")
         if BattleReport.battle_id == battle_id_into:
             lua = lupa.LuaRuntime()
-            lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/protobuf/?.lua;\" .. package.path")
-            lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/?.lua;\" .. package.path")
-            lua.execute("require(\"battle\")")
+            # lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/protobuf/?.lua;\" .. package.path")
+            # lua.execute("package.path = \";../../com/Tools/MyPoco/protocol/trunk/src/?.lua;\" .. package.path")
+            lua.execute('''package.path = ";''' + root_dir + '''/protocol/trunk/src/protobuf/?.lua;" .. package.path''')
+            lua.execute('''package.path = ";''' + root_dir + '''/protocol/trunk/src/?.lua;" .. package.path''')
+            lua.execute('''require("battle")''')
             autoBattleResult = lua.eval("autoBattleResult")
             resultJson = autoBattleResult(jsonStr)  # 执行战斗
             result = json.loads(resultJson)
@@ -260,10 +273,16 @@ class ProtocolFunction:
                 print("战斗成功")
             else:
                 print("战斗失败" + str(S2C_CheckBattleResult.ret))
+                if S2C_CheckBattleResult.ret == 1001:
+                    raise ProtocolException("战斗失败,需要更新战斗代码")  # 直接秒怪可以避免
                 raise ProtocolException("战斗失败")
 
     def add_friend(self, name):
-        self.get_role_id()
+        """
+        添加好友
+        :param name: 要添加人的角色名
+        :return:
+        """
         flag_Friend_AddFriend, data_Friend_AddFriend = self.protocol.MSG_C2S_Friend_AddFriend(name, self.uid, self.sid)
         S2C_ChangeFormation = cs_pb2.S2C_Friend_AddFriend()  # 创建返回协议对象
         S2C_ChangeFormation.ParseFromString(data_Friend_AddFriend)  # 解析协议返回值
@@ -279,7 +298,6 @@ class ProtocolFunction:
         :param name:
         :return:
         """
-        self.get_role_id()
         flag_Dungeon_ChallengeStageBegin, data_Dungeon_ChallengeStageBegin = self.protocol.MSG_C2S_Dungeon_ChallengeStageBegin(
             fuben_id, self.uid, self.sid)
         S2C_Dungeon_ChallengeStageBegin = cs_pb2.S2C_Dungeon_ChallengeStageBegin()  # 创建返回协议对象
@@ -287,19 +305,45 @@ class ProtocolFunction:
         battle_id = S2C_Dungeon_ChallengeStageBegin.battle_id
         self.do_Battle(data_Dungeon_ChallengeStageBegin, battle_id)
 
-    def Biography_ExecuteMission(self, mingjiangzhuan_id):
+    def Biography_ExecuteMission(self, mingjiangzhuan_id, type_num):
         """
         名将传战斗
+        :param mingjiangzhuan_id:关卡ID
+        :param type_num:1/2 ，战斗/非战斗战斗任务的判断id
+        :return:
+        """
+        flag_Biography_ExecuteMission, data_Biography_ExecuteMission = self.protocol.MSG_C2S_Biography_ExecuteMission(
+            mingjiangzhuan_id, type_num, self.uid, self.sid)
+        S2C_Biography_ExecuteMission = cs_pb2.S2C_Biography_ExecuteMission()  # 创建返回协议对象
+        if type_num == 2:
+            data_ParseFromString = data_Biography_ExecuteMission
+        else:
+            data_ParseFromString = data_Biography_ExecuteMission["10703"]
+        S2C_Biography_ExecuteMission.ParseFromString(data_ParseFromString)  # 解析协议返回值
+        battle_id = S2C_Biography_ExecuteMission.battle_id
+        if type_num == 2:
+            if S2C_Biography_ExecuteMission.ret == 1:
+                print(str(mingjiangzhuan_id) + "," + str(type_num) + "跳过任务成功")
+            else:
+                print(str(mingjiangzhuan_id) + "," + str(type_num) + "跳过任务失败" + str(S2C_Biography_ExecuteMission.ret))
+                raise ProtocolException(str(mingjiangzhuan_id) + "," + str(type_num) + "跳过任务失败")
+        else:
+            self.do_Battle(data_Biography_ExecuteMission, battle_id)
+
+    def Storm_ChallengeBegin(self, storm_id, cell_id, ):
+        """
+        攻城掠地战斗
         :param name:
         :return:
         """
-        self.get_role_id()
-        flag_Biography_ExecuteMission, data_Biography_ExecuteMission = self.protocol.MSG_C2S_Biography_ExecuteMission(
-            mingjiangzhuan_id, self.uid, self.sid)
-        S2C_Biography_ExecuteMission = cs_pb2.S2C_Biography_ExecuteMission()  # 创建返回协议对象
-        S2C_Biography_ExecuteMission.ParseFromString(data_Biography_ExecuteMission["10703"])  # 解析协议返回值
-        battle_id = S2C_Biography_ExecuteMission.battle_id
-        self.do_Battle(data_Biography_ExecuteMission, battle_id)
+        flag_Storm_ChallengeBegin, data_Storm_ChallengeBegin = self.protocol.MSG_C2S_Storm_ChallengeBegin(storm_id,
+                                                                                                          cell_id,
+                                                                                                          self.uid,
+                                                                                                          self.sid)
+        S2C_Storm_ChallengeBegin = cs_pb2.S2C_Storm_ChallengeBegin()  # 创建返回协议对象
+        S2C_Storm_ChallengeBegin.ParseFromString(data_Storm_ChallengeBegin["12305"])  # 解析协议返回值
+        battle_id = S2C_Storm_ChallengeBegin.battle_id
+        self.do_Battle(S2C_Storm_ChallengeBegin, battle_id)
 
     def Create_Guild(self, name):
         """
@@ -307,7 +351,6 @@ class ProtocolFunction:
         :param Guild_name: string 军团名字
         :return:
         """
-        self.get_role_id()
         flag_Guild_Create, data_Guild_Create = self.protocol.MSG_C2S_Guild_Create(name, self.uid, self.sid)
         C2S_Guild_Create = cs_pb2.S2C_Guild_Create()  # 创建返回协议对象
         C2S_Guild_Create.ParseFromString(data_Guild_Create)  # 解析协议返回值
@@ -323,7 +366,6 @@ class ProtocolFunction:
         :param Guild_name: string 军团名字
         :return:
         """
-        self.get_role_id()
         flag_search_Guild, data_search_Guild = self.protocol.MSG_C2S_Guild_Search(Guild_name, self.uid, self.sid)
         S2C_search_Guild = cs_pb2.S2C_Guild_Search()  # 创建返回协议对象
         S2C_search_Guild.ParseFromString(data_search_Guild)  # 解析协议返回值
@@ -343,32 +385,27 @@ class ProtocolFunction:
             print("加入失败" + str(S2C_Guild_ReqJoin.ret))
             raise ProtocolException("军团加入失败")
 
-
     def OrderWorld_Donate(self, num):
         """
         号令添加捐献旗子道具
         :param num: int 捐献数量
         :return:
         """
-        self.get_role_id()
         flag_C2S_OrderWorld_Donate, data_C2S_OrderWorld_Donate = self.protocol.MSG_C2S_OrderWorld_Donate(num, self.uid,
                                                                                                          self.sid)
         S2C_OrderWorld_Donate = cs_pb2.S2C_OrderWorld_Donate()  # 创建返回协议对象
         S2C_OrderWorld_Donate.ParseFromString(data_C2S_OrderWorld_Donate)  # 解析协议返回值
         if S2C_OrderWorld_Donate.ret == 1:
-            print("捐献成功")
+            print("号令旗子捐献成功")
         else:
-            print("捐献失败" + str(S2C_OrderWorld_Donate.ret))
-            raise ProtocolException("捐献失败")
+            print("号令旗子捐献失败" + str(S2C_OrderWorld_Donate.ret))
+            raise ProtocolException("号令旗子捐献失败")
 
     def Friend_ConfirmFriend(self, ):
         """
         同意添加好友，全部同意
-        :param uid:
-        :param sid:
         :return:
         """
-        self.get_role_id()
         flag_C2S_Friend_ConfirmFriend, data_C2S_Friend_ConfirmFriend = self.protocol.MSG_C2S_Friend_ConfirmFriend(
             self.uid, self.sid)
         C2S_Friend_ConfirmFriend = cs_pb2.S2C_Friend_ConfirmFriend()  # 创建返回协议对象
@@ -379,9 +416,175 @@ class ProtocolFunction:
             print("全部同意失败" + str(C2S_Friend_ConfirmFriend.ret))
             raise ProtocolException("全部同意失败")
 
+    def Formation_ChangePosition(self,pos_list ):
+        """
+        更改上阵位置,[6,1,2,3,4,5]，表示主角在6号位
+        :param pos_list: list 顺序是上阵的参数，参数是阵位
+        :return:
+        """
+        flag_C2S_Formation_ChangePosition, data_C2S_Formation_ChangePosition = self.protocol.MSG_C2S_Formation_ChangePosition(pos_list,self.uid, self.sid)
+        S2C_Formation_ChangePosition = cs_pb2.S2C_Formation_ChangePosition()  # 创建返回协议对象
+        S2C_Formation_ChangePosition.ParseFromString(data_C2S_Formation_ChangePosition)  # 解析协议返回值
+        if S2C_Formation_ChangePosition.ret == 1:
+            print("更改上阵位置成功")
+        else:
+            print("更改上阵位置失败" + str(S2C_Formation_ChangePosition.ret))
+            raise ProtocolException("更改上阵位置失败")
+
+    def DeadBattle_GetInfo(self, ):
+        """
+        获取无双试炼的关卡信息
+        :param uid:
+        :param sid:
+        :return:可选buff id
+        """
+        flag_C2S_DeadBattle_GetInfo, data_C2S_DeadBattle_GetInfo = self.protocol.MSG_C2S_DeadBattle_GetInfo(
+            self.uid, self.sid)
+        S2C_DeadBattle_GetInfo = cs_pb2.S2C_DeadBattle_GetInfo()  # 创建返回协议对象
+        S2C_DeadBattle_GetInfo.ParseFromString(data_C2S_DeadBattle_GetInfo)  # 解析协议返回值
+        if S2C_DeadBattle_GetInfo.ret == 1:
+            print("查询无双信息成功")
+        else:
+            print("查询无双信息失败" + str(S2C_DeadBattle_GetInfo.ret))
+            raise ProtocolException("查询无双信息失败")
+        history_id_list = S2C_DeadBattle_GetInfo.dbattle.history_id
+        history_id = 0
+        for history_id_in_list in history_id_list:
+            if history_id < history_id_in_list:
+                history_id = history_id_in_list
+        is_award = S2C_DeadBattle_GetInfo.dbattle.is_award
+        return history_id, is_award
+
+    def DeadBattle(self, ):
+        """
+        无双试炼
+        :return:
+        """
+        flag_DeadBattle_ChallengeBegin, data_DeadBattle_ChallengeBegin = self.protocol.MSG_C2S_DeadBattle_ChallengeBegin(
+            self.uid, self.sid)
+        S2C_DeadBattle_ChallengeBegin = cs_pb2.S2C_DeadBattle_ChallengeBegin()  # 创建返回协议对象
+        S2C_DeadBattle_ChallengeBegin.ParseFromString(data_DeadBattle_ChallengeBegin["10520"])  # 解析协议返回值
+        battle_id = S2C_DeadBattle_ChallengeBegin.battle_id
+        self.do_Battle(data_DeadBattle_ChallengeBegin, battle_id)
+
+    def DeadBattle_BoxAward(self, ):
+        """
+        无双试炼领取通关宝箱
+        :param uid:
+        :param sid:
+        :return:可选buff id
+        """
+        flag_C2S_DeadBattle_BoxAward, data_C2S_DeadBattle_BoxAward = self.protocol.MSG_C2S_DeadBattle_BoxAward(
+            self.uid, self.sid)
+        S2C_DeadBattle_BoxAward = cs_pb2.S2C_DeadBattle_BoxAward()  # 创建返回协议对象
+        S2C_DeadBattle_BoxAward.ParseFromString(data_C2S_DeadBattle_BoxAward)  # 解析协议返回值
+        if S2C_DeadBattle_BoxAward.ret == 1:
+            print("领取通关宝箱成功")
+        else:
+            print("领取通关宝箱失败" + str(S2C_DeadBattle_BoxAward.ret))
+            raise ProtocolException("领取通关宝箱失败")
+        buff_id_list = S2C_DeadBattle_BoxAward.dbattle.floor_buff
+        buff_id = buff_id_list[2]
+        return buff_id
+
+    def DeadBattle_PickBuff(self, buff_id):
+        """
+        无双试炼领取通关buff
+        :param uid:
+        :param sid:
+        :return:可选buff id
+        """
+        flag_C2S_DeadBattle_PickBuff, data_C2S_DeadBattle_PickBuff = self.protocol.MSG_C2S_DeadBattle_PickBuff(buff_id,
+                                                                                                               self.uid,
+                                                                                                               self.sid)
+        S2C_DeadBattle_PickBuff = cs_pb2.S2C_DeadBattle_PickBuff()  # 创建返回协议对象
+        S2C_DeadBattle_PickBuff.ParseFromString(data_C2S_DeadBattle_PickBuff)  # 解析协议返回值
+        if S2C_DeadBattle_PickBuff.ret == 1:
+            print("领取通关buff成功")
+        else:
+            print("领取通关buff失败" + str(S2C_DeadBattle_PickBuff.ret))
+            raise ProtocolException("领取通关buff失败")
+
+    def huashen_shilian(self, activity_id):
+        """
+        化身10连抽
+        :param activity_id:  int 活动ID，GM后台配置
+        :param uid:
+        :param sid:
+        :return:抽到的东西
+        """
+        flag_Activity_Common_Draw, data_Activity_Common_Draw = self.protocol.MSG_C2S_Activity_Common_Draw(activity_id,
+                                                                                                          self.uid,
+                                                                                                          self.sid)
+        S2C_Activity_Common_Draw = cs_pb2.S2C_Activity_Common_Draw()  # 创建返回协议对象
+        S2C_Activity_Common_Draw.ParseFromString(data_Activity_Common_Draw)  # 解析协议返回值
+        if S2C_Activity_Common_Draw.ret == 1:
+            print("金化身十连抽成功")
+        else:
+            print("金化身十连抽失败" + str(S2C_Activity_Common_Draw.ret))
+            raise ProtocolException("金化身十连抽失败")
+        award_list = []
+        for award in S2C_Activity_Common_Draw.awards:
+            award_dic = {}
+            award_dic["type"] = award.type
+            award_dic["value"] = award.value
+            award_dic["size"] = award.size
+            award_list.append(award_dic)
+        return award_list
+
+    def hengsaoqianjun_shilian(self, activity_id):
+        """
+        横扫千军10连抽
+        :param activity_id:  int 活动ID，GM后台配置
+        :param uid:
+        :param sid:
+        :return:抽到的东西
+        """
+        flag_GoldEquip_Draw, data_GoldEquip_Draw = self.protocol.MSG_C2S_GoldEquip_Draw(activity_id, self.uid, self.sid)
+        S2C_GoldEquip_Draw = cs_pb2.S2C_GoldEquip_Draw()  # 创建返回协议对象
+        S2C_GoldEquip_Draw.ParseFromString(data_GoldEquip_Draw)  # 解析协议返回值
+        if S2C_GoldEquip_Draw.ret == 1:
+            print("横扫千军十连抽成功")
+        else:
+            print("横扫千军十连抽失败" + str(S2C_GoldEquip_Draw.ret))
+            raise ProtocolException("横扫千军十连抽失败")
+        award_list = []
+        for award in S2C_GoldEquip_Draw.awards:
+            award_dic = {}
+            award_dic["type"] = award.type
+            award_dic["value"] = award.value
+            award_dic["size"] = award.size
+            award_list.append(award_dic)
+        return award_list
+
+    def xianshishenjiang_shilian(self, activity_id, id_into):
+        """
+        限时神将10连抽
+        :param activity_id:  int 活动ID，GM后台配置
+        :param id_into: int 用于区分阵营
+        :return:抽到的东西
+        """
+        flag_Recruit_RecruitKnight, data_Recruit_RecruitKnight = self.protocol.MSG_C2S_Recruit_RecruitKnight(
+            activity_id, id_into, self.uid, self.sid)
+        S2C_Recruit_RecruitKnight = cs_pb2.S2C_Recruit_RecruitKnight()  # 创建返回协议对象
+        S2C_Recruit_RecruitKnight.ParseFromString(data_Recruit_RecruitKnight)  # 解析协议返回值
+        if S2C_Recruit_RecruitKnight.ret == 1:
+            print("限时神将十连抽成功")
+        else:
+            print("限时神将十连抽失败" + str(S2C_Recruit_RecruitKnight.ret))
+            raise ProtocolException("限时神将十连抽失败")
+        award_list = []
+        for award in S2C_Recruit_RecruitKnight.awards:
+            award_dic = {}
+            award_dic["type"] = award.type
+            award_dic["value"] = award.value
+            award_dic["size"] = award.size
+            award_list.append(award_dic)
+        return award_list
+
     def add_resource_pb(self, type_into, value_into, size_into):
         """
-        添加或消耗道具，目前只用做添加，消耗待定 #todo
+        添加或消耗道具，目前只用做添加，消耗待定
         :param type_into: int 道具类型
         :param value_into: int 道具ID
         :param size_into: int 道具数量
@@ -389,7 +592,7 @@ class ProtocolFunction:
         :param sid:
         :return:
         """
-        self.get_role_id()
+
         flag_C2S_Test, data_C2S_Test = self.protocol.MSG_C2S_Test(type_into, value_into, size_into, self.uid, self.sid)
         S2C_Test = cs_pb2.S2C_Test()  # 创建返回协议对象
         S2C_Test.ParseFromString(data_C2S_Test)  # 解析协议返回值
@@ -398,6 +601,21 @@ class ProtocolFunction:
         else:
             print("添加道具失败" + str(S2C_Test.ret))
             raise ProtocolException("添加道具失败")
+
+    def get_resource_pb(self, find_name, ):
+        """
+        添加查询资源数量
+        :param type_into: str 道具名
+        :return: int 道具数量
+        """
+        resource_type, resource_id = self.mri.get_type_id_from_name(find_name)
+        resource_list = self.Flush("资源")
+        for resource_dic in resource_list:
+            for resource_key in resource_dic.keys():
+                if resource_id == int(resource_key):
+                    resource_num = resource_dic[resource_key]
+                    return resource_num
+        return 0
 
     def GM_fengkuanghaoling(self, Guild_name, num, join):
         """
@@ -424,3 +642,71 @@ class ProtocolFunction:
         :return:
         """
         self.Dungeon_ChallengeStageBegin(fuben_id)
+
+    def GM_fengkuanghuashen(self, type_into, value_into, size_into, activity_id, is_stop):
+        """
+        十连抽化身，检测是否抽到指定的东西
+        :param type_into: int 道具type
+        :param value_into: int 道具 value
+        :param activity_id: int 活动ID，GM后台配置
+        :param is_stop: bool 是否抽到后就马上停止
+        :return:
+        """
+
+        award_list = self.huashen_shilian(activity_id)
+        num = 0
+        for award in award_list:
+            award_type = award["type"]
+            award_value = award["value"]
+            award_size = award["size"]
+            if award_type == type_into and award_value == value_into and award_size == size_into:
+                num = num + 1
+                if is_stop:
+                    raise GmException("抽到需要验证的道具了，终止抽奖")
+                else:
+                    print("抽到了" + str(num) + "次")
+
+    def GM_fengkuanghengsaoqianjun(self, type_into, value_into, size_into, activity_id, is_stop):
+        """
+        横扫千军10连抽，检测是否抽到指定的东西
+        :param type_into: int 道具type
+        :param value_into: int 道具 value
+        :param activity_id: int 活动ID，GM后台配置
+        :param is_stop: bool 是否抽到后就马上停止
+        :return:
+        """
+        award_list = self.hengsaoqianjun_shilian(activity_id)
+        num = 0
+        for award in award_list:
+            award_type = award["type"]
+            award_value = award["value"]
+            award_size = award["size"]
+            if award_type == type_into and award_value == value_into and award_size == size_into:
+                num = num + 1
+                if is_stop:
+                    raise GmException("抽到需要验证的道具了，终止抽奖")
+                else:
+                    print("抽到了" + str(num) + "次")
+
+    def GM_fengkuangxianshijinjiang(self, type_into, value_into, activity_id, id_into, is_stop):
+        """
+        十连抽化身，检测是否抽到指定的东西
+        :param type_into: int 道具type
+        :param value_into: int 道具 value
+        :param activity_id: int 活动ID，GM后台配置
+        :param id_into: int 期数ID，GM后台配置
+        :param is_stop: bool 是否抽到后就马上停止
+        :return:
+        """
+
+        award_list = self.xianshishenjiang_shilian(activity_id, id_into)
+        num = 0
+        for award in award_list:
+            award_type = award["type"]
+            award_value = award["value"]
+            if award_type == type_into and award_value == value_into:
+                num = num + 1
+                if is_stop:
+                    raise GmException("抽到需要验证的道具了，终止抽奖")
+                else:
+                    print("抽到了" + str(num) + "次")

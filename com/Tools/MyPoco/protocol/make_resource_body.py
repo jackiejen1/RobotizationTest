@@ -6,6 +6,8 @@
 # @function : 生成GM后台接口所需的信息
 import json
 
+import math
+
 from MyPoco.foundation.information import Information
 import time
 from MyPoco.airtestide_lack_packages import xlrd
@@ -46,6 +48,30 @@ class MakeResourceBody:
         else:
             raise GmException(checkpoint_name + "关卡编号不存在")
         return checkpoint_id
+
+    def get_num_list_from_name(self, checkpoint_num):
+        """
+        根据玩法章节返回该资源在表中对应的id
+        :param checkpoint_num: str 大章节代号1.2.3
+        :return:num_lists[[id,type],[id,type]]
+        """
+        num_lists = []
+        table = self.checkpoint_xl.sheets()[1]
+        col = table.col_values(0)#列
+        col_list = col[1:]
+        for i in range(checkpoint_num+1)[1:]:
+            is_id =i*1000
+            for ii in range(len(col_list)):#整个表的长度
+                is_id = is_id + 1
+                if is_id in col_list:
+                    row = table.row_values(col.index(is_id))
+                    num_list = []
+                    num_list.append(int(row[1]))
+                    num_list.append(int(row[2]))
+                    num_lists.append(num_list)
+                else:
+                    break
+        return num_lists
 
     def get_type_id_from_name(self, resource_name):
         """

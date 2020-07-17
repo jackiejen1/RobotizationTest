@@ -16,7 +16,7 @@ import uuid
 from airtest.core.helper import device_platform
 import six
 import struct
-from poco.utils.simplerpc.transport.tcp.protocol import SimpleProtocolFilter
+from MyPoco.airtestide_lack_packages.poco.utils.simplerpc.transport.tcp.protocol import SimpleProtocolFilter
 from airtest.core.api import connect_device, device as current_device
 from MyPoco.foundation.information import Information
 from MyPoco.foundation.MyException import *
