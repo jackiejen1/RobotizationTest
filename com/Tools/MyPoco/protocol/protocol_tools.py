@@ -74,24 +74,24 @@ def _recv_data(s, api_attr, buffersize, limittime):
     while True:#这里是一直接收数据的
         try:
             ct = int(time.time())
-            if ct - rst > limittime:
+            if ct - rst > limittime: #判断超时
                 recvtime = time.time()
                 recvdata = b'error'
                 return recvdata, recvtime
             s.settimeout(limittime)
-            rev_data = s.recv(buffersize)#第一次接收数据，获取消息头
-            if len(rev_data) != buffersize:
-                recvtime = time.time()
-                recvdata = b'error'
-                return recvdata, recvtime
+            rev_data = s.recv(buffersize)#第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
+            if len(rev_data) != buffersize:#拆包处理，有时候第一条不是完整数据
+                rev_data =rev_data + s.recv(buffersize-len(rev_data))
+                # return recvdata, recvtime
                 # continue
             if len(rev_data) == 0:
                 data = b'error'
+                print("error,消息头长度为0")
                 recv_time = time.time()
                 return data, recv_time
-            head_data = struct.unpack('>IIQQQ', rev_data)
+            head_data = struct.unpack('>IIQQQ', rev_data)#把消息头解包
             s.settimeout(limittime)
-            tmpdata = s.recv(head_data[0] - 32)
+            tmpdata = s.recv(head_data[0] - 32)#接收除消息头以外的消息体
             while (len(tmpdata) < (head_data[0] - 32)):#消息没收完就继续收
                 tmpdata += s.recv(head_data[0] - 32 - len(tmpdata))
             #收完完整的一条后进行校验
@@ -102,7 +102,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
                         recvtime = time.time()
                         recvdata = tmpdata
                         recvdata_dic[str(rec)] = recvdata
-                        then_len =then_len + 1
+                        then_len = then_len + 1
                 if then_len == len(recvcmd):
                     return recvdata_dic,recvtime
             else:
@@ -117,7 +117,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
             #如果不是指定的协议，就继续接收下一条协议内容
         except Exception as e:
             print("socket接收数据时发生错误")
-            print("具体错误 {}".format(e))
+            print("error,具体错误 {}".format(e))
             recvtime = time.time()
             recvdata = b'error'
             return recvdata, recvtime

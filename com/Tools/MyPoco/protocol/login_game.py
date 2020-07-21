@@ -213,23 +213,139 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_Biography_ExecuteMission_attr, 32)  # 发送协议
         return flag, data
 
-    def MSG_C2S_Storm_ChallengeBegin(self, storm_id, cell_id, uid, sid):
+    def MSG_C2S_Storm_ChallengeBegin(self, storm_id_into, cell_id_into, uid, sid):
         """
-        发起攻城掠地战斗，todo 未完成，战斗ID太难了
-        :param id:
+        发起攻城掠地战斗
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 小怪id
         :param uid:
         :param sid:
         :return:
         """
         C2S_Storm_ChallengeBegin = cs_pb2.C2S_Storm_ChallengeBegin()
-        C2S_Storm_ChallengeBegin.storm_id = storm_id
-        C2S_Storm_ChallengeBegin.cell_id = cell_id
+        C2S_Storm_ChallengeBegin.storm_id = storm_id_into
+        C2S_Storm_ChallengeBegin.cell_id = cell_id_into
         C2S_Storm_ChallengeBegin = C2S_Storm_ChallengeBegin.SerializeToString()
         C2S_Storm_ChallengeBegin_attr = {'name': "C2S_Storm_ChallengeBegin", 'protocol': 'protobuf-ss',
                                                 'send_cmd': 12304, 'recv_cmd': [12305, 20000], 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Storm_ChallengeBegin, C2S_Storm_ChallengeBegin_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Storm_ChallengeBegin_attr, 32)  # 发送协议
         return flag, data
+
+    def MSG_C2S_EliteDungeon_BeginChallenge(self, stage_id_into, diff_type_into, uid, sid):
+        """
+        发起炼狱副本战斗
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 小怪id
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_EliteDungeon_BeginChallenge = cs_pb2.C2S_EliteDungeon_BeginChallenge()
+        C2S_EliteDungeon_BeginChallenge.stage_id = stage_id_into
+        C2S_EliteDungeon_BeginChallenge.diff_type = diff_type_into
+        C2S_EliteDungeon_BeginChallenge = C2S_EliteDungeon_BeginChallenge.SerializeToString()
+        C2S_EliteDungeon_BeginChallenge_attr = {'name': "C2S_EliteDungeon_BeginChallenge", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 14154, 'recv_cmd': [14155, 20000], 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_EliteDungeon_BeginChallenge, C2S_EliteDungeon_BeginChallenge_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_EliteDungeon_BeginChallenge_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Rebel_AttackBegin(self, id_into, uid, sid):
+        """
+        讨伐巨兽战斗
+        :param storm_id_into: int 龙炮、熊车id
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Rebel_AttackBegin = cs_pb2.C2S_Rebel_AttackBegin()
+        C2S_Rebel_AttackBegin.uid = uid
+        C2S_Rebel_AttackBegin.id = id_into
+        C2S_Rebel_AttackBegin.attack_type = 1
+        C2S_Rebel_AttackBegin = C2S_Rebel_AttackBegin.SerializeToString()
+        C2S_Rebel_AttackBegin_attr = {'name': "C2S_Rebel_AttackBegin", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 11152, 'recv_cmd': [11153, 20000], 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Rebel_AttackBegin, C2S_Rebel_AttackBegin_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Rebel_AttackBegin_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_EliteDungeon_FastChallenge(self,stage_id_into,diff_type_into,times_into,uid, sid):
+        """
+        发起炼狱副本扫荡
+        :param storm_id_into: int
+        :param cell_id_into:int
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_EliteDungeon_FastChallenge = cs_pb2.C2S_EliteDungeon_FastChallenge()
+        C2S_EliteDungeon_FastChallenge.stage_id =stage_id_into
+        C2S_EliteDungeon_FastChallenge.diff_type = diff_type_into
+        C2S_EliteDungeon_FastChallenge.times = times_into
+        C2S_EliteDungeon_FastChallenge = C2S_EliteDungeon_FastChallenge.SerializeToString()
+        C2S_EliteDungeon_FastChallenge_attr = {'name': "C2S_EliteDungeon_FastChallenge", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 14157, 'recv_cmd': 14158, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_EliteDungeon_FastChallenge, C2S_EliteDungeon_FastChallenge_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_EliteDungeon_FastChallenge_attr, 32)  # 发送协议
+        return flag, data
+
+
+    def MSG_C2S_Storm_Award(self,storm_id_into,cell_id_into,uid, sid):
+        """
+        攻城掠地领取宝箱事件
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 小怪id
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Storm_Award = cs_pb2.C2S_Storm_Award()
+        C2S_Storm_Award.storm_id =storm_id_into
+        C2S_Storm_Award.cell_id = cell_id_into
+        C2S_Storm_Award = C2S_Storm_Award.SerializeToString()
+        C2S_Storm_Award_attr = {'name': "C2S_Storm_Award", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 12307, 'recv_cmd': 12308, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Storm_Award, C2S_Storm_Award_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Storm_Award_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Storm_Break(self,storm_id_into,cell_id_into,uid, sid):
+        """
+        攻城掠地清除障碍事件
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 小怪id
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Storm_Break = cs_pb2.C2S_Storm_Break()
+        C2S_Storm_Break.storm_id =storm_id_into
+        C2S_Storm_Break.cell_id = cell_id_into
+        C2S_Storm_Break = C2S_Storm_Break.SerializeToString()
+        C2S_Storm_Break_attr = {'name': "C2S_Storm_Break", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 12309, 'recv_cmd': 12310, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Storm_Break, C2S_Storm_Break_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Storm_Break_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Storm_Reset(self,storm_id_into,uid, sid):
+        """
+        攻城掠地中关卡重置
+        :param storm_id_into: int 章节id
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Storm_Reset = cs_pb2.C2S_Storm_Reset()
+        C2S_Storm_Reset.storm_id =storm_id_into
+        C2S_Storm_Reset = C2S_Storm_Reset.SerializeToString()
+        C2S_Storm_Reset_attr = {'name': "C2S_Storm_Reset", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 12313, 'recv_cmd': 12314, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Storm_Reset, C2S_Storm_Reset_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Storm_Reset_attr, 32)  # 发送协议
+        return flag, data
+
     def MSG_C2S_DeadBattle_GetInfo(self,uid, sid):
         """
         获取无双试炼的关卡信息

@@ -49,6 +49,7 @@ class MyPoco:
         :param protocol_name: 协议名
         :return:时间戳
         """
+        self.protocol = None
         self.GM_server_name = server_name
         if username == "":
             username = self.get_random_account()
@@ -646,23 +647,23 @@ class MyPoco:
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("典韦")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(6, "典韦")
-        self.protocol.Formation_ChangePosition([6,1,2,3,4,5])
+        self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])
         # 开始一键通关副本，海外后续使用GMAPI
         tilizhi = self.get_resource_pb("体力值")
         add_tilizhi_num = 1000 - tilizhi
+        add_tili_type, add_tili_value = self.protocol.mri.get_type_id_from_name("体力值")
         if add_tilizhi_num == 0:
             pass
         else:
             # 初始化体力值到1000
-            add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
-            self.protocol.add_resource_pb(add_type, add_value, add_tilizhi_num)
+            self.protocol.add_resource_pb(add_tili_type, add_tili_value, add_tilizhi_num)
         for i in range(32)[1:]:  # 副本通关数
             for ii in range(15)[1:]:  # 关卡数可以多一点，适配小关卡数量不确定性
                 checkpoint_name = "副本-" + str(i) + "-" + str(ii)
                 try:
                     fuben_id = self.protocol.mri.get_num_from_name(checkpoint_name)
                 except Exception:  # 找不到关卡说明打完了，就终止
-                    self.protocol.add_resource_pb(add_type, add_value, 50)
+                    self.protocol.add_resource_pb(add_tili_type, add_tili_value, 500)
                     break
                 self.protocol.GM_fengkuangfuben(fuben_id)
         self.GM_yijian_mingjiangzhuan(7)  # 通关名将传
@@ -677,16 +678,19 @@ class MyPoco:
         :return:
         """
         history_id, is_award = self.protocol.DeadBattle_GetInfo()
-        history_id = history_id + 1
-        checkpoint_num = checkpoint_num_into + 1
-        if history_id >= checkpoint_num:
-            raise GmException(str(checkpoint_num_into) + "关已打过")
-        for i in range(checkpoint_num)[history_id:]:
-            #先判断能不能领奖，然后再战斗领奖，会出现打完奖励没领的情况
-            if (i % 3 == 0) or (i % 7 == 0) and not is_award:  # 关底或者boss战领取宝箱和buff
+        Current_id = history_id + 1  # 历史的ID是都打过的
+        checkpoint_num = checkpoint_num_into + 1  # 因为下面for循环要从1开始，所以要+1
+        if Current_id >= checkpoint_num:
+            return print(str(checkpoint_num_into) + "关已打过")
+        Box_id = Current_id - (Current_id // 7) * 7
+        for i in range(checkpoint_num)[Current_id:]:
+            self.protocol.DeadBattle()
+            if (Box_id % 3 == 0) or (Box_id % 7 == 0) and not is_award:  # 关底或者boss战领取宝箱和buff
                 buff_id = self.protocol.DeadBattle_BoxAward()
                 self.protocol.DeadBattle_PickBuff(buff_id)
-            self.protocol.DeadBattle()
+            Box_id = Box_id + 1
+            if Box_id >= 7:
+                Box_id = Box_id - (Box_id // 7) * 7
 
     def GM_fengkuang_haoling(self, Guild_name, num, join=False):
         """
@@ -712,7 +716,6 @@ class MyPoco:
         """
         一键通关名将传，目前仅限于少三2
         :param checkpoint_num:int 大章节代号1.2.3
-
         :return:
         """
         add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
@@ -729,21 +732,85 @@ class MyPoco:
                 add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
                 self.protocol.add_resource_pb(add_type, add_value, 5)
 
-    # def GM_yijianmingguanai(self, checkpoint_num):
-    #     """
-    #     一键通关关隘，目前仅限于少三2 todo 没做，战斗id不好搞
-    #     :param checkpoint_num:
-    #     :return:
-    #     """
-    #     add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
-    #     self.protocol.add_resource_pb(add_type, add_value, 1)
-    #     self.shangzhenwujiang(2, "陆逊")
-    #     num_lists = self.protocol.mri.get_num_list_from_name(checkpoint_num)
-    #     # print(num_lists)
-    #     for num_list in num_lists:
-    #         storm_id = num_list[0]
-    #         cell_id = num_list[1]
-    #         self.protocol.Storm_ChallengeBegin(storm_id, cell_id, )
+    def GM_yijian_guanai(self, checkpoint_num=3):
+        """
+        一键通关关隘，目前仅限于少三2，只支持到第三关结束
+        :param checkpoint_num:关卡数
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        self.shangzhenwujiang(2, "陆逊")
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("疲劳值")
+        num_lists = self.protocol.mri.get_num_list_from_name_ga(checkpoint_num)
+        num = 0
+        for num_list in num_lists:
+            if num_list[2] == 1:
+                num = num + 1
+                if num == 8:
+                    num = 0
+                    self.protocol.add_resource_pb(add_type, add_value, 10)
+            self.protocol.GM_yijian_guanai(num_list)
+
+    def GM_huoyue_guanai(self):
+        """
+        剑阁，三个怪,用于老账号
+        :return:
+        """
+        self.protocol.GM_huoyue_guanai()
+        self.protocol.Storm_Reset(2001)#刷新剑阁，一天一次
+
+    def GM_huoyue_lianyufuben(self):
+        """
+        炼狱副本，5次
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("霸王手戟")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("定军刀")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("曲燕")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("诸葛连弩")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("墨羽扇")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("雌雄双股剑")
+        self.protocol.add_resource_pb(add_type, add_value, 1)
+        self.protocol.EliteDungeon_BeginChallenge(190101,1)
+        self.protocol.EliteDungeon_FastChallenge(190101,1,1)
+        self.protocol.EliteDungeon_FastChallenge(190101, 1, 1)
+        self.protocol.EliteDungeon_FastChallenge(190101, 1, 1)
+        self.protocol.EliteDungeon_FastChallenge(190101, 1, 1)
+
+    def GM_huoyue_taofajushou(self):
+        """
+        打10次巨兽
+        :return:
+        """
+
+        week = self.get_time_str(self.protocol.sever_time)[2]
+        if week in [1, 3, 5]:
+            id_into = 1
+        elif week in [2, 4, 6]:
+            id_into = 2
+        else:
+            id_into = 1
+        for i in range(10):
+            self.protocol.Rebel_AttackBegin(id_into)
+
+
+    def GM_huoyue_mingjiangzhuan(self):
+        """
+        扫荡名将传，目前仅限于少三2
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("列传次数")
+        self.protocol.add_resource_pb(add_type, add_value, 10)
+        num_list = [1003,1004,2002,2004,2006,2007,]
+        for num in num_list:
+            self.protocol.Biography_ExecuteMission(num, 1)
+
 
     def GM_fengkuang_haoyou(self, num, account_into=None, sever_name_into=None):
         """
@@ -764,11 +831,16 @@ class MyPoco:
             account1 = self.get_random_account()
             self.make_new_role(sever_name, account1)
             self.protocol.add_resource_pb(add_type, add_value, 4899990)
+            self.protocol.socket_close()
+        account_list = []
         for i in range(num):
             account = self.get_random_account()
+            account_list.append(account)
             self.make_new_role(sever_name, account)
             self.protocol.add_resource_pb(add_type, add_value, 4899990)
             self.add_friend(account1[2:])
+            self.protocol.socket_close()
+            # time.sleep(4)
         self.make_new_role(sever_name, account1)
         self.pass_friend()
         print("账号" + account1 + "上有" + str(num) + "个好友")

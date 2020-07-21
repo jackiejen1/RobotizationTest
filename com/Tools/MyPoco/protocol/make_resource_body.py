@@ -37,7 +37,7 @@ class MakeResourceBody:
 
     def get_num_from_name(self, checkpoint_name):
         """
-        根据玩法章节返回该资源在表中对应的id
+        根据玩法章节返回该资源在表中对应的id，副本专用
         :param resource_name: str 功能名+大章节数+小关卡数
         """
         table = self.checkpoint_xl.sheets()[0]
@@ -51,7 +51,7 @@ class MakeResourceBody:
 
     def get_num_list_from_name(self, checkpoint_num):
         """
-        根据玩法章节返回该资源在表中对应的id
+        根据玩法章节返回该资源在表中对应的id,列传专用
         :param checkpoint_num: str 大章节代号1.2.3
         :return:num_lists[[id,type],[id,type]]
         """
@@ -68,6 +68,31 @@ class MakeResourceBody:
                     num_list = []
                     num_list.append(int(row[1]))
                     num_list.append(int(row[2]))
+                    num_lists.append(num_list)
+                else:
+                    break
+        return num_lists
+
+    def get_num_list_from_name_ga(self, checkpoint_num):
+        """
+        根据玩法章节返回该资源在表中对应的id，关隘专用
+        :param checkpoint_num: str 大章节代号1.2.3
+        :return:num_lists[[storm_id,cell_id,type],[storm_id,cell_id,type]]
+        """
+        num_lists = []
+        table = self.checkpoint_xl.sheets()[2]
+        col = table.col_values(0)#列
+        col_list = col[1:]
+        for i in range(checkpoint_num+1)[1:]:
+            is_id =i*1000
+            for ii in range(len(col_list)):#整个表的长度
+                is_id = is_id + 1
+                if is_id in col_list:
+                    row = table.row_values(col.index(is_id))
+                    num_list = []
+                    num_list.append(int(row[1]))
+                    num_list.append(int(row[2]))
+                    num_list.append(int(row[3]))
                     num_lists.append(num_list)
                 else:
                     break

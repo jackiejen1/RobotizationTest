@@ -12,7 +12,6 @@ import json
 import os
 import time
 from socket import create_connection
-
 from MyPoco.foundation.MyException import *
 from MyPoco.protocol import battle_tools
 from MyPoco.protocol.make_resource_body import MakeResourceBody
@@ -71,6 +70,15 @@ class ProtocolFunction:
         if self.uid == 0:
             self.socket = create_connection((self.host, self.port))
             self.Login(region)
+
+    def socket_close(self):
+        """
+        关闭链接
+        :return:
+        """
+        # shutdown方法是用来实现通信模式的，模式分三种，SHUT_RD 关闭接收消息通道，SHUT_WR 关闭发送消息通道，SHUT_RDWR 两个通道都关闭。
+        self.socket.shutdown(2)
+        self.socket.close()
 
     def send_protocol(self, arg_dic):
         """
@@ -305,6 +313,19 @@ class ProtocolFunction:
         battle_id = S2C_Dungeon_ChallengeStageBegin.battle_id
         self.do_Battle(data_Dungeon_ChallengeStageBegin, battle_id)
 
+    def EliteDungeon_BeginChallenge(self, stage_id_into, diff_type_into, ):
+        """
+        炼狱副本战斗
+        :param name:
+        :return:
+        """
+        flag_EliteDungeon_BeginChallenge, data_EliteDungeon_BeginChallenge = self.protocol.MSG_C2S_EliteDungeon_BeginChallenge(
+            stage_id_into, diff_type_into, self.uid, self.sid)
+        S2C_EliteDungeon_BeginChallenge = cs_pb2.S2C_EliteDungeon_BeginChallenge()  # 创建返回协议对象
+        S2C_EliteDungeon_BeginChallenge.ParseFromString(data_EliteDungeon_BeginChallenge["14155"])  # 解析协议返回值
+        battle_id = S2C_EliteDungeon_BeginChallenge.battle_id
+        self.do_Battle(data_EliteDungeon_BeginChallenge, battle_id)
+
     def Biography_ExecuteMission(self, mingjiangzhuan_id, type_num):
         """
         名将传战斗
@@ -330,20 +351,102 @@ class ProtocolFunction:
         else:
             self.do_Battle(data_Biography_ExecuteMission, battle_id)
 
-    def Storm_ChallengeBegin(self, storm_id, cell_id, ):
+    def Storm_ChallengeBegin(self, storm_id_into, cell_id_into, ):
         """
         攻城掠地战斗
-        :param name:
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 小怪id
         :return:
         """
-        flag_Storm_ChallengeBegin, data_Storm_ChallengeBegin = self.protocol.MSG_C2S_Storm_ChallengeBegin(storm_id,
-                                                                                                          cell_id,
+        flag_Storm_ChallengeBegin, data_Storm_ChallengeBegin = self.protocol.MSG_C2S_Storm_ChallengeBegin(storm_id_into,
+                                                                                                          cell_id_into,
                                                                                                           self.uid,
                                                                                                           self.sid)
         S2C_Storm_ChallengeBegin = cs_pb2.S2C_Storm_ChallengeBegin()  # 创建返回协议对象
         S2C_Storm_ChallengeBegin.ParseFromString(data_Storm_ChallengeBegin["12305"])  # 解析协议返回值
         battle_id = S2C_Storm_ChallengeBegin.battle_id
-        self.do_Battle(S2C_Storm_ChallengeBegin, battle_id)
+        self.do_Battle(data_Storm_ChallengeBegin, battle_id)
+
+    def Rebel_AttackBegin(self, id_into):
+        """
+        攻城掠地战斗
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 小怪id
+        :return:
+        """
+
+        flag_Rebel_AttackBegin, data_Rebel_AttackBegin = self.protocol.MSG_C2S_Rebel_AttackBegin(id_into, self.uid,
+                                                                                                 self.sid)
+        S2C_Rebel_AttackBegin = cs_pb2.S2C_Rebel_AttackBegin()  # 创建返回协议对象
+        S2C_Rebel_AttackBegin.ParseFromString(data_Rebel_AttackBegin["11153"])  # 解析协议返回值
+        battle_id = S2C_Rebel_AttackBegin.battle_id
+        self.do_Battle(data_Rebel_AttackBegin, battle_id)
+
+    def EliteDungeon_FastChallenge(self, stage_id_into, diff_type_into, times_into, ):
+        """
+        发起炼狱副本扫荡
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 宝箱id
+        :return:
+        """
+        flag_EliteDungeon_FastChallenge, data_EliteDungeon_FastChallenge = self.protocol.MSG_C2S_EliteDungeon_FastChallenge(
+            stage_id_into, diff_type_into, times_into, self.uid, self.sid)
+        S2C_EliteDungeon_FastChallenge = cs_pb2.S2C_EliteDungeon_FastChallenge()  # 创建返回协议对象
+        S2C_EliteDungeon_FastChallenge.ParseFromString(data_EliteDungeon_FastChallenge)  # 解析协议返回值
+        if S2C_EliteDungeon_FastChallenge.ret == 1:
+            print("炼狱副本扫荡成功")
+        else:
+            print("炼狱副本扫荡失败" + str(S2C_EliteDungeon_FastChallenge.ret))
+            raise ProtocolException("炼狱副本扫荡失败")
+
+    def Storm_Award(self, storm_id_into, cell_id_into, ):
+        """
+        攻城掠地领取宝箱事件
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 宝箱id
+        :return:
+        """
+        flag_Storm_Award, data_Storm_Award = self.protocol.MSG_C2S_Storm_Award(storm_id_into, cell_id_into, self.uid,
+                                                                               self.sid)
+        S2C_Storm_Award = cs_pb2.S2C_Storm_Award()  # 创建返回协议对象
+        S2C_Storm_Award.ParseFromString(data_Storm_Award)  # 解析协议返回值
+        if S2C_Storm_Award.ret == 1:
+            print("领取宝箱成功")
+        else:
+            print("领取宝箱失败" + str(S2C_Storm_Award.ret))
+            raise ProtocolException("领取宝箱失败")
+
+    def Storm_Reset(self, storm_id_into, ):
+        """
+        攻城掠地中关卡重置
+        :param storm_id_into: int 章节id
+        :return:
+        """
+        flag_Storm_Reset, data_Storm_Reset = self.protocol.MSG_C2S_Storm_Reset(storm_id_into, self.uid, self.sid)
+        S2C_Storm_Reset = cs_pb2.S2C_Storm_Reset()  # 创建返回协议对象
+        S2C_Storm_Reset.ParseFromString(data_Storm_Reset)  # 解析协议返回值
+        if S2C_Storm_Reset.ret == 1:
+            print("关卡重置成功")
+        else:
+            print("关卡重置失败" + str(S2C_Storm_Reset.ret))
+            raise ProtocolException("关卡重置失败")
+
+    def Storm_Break(self, storm_id_into, cell_id_into, ):
+        """
+        攻城掠地清除障碍事件
+        :param storm_id_into: int 章节id
+        :param cell_id_into:int 宝箱id
+        :return:
+        """
+        flag_Storm_Break, data_Storm_Break = self.protocol.MSG_C2S_Storm_Break(storm_id_into, cell_id_into, self.uid,
+                                                                               self.sid)
+        S2C_Storm_Break = cs_pb2.S2C_Storm_Break()  # 创建返回协议对象
+        S2C_Storm_Break.ParseFromString(data_Storm_Break)  # 解析协议返回值
+        if S2C_Storm_Break.ret == 1:
+            print("领取宝箱成功")
+        else:
+            print("领取宝箱失败" + str(S2C_Storm_Break.ret))
+            raise ProtocolException("领取宝箱失败")
 
     def Create_Guild(self, name):
         """
@@ -416,13 +519,14 @@ class ProtocolFunction:
             print("全部同意失败" + str(C2S_Friend_ConfirmFriend.ret))
             raise ProtocolException("全部同意失败")
 
-    def Formation_ChangePosition(self,pos_list ):
+    def Formation_ChangePosition(self, pos_list):
         """
         更改上阵位置,[6,1,2,3,4,5]，表示主角在6号位
         :param pos_list: list 顺序是上阵的参数，参数是阵位
         :return:
         """
-        flag_C2S_Formation_ChangePosition, data_C2S_Formation_ChangePosition = self.protocol.MSG_C2S_Formation_ChangePosition(pos_list,self.uid, self.sid)
+        flag_C2S_Formation_ChangePosition, data_C2S_Formation_ChangePosition = self.protocol.MSG_C2S_Formation_ChangePosition(
+            pos_list, self.uid, self.sid)
         S2C_Formation_ChangePosition = cs_pb2.S2C_Formation_ChangePosition()  # 创建返回协议对象
         S2C_Formation_ChangePosition.ParseFromString(data_C2S_Formation_ChangePosition)  # 解析协议返回值
         if S2C_Formation_ChangePosition.ret == 1:
@@ -710,3 +814,32 @@ class ProtocolFunction:
                     raise GmException("抽到需要验证的道具了，终止抽奖")
                 else:
                     print("抽到了" + str(num) + "次")
+
+    def GM_yijian_guanai(self, checkpoint_id_list):
+        """
+        一键通关关隘，目前仅限于少三2
+        :param checkpoint_id_list:
+        :return:
+        """
+        storm_id_into = checkpoint_id_list[0]
+        cell_id_into = checkpoint_id_list[1]
+        storm_type = checkpoint_id_list[2]
+        if storm_type == 1:
+            self.Storm_ChallengeBegin(storm_id_into, cell_id_into)
+        elif storm_type == 2:
+            self.Storm_Award(storm_id_into, cell_id_into)
+        elif storm_type == 3:
+            self.Storm_Break(storm_id_into, cell_id_into)
+        else:
+            raise GmException("没有对应的战斗类型")
+
+    def GM_huoyue_guanai(self, ):
+        """
+        剑阁，三个怪
+        :param checkpoint_num:
+        :return:
+        """
+        self.Storm_ChallengeBegin(2001, 1)
+        self.Storm_ChallengeBegin(2001, 3)
+        self.Storm_ChallengeBegin(2001, 5)
+        # self.Storm_Reset(2001)
