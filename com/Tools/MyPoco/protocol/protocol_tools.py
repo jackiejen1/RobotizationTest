@@ -77,6 +77,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
             if ct - rst > limittime: #判断超时
                 recvtime = time.time()
                 recvdata = b'error'
+                print("error,用时太长了")
                 return recvdata, recvtime
             s.settimeout(limittime)
             rev_data = s.recv(buffersize)#第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
@@ -118,6 +119,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
         except Exception as e:
             print("socket接收数据时发生错误")
             print("error,具体错误 {}".format(e))
+            print("战斗协议的话可能是无需战斗造成的")
             recvtime = time.time()
             recvdata = b'error'
             return recvdata, recvtime

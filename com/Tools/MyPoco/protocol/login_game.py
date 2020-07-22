@@ -246,7 +246,7 @@ class LoginGame:
         C2S_EliteDungeon_BeginChallenge.diff_type = diff_type_into
         C2S_EliteDungeon_BeginChallenge = C2S_EliteDungeon_BeginChallenge.SerializeToString()
         C2S_EliteDungeon_BeginChallenge_attr = {'name': "C2S_EliteDungeon_BeginChallenge", 'protocol': 'protobuf-ss',
-                                                'send_cmd': 14154, 'recv_cmd': [14155, 20000], 'uid': uid, 'sid': sid}
+                                                'send_cmd': 14154, 'recv_cmd': 14155, 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_EliteDungeon_BeginChallenge, C2S_EliteDungeon_BeginChallenge_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_EliteDungeon_BeginChallenge_attr, 32)  # 发送协议
         return flag, data
@@ -265,10 +265,78 @@ class LoginGame:
         C2S_Rebel_AttackBegin.attack_type = 1
         C2S_Rebel_AttackBegin = C2S_Rebel_AttackBegin.SerializeToString()
         C2S_Rebel_AttackBegin_attr = {'name': "C2S_Rebel_AttackBegin", 'protocol': 'protobuf-ss',
-                                                'send_cmd': 11152, 'recv_cmd': [11153, 20000], 'uid': uid, 'sid': sid}
+                                                'send_cmd': 11152, 'recv_cmd': 11153, 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Rebel_AttackBegin, C2S_Rebel_AttackBegin_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Rebel_AttackBegin_attr, 32)  # 发送协议
         return flag, data
+
+    def MSG_C2S_ContendTreasure_OneKeyFast(self, id_into, uid, sid):
+        """
+        一键夺宝
+        :param storm_id_into: 要合成的宝物id
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_ContendTreasure_OneKeyFast = cs_pb2.C2S_ContendTreasure_OneKeyFast()
+        C2S_ContendTreasure_OneKeyFast.id = id_into
+        C2S_ContendTreasure_OneKeyFast.is_use_item = 1
+        C2S_ContendTreasure_OneKeyFast = C2S_ContendTreasure_OneKeyFast.SerializeToString()
+        C2S_ContendTreasure_OneKeyFast_attr = {'name': "C2S_ContendTreasure_OneKeyFast", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 10812, 'recv_cmd': 10813, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_ContendTreasure_OneKeyFast, C2S_ContendTreasure_OneKeyFast_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_ContendTreasure_OneKeyFast_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Arena_OneKeyChallenge(self, num_into, uid, sid):
+        """
+        一键竞技场
+        :param num_into: 挑战次数
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Arena_OneKeyChallenge = cs_pb2.C2S_Arena_OneKeyChallenge()
+        C2S_Arena_OneKeyChallenge.num = num_into
+        C2S_Arena_OneKeyChallenge = C2S_Arena_OneKeyChallenge.SerializeToString()
+        C2S_Arena_OneKeyChallenge_attr = {'name': "C2S_Arena_OneKeyChallenge", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 10495, 'recv_cmd': 10496, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Arena_OneKeyChallenge, C2S_Arena_OneKeyChallenge_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Arena_OneKeyChallenge_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Arena_ChallengeBegin(self, rank_into, uid, sid):
+        """
+        竞技场挑战
+        :param rank_into: 挑战名次
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Arena_ChallengeBegin = cs_pb2.C2S_Arena_ChallengeBegin()
+        C2S_Arena_ChallengeBegin.rank = rank_into
+        C2S_Arena_ChallengeBegin = C2S_Arena_ChallengeBegin.SerializeToString()
+        C2S_Arena_ChallengeBegin_attr = {'name': "C2S_Arena_ChallengeBegin", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 10482, 'recv_cmd': 10483, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Arena_ChallengeBegin, C2S_Arena_ChallengeBegin_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Arena_ChallengeBegin_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Arena_GetMainInfo(self, uid, sid):
+        """
+        获取竞技场可挑战名单
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Arena_GetMainInfo = cs_pb2.C2S_Arena_GetMainInfo()
+        C2S_Arena_GetMainInfo = C2S_Arena_GetMainInfo.SerializeToString()
+        C2S_Arena_GetMainInfo_attr = {'name': "C2S_Arena_GetMainInfo", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 10480, 'recv_cmd': 10481, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Arena_GetMainInfo, C2S_Arena_GetMainInfo_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Arena_GetMainInfo_attr, 32)  # 发送协议
+        return flag, data
+
 
     def MSG_C2S_EliteDungeon_FastChallenge(self,stage_id_into,diff_type_into,times_into,uid, sid):
         """
@@ -408,6 +476,27 @@ class LoginGame:
         senddata = pack_data(C2S_DeadBattle_BoxAward, C2S_DeadBattle_BoxAward_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_DeadBattle_BoxAward_attr, 32)  # 发送协议
         return flag, data
+
+
+    def MSG_C2S_Shop_Shopping(self,id_into,num_into,uid, sid):
+        """
+        商城购买道具
+        :param storm_id_into: int 道具id
+        :param num_into:int 道具数量
+        :return:
+        """
+        C2S_Shop_Shopping = cs_pb2.C2S_Shop_Shopping()
+        KV = out_base_pb2.KV()
+        KV.id = id_into
+        KV.num = num_into
+        C2S_Shop_Shopping.info.MergeFrom(KV)
+        C2S_Shop_Shopping = C2S_Shop_Shopping.SerializeToString()
+        C2S_Shop_Shopping_attr = {'name': "C2S_Shop_Shopping", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 10422, 'recv_cmd': 10423, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Shop_Shopping, C2S_Shop_Shopping_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Shop_Shopping_attr, 32)  # 发送协议
+        return flag, data
+
     def MSG_C2S_DeadBattle_PickBuff(self,buff_id,uid, sid):
         """
         无双试炼领取通关buff
@@ -418,10 +507,27 @@ class LoginGame:
         C2S_DeadBattle_PickBuff = cs_pb2.C2S_DeadBattle_PickBuff()
         C2S_DeadBattle_PickBuff.id = buff_id
         C2S_DeadBattle_PickBuff = C2S_DeadBattle_PickBuff.SerializeToString()
-        C2S_DeadBattle_PickBuff_attr = {'name': "C2S_DeadBattle_BoxAward", 'protocol': 'protobuf-ss',
+        C2S_DeadBattle_PickBuff_attr = {'name': "C2S_DeadBattle_PickBuff", 'protocol': 'protobuf-ss',
                                       'send_cmd': 10512, 'recv_cmd': 10513, 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_DeadBattle_PickBuff, C2S_DeadBattle_PickBuff_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_DeadBattle_PickBuff_attr, 32)  # 发送协议
+        return flag, data
+
+
+    def MSG_C2S_Friend_SendGift(self,uid, sid):
+        """
+        给所有好友送礼物
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Friend_SendGift = cs_pb2.C2S_Friend_SendGift()
+        C2S_Friend_SendGift.id = 0
+        C2S_Friend_SendGift = C2S_Friend_SendGift.SerializeToString()
+        C2S_Friend_SendGift_attr = {'name': "C2S_Friend_SendGift", 'protocol': 'protobuf-ss',
+                                      'send_cmd': 10918, 'recv_cmd': 10919, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Friend_SendGift, C2S_Friend_SendGift_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Friend_SendGift_attr, 32)  # 发送协议
         return flag, data
 
     def MSG_C2S_CheckBattleResult(self, result_into, uid, sid):

@@ -322,9 +322,13 @@ class ProtocolFunction:
         flag_EliteDungeon_BeginChallenge, data_EliteDungeon_BeginChallenge = self.protocol.MSG_C2S_EliteDungeon_BeginChallenge(
             stage_id_into, diff_type_into, self.uid, self.sid)
         S2C_EliteDungeon_BeginChallenge = cs_pb2.S2C_EliteDungeon_BeginChallenge()  # 创建返回协议对象
-        S2C_EliteDungeon_BeginChallenge.ParseFromString(data_EliteDungeon_BeginChallenge["14155"])  # 解析协议返回值
-        battle_id = S2C_EliteDungeon_BeginChallenge.battle_id
-        self.do_Battle(data_EliteDungeon_BeginChallenge, battle_id)
+        S2C_EliteDungeon_BeginChallenge.ParseFromString(data_EliteDungeon_BeginChallenge)  # 解析协议返回值
+        if S2C_EliteDungeon_BeginChallenge.ret == 1:
+            print("炼狱副本成功")
+        else:
+            print("炼狱副本失败" + str(S2C_EliteDungeon_BeginChallenge.ret))
+            raise ProtocolException("炼狱副本失败")
+
 
     def Biography_ExecuteMission(self, mingjiangzhuan_id, type_num):
         """
@@ -369,7 +373,7 @@ class ProtocolFunction:
 
     def Rebel_AttackBegin(self, id_into):
         """
-        攻城掠地战斗
+        讨伐巨兽战斗
         :param storm_id_into: int 章节id
         :param cell_id_into:int 小怪id
         :return:
@@ -378,9 +382,82 @@ class ProtocolFunction:
         flag_Rebel_AttackBegin, data_Rebel_AttackBegin = self.protocol.MSG_C2S_Rebel_AttackBegin(id_into, self.uid,
                                                                                                  self.sid)
         S2C_Rebel_AttackBegin = cs_pb2.S2C_Rebel_AttackBegin()  # 创建返回协议对象
-        S2C_Rebel_AttackBegin.ParseFromString(data_Rebel_AttackBegin["11153"])  # 解析协议返回值
-        battle_id = S2C_Rebel_AttackBegin.battle_id
-        self.do_Battle(data_Rebel_AttackBegin, battle_id)
+        S2C_Rebel_AttackBegin.ParseFromString(data_Rebel_AttackBegin)  # 解析协议返回值
+        if S2C_Rebel_AttackBegin.ret == 1:
+            print("讨伐巨兽成功")
+        else:
+            print("讨伐巨兽失败" + str(S2C_Rebel_AttackBegin.ret))
+            raise ProtocolException("讨伐巨兽失败")
+
+
+    def ContendTreasure_OneKeyFast(self, id_into):
+        """
+        一键夺宝
+        :param storm_id_into: 要合成的宝物id
+        :return:
+        """
+        flag_ContendTreasure_OneKeyFast, data_ContendTreasure_OneKeyFast = self.protocol.MSG_C2S_ContendTreasure_OneKeyFast(id_into, self.uid,
+                                                                                                 self.sid)
+        S2C_ContendTreasure_OneKeyFast = cs_pb2.S2C_ContendTreasure_OneKeyFast()  # 创建返回协议对象
+        S2C_ContendTreasure_OneKeyFast.ParseFromString(data_ContendTreasure_OneKeyFast)  # 解析协议返回值
+        if S2C_ContendTreasure_OneKeyFast.ret == 1:
+            print("一键夺宝成功")
+        else:
+            print("一键夺宝失败" + str(S2C_ContendTreasure_OneKeyFast.ret))
+            raise ProtocolException("一键夺宝失败")
+
+    def Arena_OneKeyChallenge(self, num_into):
+        """
+        一键竞技场
+        :param num_into: 挑战次数
+        :return:
+        """
+        flag_Arena_OneKeyChallenge, data_Arena_OneKeyChallenge = self.protocol.MSG_C2S_Arena_OneKeyChallenge(num_into, self.uid,
+                                                                                                 self.sid)
+        S2C_Arena_OneKeyChallenge = cs_pb2.S2C_Arena_OneKeyChallenge()  # 创建返回协议对象
+        S2C_Arena_OneKeyChallenge.ParseFromString(data_Arena_OneKeyChallenge)  # 解析协议返回值
+        if S2C_Arena_OneKeyChallenge.ret == 1:
+            print("一键竞技场成功")
+        else:
+            print("一键竞技场失败" + str(S2C_Arena_OneKeyChallenge.ret))
+            raise ProtocolException("一键竞技场失败")
+
+
+    def Arena_ChallengeBegin(self, rank_into):
+        """
+        竞技场挑战
+        :param rank_into: 挑战名次
+        :return:
+        """
+        flag_Arena_ChallengeBegin, data_Arena_ChallengeBegin = self.protocol.MSG_C2S_Arena_ChallengeBegin(rank_into, self.uid,
+                                                                                                 self.sid)
+        S2C_Arena_ChallengeBegin = cs_pb2.S2C_Arena_ChallengeBegin()  # 创建返回协议对象
+        S2C_Arena_ChallengeBegin.ParseFromString(data_Arena_ChallengeBegin)  # 解析协议返回值
+        if S2C_Arena_ChallengeBegin.ret == 1:
+            print("竞技场挑战成功")
+        else:
+            print("竞技场挑战失败" + str(S2C_Arena_ChallengeBegin.ret))
+            raise ProtocolException("竞技场挑战失败")
+
+    def Arena_GetMainInfo(self):
+        """
+        获取竞技场可挑战名单
+        :return:list 挑战名单
+        """
+        flag_Arena_GetMainInfo, data_Arena_GetMainInfo = self.protocol.MSG_C2S_Arena_GetMainInfo(self.uid,
+                                                                                                 self.sid)
+        S2C_Arena_GetMainInfo = cs_pb2.S2C_Arena_GetMainInfo()  # 创建返回协议对象
+        S2C_Arena_GetMainInfo.ParseFromString(data_Arena_GetMainInfo)  # 解析协议返回值
+        if S2C_Arena_GetMainInfo.ret == 1:
+            print("获取竞技场可挑战名单成功")
+        else:
+            print("获取竞技场可挑战名单失败" + str(S2C_Arena_GetMainInfo.ret))
+            raise ProtocolException("获取竞技场可挑战名单失败")
+        rank_list = []
+        for arena_unit in S2C_Arena_GetMainInfo.arena_units:
+            rank = arena_unit.rank
+            rank_list.append(rank)
+        return rank_list
 
     def EliteDungeon_FastChallenge(self, stage_id_into, diff_type_into, times_into, ):
         """
@@ -443,11 +520,26 @@ class ProtocolFunction:
         S2C_Storm_Break = cs_pb2.S2C_Storm_Break()  # 创建返回协议对象
         S2C_Storm_Break.ParseFromString(data_Storm_Break)  # 解析协议返回值
         if S2C_Storm_Break.ret == 1:
-            print("领取宝箱成功")
+            print("清除障碍成功")
         else:
-            print("领取宝箱失败" + str(S2C_Storm_Break.ret))
-            raise ProtocolException("领取宝箱失败")
-
+            print("清除障碍失败" + str(S2C_Storm_Break.ret))
+            raise ProtocolException("清除障碍失败")
+    def Shop_Shopping(self, id_into,num_into, ):
+        """
+        商城购买道具
+        :param storm_id_into: int 道具id
+        :param num_into:int 道具数量
+        :return:
+        """
+        flag_Shop_Shopping, data_Shop_Shopping = self.protocol.MSG_C2S_Shop_Shopping(id_into,num_into, self.uid,
+                                                                               self.sid)
+        S2C_Shop_Shopping = cs_pb2.S2C_Shop_Shopping()  # 创建返回协议对象
+        S2C_Shop_Shopping.ParseFromString(data_Shop_Shopping)  # 解析协议返回值
+        if S2C_Shop_Shopping.ret == 1:
+            print("商城购买道具成功")
+        else:
+            print("商城购买道具失败" + str(S2C_Shop_Shopping.ret))
+            raise ProtocolException("商城购买道具失败")
     def Create_Guild(self, name):
         """
         创建军团
@@ -462,6 +554,21 @@ class ProtocolFunction:
         else:
             print("创建军团失败" + str(C2S_Guild_Create.ret))
             raise ProtocolException("创建军团失败")
+
+
+    def Friend_SendGift(self,):
+        """
+        给所有好友送礼物
+        :return:
+        """
+        flag_Friend_SendGift, data_Friend_SendGift = self.protocol.MSG_C2S_Friend_SendGift(self.uid, self.sid)
+        S2C_Friend_SendGift = cs_pb2.S2C_Friend_SendGift()  # 创建返回协议对象
+        S2C_Friend_SendGift.ParseFromString(data_Friend_SendGift)  # 解析协议返回值
+        if S2C_Friend_SendGift.ret == 1:
+            print("一键送礼成功")
+        else:
+            print("一键送礼失败" + str(S2C_Friend_SendGift.ret))
+            raise ProtocolException("一键送礼失败")
 
     def search_Guild(self, Guild_name):
         """
