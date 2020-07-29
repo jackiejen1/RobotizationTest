@@ -16,9 +16,9 @@ import xlwt
 
 def handle_excel(path_input,path_output):
     """
-    处理excel表格的数据
-    :param path_input:
-    :param path_output:
+    处理excel表格的数据，用以生成副本关卡ID表
+    :param path_input:策划的ID表
+    :param path_output:指定一个空表
     :return:
     """
     checkpoint_xl = xlrd.open_workbook(path_input)#打开指定表格

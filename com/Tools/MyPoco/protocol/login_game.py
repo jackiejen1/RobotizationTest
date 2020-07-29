@@ -175,6 +175,27 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_Friend_AddFriend_attr, 32)  # 发送协议
         return flag, data
 
+    def MSG_C2S_Sell(self, type_into,consume_into, uid, sid):
+        """
+        出售
+        :param consume_into: 唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Sell = cs_pb2.C2S_Sell()
+
+        consume = C2S_Sell.consumes.add()
+        consume.type = type_into
+        consume.value = consume_into
+        consume.size = 1
+        C2S_Sell = C2S_Sell.SerializeToString()
+        C2S_Sell_attr = {'name': "C2S_Sell", 'protocol': 'protobuf-ss',
+                                     'send_cmd': 10147, 'recv_cmd': 10148, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Sell, C2S_Sell_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Sell_attr, 32)  # 发送协议
+        return flag, data
+
     def MSG_C2S_Dungeon_ChallengeStageBegin(self, id, uid, sid):
         """
         发起副本战斗
@@ -636,7 +657,7 @@ class LoginGame:
 
     def MSG_C2S_Test(self, type_into, value_into, size_into, uid, sid):
         """
-        添加或消耗道具，目前只用做添加，消耗待定 #todo
+        添加道具
         :param type_into: int 道具类型
         :param value_into: int 道具ID
         :param size_into: int 道具数量
@@ -649,6 +670,48 @@ class LoginGame:
         award.type = type_into
         award.value = value_into
         award.size = size_into
+        C2S_Test = C2S_Test.SerializeToString()
+        C2S_Test_attr = {'name': "C2S_Test", 'protocol': 'protobuf-ss', 'send_cmd': 10140, 'recv_cmd': 10141,
+                         'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Test, C2S_Test_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Test_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Test_Consumes(self, type_into, value_into, size_into, uid, sid):
+        """
+        消耗道具
+        :param type_into: int 道具类型
+        :param value_into: int 道具ID
+        :param size_into: int 道具数量
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Test = cs_pb2.C2S_Test()
+        consume = C2S_Test.consumes.add()
+        consume.type = type_into
+        consume.value = value_into
+        consume.size = size_into
+        C2S_Test = C2S_Test.SerializeToString()
+        C2S_Test_attr = {'name': "C2S_Test", 'protocol': 'protobuf-ss', 'send_cmd': 10140, 'recv_cmd': 10141,
+                         'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Test, C2S_Test_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Test_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Test_Consumes_some(self, consumes_into_list,  uid, sid):
+        """
+        消耗道具
+        :param type_into: int 道具类型
+        :param value_into: int 道具ID
+        :param size_into: int 道具数量
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Test = cs_pb2.C2S_Test()
+        for consumes_into in consumes_into_list:
+            C2S_Test.consumes.append(consumes_into)
         C2S_Test = C2S_Test.SerializeToString()
         C2S_Test_attr = {'name': "C2S_Test", 'protocol': 'protobuf-ss', 'send_cmd': 10140, 'recv_cmd': 10141,
                          'uid': uid, 'sid': sid}
@@ -713,4 +776,20 @@ class LoginGame:
                                          'send_cmd': 12250, 'recv_cmd': 12251, 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Recruit_RecruitKnight, C2S_Recruit_RecruitKnight_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Recruit_RecruitKnight_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_S2C_OpObject(self,uid, sid):
+        """
+        身上状态变更，暂时用来查询元宝数量
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Flush = cs_pb2.C2S_Flush()
+        C2S_Flush.user=True
+        C2S_Flush = C2S_Flush.SerializeToString()
+        C2S_Flush_attr = {'name': "C2S_Flush", 'protocol': 'protobuf-ss', 'send_cmd': 10100, 'recv_cmd': 10150,
+                         'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Flush, C2S_Flush_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Flush_attr, 32)  # 发送协议
         return flag, data

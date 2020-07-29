@@ -83,6 +83,12 @@ class MyPoco:
         """
         return self.protocol.get_resource_pb(find_name)
 
+    def del_all_resource_pb(self):
+        """
+        删除账号上的碎片、道具、资源、装备、宝物、进阶装备、名将传道具
+        :return:
+        """
+        self.protocol.del_all_resource_pb()
     def shangzhenwujiang(self, pos, name):
         """
         上阵武将
@@ -613,7 +619,7 @@ class MyPoco:
                 add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
                 self.protocol.add_resource_pb(add_type, add_value, 1000)
 
-    def GM_yijian_account_haiwai_v1(self, account):
+    def GM_yijian_account_v1(self, account):
         """
         一键制作账号，1. 创建帐号（名字字数无具体要求）
                     2. 新手引导结束
@@ -634,9 +640,9 @@ class MyPoco:
         add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
         self.protocol.add_resource_pb(add_type, add_value, 910)
         # 上阵武将
-        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("刘备")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("陆逊")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
-        self.shangzhenwujiang(2, "刘备")
+        self.shangzhenwujiang(2, "陆逊")
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("小乔")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(3, "小乔")
@@ -649,7 +655,7 @@ class MyPoco:
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("典韦")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(6, "典韦")
-        self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])#调整阵型
+        self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])  # 调整阵型
         # 开始一键通关副本，海外后续使用GMAPI
         tilizhi = self.get_resource_pb("体力值")
         add_tilizhi_num = 1000 - tilizhi
@@ -671,16 +677,185 @@ class MyPoco:
         self.GM_yijian_mingjiangzhuan(7)  # 通关名将传
         self.GM_fengkuang_haoyou(50, account_into=account)  # 加好友
         self.GM_yijian_wushaungshilian(20)  # 通关无双试炼
-        # self.shangzhenwujiang(2, "刘备")
-        self.GM_fengkuang_fuben("副本-15-5",30)
-        self.GM_shop_shopping(105, 10)#买10个银币
-        self.GM_shop_shopping(101,4)#买4个体力丹
-        self.GM_yijian_guanai()#通关关隘
+        self.GM_fengkuang_fuben("副本-15-5", 30)
+        self.GM_shop_shopping(105, 10)  # 买10个银币
+        self.GM_shop_shopping(101, 4)  # 买4个体力丹
+        self.GM_yijian_guanai()  # 通关关隘
         # self.GM_huoyue_lianyufuben()#炼狱副本
         # self.GM_huoyue_taofajushou()#讨伐巨兽
-        self.GM_huoyue_friend_send_gift()#好友送礼
-        self.GM_huoyue_mijingduobao()#秘境寻宝
-        self.GM_huoyue_jingjichang()#挑战竞技场
+        self.GM_huoyue_friend_send_gift()  # 好友送礼
+        self.GM_huoyue_mijingduobao()  # 秘境寻宝
+        self.GM_huoyue_jingjichang()  # 挑战竞技场
+        for i in range(31)[1:]:
+            self.protocol.add_resource_pb(6, i, 1000)
+        self.protocol.add_resource_pb(5, 50150, 1)
+        self.protocol.add_resource_pb(5, 50160, 1)
+        self.protocol.add_resource_pb(5, 50170, 1)
+        self.protocol.add_resource_pb(5, 50180, 1)
+        self.protocol.add_resource_pb(7, 411, 2)
+        self.protocol.add_resource_pb(7, 412, 2)
+        self.protocol.add_resource_pb(7, 413, 2)
+        self.protocol.add_resource_pb(7, 414, 2)
+        self.protocol.add_resource_pb(7, 421, 4)
+        self.protocol.add_resource_pb(7, 422, 4)
+        self.protocol.add_resource_pb(7, 423, 4)
+        self.protocol.add_resource_pb(7, 424, 4)
+        self.protocol.add_resource_pb(8, 11210, 10)
+        self.protocol.add_resource_pb(8, 11320, 10)
+        self.protocol.add_resource_pb(8, 12210, 10)
+        self.protocol.add_resource_pb(8, 12320, 10)
+        self.protocol.add_resource_pb(8, 14010, 50)
+        self.protocol.add_resource_pb(8, 14020, 50)
+        self.protocol.add_resource_pb(15, 510060, 1)
+        self.protocol.add_resource_pb(15, 510070, 1)
+        self.protocol.add_resource_pb(15, 510080, 1)
+        self.protocol.add_resource_pb(2, 411, 500)
+        self.protocol.add_resource_pb(2, 412, 500)
+        self.protocol.add_resource_pb(2, 413, 500)
+        self.protocol.add_resource_pb(2, 414, 500)
+        self.protocol.add_resource_pb(2, 421, 500)
+        self.protocol.add_resource_pb(2, 422, 500)
+        self.protocol.add_resource_pb(2, 423, 500)
+        self.protocol.add_resource_pb(2, 424, 500)
+        self.protocol.add_resource_pb(2, 22020, 1000)
+        self.protocol.add_resource_pb(2, 22030, 1000)
+        self.protocol.add_resource_pb(2, 23010, 1000)
+        self.protocol.add_resource_pb(2, 23020, 1000)
+        self.protocol.add_resource_pb(2, 23060, 1000)
+        self.protocol.add_resource_pb(2, 50150, 1000)
+        self.protocol.add_resource_pb(2, 50160, 1000)
+        self.protocol.add_resource_pb(2, 50170, 1000)
+        self.protocol.add_resource_pb(2, 50050, 1000)
+        self.protocol.add_resource_pb(2, 510040, 1000)
+        self.protocol.add_resource_pb(2, 510050, 1000)
+        self.protocol.add_resource_pb(2, 510060, 1000)
+        self.protocol.add_resource_pb(2, 510070, 1000)
+        self.protocol.add_resource_pb(2, 510080, 1000)
+        self.protocol.add_resource_pb(2, 15302, 1000)
+        self.protocol.add_resource_pb(2, 15401, 1000)
+        self.protocol.add_resource_pb(2, 15402, 1000)
+        self.protocol.add_resource_pb(3, 1, 1000)
+        self.protocol.add_resource_pb(3, 2, 100000)
+        self.protocol.add_resource_pb(3, 6, 100)
+        self.protocol.add_resource_pb(3, 7, 5000)
+        self.protocol.add_resource_pb(3, 8, 5000)
+        self.protocol.add_resource_pb(3, 9, 5000)
+        self.protocol.add_resource_pb(3, 10, 10000)
+        self.protocol.add_resource_pb(3, 11, 20000)
+        self.protocol.add_resource_pb(3, 12, 1000)
+        self.protocol.add_resource_pb(3, 13, 1000)
+        self.protocol.add_resource_pb(3, 14, 1000)
+        self.protocol.add_resource_pb(3, 15, 1000)
+        self.protocol.add_resource_pb(3, 22, 1000)
+        self.protocol.add_resource_pb(3, 23, 1000)
+        self.protocol.add_resource_pb(3, 24, 100)
+        self.protocol.add_resource_pb(3, 26, 10000)
+        self.protocol.add_resource_pb(3, 28, 1000)
+        self.protocol.add_resource_pb(3, 29, 1000)
+        self.protocol.add_resource_pb(3, 32, 10000)
+        self.protocol.add_resource_pb(3, 35, 1000)
+        self.protocol.add_resource_pb(3, 37, 500)
+        self.protocol.add_resource_pb(3, 39, 100)
+        self.protocol.add_resource_pb(3, 47, 3000)
+        self.protocol.add_resource_pb(3, 48, 3000)
+        self.protocol.add_resource_pb(3, 49, 3000)
+        self.protocol.add_resource_pb(3, 50, 3000)
+        self.protocol.add_resource_pb(3, 56, 3000)
+        self.protocol.add_resource_pb(3, 62, 50)
+        self.protocol.add_resource_pb(3, 63, 50)
+        self.protocol.add_resource_pb(3, 64, 50)
+        self.protocol.add_resource_pb(3, 103, 100)
+        self.protocol.add_resource_pb(3, 104, 100)
+        self.protocol.add_resource_pb(3, 105, 100)
+        self.protocol.add_resource_pb(3, 119, 100)
+        self.protocol.add_resource_pb(3, 130, 1000)
+        self.protocol.add_resource_pb(3, 131, 1000)
+        self.protocol.add_resource_pb(3, 132, 1000)
+        self.protocol.add_resource_pb(3, 133, 1000)
+        self.protocol.add_resource_pb(3, 157, 2000)
+        # 删除道具
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
+        yuanbaoshuliang = self.protocol.get_resource_pb_yuanbao()
+        print("元宝数量========", yuanbaoshuliang)
+        self.protocol.del_resource_pb(add_type, add_value, yuanbaoshuliang)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("银币")
+        yinbishuliang = self.get_resource_pb("银币")
+        self.protocol.del_resource_pb(add_type, add_value, yinbishuliang)
+
+    def GM_yijian_account_v2(self, account):
+        """
+        一键制作账号，1. 创建帐号（名字字数无具体要求）
+                    2. 新手引导结束
+                    3. 角色等级>30
+                    4. 通关主线副本>30章
+                    5. 通关名将传>7章
+                    6. 通关无双试练>20关
+                    7. 好友数量>50个
+                    8. 武将上阵5个（小乔，貂蝉，马超，刘备，典韦）
+                    清除所有资源
+        :param account:str 账号 给添加好友功能使用
+        :return:
+        """
+        # 加资源，等级
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 409909990)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("测试属性")
+        self.protocol.add_resource_pb(add_type, add_value, 999999999)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
+        self.protocol.add_resource_pb(add_type, add_value, 910)
+        # 上阵武将
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("陆逊")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(2, "陆逊")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("小乔")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(3, "小乔")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("貂蝉")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(4, "貂蝉")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("马超")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(5, "马超")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("典韦")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(6, "典韦")
+        self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])  # 调整阵型
+        # 开始一键通关副本，海外后续使用GMAPI
+        tilizhi = self.get_resource_pb("体力值")
+        add_tilizhi_num = 1000 - tilizhi
+        add_tili_type, add_tili_value = self.protocol.mri.get_type_id_from_name("体力值")
+        if add_tilizhi_num == 0:
+            pass
+        else:
+            # 初始化体力值到1000
+            self.protocol.add_resource_pb(add_tili_type, add_tili_value, add_tilizhi_num)
+        for i in range(32)[1:]:  # 副本通关数
+            for ii in range(15)[1:]:  # 关卡数可以多一点，适配小关卡数量不确定性
+                checkpoint_name = "副本-" + str(i) + "-" + str(ii)
+                try:
+                    fuben_id = self.protocol.mri.get_num_from_name(checkpoint_name)
+                except Exception:  # 找不到关卡说明打完了，就终止
+                    self.protocol.add_resource_pb(add_tili_type, add_tili_value, 500)
+                    break
+                self.protocol.GM_fengkuangfuben(fuben_id)
+        self.GM_yijian_mingjiangzhuan(7)  # 通关名将传
+        self.GM_fengkuang_haoyou(50, account_into=account)  # 加好友
+        self.GM_yijian_wushaungshilian(20)  # 通关无双试炼
+        self.GM_fengkuang_fuben("副本-15-5", 30)
+        self.GM_shop_shopping(105, 10)  # 买10个银币
+        self.GM_shop_shopping(101, 4)  # 买4个体力丹
+        self.GM_yijian_guanai()  # 通关关隘
+        # self.GM_huoyue_lianyufuben()#炼狱副本
+        # self.GM_huoyue_taofajushou()#讨伐巨兽
+        self.GM_huoyue_friend_send_gift()  # 好友送礼
+        self.GM_huoyue_mijingduobao()  # 秘境寻宝
+        self.GM_huoyue_jingjichang()  # 挑战竞技场
+        self.del_all_resource_pb()
+        # 删除道具
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
+        yuanbaoshuliang = self.protocol.get_resource_pb_yuanbao()
+        self.protocol.del_resource_pb(add_type, add_value, yuanbaoshuliang)
+
 
     def GM_yijian_wushaungshilian(self, checkpoint_num_into):
         """
@@ -729,9 +904,9 @@ class MyPoco:
         :param checkpoint_num:int 大章节代号1.2.3
         :return:
         """
-        add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
-        self.protocol.add_resource_pb(add_type, add_value, 1)
-        self.shangzhenwujiang(2, "陆逊")
+        # add_type, add_value = self.protocol.mri.get_type_id_from_name("陆逊")
+        # self.protocol.add_resource_pb(add_type, add_value, 1)
+        # self.shangzhenwujiang(2, "陆逊")
         num_lists = self.protocol.mri.get_num_list_from_name(checkpoint_num)
         for num_list in num_lists:
             mingjiangzhuan_id = num_list[0]
@@ -769,7 +944,7 @@ class MyPoco:
         :return:
         """
         self.protocol.GM_huoyue_guanai()
-        self.protocol.Storm_Reset(2001)#刷新剑阁，一天一次
+        self.protocol.Storm_Reset(2001)  # 刷新剑阁，一天一次
 
     def GM_huoyue_lianyufuben(self):
         """
@@ -788,9 +963,9 @@ class MyPoco:
         self.protocol.add_resource_pb(add_type, add_value, 1)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("雌雄双股剑")
         self.protocol.add_resource_pb(add_type, add_value, 1)
-        self.protocol.EliteDungeon_BeginChallenge(190101,1)
+        self.protocol.EliteDungeon_BeginChallenge(190101, 1)
         time.sleep(3)
-        self.protocol.EliteDungeon_FastChallenge(190101,1,1)
+        self.protocol.EliteDungeon_FastChallenge(190101, 1, 1)
         time.sleep(3)
         self.protocol.EliteDungeon_FastChallenge(190101, 1, 1)
         time.sleep(3)
@@ -805,7 +980,7 @@ class MyPoco:
         """
 
         week = self.get_time_str(self.protocol.sever_time)[2]
-        if week in [1, 3, 5,7]:
+        if week in [1, 3, 5, 7]:
             id_into = 1
         elif week in [2, 4, 6]:
             id_into = 2
@@ -840,27 +1015,27 @@ class MyPoco:
         :return:
         """
         for i in range(21)[1:]:
-            mingci_id = self.GM_getinfo_jingjichang()[0]
+            mingci_id = self.GM_getinfo_jingjichang()[1]
             self.protocol.Arena_ChallengeBegin(mingci_id)
-            time.sleep(0.5)
-    def GM_getinfo_jingjichang(self,):
+            time.sleep(1)
+
+    def GM_getinfo_jingjichang(self, ):
         """
         获取竞技场可挑战名单
         :return:list 挑战名单
         """
         return self.protocol.Arena_GetMainInfo()
 
-
-    def GM_shop_shopping(self,id_into,num_into, ):
+    def GM_shop_shopping(self, id_into, num_into, ):
         """
         商城购买道具
         :param storm_id_into: int 道具id
         :param num_into:int 道具数量
         :return:
         """
-        self.protocol.Shop_Shopping(id_into,num_into, )
+        self.protocol.Shop_Shopping(id_into, num_into, )
 
-    def GM_huoyue_friend_send_gift(self,):
+    def GM_huoyue_friend_send_gift(self, ):
         """
         给所有好友送礼物
         :return:
@@ -874,10 +1049,9 @@ class MyPoco:
         """
         add_type, add_value = self.protocol.mri.get_type_id_from_name("列传次数")
         self.protocol.add_resource_pb(add_type, add_value, 10)
-        num_list = [1003,1004,2002,2004,2006,2007,]
+        num_list = [1003, 1004, 2002, 2004, 2006, 2007, ]
         for num in num_list:
             self.protocol.Biography_ExecuteMission(num, 1)
-
 
     def GM_fengkuang_haoyou(self, num, account_into=None, sever_name_into=None):
         """

@@ -81,7 +81,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
                 return recvdata, recvtime
             s.settimeout(limittime)
             rev_data = s.recv(buffersize)#第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
-            if len(rev_data) != buffersize:#拆包处理，有时候第一条不是完整数据
+            if len(rev_data) != buffersize:#拆包发送，第一条不是完整数据，长度会不够
                 rev_data =rev_data + s.recv(buffersize-len(rev_data))
                 # return recvdata, recvtime
                 # continue
