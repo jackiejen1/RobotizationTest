@@ -16,14 +16,22 @@ import struct
 import time
 from socket import error
 def protobuf_protocol(data, api_attr):
+    """
+    消息体拼接函数，根据项目组装包头
+    :param data: pb协议对象，消息体
+    :param api_attr:
+    :return:
+    """
     msg_data_str = data
-    pack_length = len(msg_data_str) + 32#24 包体对象
-    cmd = api_attr['send_cmd']
+    pack_length = len(msg_data_str) + 32#32 是包头长度
+    cmd = api_attr['send_cmd']#发包协议ID号
     uid = api_attr['uid']
     sid = api_attr['sid']
     cid = 0
-    head_data = struct.pack(">IIQQQ", pack_length, cmd, uid, sid, cid)
-    msg_data_str = head_data + msg_data_str
+    head_data = struct.pack(">IIQQQ", pack_length, cmd, uid, sid, cid)#把包头需要的信息转成bytes
+    #IIQQQ表示根据什么规则去把python的类型转换成c的类型
+    #>大端小端，内存对其？设备位数？
+    msg_data_str = head_data + msg_data_str#把包头和包体拼接
     return msg_data_str
 
 # 全部协议打包函数字典
@@ -46,10 +54,17 @@ all_protocol = {
 
 # 给外部调用的主函数
 def pack_data(data, api_attr=None):
+    """
+    打包函数，数据bytes化
+    :param data: pb协议对象，消息体
+    :param api_attr: 用来打包的参数字典
+    :return:
+    """
     msg_data_str = b''
     protocol = api_attr['protocol']
     if protocol in all_protocol.keys():
-        data = all_protocol[protocol](data, api_attr)
+        print(data, api_attr)
+        data = all_protocol[protocol](data, api_attr)#打包函数，all_protocol[protocol]是个函数
         return data
     else:
         print("not found protocol process")
@@ -65,39 +80,39 @@ def _recv_data(s, api_attr, buffersize, limittime):
         :param limitime: 接收超时时长
         :return: 接收标志与接收到的数据，出错时返回的数据为 b'error'
         """
-    recvcmd = api_attr['recv_cmd']
-    # if len(recvcmd) > 1:
+    recvcmd = api_attr['recv_cmd']#确定需要接收的协议ID
     recvdata_dic = {}
     then_len = 0
     print("当前接收接口:--{} cmd: {}".format(api_attr['name'], recvcmd))
     rst = int(time.time())
-    while True:#这里是一直接收数据的
+    s.settimeout(limittime)  # 设置超时时间
+    while True:#这里是一直接收数据的，只要有消息，就一直接收
         try:
             ct = int(time.time())
-            if ct - rst > limittime: #判断超时
+            #规定时间内没有收到想要的包就退出
+            if ct - rst > limittime:
                 recvtime = time.time()
                 recvdata = b'error'
-                print("error,用时太长了")
+                print("等了很久都没有等到想要的")
                 return recvdata, recvtime
-            s.settimeout(limittime)
             rev_data = s.recv(buffersize)#第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
-            if len(rev_data) != buffersize:#拆包发送，第一条不是完整数据，长度会不够
-                rev_data =rev_data + s.recv(buffersize-len(rev_data))
-                # return recvdata, recvtime
-                # continue
             if len(rev_data) == 0:
                 data = b'error'
                 print("error,消息头长度为0")
                 recv_time = time.time()
                 return data, recv_time
+            if len(rev_data) < buffersize:#服务端拆包发送，第一条不是完整数据，包头长度会不够
+                rev_data =rev_data + s.recv(buffersize-len(rev_data))
             head_data = struct.unpack('>IIQQQ', rev_data)#把消息头解包
-            s.settimeout(limittime)
-            tmpdata = s.recv(head_data[0] - 32)#接收除消息头以外的消息体
-            while (len(tmpdata) < (head_data[0] - 32)):#消息没收完就继续收
-                tmpdata += s.recv(head_data[0] - 32 - len(tmpdata))
+            #通过消息头数据，计算出消息体的长度
+            data_len = head_data[0] - 32
+            tmpdata = s.recv(data_len)#接收后续的消息体
+            while (len(tmpdata) < data_len):#一次没收完，就继续收
+                tmpdata += s.recv(data_len - len(tmpdata))
             #收完完整的一条后进行校验
             recvtime = time.time()
             if isinstance(recvcmd,list):
+                #需要多条返回协议的处理
                 for rec in recvcmd:
                     if head_data[1] == rec:  # 这里对返回数据进行校验，只返回要求协议ID的数据
                         recvtime = time.time()
@@ -111,10 +126,6 @@ def _recv_data(s, api_attr, buffersize, limittime):
                     recvtime = time.time()
                     recvdata = tmpdata
                     return recvdata, recvtime
-            # if head_data[1] == recvcmd:#这里对返回数据进行校验，只返回要求协议ID的数据
-            #     recvtime = time.time()
-            #     recvdata = tmpdata
-            #     return recvdata, recvtime
             #如果不是指定的协议，就继续接收下一条协议内容
         except Exception as e:
             print("socket接收数据时发生错误")
@@ -124,32 +135,32 @@ def _recv_data(s, api_attr, buffersize, limittime):
             recvdata = b'error'
             return recvdata, recvtime
 
-# def recv_data(sock, api_attr, headsize, norecv=False, limitime=30):
-#     """
-#     发送并接收socket数据，并返回给调用函数
-#     :param sock: 使用的socket
-#     :param socketdata: 要发送的数据，已经pack好的数据
-#     :param api_attr: 属性参数字典
-#     :param headsize: 数据包大小
-#     :param norecv: 是否需要接收返回，不需要接收返回时，发送完数据后就直接返回，发送的标志和 b'norecv'
-#     :param limitime: 发送与接收timeout时长
-#     :return: 发送或者接收标志 ，接收到的数据或者 b'norecv' b'error'
-#     """
-#     workname = api_attr['name']
-#     print("当前发送接口:--{}".format(workname))
-#     flag = True
-#     if not flag:
-#         return flag, b'error'
-#     else:
-#         print("send data success")
-#     if norecv:
-#         return flag, b'norecv'
-#     receive_data, recv_time = _recv_data(sock, api_attr, headsize, limitime)
-#     if receive_data != b'error':
-#         flag = True
-#     else:
-#         flag = False
-#     return flag, receive_data
+def recv_data(sock, api_attr, headsize, norecv=False, limitime=30):
+    """
+    接收socket数据，用来单独调用接收多条指定的协议回包
+    :param sock: 使用的socket
+    :param socketdata: 要发送的数据，已经pack好的数据
+    :param api_attr: 属性参数字典
+    :param headsize: 数据包大小
+    :param norecv: 是否需要接收返回，不需要接收返回时，发送完数据后就直接返回，发送的标志和 b'norecv'
+    :param limitime: 发送与接收timeout时长
+    :return: 发送或者接收标志 ，接收到的数据或者 b'norecv' b'error'
+    """
+    workname = api_attr['name']
+    print("当前发送接口:--{}".format(workname))
+    flag = True
+    if not flag:
+        return flag, b'error'
+    else:
+        print("send data success")
+    if norecv:
+        return flag, b'norecv'
+    receive_data, recv_time = _recv_data(sock, api_attr, headsize, limitime)
+    if receive_data != b'error':
+        flag = True
+    else:
+        flag = False
+    return flag, receive_data
 
 def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=30):
     """
@@ -166,16 +177,16 @@ def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=30
     print("当前发送接口:--{}".format(workname))
     flag = True
     try:
-        sock.send(socketdata)
+        sock.send(socketdata) #发送数据
     except error:
         flag = False
     if not flag:
         return flag, b'error'
     else:
         print("send data success")
-    if norecv:
+    if norecv:#是否需要接受数据，默认接收
         return flag, b'norecv'
-    receive_data, recv_time = _recv_data(sock, api_attr, headsize, limitime)
+    receive_data, recv_time = _recv_data(sock, api_attr, headsize, limitime)#开始接收数据
     if receive_data != b'error':
         flag = True
     else:

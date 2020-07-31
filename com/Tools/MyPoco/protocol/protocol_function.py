@@ -157,21 +157,21 @@ class ProtocolFunction:
                              "特权": "S2C_FlushPrivilege", }
         protocol_name = protocol_name_dic[find_name]
         self.Flush_id_dic = {"S2C_FlushRedPoint": "10103",
-                        "S2C_FlushKnight": "10104",
-                        "S2C_FlushFragment": "10105",
-                        "S2C_FlushItem": "10106",
-                        "S2C_FlushUniteToken": "10107",
-                        "S2C_FlushResource": "10108",
-                        "S2C_FlushFormation": "10109",
-                        "S2C_FlushAdvanceEquipment": "10110",
-                        "S2C_FlushEquipment": "10111",
-                        "S2C_FlushTreasure": "10112",
-                        "S2C_FlushDress": "10113",
-                        "S2C_FlushRedPacket": "10114",
-                        "S2C_FlushRandomPlayer": "10115",
-                        "S2C_FlushBiographyItem": "10116",
-                        "S2C_FlushSkin": "10117",
-                        "S2C_FlushPrivilege": "10118", }
+                             "S2C_FlushKnight": "10104",
+                             "S2C_FlushFragment": "10105",
+                             "S2C_FlushItem": "10106",
+                             "S2C_FlushUniteToken": "10107",
+                             "S2C_FlushResource": "10108",
+                             "S2C_FlushFormation": "10109",
+                             "S2C_FlushAdvanceEquipment": "10110",
+                             "S2C_FlushEquipment": "10111",
+                             "S2C_FlushTreasure": "10112",
+                             "S2C_FlushDress": "10113",
+                             "S2C_FlushRedPacket": "10114",
+                             "S2C_FlushRandomPlayer": "10115",
+                             "S2C_FlushBiographyItem": "10116",
+                             "S2C_FlushSkin": "10117",
+                             "S2C_FlushPrivilege": "10118", }
         recv_cmd_id = self.Flush_id_dic[protocol_name]
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, recv_cmd_id)
         # S2C_Flush = cs_pb2.S2C_Flush()  # 创建返回协议对象
@@ -192,21 +192,21 @@ class ProtocolFunction:
         S2C_FlushSkin = cs_pb2.S2C_FlushSkin()
         S2C_FlushPrivilege = cs_pb2.S2C_FlushPrivilege()
         self.Flush_name_dic = {"S2C_FlushRedPoint": "S2C_FlushRedPoint.ParseFromString(data_Flush)",
-                          "S2C_FlushKnight": "S2C_FlushKnight.ParseFromString(data_Flush)",
-                          "S2C_FlushFragment": "S2C_FlushFragment.ParseFromString(data_Flush)",
-                          "S2C_FlushItem": "S2C_FlushItem.ParseFromString(data_Flush)",
-                          "S2C_FlushUniteToken": "S2C_FlushUniteToken.ParseFromString(data_Flush)",
-                          "S2C_FlushResource": "S2C_FlushResource.ParseFromString(data_Flush)",
-                          "S2C_FlushFormation": "S2C_FlushFormation.ParseFromString(data_Flush)",
-                          "S2C_FlushAdvanceEquipment": "S2C_FlushAdvanceEquipment.ParseFromString(data_Flush)",
-                          "S2C_FlushEquipment": "S2C_FlushEquipment.ParseFromString(data_Flush)",
-                          "S2C_FlushTreasure": "S2C_FlushTreasure.ParseFromString(data_Flush)",
-                          "S2C_FlushDress": "S2C_FlushDress.ParseFromString(data_Flush)",
-                          "S2C_FlushRedPacket": "S2C_FlushRedPacket.ParseFromString(data_Flush)",
-                          "S2C_FlushRandomPlayer": "S2C_FlushRandomPlayer.ParseFromString(data_Flush)",
-                          "S2C_FlushBiographyItem": "S2C_FlushBiographyItem.ParseFromString(data_Flush)",
-                          "S2C_FlushSkin": "S2C_FlushSkin.ParseFromString(data_Flush)",
-                          "S2C_FlushPrivilege": "S2C_FlushPrivilege.ParseFromString(data_Flush)", }
+                               "S2C_FlushKnight": "S2C_FlushKnight.ParseFromString(data_Flush)",
+                               "S2C_FlushFragment": "S2C_FlushFragment.ParseFromString(data_Flush)",
+                               "S2C_FlushItem": "S2C_FlushItem.ParseFromString(data_Flush)",
+                               "S2C_FlushUniteToken": "S2C_FlushUniteToken.ParseFromString(data_Flush)",
+                               "S2C_FlushResource": "S2C_FlushResource.ParseFromString(data_Flush)",
+                               "S2C_FlushFormation": "S2C_FlushFormation.ParseFromString(data_Flush)",
+                               "S2C_FlushAdvanceEquipment": "S2C_FlushAdvanceEquipment.ParseFromString(data_Flush)",
+                               "S2C_FlushEquipment": "S2C_FlushEquipment.ParseFromString(data_Flush)",
+                               "S2C_FlushTreasure": "S2C_FlushTreasure.ParseFromString(data_Flush)",
+                               "S2C_FlushDress": "S2C_FlushDress.ParseFromString(data_Flush)",
+                               "S2C_FlushRedPacket": "S2C_FlushRedPacket.ParseFromString(data_Flush)",
+                               "S2C_FlushRandomPlayer": "S2C_FlushRandomPlayer.ParseFromString(data_Flush)",
+                               "S2C_FlushBiographyItem": "S2C_FlushBiographyItem.ParseFromString(data_Flush)",
+                               "S2C_FlushSkin": "S2C_FlushSkin.ParseFromString(data_Flush)",
+                               "S2C_FlushPrivilege": "S2C_FlushPrivilege.ParseFromString(data_Flush)", }
 
         eval(self.Flush_name_dic[protocol_name])
         obj = eval(protocol_name)
@@ -229,58 +229,58 @@ class ProtocolFunction:
         :return:
         """
         consumes_into_list = []
-        consumes_into_dic ={}
-        #装备
+        consumes_into_dic = {}
+        # 装备
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, 10111)
         S2C_FlushEquipment = cs_pb2.S2C_FlushEquipment()
         S2C_FlushEquipment.ParseFromString(data_Flush)
         for equipment in S2C_FlushEquipment.equipments:
-            self.chushou(7,equipment.id)
-        #宝物
+            self.chushou(7, equipment.id)
+        # 宝物
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, 10112)
         S2C_FlushTreasure = cs_pb2.S2C_FlushTreasure()
         S2C_FlushTreasure.ParseFromString(data_Flush)
         for treasure in S2C_FlushTreasure.treasures:
-            self.chushou(8,treasure.id)
-        #碎片
+            self.chushou(8, treasure.id)
+        # 碎片
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, 10105)
         S2C_FlushFragment = cs_pb2.S2C_FlushFragment()
         S2C_FlushFragment.ParseFromString(data_Flush)
         for fragment in S2C_FlushFragment.fragments:
-            self.del_resource_pb(2,fragment.id,fragment.num)
-        #道具
+            self.del_resource_pb(2, fragment.id, fragment.num)
+        # 道具
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, 10106)
         S2C_FlushItem = cs_pb2.S2C_FlushItem()
         S2C_FlushItem.ParseFromString(data_Flush)
         for item in S2C_FlushItem.items:
-            self.del_resource_pb(3,item.id,item.num)
-        #资源
+            self.del_resource_pb(3, item.id, item.num)
+        # 资源
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, 10108)
         S2C_FlushResource = cs_pb2.S2C_FlushResource()
         S2C_FlushResource.ParseFromString(data_Flush)
         for resource in S2C_FlushResource.resources:
-            self.del_resource_pb(1,resource.id,resource.num)
-        #进阶装备
+            self.del_resource_pb(1, resource.id, resource.num)
+        # 进阶装备
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, 10110)
         S2C_FlushAdvanceEquipment = cs_pb2.S2C_FlushAdvanceEquipment()
         S2C_FlushAdvanceEquipment.ParseFromString(data_Flush)
         for advance_equipment in S2C_FlushAdvanceEquipment.advance_equipments:
-            self.del_resource_pb(6,advance_equipment.id,advance_equipment.num)
-        #名将传道具
+            self.del_resource_pb(6, advance_equipment.id, advance_equipment.num)
+        # 名将传道具
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, 10116)
         S2C_FlushBiographyItem = cs_pb2.S2C_FlushBiographyItem()
         S2C_FlushBiographyItem.ParseFromString(data_Flush)
         for biography_item in S2C_FlushBiographyItem.biography_items:
-            self.del_resource_pb(12,biography_item.id,biography_item.num)
-        self.protocol.MSG_C2S_Test_Consumes_some( consumes_into_list,  self.uid, self.sid)
+            self.del_resource_pb(12, biography_item.id, biography_item.num)
+        self.protocol.MSG_C2S_Test_Consumes_some(consumes_into_list, self.uid, self.sid)
 
-    def chushou(self,type_into,consume_into):
+    def chushou(self, type_into, consume_into):
         """
         出售装备和宝物
         :param consume_into: 唯一ID
         :return:
         """
-        flag_Sell, data_Sell =self.protocol.MSG_C2S_Sell( type_into,consume_into,self.uid, self.sid, )
+        flag_Sell, data_Sell = self.protocol.MSG_C2S_Sell(type_into, consume_into, self.uid, self.sid, )
         S2C_Sell = cs_pb2.S2C_Sell()  # 创建返回协议对象
         S2C_Sell.ParseFromString(data_Sell)  # 解析协议返回值
         if S2C_Sell.ret == 1:
@@ -395,7 +395,6 @@ class ProtocolFunction:
             print("炼狱副本失败" + str(S2C_EliteDungeon_BeginChallenge.ret))
             raise ProtocolException("炼狱副本失败")
 
-
     def Biography_ExecuteMission(self, mingjiangzhuan_id, type_num):
         """
         名将传战斗
@@ -455,15 +454,15 @@ class ProtocolFunction:
             print("讨伐巨兽失败" + str(S2C_Rebel_AttackBegin.ret))
             raise ProtocolException("讨伐巨兽失败")
 
-
     def ContendTreasure_OneKeyFast(self, id_into):
         """
         一键夺宝
         :param storm_id_into: 要合成的宝物id
         :return:
         """
-        flag_ContendTreasure_OneKeyFast, data_ContendTreasure_OneKeyFast = self.protocol.MSG_C2S_ContendTreasure_OneKeyFast(id_into, self.uid,
-                                                                                                 self.sid)
+        flag_ContendTreasure_OneKeyFast, data_ContendTreasure_OneKeyFast = self.protocol.MSG_C2S_ContendTreasure_OneKeyFast(
+            id_into, self.uid,
+            self.sid)
         S2C_ContendTreasure_OneKeyFast = cs_pb2.S2C_ContendTreasure_OneKeyFast()  # 创建返回协议对象
         S2C_ContendTreasure_OneKeyFast.ParseFromString(data_ContendTreasure_OneKeyFast)  # 解析协议返回值
         if S2C_ContendTreasure_OneKeyFast.ret == 1:
@@ -478,8 +477,9 @@ class ProtocolFunction:
         :param num_into: 挑战次数
         :return:
         """
-        flag_Arena_OneKeyChallenge, data_Arena_OneKeyChallenge = self.protocol.MSG_C2S_Arena_OneKeyChallenge(num_into, self.uid,
-                                                                                                 self.sid)
+        flag_Arena_OneKeyChallenge, data_Arena_OneKeyChallenge = self.protocol.MSG_C2S_Arena_OneKeyChallenge(num_into,
+                                                                                                             self.uid,
+                                                                                                             self.sid)
         S2C_Arena_OneKeyChallenge = cs_pb2.S2C_Arena_OneKeyChallenge()  # 创建返回协议对象
         S2C_Arena_OneKeyChallenge.ParseFromString(data_Arena_OneKeyChallenge)  # 解析协议返回值
         if S2C_Arena_OneKeyChallenge.ret == 1:
@@ -488,15 +488,15 @@ class ProtocolFunction:
             print("一键竞技场失败" + str(S2C_Arena_OneKeyChallenge.ret))
             raise ProtocolException("一键竞技场失败")
 
-
     def Arena_ChallengeBegin(self, rank_into):
         """
         竞技场挑战
         :param rank_into: 挑战名次
         :return:
         """
-        flag_Arena_ChallengeBegin, data_Arena_ChallengeBegin = self.protocol.MSG_C2S_Arena_ChallengeBegin(rank_into, self.uid,
-                                                                                                 self.sid)
+        flag_Arena_ChallengeBegin, data_Arena_ChallengeBegin = self.protocol.MSG_C2S_Arena_ChallengeBegin(rank_into,
+                                                                                                          self.uid,
+                                                                                                          self.sid)
         S2C_Arena_ChallengeBegin = cs_pb2.S2C_Arena_ChallengeBegin()  # 创建返回协议对象
         S2C_Arena_ChallengeBegin.ParseFromString(data_Arena_ChallengeBegin)  # 解析协议返回值
         if S2C_Arena_ChallengeBegin.ret == 1:
@@ -523,16 +523,16 @@ class ProtocolFunction:
         for arena_unit in S2C_Arena_GetMainInfo.arena_units:
             rank = arena_unit.rank
             rank_list.append(rank)
-        for ii in  range(len(rank_list)-1):
+        for ii in range(len(rank_list) - 1):
             is_not = 0
-            for i in range(len(rank_list)-1):
+            for i in range(len(rank_list) - 1):
                 x = rank_list[i]
-                y = rank_list[i+1]
-                if x < y :
-                    rank_list[i + 1]=x
-                    rank_list[i] =y
-                    is_not = is_not+1
-            if is_not ==0:
+                y = rank_list[i + 1]
+                if x < y:
+                    rank_list[i + 1] = x
+                    rank_list[i] = y
+                    is_not = is_not + 1
+            if is_not == 0:
                 return rank_list
         return rank_list
 
@@ -601,15 +601,16 @@ class ProtocolFunction:
         else:
             print("清除障碍失败" + str(S2C_Storm_Break.ret))
             raise ProtocolException("清除障碍失败")
-    def Shop_Shopping(self, id_into,num_into, ):
+
+    def Shop_Shopping(self, id_into, num_into, ):
         """
         商城购买道具
         :param storm_id_into: int 道具id
         :param num_into:int 道具数量
         :return:
         """
-        flag_Shop_Shopping, data_Shop_Shopping = self.protocol.MSG_C2S_Shop_Shopping(id_into,num_into, self.uid,
-                                                                               self.sid)
+        flag_Shop_Shopping, data_Shop_Shopping = self.protocol.MSG_C2S_Shop_Shopping(id_into, num_into, self.uid,
+                                                                                     self.sid)
         S2C_Shop_Shopping = cs_pb2.S2C_Shop_Shopping()  # 创建返回协议对象
         S2C_Shop_Shopping.ParseFromString(data_Shop_Shopping)  # 解析协议返回值
         if S2C_Shop_Shopping.ret == 1:
@@ -617,6 +618,7 @@ class ProtocolFunction:
         else:
             print("商城购买道具失败" + str(S2C_Shop_Shopping.ret))
             raise ProtocolException("商城购买道具失败")
+
     def Create_Guild(self, name):
         """
         创建军团
@@ -632,8 +634,7 @@ class ProtocolFunction:
             print("创建军团失败" + str(C2S_Guild_Create.ret))
             raise ProtocolException("创建军团失败")
 
-
-    def Friend_SendGift(self,):
+    def Friend_SendGift(self, ):
         """
         给所有好友送礼物
         :return:
@@ -901,7 +902,8 @@ class ProtocolFunction:
         :return:
         """
 
-        flag_C2S_Test, data_C2S_Test = self.protocol.MSG_C2S_Test_Consumes(type_into, value_into, size_into, self.uid, self.sid)
+        flag_C2S_Test, data_C2S_Test = self.protocol.MSG_C2S_Test_Consumes(type_into, value_into, size_into, self.uid,
+                                                                           self.sid)
         S2C_Test = cs_pb2.S2C_Test()  # 创建返回协议对象
         S2C_Test.ParseFromString(data_C2S_Test)  # 解析协议返回值
         if S2C_Test.ret == 1:

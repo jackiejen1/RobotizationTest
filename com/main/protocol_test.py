@@ -29,7 +29,7 @@ if __name__ == '__main__':
     sever_name = "QA1"
     account = my_poco.get_random_account()#随机账号
     # account = "qa3006"
-    # sever_time = my_poco.make_new_role(sever_name, account)#创建或登录已有账号
+    sever_time = my_poco.make_new_role(sever_name, account)#创建或登录已有账号
     # my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
     # my_poco.add_resource({"角色经验": 409909990,})#添加资源，海外暂不支持
     # my_poco.set_checkpoint(account, sever_name, {"副本": "副本-279-10"})#通关副本，海外暂不支持
@@ -53,7 +53,10 @@ if __name__ == '__main__':
     # my_poco.GM_huoyue_friend_send_gift()  # 好友送礼
     # my_poco.GM_huoyue_mijingduobao()
     # my_poco.GM_huoyue_jingjichang()
-    num = 2
+
+    my_poco.protocol.add_resource_pb(999,0,1)
+
+    num = 0
     account_list = []
     Thread_list = []
     for i in range(num):

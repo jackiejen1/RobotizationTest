@@ -196,7 +196,6 @@ class GetPocoDic(object):
         msg_bytes = self.prot.pack(b)
         self.send(msg_bytes)
         self.buf = b''
-
         while True:
             try:
                 ret = self.recv()
@@ -206,7 +205,6 @@ class GetPocoDic(object):
                     break
             except Exception:
                 break
-            # self.buf = self.buf + ret
         if self.buf != b'':
             ret = self.prot.unpack(self.buf)
             poco_path_dic_byte = ret[1]
