@@ -53,9 +53,10 @@ class EntryGameSs2:
             self.my_poco_obj.touch_poco("Btn_login")  # 开始游戏
 
         time.sleep(15)
-        if self.my_poco_obj.is_in_dic("RedPacketRainReceiveLayer/__view/Comp_effect"):  # 红包雨
-            self.my_poco_obj.touch_poco("RedPacketRainReceiveLayer/__view/Comp_effect")
-            time.sleep(2)
+        self.my_poco_obj.get_poco_dic()
+        if self.my_poco_obj.is_in_dic("未命名0/popup/RedPacketRainReceiveLayer/__view/Comp_effect"):  # 红包雨
+            self.my_poco_obj.touch_poco("未命名0/popup/RedPacketRainReceiveLayer/__view/Comp_effect")
+            time.sleep(4)
             stop_app(self.game_name)
             time.sleep(2)
             start_app(self.game_name)
@@ -77,6 +78,11 @@ class EntryGameSs2:
         for i in range(10):
             print("开始关闭广告")
             self.my_poco_obj.get_poco_dic()
+            if self.my_poco_obj.is_in_dic("未命名0/popup/FortuneBagOpenPop/__view/Btn_open"):  # 聚福气
+                self.my_poco_obj.touch_poco("未命名0/popup/FortuneBagOpenPop/__view/Btn_open")
+                time.sleep(2)
+                self.my_poco_obj.touch_poco("未命名0/popup/FortuneBagOpenPop/__view/Comp_progress/Btn_upgrade/title")
+                self.my_poco_obj.touch_poco("Btn_return")
             if self.my_poco_obj.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 广告
                 print("关闭广告")# todo 没有进来
                 self.my_poco_obj.touch_poco("Btn_close")

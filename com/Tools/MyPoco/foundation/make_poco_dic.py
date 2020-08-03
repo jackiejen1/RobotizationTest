@@ -177,6 +177,7 @@ class MakePocoDic:
         if self.poco_dic == None:
             # 点击之后会清空，unexpected会直接调用该方法，所以需要刷一下最新的UI树
             self.get_poco_dic()
+        # self.get_poco_dic()
         if poco_path in self.poco_dic.keys():
             poco_path_pos = self.poco_dic[poco_path]["pos"]
             if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:#todo 这里需要优化

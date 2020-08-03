@@ -10,6 +10,8 @@
 #         辅助脚本使用MyPocoObject类编写
 # Reference:********************************
 import os
+import threading
+
 from MyPoco.foundation.MyException import *
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.entry_game import EntryGame
@@ -1069,19 +1071,27 @@ class MyPoco:
         if account_into != None:
             account1 = account_into
         else:
+            #创建一个新的账号
             account1 = self.get_random_account()
             self.make_new_role(sever_name, account1)
             self.protocol.add_resource_pb(add_type, add_value, 4899990)
             self.protocol.socket_close()
-        account_list = []
+        Thread_list = []
         for i in range(num):
-            account = self.get_random_account()
-            account_list.append(account)
-            self.make_new_role(sever_name, account)
-            self.protocol.add_resource_pb(add_type, add_value, 4899990)
-            self.add_friend(account1[2:])
-            self.protocol.socket_close()
-            # time.sleep(4)
+            thread = myThread(sever_name, account1)
+            print("创建新线程"+str(i))
+            # 开启新线程
+            thread.start()
+            Thread_list.append(thread)
+        for thread in Thread_list:
+            print("开始线程")
+            thread.join()
+        # for i in range(num):
+        #     self.make_new_role(sever_name, self.get_random_account())
+        #     self.protocol.add_resource_pb(add_type, add_value, 4899990)
+        #     self.add_friend(account1[2:])
+        #     self.protocol.socket_close()
+        #     # time.sleep(4)
         self.make_new_role(sever_name, account1)
         self.pass_friend()
         print("账号" + account1 + "上有" + str(num) + "个好友")
@@ -1184,3 +1194,15 @@ class MyPoco:
             except GmException:
                 print(resource_name + "抽到了")
                 break
+class myThread (threading.Thread):
+    def __init__(self, sever_name_into, account_into):
+        threading.Thread.__init__(self)
+        self.sever_name = sever_name_into
+        self.account = account_into
+
+    def run(self):
+        my_poco = MyPoco("少三2", None)
+        my_poco.make_new_role(self.sever_name, my_poco.get_random_account())
+        my_poco.protocol.add_resource_pb(1, 1, 4899990)
+        my_poco.add_friend(self.account[2:])
+        my_poco.protocol.socket_close()

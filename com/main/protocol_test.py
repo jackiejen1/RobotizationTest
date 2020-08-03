@@ -22,7 +22,7 @@ class myThread (threading.Thread):
     def run(self):
         my_poco = MyPoco("少三2", None)
         my_poco.make_new_role(self.sever_name, self.account)  # 创建或登录已有账号
-        my_poco.GM_yijian_account_v2(account)
+        my_poco.GM_yijian_account_v2(self.account)
 
 if __name__ == '__main__':
     my_poco = MyPoco("少三2",__phone_id__)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # my_poco.GM_fengkuang_huashen(804,"元宝",6666)
     # my_poco.GM_fengkuang_hengsaoqianjun(457,"金斧子")
     # my_poco.GM_fengkuang_xianshijinjiang(795,"第六期金1-金5","吴","金将5选1箱（吴）")
-    # my_poco.GM_fengkuang_haoyou(100,sever_name_into=sever_name,)
+    my_poco.GM_fengkuang_haoyou(50,sever_name_into=sever_name,)
     # my_poco.GM_yijian_account_v1(account)
     # my_poco.GM_yijian_account_v2(account)
     # my_poco.del_all_resource_pb()
@@ -53,22 +53,23 @@ if __name__ == '__main__':
     # my_poco.GM_huoyue_friend_send_gift()  # 好友送礼
     # my_poco.GM_huoyue_mijingduobao()
     # my_poco.GM_huoyue_jingjichang()
-
-    my_poco.protocol.add_resource_pb(999,0,1)
-
-    num = 0
-    account_list = []
-    Thread_list = []
-    for i in range(num):
-        account = my_poco.get_random_account()
-        account_list.append(account)
-        print(account_list)
-        thread = myThread(sever_name, account)
-        # 开启新线程
-        thread.start()
-        Thread_list.append(thread)
-    for thread in Thread_list:
-        thread.join()
+    a = ['36714219', '36964902', '37407723']
+    # my_poco.protocol.add_resource_pb(999,0,1)
+    # num = 3
+    # account_list = []
+    # Thread_list = []
+    # for i in range(num):
+    #     my_poco = MyPoco("少三2",__phone_id__)
+    #     sever_name = "QA1"
+    #     account = my_poco.get_random_account()
+    #     account_list.append(account)
+    #     print(account_list)
+    #     thread = myThread(sever_name, account)
+    #     # 开启新线程
+    #     thread.start()
+    #     Thread_list.append(thread)
+    # for thread in Thread_list:
+    #     thread.join()
 
 
 

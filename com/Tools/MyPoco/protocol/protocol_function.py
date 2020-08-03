@@ -67,9 +67,9 @@ class ProtocolFunction:
         self.sever_time = 0
         self.Login(region)
         # 这里做一个新账号的判断，如果是新账号就自动再登录一次获取一下UID
-        if self.uid == 0:
-            self.socket = create_connection((self.host, self.port))
-            self.Login(region)
+        # if self.uid == 0:
+        #     self.socket = create_connection((self.host, self.port))
+        #     self.Login(region)
 
     def socket_close(self):
         """
@@ -122,9 +122,9 @@ class ProtocolFunction:
         if G2C_Login.ret == 3:
             print("新账号，开始创建角色")
             flag_Create, data_Create = self.protocol.MSG_C2G_Create(G2C_Login.uid, G2C_Login.sid)
-            G2C_Create = cg_pb2.C2G_Create()
+            G2C_Create = cg_pb2.G2C_Create()
             G2C_Create.ParseFromString(data_Create)
-            # print(G2C_Create)
+            self.uid=G2C_Create.uid
         elif G2C_Login.ret == 2:
             raise GameServerStopException("服务器维护中,创建账号失败")
         # 获取服务器时间

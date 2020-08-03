@@ -63,7 +63,6 @@ def pack_data(data, api_attr=None):
     msg_data_str = b''
     protocol = api_attr['protocol']
     if protocol in all_protocol.keys():
-        print(data, api_attr)
         data = all_protocol[protocol](data, api_attr)#打包函数，all_protocol[protocol]是个函数
         return data
     else:
