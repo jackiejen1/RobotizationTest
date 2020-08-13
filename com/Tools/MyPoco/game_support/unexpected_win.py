@@ -31,8 +31,14 @@ class UnexpectedWin:
                 self.uw = UnexpectedWinSx(self.game_name_key,self.phone_id)
             elif self.game_name == "com.youzu.test.qa":
                 self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "jp.co.yoozoo.sgsblast":
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.yoozoo.kr.snsgz2":
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
             elif self.game_name == "com.youzu.android.snsgz":
                 self.uw = UnexpectedWinSs(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.gamesword.twsst":
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
             else:
                 pass
         print("开始查找异常窗口")

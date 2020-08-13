@@ -24,7 +24,7 @@ import lupa
 
 
 class ProtocolFunction:
-    def __init__(self, game_name, server_name, protocol_name, username):
+    def __init__(self, game_name, server_name, protocol_name, username,is_new_account):
         """
         用于协议测试使用，创建账号的协议方法单独实现
         开局指定测试哪个游戏的哪条协议
@@ -34,14 +34,15 @@ class ProtocolFunction:
         :param protocol_name: 协议名，默认空，只走登录
         :param username: 账号
         """
+        self.login_two = False
+        self.is_new_account = is_new_account
+        self.socket = None
         self.info = Information()
         self.game_name = self.info.get_config(game_name, "app_name")
         self.mri = MakeResourceBody(game_name)
         self.pt = ProtocolTools(game_name)
-        # self.username = self.info.get_config(self.game_name,"new_game_account1")
         self.username = username
         self.protocol_name = protocol_name
-        # self.protocol_ages_list= self.pt.get_args_list(protocol_name)  #  todo 可能有报错
         # 开始连接
         server_name = server_name + "_server_ages"
         socket_ages_dic = self.info.get_config(game_name, server_name)
@@ -53,19 +54,28 @@ class ProtocolFunction:
         except Exception:
             raise GmException("服务器可能在维护")
         # 启动登陆
-        if "韩国" in server_name:
+        if "韩国" in game_name:
             region = "韩国"
-        elif "日本" in server_name:
+        elif "日本" in game_name:
             region = "日本"
-        elif "新马" in server_name:
+        elif "新马" in game_name:
             region = "新马"
-        elif "台湾" in server_name:
+        elif "台湾" in game_name:
             region = "台湾"
         else:
             region = "国内"
         self.uid = 0
         self.sever_time = 0
         self.Login(region)
+        if self.login_two:
+            game_account_f = time.time()
+            game_account_int = int(game_account_f * 1000000)
+            self.username = str(game_account_int)[-8:]
+            try:
+                self.socket = create_connection((self.host, self.port))
+            except Exception:
+                raise GmException("服务器可能在维护")
+            self.Login(region)
         # 这里做一个新账号的判断，如果是新账号就自动再登录一次获取一下UID
         # if self.uid == 0:
         #     self.socket = create_connection((self.host, self.port))
@@ -106,30 +116,45 @@ class ProtocolFunction:
         :param region: 用来确定是登陆国内还是海外
         :return: 角色ID和服务器时间
         """
-        self.protocol = LoginGame(self.socket, self.server_id, self.game_name, self.username)
+        self.protocol = LoginGame(self.socket, self.server_id,self.username)
         flag, data = self.protocol.MSG_C2G_Login(region)
         G2C_Login = cg_pb2.G2C_Login()
         G2C_Login.ParseFromString(data)
-        print(G2C_Login)
-        print("账号登录成功")
-        # self.info.set_config("com.youzu.test.qa","uid",str(G2C_Login.uid))
-        # self.info.set_config("com.youzu.test.qa","sid",str(G2C_Login.sid))
+        print("账号登录成功,账号为"+str(self.username),G2C_Login)
         # 如果ret等于3则需要创角协议
         self.uid = G2C_Login.uid
         self.sid = G2C_Login.sid
         if self.uid != 0:
             add_msg_in_log("role_id:" + str(self.uid))
-        if G2C_Login.ret == 3:
+            #需要是个新账号，但不是
+            if self.is_new_account:
+                self.login_two = True
+                print("需要是个新账号，但不是,重新创号")
+        if G2C_Login.ret == 5:
+            raise GmException("重复登录,创建角色失败"+str(self.username))
+        elif G2C_Login.ret == 3:
             print("新账号，开始创建角色")
-            flag_Create, data_Create = self.protocol.MSG_C2G_Create(G2C_Login.uid, G2C_Login.sid)
+            flag_Create, data_Create = self.protocol.MSG_C2G_Create(0, G2C_Login.sid)
             G2C_Create = cg_pb2.G2C_Create()
             G2C_Create.ParseFromString(data_Create)
-            self.uid=G2C_Create.uid
+            if G2C_Create.ret == 1:
+                msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + self.username[2:]+"，UID：" + str(G2C_Create.uid)
+                print(msg)
+                add_msg_in_log(msg)
+                self.uid = G2C_Create.uid
+            else:
+                print("*********-**********")
+                print("账号：" + self.username)
+                print(G2C_Create)
+                print("------------------------")
+                print(G2C_Login)
+                print("*********-**********")
+                raise GmException("创建角色失败" + str(G2C_Create.uid))
         elif G2C_Login.ret == 2:
             raise GameServerStopException("服务器维护中,创建账号失败")
         # 获取服务器时间
         if self.sever_time == 0:
-            flag_SyncTime, data_SyncTime = self.protocol.MSG_C2S_SyncTime(G2C_Login.uid, G2C_Login.sid)  # 发送协议
+            flag_SyncTime, data_SyncTime = self.protocol.MSG_C2S_SyncTime(self.uid, G2C_Login.sid)  # 发送协议
             S2C_SyncTime = cs_pb2.S2C_SyncTime()  # 创建返回协议对象
             S2C_SyncTime.ParseFromString(data_SyncTime)  # 解析协议返回值
             self.sever_time = S2C_SyncTime.server_time  # 拿取返回值参数
@@ -215,6 +240,16 @@ class ProtocolFunction:
             for knight in obj.knights:
                 body[str(knight.base_id)] = int(knight.id)
             return body
+        if find_name == "装备":
+            for equipment in obj.equipments:
+                if equipment.position==0:
+                    if str(equipment.base_id) not in body.keys():
+                        equipment_list = []
+                    else:
+                        equipment_list = body[str(equipment.base_id)]
+                    equipment_list.append(equipment.id)
+                    body[str(equipment.base_id)] =equipment_list
+            return body
         if find_name == "资源":
             resource_list = []
             for resource in obj.resources:
@@ -286,7 +321,7 @@ class ProtocolFunction:
         if S2C_Sell.ret == 1:
             print("出售成功")
         else:
-            print("出售失败" + str(S2C_Sell.ret))
+            print(str(self.uid) + "出售失败" + str(S2C_Sell.ret))
             raise ProtocolException("出售失败")
 
     def shangzhenwujiang(self, pos, id):
@@ -306,10 +341,32 @@ class ProtocolFunction:
             if S2C_ChangeFormation.ret == 1:
                 print("上阵成功")
             else:
-                print("上阵失败" + str(S2C_ChangeFormation.ret))
+                print(str(self.uid) + "上阵失败" + str(S2C_ChangeFormation.ret))
                 raise ProtocolException("上阵失败")
         else:
-            raise ValueException("武将坑位数值超出范围")
+            raise ValueException(str(self.uid) + "武将坑位数值超出范围")
+
+    def chuandaizhuangbei(self, pos, id):
+        """
+        穿戴装备
+        :param pos: 坑位，1-6
+        :param id: 装备ID
+        :return:
+        """
+        if 0< pos and pos< 25 :
+            flag_ChangeFormation, data_ChangeFormation = self.protocol.MSG_C2S_Formation_ChangeFormation(3, pos, id,
+                                                                                                         self.uid,
+                                                                                                         self.sid)
+            # 只上阵，不解析
+            S2C_ChangeFormation = cs_pb2.S2C_Formation_ChangeFormation()  # 创建返回协议对象
+            S2C_ChangeFormation.ParseFromString(data_ChangeFormation)  # 解析协议返回值
+            if S2C_ChangeFormation.ret == 1:
+                print("穿戴成功")
+            else:
+                print(str(self.uid) + "穿戴失败" + str(S2C_ChangeFormation.ret))
+                raise ProtocolException("穿戴失败")
+        else:
+            raise ValueException(str(self.uid) + "装备坑位数值超出范围")
 
     def do_Battle(self, data_into, battle_id_into):
         """
@@ -346,10 +403,10 @@ class ProtocolFunction:
             if S2C_CheckBattleResult.ret == 1:
                 print("战斗成功")
             else:
-                print("战斗失败" + str(S2C_CheckBattleResult.ret))
+                print(str(self.uid) + "战斗失败" + str(S2C_CheckBattleResult.ret))
                 if S2C_CheckBattleResult.ret == 1001:
                     raise ProtocolException("战斗失败,需要更新战斗代码")  # 直接秒怪可以避免
-                raise ProtocolException("战斗失败")
+                raise ProtocolException(str(self.uid) + "战斗失败")
 
     def add_friend(self, name):
         """
@@ -363,7 +420,7 @@ class ProtocolFunction:
         if S2C_ChangeFormation.ret == 1:
             print("添加好友成功")
         else:
-            print("添加好友失败" + str(S2C_ChangeFormation.ret))
+            print(str(self.uid) + "添加好友失败" + str(S2C_ChangeFormation.ret))
             raise ProtocolException("添加好友失败")
 
     def Dungeon_ChallengeStageBegin(self, fuben_id):
@@ -392,7 +449,7 @@ class ProtocolFunction:
         if S2C_EliteDungeon_BeginChallenge.ret == 1:
             print("炼狱副本成功")
         else:
-            print("炼狱副本失败" + str(S2C_EliteDungeon_BeginChallenge.ret))
+            print(str(self.uid) + "炼狱副本失败" + str(S2C_EliteDungeon_BeginChallenge.ret))
             raise ProtocolException("炼狱副本失败")
 
     def Biography_ExecuteMission(self, mingjiangzhuan_id, type_num):
@@ -415,7 +472,8 @@ class ProtocolFunction:
             if S2C_Biography_ExecuteMission.ret == 1:
                 print(str(mingjiangzhuan_id) + "," + str(type_num) + "跳过任务成功")
             else:
-                print(str(mingjiangzhuan_id) + "," + str(type_num) + "跳过任务失败" + str(S2C_Biography_ExecuteMission.ret))
+                print(str(self.uid) + str(mingjiangzhuan_id) + "," + str(type_num) + "跳过任务失败" + str(
+                    S2C_Biography_ExecuteMission.ret))
                 raise ProtocolException(str(mingjiangzhuan_id) + "," + str(type_num) + "跳过任务失败")
         else:
             self.do_Battle(data_Biography_ExecuteMission, battle_id)
@@ -451,7 +509,7 @@ class ProtocolFunction:
         if S2C_Rebel_AttackBegin.ret == 1:
             print("讨伐巨兽成功")
         else:
-            print("讨伐巨兽失败" + str(S2C_Rebel_AttackBegin.ret))
+            print(str(self.uid) + "讨伐巨兽失败" + str(S2C_Rebel_AttackBegin.ret))
             raise ProtocolException("讨伐巨兽失败")
 
     def ContendTreasure_OneKeyFast(self, id_into):
@@ -468,7 +526,7 @@ class ProtocolFunction:
         if S2C_ContendTreasure_OneKeyFast.ret == 1:
             print("一键夺宝成功")
         else:
-            print("一键夺宝失败" + str(S2C_ContendTreasure_OneKeyFast.ret))
+            print(str(self.uid) + "一键夺宝失败" + str(S2C_ContendTreasure_OneKeyFast.ret))
             raise ProtocolException("一键夺宝失败")
 
     def Arena_OneKeyChallenge(self, num_into):
@@ -485,7 +543,7 @@ class ProtocolFunction:
         if S2C_Arena_OneKeyChallenge.ret == 1:
             print("一键竞技场成功")
         else:
-            print("一键竞技场失败" + str(S2C_Arena_OneKeyChallenge.ret))
+            print(str(self.uid) + "一键竞技场失败" + str(S2C_Arena_OneKeyChallenge.ret))
             raise ProtocolException("一键竞技场失败")
 
     def Arena_ChallengeBegin(self, rank_into):
@@ -502,7 +560,7 @@ class ProtocolFunction:
         if S2C_Arena_ChallengeBegin.ret == 1:
             print("竞技场挑战成功")
         else:
-            print("竞技场挑战失败" + str(S2C_Arena_ChallengeBegin.ret))
+            print(str(self.uid) + "竞技场挑战失败" + str(S2C_Arena_ChallengeBegin.ret))
             raise ProtocolException("竞技场挑战失败")
 
     def Arena_GetMainInfo(self):
@@ -517,7 +575,7 @@ class ProtocolFunction:
         if S2C_Arena_GetMainInfo.ret == 1:
             print("获取竞技场可挑战名单成功")
         else:
-            print("获取竞技场可挑战名单失败" + str(S2C_Arena_GetMainInfo.ret))
+            print(str(self.uid) + "获取竞技场可挑战名单失败" + str(S2C_Arena_GetMainInfo.ret))
             raise ProtocolException("获取竞技场可挑战名单失败")
         rank_list = []
         for arena_unit in S2C_Arena_GetMainInfo.arena_units:
@@ -550,7 +608,7 @@ class ProtocolFunction:
         if S2C_EliteDungeon_FastChallenge.ret == 1:
             print("炼狱副本扫荡成功")
         else:
-            print("炼狱副本扫荡失败" + str(S2C_EliteDungeon_FastChallenge.ret))
+            print(str(self.uid) + "炼狱副本扫荡失败" + str(S2C_EliteDungeon_FastChallenge.ret))
             raise ProtocolException("炼狱副本扫荡失败")
 
     def Storm_Award(self, storm_id_into, cell_id_into, ):
@@ -567,7 +625,7 @@ class ProtocolFunction:
         if S2C_Storm_Award.ret == 1:
             print("领取宝箱成功")
         else:
-            print("领取宝箱失败" + str(S2C_Storm_Award.ret))
+            print(str(self.uid) + "领取宝箱失败" + str(S2C_Storm_Award.ret))
             raise ProtocolException("领取宝箱失败")
 
     def Storm_Reset(self, storm_id_into, ):
@@ -582,7 +640,7 @@ class ProtocolFunction:
         if S2C_Storm_Reset.ret == 1:
             print("关卡重置成功")
         else:
-            print("关卡重置失败" + str(S2C_Storm_Reset.ret))
+            print(str(self.uid) + "关卡重置失败" + str(S2C_Storm_Reset.ret))
             raise ProtocolException("关卡重置失败")
 
     def Storm_Break(self, storm_id_into, cell_id_into, ):
@@ -599,7 +657,7 @@ class ProtocolFunction:
         if S2C_Storm_Break.ret == 1:
             print("清除障碍成功")
         else:
-            print("清除障碍失败" + str(S2C_Storm_Break.ret))
+            print(str(self.uid) + "清除障碍失败" + str(S2C_Storm_Break.ret))
             raise ProtocolException("清除障碍失败")
 
     def Shop_Shopping(self, id_into, num_into, ):
@@ -616,7 +674,7 @@ class ProtocolFunction:
         if S2C_Shop_Shopping.ret == 1:
             print("商城购买道具成功")
         else:
-            print("商城购买道具失败" + str(S2C_Shop_Shopping.ret))
+            print(str(self.uid) + "商城购买道具失败" + str(S2C_Shop_Shopping.ret))
             raise ProtocolException("商城购买道具失败")
 
     def Create_Guild(self, name):
@@ -631,7 +689,7 @@ class ProtocolFunction:
         if C2S_Guild_Create.ret == 1:
             print("创建军团成功")
         else:
-            print("创建军团失败" + str(C2S_Guild_Create.ret))
+            print(str(self.uid) + "创建军团失败" + str(C2S_Guild_Create.ret))
             raise ProtocolException("创建军团失败")
 
     def Friend_SendGift(self, ):
@@ -645,7 +703,7 @@ class ProtocolFunction:
         if S2C_Friend_SendGift.ret == 1:
             print("一键送礼成功")
         else:
-            print("一键送礼失败" + str(S2C_Friend_SendGift.ret))
+            print(str(self.uid) + "一键送礼失败" + str(S2C_Friend_SendGift.ret))
             raise ProtocolException("一键送礼失败")
 
     def search_Guild(self, Guild_name):
@@ -662,7 +720,7 @@ class ProtocolFunction:
         if S2C_search_Guild.ret == 1:
             print("查询成功")
         else:
-            print("查询失败" + str(S2C_search_Guild.ret))
+            print(str(self.uid) + "查询失败" + str(S2C_search_Guild.ret))
             raise ProtocolException("军团不存在")
         flag_Guild_ReqJoin, data_Guild_ReqJoin = self.protocol.MSG_C2S_Guild_ReqJoin(guild_id, self.uid, self.sid)
         S2C_Guild_ReqJoin = cs_pb2.S2C_Guild_ReqJoin()  # 创建返回协议对象
@@ -670,8 +728,23 @@ class ProtocolFunction:
         if S2C_Guild_ReqJoin.join:
             print("加入成功")
         else:
-            print("加入失败" + str(S2C_Guild_ReqJoin.ret))
+            print(str(self.uid) + "加入失败" + str(S2C_Guild_ReqJoin.ret))
             raise ProtocolException("军团加入失败")
+
+    def Guild_Quit(self,):
+        """
+        退出军团
+        :param Guild_name: string 军团名字
+        :return:
+        """
+        flag_Guild_Quit, data_Guild_Quit = self.protocol.MSG_C2S_Guild_Quit(self.uid, self.sid)
+        S2C_Guild_Quit = cs_pb2.S2C_Guild_Quit()  # 创建返回协议对象
+        S2C_Guild_Quit.ParseFromString(data_Guild_Quit)  # 解析协议返回值
+        if S2C_Guild_Quit.ret == 1:
+            print("退出军团成功")
+        else:
+            print(str(self.uid) + "退出军团失败" + str(S2C_Guild_Quit.ret))
+            raise ProtocolException("退出军团失败")
 
     def OrderWorld_Donate(self, num):
         """
@@ -686,7 +759,7 @@ class ProtocolFunction:
         if S2C_OrderWorld_Donate.ret == 1:
             print("号令旗子捐献成功")
         else:
-            print("号令旗子捐献失败" + str(S2C_OrderWorld_Donate.ret))
+            print(str(self.uid) + "号令旗子捐献失败" + str(S2C_OrderWorld_Donate.ret))
             raise ProtocolException("号令旗子捐献失败")
 
     def Friend_ConfirmFriend(self, ):
@@ -701,7 +774,7 @@ class ProtocolFunction:
         if C2S_Friend_ConfirmFriend.ret == 1:
             print("全部同意成功")
         else:
-            print("全部同意失败" + str(C2S_Friend_ConfirmFriend.ret))
+            print(str(self.uid) + "全部同意失败" + str(C2S_Friend_ConfirmFriend.ret))
             raise ProtocolException("全部同意失败")
 
     def Formation_ChangePosition(self, pos_list):
@@ -717,7 +790,7 @@ class ProtocolFunction:
         if S2C_Formation_ChangePosition.ret == 1:
             print("更改上阵位置成功")
         else:
-            print("更改上阵位置失败" + str(S2C_Formation_ChangePosition.ret))
+            print(str(self.uid) + "更改上阵位置失败" + str(S2C_Formation_ChangePosition.ret))
             raise ProtocolException("更改上阵位置失败")
 
     def DeadBattle_GetInfo(self, ):
@@ -734,7 +807,7 @@ class ProtocolFunction:
         if S2C_DeadBattle_GetInfo.ret == 1:
             print("查询无双信息成功")
         else:
-            print("查询无双信息失败" + str(S2C_DeadBattle_GetInfo.ret))
+            print(str(self.uid) + "查询无双信息失败" + str(S2C_DeadBattle_GetInfo.ret))
             raise ProtocolException("查询无双信息失败")
         history_id_list = S2C_DeadBattle_GetInfo.dbattle.history_id
         history_id = 0
@@ -770,7 +843,7 @@ class ProtocolFunction:
         if S2C_DeadBattle_BoxAward.ret == 1:
             print("领取通关宝箱成功")
         else:
-            print("领取通关宝箱失败" + str(S2C_DeadBattle_BoxAward.ret))
+            print(str(self.uid) + "领取通关宝箱失败" + str(S2C_DeadBattle_BoxAward.ret))
             raise ProtocolException("领取通关宝箱失败")
         buff_id_list = S2C_DeadBattle_BoxAward.dbattle.floor_buff
         buff_id = buff_id_list[2]
@@ -791,8 +864,28 @@ class ProtocolFunction:
         if S2C_DeadBattle_PickBuff.ret == 1:
             print("领取通关buff成功")
         else:
-            print("领取通关buff失败" + str(S2C_DeadBattle_PickBuff.ret))
+            print(str(self.uid) + "领取通关buff失败" + str(S2C_DeadBattle_PickBuff.ret))
             raise ProtocolException("领取通关buff失败")
+
+    def Equipment_Upgrade(self, id_into, times_into):
+        """
+        强化装备
+        :param uid:
+        :param sid:
+        :return:可选buff id
+        """
+        flag_C2S_Equipment_Upgrade, data_C2S_Equipment_Upgrade = self.protocol.MSG_C2S_Equipment_Upgrade(id_into, times_into,
+                                                                                                               self.uid,
+                                                                                                               self.sid)
+        S2C_Equipment_Upgrade = cs_pb2.S2C_Equipment_Upgrade()  # 创建返回协议对象
+        S2C_Equipment_Upgrade.ParseFromString(data_C2S_Equipment_Upgrade)  # 解析协议返回值
+        if S2C_Equipment_Upgrade.ret == 1:
+            print("强化装备成功，当前装备等级"+str(S2C_Equipment_Upgrade.level))
+        else:
+            print(str(self.uid) + "强化装备失败" + str(S2C_Equipment_Upgrade.ret))
+            raise ProtocolException("强化装备失败")
+        return S2C_Equipment_Upgrade.level[0]
+
 
     def huashen_shilian(self, activity_id):
         """
@@ -810,7 +903,7 @@ class ProtocolFunction:
         if S2C_Activity_Common_Draw.ret == 1:
             print("金化身十连抽成功")
         else:
-            print("金化身十连抽失败" + str(S2C_Activity_Common_Draw.ret))
+            print(str(self.uid) + "金化身十连抽失败" + str(S2C_Activity_Common_Draw.ret))
             raise ProtocolException("金化身十连抽失败")
         award_list = []
         for award in S2C_Activity_Common_Draw.awards:
@@ -835,7 +928,7 @@ class ProtocolFunction:
         if S2C_GoldEquip_Draw.ret == 1:
             print("横扫千军十连抽成功")
         else:
-            print("横扫千军十连抽失败" + str(S2C_GoldEquip_Draw.ret))
+            print(str(self.uid) + "横扫千军十连抽失败" + str(S2C_GoldEquip_Draw.ret))
             raise ProtocolException("横扫千军十连抽失败")
         award_list = []
         for award in S2C_GoldEquip_Draw.awards:
@@ -860,7 +953,7 @@ class ProtocolFunction:
         if S2C_Recruit_RecruitKnight.ret == 1:
             print("限时神将十连抽成功")
         else:
-            print("限时神将十连抽失败" + str(S2C_Recruit_RecruitKnight.ret))
+            print(str(self.uid) + "限时神将十连抽失败" + str(S2C_Recruit_RecruitKnight.ret))
             raise ProtocolException("限时神将十连抽失败")
         award_list = []
         for award in S2C_Recruit_RecruitKnight.awards:
@@ -888,7 +981,7 @@ class ProtocolFunction:
         if S2C_Test.ret == 1:
             print("添加道具成功")
         else:
-            print("添加道具失败" + str(S2C_Test.ret))
+            print(str(self.uid) + "添加道具失败" + str(S2C_Test.ret))
             raise ProtocolException("添加道具失败")
 
     def del_resource_pb(self, type_into, value_into, size_into):
@@ -909,7 +1002,7 @@ class ProtocolFunction:
         if S2C_Test.ret == 1:
             print("消耗道具成功")
         else:
-            print("消耗道具失败" + str(S2C_Test.ret))
+            print(str(self.uid) + "消耗道具失败" + str(S2C_Test.ret))
             raise ProtocolException("消耗道具失败")
 
     def get_resource_pb(self, find_name, ):

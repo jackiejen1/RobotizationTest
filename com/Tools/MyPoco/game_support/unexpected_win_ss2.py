@@ -42,14 +42,16 @@ class UnexpectedWinSs2:
             snapshot(msg="游戏报错")
             self.make_poco_dic.my_touch("Btn_ok")
             raise NotHaveGameException("游戏报错")
-        if self.make_poco_dic.is_in_dic("下载点2"):  # 点击完下载资源启动游戏
-            self.make_poco_dic.my_touch("下载点2")
-            time.sleep(30)
-            for i in range(20):
-                self.make_poco_dic.get_poco_dic()#这里会不停的刷新表
-                if self.make_poco_dic.is_in_dic("InputName"):
-                    break
-                time.sleep(15)
+        if self.make_poco_dic.is_in_dic("未命名0/popup/ComTxtPop/__view/txt"):  # 点击完下载资源启动游戏
+            txt_text = self.make_poco_dic.get_poco_any_value("未命名0/popup/ComTxtPop/__view/txt","text")
+            if "MB" in txt_text or "KB" in txt_text:
+                self.make_poco_dic.my_touch("未命名0/popup/ComTxtPop/__view/cancel/title")
+                time.sleep(30)
+                for i in range(20):
+                    self.make_poco_dic.get_poco_dic()#这里会不停的刷新表
+                    if self.make_poco_dic.is_in_dic("InputName"):
+                        break
+                    time.sleep(15)
         if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")
             time.sleep(1)
@@ -95,7 +97,8 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("巨兽-龙炮"):  # 副本龙炮
             if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):
                 self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
-
+        if self.make_poco_dic.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close"):
+            self.make_poco_dic.my_touch("未命名0/popup/GodboxPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("将军抱歉，为了更好的体验，我们正在对服务器进行维护，请稍后重新登录哦~"):
             self.make_poco_dic.my_touch("未命名0/未命名3/ComAssistPop/__view/Btn_cancel")
             raise GameServerMaintenanceException("服务器维护")

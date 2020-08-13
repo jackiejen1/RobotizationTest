@@ -19,12 +19,9 @@ from MyPoco.foundation.MyException import *
 
 
 class LoginGame:
-    def __init__(self, socket, server_id, game_name, username=None):
+    def __init__(self, socket, server_id,username):
         self.info = Information()
-        if username == None:
-            self.username = self.info.get_config(game_name, "new_game_account1")
-        else:
-            self.username = username
+        self.username = username
         self.socket = socket
         self.server_id = server_id
 
@@ -72,7 +69,7 @@ class LoginGame:
     # 创建角色
     def MSG_C2G_Create(self, uid, sid):
         C2G_Create = cg_pb2.C2G_Create()
-        username = str(self.username)[2:]
+        username = str(self.username)
         C2G_Create.name = username
         C2G_Create.type = 210000
         C2G_Create.server_id = self.server_id
@@ -81,9 +78,6 @@ class LoginGame:
                            'uid': uid, 'sid': sid}
         senddata = pack_data(C2G_Create, C2G_Create_attr)
         flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 32)
-        msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + username
-        print(msg)
-        add_msg_in_log(msg)
         return flag, data
 
     def MSG_C2S_SyncTime(self, uid, sid):
@@ -140,7 +134,7 @@ class LoginGame:
     def MSG_C2S_Formation_ChangeFormation(self, tp, pos, id, uid, sid):
         """
         上阵协议
-        :param tp: 上阵类型，武将1，宝物2，装备3
+        :param tp: 上阵类型，武将1，装备3，宝物4
         :param pos: 位置
         :param id: 唯一ID
         :param uid:
@@ -622,6 +616,22 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_Guild_Search_attr, 32)  # 发送协议
         return flag, data
 
+    def MSG_C2S_Guild_Quit(self, uid, sid):
+        """
+        退出军团协议
+        :param Guild_name: string 军团名字
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Guild_Quit = cs_pb2.C2S_Guild_Quit()
+        C2S_Guild_Quit = C2S_Guild_Quit.SerializeToString()
+        C2S_Guild_Quit_attr = {'name': "C2S_Guild_Quit", 'protocol': 'protobuf-ss',
+                                 'send_cmd': 11014, 'recv_cmd': 11015, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Guild_Quit, C2S_Guild_Quit_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Guild_Quit_attr, 32)  # 发送协议
+        return flag, data
+
     def MSG_C2S_OrderWorld_Donate(self, num, uid, sid):
         """
         号令添加捐献旗子道具
@@ -697,6 +707,26 @@ class LoginGame:
                          'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Test, C2S_Test_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Test_attr, 32)  # 发送协议
+        return flag, data
+
+
+    def MSG_C2S_Equipment_Upgrade(self, id_into, times_into, uid, sid):
+        """
+        强化装备
+        :param id_into: int 道具唯一id
+        :param times_into: int 强化次数
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Equipment_Upgrade = cs_pb2.C2S_Equipment_Upgrade()
+        C2S_Equipment_Upgrade.id.append(id_into)
+        C2S_Equipment_Upgrade.times.append(times_into)
+        C2S_Equipment_Upgrade = C2S_Equipment_Upgrade.SerializeToString()
+        C2S_Equipment_Upgrade_attr = {'name': "C2S_Equipment_Upgrade", 'protocol': 'protobuf-ss', 'send_cmd': 10600, 'recv_cmd': 10601,
+                         'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Equipment_Upgrade, C2S_Equipment_Upgrade_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Equipment_Upgrade_attr, 32)  # 发送协议
         return flag, data
 
     def MSG_C2S_Test_Consumes_some(self, consumes_into_list,  uid, sid):

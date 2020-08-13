@@ -41,7 +41,7 @@ class MyPoco:
         self.xt = None
         self.Flush_body = None
 
-    def make_new_role(self, server_name, username="", protocol_name=""):
+    def make_new_role(self, server_name, username="", protocol_name="",is_new_account_into = False):
         """
         登录或创建角色协议，协议和GM的init方法
         如果是新账号就创角并登录，并二次记录记录uid
@@ -55,7 +55,7 @@ class MyPoco:
         self.GM_server_name = server_name
         if username == "":
             username = self.get_random_account()
-        self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username)
+        self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username,is_new_account=is_new_account_into)
         return self.protocol.sever_time
 
     def set_account_information_gm(self, account, server_name, role_id="", role=""):
@@ -69,7 +69,7 @@ class MyPoco:
         if role_id != "":
             return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id, role=role)
         else:
-            if self.game_name_key == "少三2":
+            if self.game_name_key == "少三2" or self.game_name_key == "少三2台湾" or self.game_name_key == "少三2日本" or self.game_name_key == "少三2韩国" or self.game_name_key == "少三2新马":
                 role_id, sever_time = self.protocol.get_role_id()
                 return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,
                                                        role=role)
@@ -103,6 +103,26 @@ class MyPoco:
             self.Flush_body = self.protocol.Flush("武将")
         only_id = self.Flush_body[str(wujiang_id)]
         self.protocol.shangzhenwujiang(pos, only_id)
+
+    def chuandaizhuangbei(self, pos, name):
+        """
+        上阵装备,武器1，鞋子2，头盔3，战甲4，逆时针顺序，第二个武将武器5，鞋子6.....
+        :param pos: 坑位，1-24
+        :param name: 道具的名字
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("银币")
+        self.protocol.add_resource_pb(add_type, add_value, 999999999)
+        daoju_id = self.get_resource_id(name)
+        # if (self.Flush_body == None) or (str(daoju_id) not in self.Flush_body.keys()):
+        #     self.Flush_body = self.protocol.Flush("装备")
+        self.Flush_body = self.protocol.Flush("装备")
+        only_id_list = self.Flush_body[str(daoju_id)]
+        self.protocol.chuandaizhuangbei(pos, only_id_list[0])
+        for i in range(30):
+            level = self.protocol.Equipment_Upgrade(only_id_list[0],5)
+            if level>200:
+                break
 
     def add_friend(self, name):
         """
@@ -145,6 +165,12 @@ class MyPoco:
         """
         self.protocol.search_Guild(Guild_name)
 
+    def quit_Guild(self,):
+        """
+        退出军团
+        :return:
+        """
+        self.protocol.Guild_Quit()
     def get_poco_dic(self):
         """
         刷新并获取当前界面UI信息
@@ -199,6 +225,7 @@ class MyPoco:
         关闭游戏，不区分功能或者性能
         :return:
         """
+        time.sleep(3)
         self.my_poco_obj.close_game()
 
     def swipe(self, pos1, pos2, duration=3):
@@ -620,6 +647,85 @@ class MyPoco:
             if (i % 200) == 0:
                 add_type, add_value = self.protocol.mri.get_type_id_from_name("体力值")
                 self.protocol.add_resource_pb(add_type, add_value, 1000)
+
+    def GM_yijian_chuanzhuangbei(self):
+        # 上阵武将
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("陆逊")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(2, "陆逊")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("周瑜")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(3, "周瑜")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("郭嘉")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(4, "郭嘉")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("黄忠")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(5, "黄忠")
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("诸葛亮")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(6, "诸葛亮")
+        self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])  # 调整阵型
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("测试战戟")
+        self.protocol.add_resource_pb(add_type, add_value, 6)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("测试战靴")
+        self.protocol.add_resource_pb(add_type, add_value, 6)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("测试战甲")
+        self.protocol.add_resource_pb(add_type, add_value, 6)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("测试头盔")
+        self.protocol.add_resource_pb(add_type, add_value, 6)
+        self.chuandaizhuangbei(1,"测试战戟")
+        self.chuandaizhuangbei(2, "测试战靴")
+        self.chuandaizhuangbei(3, "测试战甲")
+        self.chuandaizhuangbei(4, "测试头盔")
+        self.chuandaizhuangbei(5, "测试战戟")
+        self.chuandaizhuangbei(6, "测试战靴")
+        self.chuandaizhuangbei(7, "测试战甲")
+        self.chuandaizhuangbei(8, "测试头盔")
+        self.chuandaizhuangbei(9, "测试战戟")
+        self.chuandaizhuangbei(10, "测试战靴")
+        self.chuandaizhuangbei(11, "测试战甲")
+        self.chuandaizhuangbei(12, "测试头盔")
+        self.chuandaizhuangbei(13, "测试战戟")
+        self.chuandaizhuangbei(14, "测试战靴")
+        self.chuandaizhuangbei(15, "测试战甲")
+        self.chuandaizhuangbei(16, "测试头盔")
+        self.chuandaizhuangbei(17, "测试战戟")
+        self.chuandaizhuangbei(18, "测试战靴")
+        self.chuandaizhuangbei(19, "测试战甲")
+        self.chuandaizhuangbei(20, "测试头盔")
+        self.chuandaizhuangbei(21, "测试战戟")
+        self.chuandaizhuangbei(22, "测试战靴")
+        self.chuandaizhuangbei(23, "测试战甲")
+        self.chuandaizhuangbei(24, "测试头盔")
+
+    def GM_yijian_fuben(self, zhangjie_id):
+        """
+        开始一键通关副本，海外后续使用GMAPI
+        :param zhangjie_id: 章节id
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 409909990)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("测试属性")
+        self.protocol.add_resource_pb(add_type, add_value, 999999999)
+        tilizhi = self.get_resource_pb("体力值")
+        add_tilizhi_num = 1000 - tilizhi
+        add_tili_type, add_tili_value = self.protocol.mri.get_type_id_from_name("体力值")
+        if add_tilizhi_num == 0:
+            pass
+        else:
+            # 初始化体力值到1000
+            self.protocol.add_resource_pb(add_tili_type, add_tili_value, add_tilizhi_num)
+        for i in range(zhangjie_id+1)[1:]:  # 副本通关数
+            for ii in range(15)[1:]:  # 关卡数可以多一点，适配小关卡数量不确定性
+                checkpoint_name = "副本-" + str(i) + "-" + str(ii)
+                try:
+                    fuben_id = self.protocol.mri.get_num_from_name(checkpoint_name)
+                except Exception:  # 找不到关卡说明打完了，就终止
+                    self.protocol.add_resource_pb(add_tili_type, add_tili_value, 500)
+                    break
+                self.protocol.GM_fengkuangfuben(fuben_id)
 
     def GM_yijian_account_v1(self, account):
         """
@@ -1076,22 +1182,23 @@ class MyPoco:
             self.make_new_role(sever_name, account1)
             self.protocol.add_resource_pb(add_type, add_value, 4899990)
             self.protocol.socket_close()
-        Thread_list = []
-        for i in range(num):
-            thread = myThread(sever_name, account1)
-            print("创建新线程"+str(i))
-            # 开启新线程
-            thread.start()
-            Thread_list.append(thread)
-        for thread in Thread_list:
-            print("开始线程")
-            thread.join()
+        # Thread_list = []
         # for i in range(num):
-        #     self.make_new_role(sever_name, self.get_random_account())
-        #     self.protocol.add_resource_pb(add_type, add_value, 4899990)
-        #     self.add_friend(account1[2:])
-        #     self.protocol.socket_close()
-        #     # time.sleep(4)
+        #     thread = myThread(sever_name, account1)
+        #     print("创建新线程"+str(i))
+        #     # 开启新线程
+        #     thread.start()
+        #     Thread_list.append(thread)
+        # for thread in Thread_list:
+        #     print("开始线程")
+        #     thread.join()
+        for i in range(num):
+            time.sleep(0.1)
+            self.make_new_role(sever_name, self.get_random_account())
+            self.protocol.add_resource_pb(add_type, add_value, 4899990)
+            self.add_friend(account1)
+            self.protocol.socket_close()
+            # time.sleep(4)
         self.make_new_role(sever_name, account1)
         self.pass_friend()
         print("账号" + account1 + "上有" + str(num) + "个好友")
@@ -1106,6 +1213,7 @@ class MyPoco:
         :param is_stop: bool 是否抽到后就马上停止
         :return:
         """
+
         cishu = 1000  # 默认抽1000次十连
         resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("化身灵力")
@@ -1202,7 +1310,8 @@ class myThread (threading.Thread):
 
     def run(self):
         my_poco = MyPoco("少三2", None)
-        my_poco.make_new_role(self.sever_name, my_poco.get_random_account())
+        account= my_poco.get_random_account()
+        my_poco.make_new_role(self.sever_name,account)
         my_poco.protocol.add_resource_pb(1, 1, 4899990)
-        my_poco.add_friend(self.account[2:])
+        my_poco.add_friend(self.account)
         my_poco.protocol.socket_close()

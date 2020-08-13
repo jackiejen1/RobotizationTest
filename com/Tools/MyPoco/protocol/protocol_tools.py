@@ -96,10 +96,11 @@ def _recv_data(s, api_attr, buffersize, limittime):
                 return recvdata, recvtime
             rev_data = s.recv(buffersize)#第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
             if len(rev_data) == 0:
-                data = b'error'
-                print("error,消息头长度为0")
-                recv_time = time.time()
-                return data, recv_time
+                print(str(api_attr['uid'])+":error,消息头长度为0")
+                raise Exception("消息头长度为0")
+                # data = b'error'
+                # recv_time = time.time()
+                # return data, recv_time
             if len(rev_data) < buffersize:#服务端拆包发送，第一条不是完整数据，包头长度会不够
                 rev_data =rev_data + s.recv(buffersize-len(rev_data))
             head_data = struct.unpack('>IIQQQ', rev_data)#把消息头解包
@@ -161,7 +162,7 @@ def recv_data(sock, api_attr, headsize, norecv=False, limitime=30):
         flag = False
     return flag, receive_data
 
-def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=30):
+def send_receive(sock, socketdata, api_attr, headsize, norecv=False, limitime=40):
     """
     发送并接收socket数据，并返回给调用函数
     :param sock: 使用的socket

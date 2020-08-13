@@ -21,25 +21,28 @@ class myThread (threading.Thread):
 
     def run(self):
         my_poco = MyPoco("少三2", None)
-        my_poco.make_new_role(self.sever_name, self.account)  # 创建或登录已有账号
+        my_poco.make_new_role(self.sever_name, self.account,is_new_account_into=True)  # 创建或登录已有账号
         my_poco.GM_yijian_account_v2(self.account)
 
 if __name__ == '__main__':
-    my_poco = MyPoco("少三2",__phone_id__)
-    sever_name = "QA1"
+    my_poco = MyPoco("少三2台湾",__phone_id__)
+    sever_name = "QA3"
     account = my_poco.get_random_account()#随机账号
-    # account = "qa3006"
-    sever_time = my_poco.make_new_role(sever_name, account)#创建或登录已有账号
-    # my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
-    # my_poco.add_resource({"角色经验": 409909990,})#添加资源，海外暂不支持
-    # my_poco.set_checkpoint(account, sever_name, {"副本": "副本-279-10"})#通关副本，海外暂不支持
+    # account = "14528005"
+    sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
+    my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
+    my_poco.add_resource({"角色经验": 409909990,"测试属性": 409909990,"银币": 999999,})#添加资源，海外暂不支持
+    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-100-10"})#通关副本，海外暂不支持
+    # my_poco.GM_yijian_fuben(4)#通关副本，海外用这个
     # my_poco.GM_yijian_mingjiangzhuan(8)
     # my_poco.GM_fengkuang_fuben("副本-195-9",5)
-    # my_poco.GM_fengkuang_haoling("sx",1334,True)
+    my_poco.GM_yijian_chuanzhuangbei()
+    # my_poco.quit_Guild()
+    # my_poco.GM_fengkuang_haoling("ssd",1334,True)
     # my_poco.GM_fengkuang_huashen(804,"元宝",6666)
     # my_poco.GM_fengkuang_hengsaoqianjun(457,"金斧子")
     # my_poco.GM_fengkuang_xianshijinjiang(795,"第六期金1-金5","吴","金将5选1箱（吴）")
-    my_poco.GM_fengkuang_haoyou(50,sever_name_into=sever_name,)
+    # my_poco.GM_fengkuang_haoyou(50,sever_name_into=sever_name,)
     # my_poco.GM_yijian_account_v1(account)
     # my_poco.GM_yijian_account_v2(account)
     # my_poco.del_all_resource_pb()
@@ -53,21 +56,25 @@ if __name__ == '__main__':
     # my_poco.GM_huoyue_friend_send_gift()  # 好友送礼
     # my_poco.GM_huoyue_mijingduobao()
     # my_poco.GM_huoyue_jingjichang()
-    a = ['36714219', '36964902', '37407723']
+    # for i in range(5):
+    #     account = my_poco.get_random_account()  # 随机账号
+    #     sever_time = my_poco.make_new_role(sever_name, account)  # 创建或登录已有账号
+    #     my_poco.GM_fengkuang_haoyou(50, sever_name_into=sever_name, )
     # my_poco.protocol.add_resource_pb(999,0,1)
-    # num = 3
-    # account_list = []
-    # Thread_list = []
-    # for i in range(num):
-    #     my_poco = MyPoco("少三2",__phone_id__)
-    #     sever_name = "QA1"
-    #     account = my_poco.get_random_account()
-    #     account_list.append(account)
-    #     print(account_list)
-    #     thread = myThread(sever_name, account)
-    #     # 开启新线程
-    #     thread.start()
-    #     Thread_list.append(thread)
+
+    num = 0
+    account_list = []
+    Thread_list = []
+    for i in range(num):
+        my_poco = MyPoco("少三2",__phone_id__)
+        sever_name = "QA4"
+        account = my_poco.get_random_account()
+        account_list.append(account)
+        print(account_list)
+        thread = myThread(sever_name, account)
+        # 开启新线程
+        thread.start()
+        # Thread_list.append(thread)
     # for thread in Thread_list:
     #     thread.join()
 

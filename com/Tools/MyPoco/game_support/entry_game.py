@@ -28,7 +28,13 @@ class EntryGame:
         :return:poco
         """
         if self.game_name == "com.youzu.test.qa":  # ss2
-            egss2 = EntryGameSs2(self.phone_id)
+            egss2 = EntryGameSs2(self.phone_id,self.game_name)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
+        elif self.game_name == "jp.co.yoozoo.sgsblast":
+            egss2 = EntryGameSs2(self.phone_id,self.game_name)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
+        elif self.game_name == "com.yoozoo.kr.snsgz2":
+            egss2 = EntryGameSs2(self.phone_id,self.game_name)
             egss2.entry_game_ss2(sever_name_input, game_account_input)
         elif self.game_name == "com.youzu.wgame2":
             egsx = EntryGameSx(self.phone_id)
@@ -36,5 +42,8 @@ class EntryGame:
         elif self.game_name == "com.youzu.android.snsgz":
             egsx = EntryGameSs(self.phone_id)
             egsx.entry_game_ss(sever_name_input,game_account_input,password)
+        elif self.game_name == "com.gamesword.twsst":
+            egss2 = EntryGameSs2(self.phone_id,self.game_name)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
         else:
             pass
