@@ -19,11 +19,14 @@ class MakeResourceBody:
     根据资源名获取资源对应type和id，用于辅助GM后台
     """
 
-    def __init__(self, game_name_into):
+    def __init__(self, game_name_into,ui_path=None):
         info = Information()
         self.game_name = info.get_config(game_name_into, "app_name")
         excel_path = info.get_config(game_name_into, "resource_excelpath")
-        MyPocoPath = info.get_config("设置", "my_poco_path")
+        if ui_path==None:
+            MyPocoPath = info.get_config("设置", "my_poco_path")
+        else:
+            MyPocoPath = ui_path
         all_path = MyPocoPath + excel_path
         self.xl = xlrd.open_workbook(all_path)
         # if self.game_name == "com.youzu.test.qa":

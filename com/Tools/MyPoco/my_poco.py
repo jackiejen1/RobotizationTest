@@ -23,18 +23,17 @@ from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接�
 
 
 class MyPoco:
-    def __init__(self, game_name, phone_id):
+    def __init__(self, game_name, phone_id,ui_path=None):
         """
         :param game_name: 游戏名字，见ini文件App_Name项
         :param phone_id: 设备号，如果为None，表示不链接设备
         """
+        self.ui_path =ui_path
         self.info = Information()
-        # my_poco_path = os.path.abspath(os.path.dirname(__file__))
-        # self.info.set_config("MyPocoPath", "MyPocoPath", my_poco_path)
         self.game_name_key = game_name
         self.game_name = self.info.get_config(game_name, "app_name")
         self.my_poco_obj = MyPocoObject(game_name, phone_id)
-        self.gm = GmMethod(game_name)
+        self.gm = GmMethod(game_name,self.ui_path)
         self.rg = ResourceGm(game_name, phone_id)
         # self.newaccount = NewAccount(game_name, phone_id)
         self.phone_id = phone_id
@@ -55,7 +54,7 @@ class MyPoco:
         self.GM_server_name = server_name
         if username == "":
             username = self.get_random_account()
-        self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username,is_new_account=is_new_account_into)
+        self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username,is_new_account=is_new_account_into,ui_path=self.ui_path)
         return self.protocol.sever_time
 
     def set_account_information_gm(self, account, server_name, role_id="", role=""):
@@ -996,6 +995,8 @@ class MyPoco:
         :return:
         """
         # 先把消耗的道具加进去
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 99999999)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("军旗")
         self.protocol.add_resource_pb(add_type, add_value, num)
         if not join:

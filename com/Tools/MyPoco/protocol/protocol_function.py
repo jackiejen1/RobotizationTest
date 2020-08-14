@@ -24,7 +24,7 @@ import lupa
 
 
 class ProtocolFunction:
-    def __init__(self, game_name, server_name, protocol_name, username,is_new_account):
+    def __init__(self, game_name, server_name, protocol_name, username,is_new_account,ui_path=None):
         """
         用于协议测试使用，创建账号的协议方法单独实现
         开局指定测试哪个游戏的哪条协议
@@ -39,8 +39,8 @@ class ProtocolFunction:
         self.socket = None
         self.info = Information()
         self.game_name = self.info.get_config(game_name, "app_name")
-        self.mri = MakeResourceBody(game_name)
-        self.pt = ProtocolTools(game_name)
+        self.mri = MakeResourceBody(game_name,ui_path)
+        self.pt = ProtocolTools(game_name,ui_path)
         self.username = username
         self.protocol_name = protocol_name
         # 开始连接

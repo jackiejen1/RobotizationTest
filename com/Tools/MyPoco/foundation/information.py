@@ -12,7 +12,6 @@
 import configparser
 import datetime
 import re
-import threading
 from airtest.core.api import *
 import shutil
 from MyPoco.foundation.config import *
@@ -21,7 +20,6 @@ from MyPoco.foundation.config import *
 class Information:
     def __init__(self):
         root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-        self.thread_file_name = str(threading.get_ident())  # 获取线程ID
         # self.cf = configparser.ConfigParser()
         # 获取当前文件所在目录的上一级目录
         # 拼接得到config.ini文件的路径，直接使用
@@ -159,13 +157,6 @@ class Information:
                         st = li1[1]
                         phone_name = st
                         return phone_name
-
-    def get_phone_size(self):
-        """获取手机的宽高，分辨率
-        return：list_int[宽，高]
-        """
-        phone_size_list_int = int(self.get_config("Phone_Size", self.thread_file_name))
-        return phone_size_list_int
 
     def game_is_running(self):
         """

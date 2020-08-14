@@ -107,8 +107,8 @@ class EntryGameSs2:
                 self.my_poco_obj.touch_poco("LoginRewardPop/__view/n3/img0")
             if self.my_poco_obj.is_in_dic("RedPacketRainPop/__view/Btn_close"):  # 红包雨锦鲤
                 self.my_poco_obj.touch_poco("RedPacketRainPop/__view/Btn_close")
-            if self.my_poco_obj.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close"):
-                self.my_poco_obj.touch_poco("未命名0/popup/GodboxPop/__view/Btn_close")
+            # if self.my_poco_obj.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close"):
+            #     self.my_poco_obj.touch_poco("未命名0/popup/GodboxPop/__view/Btn_close")
 
             # if self.my_poco_obj.is_in_dic("天公福利,限时抢购"):  # 异常窗口也有
             #     self.my_poco_obj.touch_poco("Btn_close/n4")

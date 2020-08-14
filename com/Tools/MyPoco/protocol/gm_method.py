@@ -14,7 +14,7 @@ from MyPoco.foundation.MyException import *
 
 
 class GmMethod:
-    def __init__(self, game_name):
+    def __init__(self, game_name,ui_path = None):
         """
         根据游戏名字和服务器确定账号
         :param game: 游戏客户端ID
@@ -22,7 +22,7 @@ class GmMethod:
         self.info = Information()
         self.game_name_key = game_name
         self.game_name = self.info.get_config(game_name, "app_name")
-        self.mri = MakeResourceBody(game_name)
+        self.mri = MakeResourceBody(game_name,ui_path)
         # self.host = self.info.get_config(game_name, "gm_url")
         # self.gah = GmApiHttp(self.host)
 
