@@ -32,6 +32,10 @@ BattleField.BATTLE_FIGHTING = 0	-- 战斗中
 BattleField.BATTLE_FINISH = 1	-- 战斗完成
 BattleField.BATTLE_FAILURE = 2	-- 战斗失败
 
+BattleField.isExtraAction = false
+BattleField.disableComboRecover = false
+BattleField.forceCommonSkill = false
+
 function BattleField:ctor()
 
 	self:init()
@@ -62,6 +66,9 @@ function BattleField:init()
 
 	-- 回合数
 	self._roundCount = 0
+
+	-- 武将行动数（即使因为眩晕等没出手也算）
+	self._actionCount = {0, 0}
 
 	-- 事件监听器
 	self._listeners = {}
@@ -100,8 +107,8 @@ function BattleField:init()
 	self._record:init()
 end
 
-function BattleField:addRecord(attacker,damage)
-    self._record:addRecord(attacker,damage)
+function BattleField:addRecord(attacker, type, value)
+    self._record:addRecord(attacker, type, value)
 end
 
 function BattleField:getRecord()
@@ -265,18 +272,33 @@ function BattleField:setInitData(initData)
 	for identity = 1 , 2 do
 		local info = identity == 1 and initData.own_teams[1] or initData.enemy_teams[1]
 		-- local robot = info.user and (info.user.robot_type and info.user.robot_type ~= 0 and info.user.robot_type ~= 999)
+		local isMonster = info.monster_team_id and info.monster_team_id > 0 or false
+		-- 阵营玩法加成
+		local groupMultiple = info.demon_boss_multiple
 		for i , v in ipairs(info.units) do
-			v.multiple = info.multiple
+			if groupMultiple then
+				local infoName = isMonster and "monster_info" or "knight_info"
+				local knight_info = loadCfg("cfg."..infoName)
+				local knightCfg = knight_info.get(v.id)
+				-- 主角或该阵营武将加成
+				if groupMultiple.team == knightCfg.group or knightCfg.type == 1 then
+					v.multiple = groupMultiple.multiple
+				end
+			end
+			if info.multiple then
+				v.multiple = (v.multiple or 0) + info.multiple
+			end
 		end
 		self._battleData:setMultiple(identity,info.multiple)
 
 		-- local isMonster = robot or (self._atkType == 1 and identity == 2) or (self._atkType == 10)
-		local isMonster = info.monster_team_id
+		
 		self:setFightKnights(info.units,identity,isMonster,info.user)
 		self:setEnabledCommands(info.combo,identity)
         self._battleData:setFightValue(info.fight_value,identity)
         self._battleData:setAssist(initData.assistance_id)
-        self._battleData:setPassiveSkills(identity,info.passive_skills)
+		self._battleData:setPassiveSkills(identity,info.passive_skills)
+		self._battleData:setPets(identity, info.pets)
 	end
 	self._initData = initData
 	self._attackIndex = {1,1}
@@ -299,23 +321,40 @@ function BattleField:updateNewPlayer(winner)
 
 	self._battleData:clear(loser)
 	local robot = newData.user and (newData.user.robot_type and newData.user.robot_type ~= 0 and newData.user.robot_type ~= 999)
+	local isMonster = newData.monster_team_id and newData.monster_team_id > 0 or false
+	local groupMultiple = newData.demon_boss_multiple
 	for i , v in ipairs(newData.units) do
-		v.multiple = newData.multiple
+		if groupMultiple then
+			local infoName = isMonster and "monster_info" or "knight_info"
+			local knight_info = loadCfg("cfg."..infoName)
+			local knightCfg = knight_info.get(v.id)
+			-- 主角或该阵营武将加成
+			if groupMultiple.team == knightCfg.group or knightCfg.type == 1 then
+				v.multiple = groupMultiple.multiple
+			end
+		end
+		if newData.multiple then
+			v.multiple = (v.multiple or 0) + newData.multiple
+		end
 	end
 	self._battleData:setMultiple(identity,newData.multiple)
 
 	-- local isMonster = robot or (self._atkType == 1 and loser == 2) or (self._atkType == 10)
-	local isMonster = newData.monster_team_id
+	
 	self:setFightKnights(newData.units,loser,isMonster,newData.user)
 	self:setEnabledCommands(newData.combo,loser)
 	self._battleData:setFightValue(newData.fight_value,loser)
-    self._battleData:setPassiveSkills(loser,newData.passive_skills)
+	self._battleData:setPassiveSkills(loser,newData.passive_skills)
+	self._battleData:setPets(loser, newData.pets)
 
 	-- 清掉胜利方的buff
 	local list = self._battleData:getKnightList(winner)
 	for i , v in ipairs(list) do
 		v:clearBuff()
+		v:clearPassiveSkill()
 	end
+	-- 清除额外行动次数
+	self._action:clearExtraAction()
 	self._battleData:setRoundFinish(true)
 	self._roundCount = 0
 	self._curAttackCount = 0
@@ -433,41 +472,55 @@ function BattleField:execute(onlyResult,skillInfo)
 	-- 本次操作的命令集合
 	local commands = CommandComponent.create()
 
-	-- 一回合刚开始
-	local roundStart = battleData:getRoundFinish()
-	if roundStart then
-		-- 回合数加1
-		self._roundCount = self._roundCount + 1
-		-- 回合开始的处理
-		if self._roundCount > 1 then
-			local command = RoundComponent.roundStart(battleData)
-			commands:addRoundCommand(command)
-		end
-
-		local knights = battleData:getKnights()
-		for i, knight in knights:ipairs() do
-			if not knight.isDead then
-				knight:excuteSpRule(SkillSpecialRule.TYPE.ROUND_START)
-			end
-		end
-		battleData:excuteSpRule(SkillSpecialRule.TYPE.ROUND_START)
+	-- 是否有额外行动次数
+	local isExtraAction, extraAction = self._action:hasExtraAction()
+	if isExtraAction then
+		BattleField.isExtraAction = true
+		BattleField.disableComboRecover = extraAction.disableComboRecover == true
+		BattleField.forceCommonSkill = extraAction.forceCommonSkill == true
 	end
 
+
+	-- 一回合刚开始
+	if not BattleField.isExtraAction then
+		local roundStart = battleData:getRoundFinish()
+		if roundStart then
+			-- 回合数加1
+			self._roundCount = self._roundCount + 1
+			-- 回合开始的处理
+			if self._roundCount > 1 then
+				local command = RoundComponent.roundStart(battleData)
+				commands:addRoundCommand(command)
+			end
+			
+			local knights = battleData:getAllKnightList()
+			for i, knight in ipairs(knights) do
+				if not knight.isDead then
+					knight:excuteSpRule(SkillSpecialRule.TYPE.ROUND_START)
+				end
+			end
+			battleData:excuteSpRule(SkillSpecialRule.TYPE.ROUND_START)
+		end
+	end
+		
 	-- 计算行动顺序，获取当前谁出手
 	local attacker = nil
 	local isReady, command = true, nil
 
-	-- 此处判断ai逻辑
-	-- 不能在第一轮
-	if not skillInfo and self._attackCount > 0 then
-		-- 如果是录像，按记录播放，不管ai逻辑
-		if self._isVideo then
-			skillInfo = self._videoCommands[self._attackCount]
-		else
-			skillInfo = self._auto:checkAuto(battleData)
+	if not BattleField.isExtraAction then
+		-- 此处判断ai逻辑
+		-- 不能在第一轮
+		if not skillInfo and self._attackCount > 0 then
+			-- 如果是录像，按记录播放，不管ai逻辑
+			if self._isVideo then
+				skillInfo = self._videoCommands[self._attackCount]
+			else
+				skillInfo = self._auto:checkAuto(battleData)
+			end
 		end
 	end
 
+	-- 玩家放合击，额外回合需要合并，目前在battlelayer resetLayer里跳过额外回合
 	-- 玩家出手
 	if skillInfo and skillInfo.id > 0 then
 		
@@ -489,8 +542,8 @@ function BattleField:execute(onlyResult,skillInfo)
 		self._attackCount = self._attackCount + 1
 		self._curAttackCount = self._curAttackCount + 1
 
-		-- 如果有触发技能，则先释放触发技能
 		local passiveSkill = battleData:getNextFastPassive()
+		-- 如果有触发技能，则先释放触发技能
 		if not passiveSkill then
 			passiveSkill = battleData:getNextPassive()
 		end
@@ -510,6 +563,10 @@ function BattleField:execute(onlyResult,skillInfo)
 		else
 			-- 找出当前出手的武将
 			attacker = self._action:next()
+			-- 额外回合不算队伍的武将行动次数，防止提前触发应龙神兽这类被动
+			if not BattleField.isExtraAction then
+				self._actionCount[attacker.identity] = self._actionCount[attacker.identity] + 1
+			end
 
 			-- 看看当前出手武将有没有“准备”好，因为出手前有一些数据要计算，可能导致武将不能出手，比如被buff弄死了
 			isReady, command = UpdateComponent.update(attacker, battleData, self)
@@ -525,14 +582,26 @@ function BattleField:execute(onlyResult,skillInfo)
 
 	-- 只有准备好的时候才会出手
 	if isReady then
+		-- 出手前需要计算的合并的被动
+		local earlyPassiveCommands = {}
+		if not attacker.isPlayer then
+			attacker:excuteSpRule(SkillSpecialRule.TYPE.BEFORE_SKILL)
+
+			local passiveSkill = battleData:getNextFastPassive()
+			if passiveSkill then
+				local passiveCommand = FightComponent.fightPassive(passiveSkill, battleData, self)
+				if passiveCommand then
+					earlyPassiveCommands[#earlyPassiveCommands+1] = passiveCommand
+				end
+			end
+		end
+
 		-- 武将出手，产生运算
 		local command = FightComponent.fight(attacker, battleData, self)
-		local passiveCommands = {}
-
-		SkillSpecialRule.disable = true
-
 		-- 有的触发要立即处理
 		local passiveSkill = battleData:getNextFastPassive()
+		local passiveCommands = {}
+		SkillSpecialRule.disable = true
 		while passiveSkill do
 			isGameOver, winner = battleData:isGameOver(self._roundCount)
 			if isGameOver then
@@ -542,45 +611,61 @@ function BattleField:execute(onlyResult,skillInfo)
 			if passiveCommand then
 				passiveCommands[#passiveCommands+1] = passiveCommand
 			end
-
+			
 			passiveSkill = battleData:getNextFastPassive()
 		end
-
 		SkillSpecialRule.disable = false
-
-		command:update()
-		commands:addFightCommand(command)
-
-		for i , passiveCommand in ipairs(passiveCommands) do
+		-- 提前的被动结算
+		for i, passiveCommand in ipairs(earlyPassiveCommands) do
 			passiveCommand:update()
 			commands:addFightCommand(passiveCommand,true)
 		end
-
-		-- 结算过程中会有新的触发，也要处理
-		passiveCommands = {}
-		SkillSpecialRule.disable = true
-
-		local passiveSkill = battleData:getNextFastPassive()
-		while passiveSkill do
-			isGameOver, winner = battleData:isGameOver(self._roundCount)
-			if isGameOver then
-				break
-			end
-			passiveCommand = FightComponent.fightPassive(passiveSkill, battleData, self)
-			if passiveCommand then
-				passiveCommands[#passiveCommands+1] = passiveCommand
-			end
-
-			passiveSkill = battleData:getNextFastPassive()
-		end
-
-		SkillSpecialRule.disable = false
-
+		-- 玩家、武将技能结算
+		command:update()
+		commands:addFightCommand(command)
+		-- 被动结算
 		for i , passiveCommand in ipairs(passiveCommands) do
 			passiveCommand:update()
 			commands:addFightCommand(passiveCommand,true)
 		end
 	end
+
+	-- 提前
+	if attacker and not attacker.isPlayer then
+		-- 武将行动结束（即使没出手攻击）
+		battleData:excuteSpRule(SkillSpecialRule.TYPE.ACTION)
+		battleData:excuteKnightSpRule(SkillSpecialRule.TYPE.ACTION)
+	end
+
+	local passiveSkill = battleData:getNextFastPassive()
+	while passiveSkill do
+		local passiveCommands = {}
+		SkillSpecialRule.disable = true
+		while passiveSkill do
+			isGameOver, winner = battleData:isGameOver(self._roundCount)
+			if isGameOver then
+				break
+			end
+			local passiveCommand = FightComponent.fightPassive(passiveSkill, battleData, self)
+			if passiveCommand then
+				passiveCommands[#passiveCommands+1] = passiveCommand
+			end
+			
+			passiveSkill = battleData:getNextFastPassive()
+		end
+		
+		SkillSpecialRule.disable = false
+		
+		for i , passiveCommand in ipairs(passiveCommands) do
+			passiveCommand:update()
+			commands:addFightCommand(passiveCommand,true)
+		end
+		-- update后可能触发新被动
+		passiveSkill = battleData:getNextFastPassive()
+	end
+	-- 攻击结束
+	local command = UpdateComponent.updateAfterAttack(attacker, battleData, self)
+	commands:addUpdateAfterAttackCommand(command)
 
 	local lastAttack = self._action:checkFinish()
 	-- 判断一下是否战斗结束了
@@ -617,9 +702,23 @@ function BattleField:execute(onlyResult,skillInfo)
 	else
 		self._state = BattleField.BATTLE_FIGHTING
 	end
-	
+	BattleField.isExtraAction = false
+	BattleField.disableComboRecover = false
+	BattleField.forceCommonSkill = false
+
 	return self._state, not onlyResult and commands:pack() or nil
 
+end
+
+-- 跳过额外行动次数
+function BattleField:executeExtraAction()
+	repeat
+		local hasExtraAction = self:hasExtraAction()
+		if hasExtraAction then
+			state = self:execute(true)
+		end
+		hasExtraAction = self:hasExtraAction()
+	until not hasExtraAction or state ~= BattleField.BATTLE_FIGHTING
 end
 
 -- 获取玩家操作集合
@@ -911,6 +1010,22 @@ function BattleField:getNextKnight()
 	if knight then
 		return knight.serialId
 	end
+end
+
+function BattleField:getActionCount(identity)
+	return self._actionCount[identity]
+end
+
+function BattleField:getAttackIndex(identity)
+	return self._attackIndex[identity]
+end
+
+function BattleField:addExtraAction(knight)
+	self._action:addExtraAction(knight)
+end
+
+function BattleField:hasExtraAction()
+	return self._action:hasExtraAction()
 end
 
 return BattleField

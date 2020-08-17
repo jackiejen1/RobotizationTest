@@ -82,6 +82,17 @@ local Parameters = {
     KTOM_DAMAGE_HIGH = 2042,
     UTOM_DAMAGE_LOW = 2043, -- 怪物额外受合击伤害修正
     UTOM_DAMAGE_HIGH = 2044,
+
+    QUALITY_DAMAGE_DESC_LOW = 2045, -- 品质压制系数下限
+    QUALITY_DAMAGE_DESC_HIGH = 2046, -- 品质压制系数上限
+
+    KILLING_VALUE_MAX = 2047,  -- 必杀技能量上限
+    SIPHON_ATK_HIGH = 2048,  -- 属性吸取，吸取值上限（攻击）
+    SIPHON_PHY_DEF_HIGH = 2049, -- 属性吸取，吸取值上限（物防）
+    SIPHON_MAG_DEF_HIGH = 2050, -- 属性吸取，吸取值上限（法防）
+    SECKILL_SELF_HP_LIMIT = 2051, -- 斩杀伤害的上限（自身最大生命值的X%）
+    FIGHTVALUE_PROTECT_VALUE1 = 2052, -- 战力免伤保护系数1
+    FIGHTVALUE_PROTECT_VALUE2 = 2053, -- 战力免伤保护系数2
 }
 
 local param_info = loadCfg("cfg.battle_parameter_info")

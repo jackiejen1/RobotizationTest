@@ -60,6 +60,21 @@ class MyPocoObject():
     #         self.poco = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
     #     self.make_poco_dic.set_poco(self.poco)
     #     return self.poco
+    def query_game_is_run(self, game_name):
+        """
+        查询游戏线程是否存在，主要用于开始测试前排除其他poco干扰
+        :param game_name: 游戏Activities
+        :return:
+        """
+        return self.make_poco_dic.query_game_is_run(game_name)
+
+    def get_game_run_text(self):
+        """
+        查询游戏线程是否存在，主要用于开始测试前排除其他poco干扰
+        :param game_name: 游戏Activities
+        :return:
+        """
+        return self.make_poco_dic.get_game_run_text()
 
     def my_swipe(self, start_path, end_path, timein=2):
         """

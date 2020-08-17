@@ -40,7 +40,8 @@ local biography_land_info = {
     [12] = {12,"纵横捭阖","十二",1,53,54,55,56,57,1012,10535,0,2,50130,"（再通关&<5>#num#&章解锁）","pic/dungeon_achievement/zxcj_huqichongfu.png","pic/dungeon_achievement/icon_zxcj_jianghun.png","pic/dungeon_achievement/icon_huqichongfu.png",50130,510020,500030,},  
     [13] = {13,"勇往无前","十三",1,58,59,60,61,62,1013,10596,0,2,50080,"（再通关&<5>#num#&章解锁）","pic/dungeon_achievement/zxcj_tietitafu.png","pic/dungeon_achievement/icon_zxcj_jianghun.png","pic/dungeon_achievement/icon_tietitafu.png",50080,500110,510040,},  
     [14] = {14,"独步天下","十四",1,63,64,65,66,67,1014,10702,0,2,50120,"（再通关&<5>#num#&章解锁）","pic/dungeon_achievement/zxcj_shuangjiaomeifu.png","pic/dungeon_achievement/icon_zxcj_jianghun.png","pic/dungeon_achievement/icon_shuangjiaomeifu.png",50120,500130,510060,},  
-    [15] = {15,"峥嵘头角","十五",1,68,69,70,71,72,1015,10703,0,2,50070,"（再通关&<5>#num#&章解锁）","pic/dungeon_achievement/zxcj_haoqingzhifu.png","pic/dungeon_achievement/icon_zxcj_jianghun.png","pic/dungeon_achievement/icon_haoqingzhi.png",50070,510030,500080,},
+    [15] = {15,"峥嵘头角","十五",1,68,69,70,71,72,1015,10703,0,2,50070,"（再通关&<5>#num#&章解锁）","pic/dungeon_achievement/zxcj_haoqingzhifu.png","pic/dungeon_achievement/icon_zxcj_jianghun.png","pic/dungeon_achievement/icon_haoqingzhi.png",50070,510030,500080,},  
+    [16] = {16,"毕生理想","十六",1,73,74,75,76,77,1016,10779,0,2,50100,"（再通关&<5>#num#&章解锁）","pic/dungeon_achievement/zxcj_tudufuzhou.png","pic/dungeon_achievement/icon_zxcj_jianghun.png","pic/dungeon_achievement/icon_tuduzhoufu.png",50100,510070,500210,},
     }
 }
 
@@ -59,7 +60,8 @@ local __index_id = {
     [12] = 12,  
     [13] = 13,  
     [14] = 14,  
-    [15] = 15,
+    [15] = 15,  
+    [16] = 16,
 }
 
 local __key_map = { 

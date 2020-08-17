@@ -138,7 +138,7 @@ class ProtocolFunction:
             G2C_Create = cg_pb2.G2C_Create()
             G2C_Create.ParseFromString(data_Create)
             if G2C_Create.ret == 1:
-                msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + self.username[2:]+"，UID：" + str(G2C_Create.uid)
+                msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + self.username+"，UID：" + str(G2C_Create.uid)
                 print(msg)
                 add_msg_in_log(msg)
                 self.uid = G2C_Create.uid
@@ -1068,17 +1068,14 @@ class ProtocolFunction:
         """
 
         award_list = self.huashen_shilian(activity_id)
-        num = 0
         for award in award_list:
             award_type = award["type"]
             award_value = award["value"]
             award_size = award["size"]
             if award_type == type_into and award_value == value_into and award_size == size_into:
-                num = num + 1
                 if is_stop:
                     raise GmException("抽到需要验证的道具了，终止抽奖")
-                else:
-                    print("抽到了" + str(num) + "次")
+
 
     def GM_fengkuanghengsaoqianjun(self, type_into, value_into, size_into, activity_id, is_stop):
         """

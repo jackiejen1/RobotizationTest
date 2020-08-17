@@ -33,6 +33,7 @@ message BattleUnit {
     optional uint32 cardId = 17;//穿戴幻化卡
     optional uint32 dress_num = 18;//时装数量
     optional uint32 wingId = 19;//穿戴翅膀
+		optional uint32 energy_skill_id = 20;//必杀技能
 }
 
 message BattleTeam {
@@ -51,6 +52,13 @@ message BattleTeam {
     repeated TokenKnightShow  shows = 13; //兵符对应武将显示信息
     repeated uint32 pets = 14; // 神兽id
     repeated uint32 passive_skills = 15; //被动技能
+    optional DemonBossTeamMultiple demon_boss_multiple = 16; //讨伐魔将阵营伤害倍数
+}
+
+// 讨伐魔将阵营伤害倍数
+message DemonBossTeamMultiple {
+  required uint32 team = 1; // 阵营
+  required uint32 multiple = 2; // 伤害倍数
 }
 
 // 战斗数据，会有多波战斗
@@ -110,6 +118,8 @@ message BattleUnitResult {
     optional uint32 id = 2;
     optional uint32 avartar_id = 3; //头像id
     optional uint64 dam = 4;  //伤害--数值
+    optional uint64 recover = 5;  //治疗--数值
+    optional uint64 take_dam = 6;  //受到伤害--数值
 }
 
 message BriefReport {

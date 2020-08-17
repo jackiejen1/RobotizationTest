@@ -25,8 +25,8 @@ class myThread (threading.Thread):
         my_poco.GM_yijian_account_v2(self.account)
 
 if __name__ == '__main__':
-    my_poco = MyPoco("少三2台湾",__phone_id__)
-    sever_name = "QA3"
+    my_poco = MyPoco("少三2",__phone_id__)
+    sever_name = "QA6"
     account = my_poco.get_random_account()#随机账号
     # account = "14528005"
     sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
@@ -39,11 +39,16 @@ if __name__ == '__main__':
     # my_poco.GM_yijian_chuanzhuangbei()
     # my_poco.quit_Guild()
     # my_poco.GM_fengkuang_haoling("ssd",1334,True)
-    # my_poco.GM_fengkuang_huashen(804,"元宝",6666)
+
+
+    my_poco.GM_fengkuang_huashen(508,"仙法符纸",1)
     # my_poco.GM_fengkuang_hengsaoqianjun(457,"金斧子")
     # my_poco.GM_fengkuang_xianshijinjiang(795,"第六期金1-金5","吴","金将5选1箱（吴）")
+
+
+
     # my_poco.GM_fengkuang_haoyou(50,sever_name_into=sever_name,)
-    my_poco.GM_yijian_account_v1(account)
+    # my_poco.GM_yijian_account_v1(account)
     # my_poco.GM_yijian_account_v2(account)
     # my_poco.del_all_resource_pb()
     # my_poco.GM_yijian_wushaungshilian(20)

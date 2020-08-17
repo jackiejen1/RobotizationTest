@@ -129,7 +129,7 @@ class MakePocoDic:
                         return True
                     else:
                         return False
-        add_msg_in_log("对比text属性时，" + poco_path+"节点未找到",is_pass=False)
+        add_msg_in_log("对比text属性时，" + poco_path + "节点未找到", is_pass=False)
         return False
 
     def is_visible(self, poco_path):
@@ -180,7 +180,7 @@ class MakePocoDic:
         # self.get_poco_dic()
         if poco_path in self.poco_dic.keys():
             poco_path_pos = self.poco_dic[poco_path]["pos"]
-            if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:#todo 这里需要优化
+            if poco_path_pos[0] >= 1 or poco_path_pos[1] >= 1:  # todo 这里需要优化
                 print(poco_path + "-节点坐标在屏幕外，当做不存在")
                 self.complete_poco_path = poco_path
                 return False
@@ -300,6 +300,27 @@ class MakePocoDic:
         touch_int_list = self.get_poco_pos(poco_path, click_list)
         self.touch(touch_int_list)
 
+    def query_game_is_run(self, game_name):
+        """
+        查询游戏线程是否存在，主要用于开始测试前排除其他poco干扰
+        :param game_name: 游戏Activities
+        :return:
+        """
+        game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
+        if game_name in game_running_str:
+            return True
+        else:
+            return False
+
+    def get_game_run_text(self):
+        """
+        查询游戏线程是否存在，主要用于开始测试前排除其他poco干扰
+        :param game_name: 游戏Activities
+        :return:
+        """
+        game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
+        return game_running_str
+
     def touch_pos(self, pos_list_int, is_sleep=True):
         """
         点击方法
@@ -349,9 +370,7 @@ class MakePocoDic:
         print("点击坐标" + str(pos_list) + "完成", )
         self.poco_dic = None
 
-
-
-    def swipe(self, pos1 ,pos2,duration):
+    def swipe(self, pos1, pos2, duration):
         """
         根据传入的坐标进行滑动，调用的airtest自带的滑动方法
         :param pos1: 开始

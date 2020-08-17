@@ -4,6 +4,7 @@ local BattleAttr = {
 	PHY_DEFENCE = 3,
 	MAG_DEFENCE = 4,
 	DEFENCE = 5,
+	SHIELD = 6, --护盾
 	HP_PCT = 11,
 	ATTACK_PCT = 12,
 	PHY_DEFENCE_PCT = 13,
@@ -79,6 +80,8 @@ local BattleAttr = {
 	BATTLE_KTOM_DAMAGE_DESC = 902, -- 怪物额外减免武将伤害
 	BATTLE_UTOM_DAMAGE_ADD = 903, -- 怪物额外受合击伤害
 	BATTLE_UTOM_DAMAGE_DESC = 904, -- 怪物额外减免合击伤害
+	QUALITY_SUPPRESSION = 1001,	-- 品质减伤压制系数
+	INITIAL_ENERGY = 1101,	-- 必杀技能量
 }
 
 return BattleAttr

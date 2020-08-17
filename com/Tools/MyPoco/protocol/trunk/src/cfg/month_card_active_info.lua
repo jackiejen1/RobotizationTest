@@ -5,14 +5,25 @@ local record_month_card_active_info = {}
 record_month_card_active_info.id = 0--id
 record_month_card_active_info.next_id = 0--下一ID
 record_month_card_active_info.num = 0--节点
-record_month_card_active_info.reward = 0--宝箱
+record_month_card_active_info.reward_type_1 = 0--奖励1类型
+record_month_card_active_info.reward_value_1 = 0--奖励1类型值
+record_month_card_active_info.reward_size_1 = 0--奖励1数量
+record_month_card_active_info.reward_type_2 = 0--奖励2类型
+record_month_card_active_info.reward_value_2 = 0--奖励2类型值
+record_month_card_active_info.reward_size_2 = 0--奖励2数量
+record_month_card_active_info.reward_type_3 = 0--奖励3类型
+record_month_card_active_info.reward_value_3 = 0--奖励3类型值
+record_month_card_active_info.reward_size_3 = 0--奖励3数量
+record_month_card_active_info.reward_type_4 = 0--奖励4类型
+record_month_card_active_info.reward_value_4 = 0--奖励4类型值
+record_month_card_active_info.reward_size_4 = 0--奖励4数量
 
 local month_card_active_info = {
    _data = {   
-    [1] = {1,2,10,2368,},  
-    [2] = {2,3,20,2369,},  
-    [3] = {3,4,30,2370,},  
-    [4] = {4,0,45,2371,},
+    [1] = {1,2,10,999,0,1000,1,37,100,0,0,0,0,0,0,},  
+    [2] = {2,3,20,999,0,1500,1,37,200,0,0,0,0,0,0,},  
+    [3] = {3,4,30,999,0,2000,1,37,300,0,0,0,0,0,0,},  
+    [4] = {4,0,45,999,0,3000,1,37,500,0,0,0,0,0,0,},
     }
 }
 
@@ -27,7 +38,18 @@ local __key_map = {
     id = 1,
     next_id = 2,
     num = 3,
-    reward = 4,
+    reward_type_1 = 4,
+    reward_value_1 = 5,
+    reward_size_1 = 6,
+    reward_type_2 = 7,
+    reward_value_2 = 8,
+    reward_size_2 = 9,
+    reward_type_3 = 10,
+    reward_value_3 = 11,
+    reward_size_3 = 12,
+    reward_type_4 = 13,
+    reward_value_4 = 14,
+    reward_size_4 = 15,
 }
 
 local m = { 

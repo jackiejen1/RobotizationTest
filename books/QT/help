@@ -3,7 +3,7 @@ pip install pyinstaller
 统一库版本
 pip install opencv-python==3.4.2.17 numpy==1.14.5
 将py打包成exe
-pyinstaller.exe -F -w XXX.py
+pyinstaller.exe -F -w XXX.py    一般不带-w，日志打印窗
 
 
 

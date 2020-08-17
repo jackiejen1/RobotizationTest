@@ -42,9 +42,10 @@ function SkillSpAffectRule._calcSkillAffect9(attackData)
         end
 	end
 	-- 随机去掉多余的人
+	local battleField = attackData.battleField
 	local targetCnt = #reAngerTargets
 	for i = 1, targetCnt - affectValue do
-		table.remove(reAngerTargets, math.random(targetCnt))
+		table.remove(reAngerTargets, battleField:boundedrand(1, targetCnt))
 		targetCnt = targetCnt - 1
 	end
 	-- 均分扣除怒气
@@ -72,6 +73,7 @@ function SkillSpAffectRule._calcSkillAffect9(attackData)
 	for i, v in ipairs(reAngerTargets) do
 		if v.reAnger > 0 then
 			local result = {
+				suckAnger = true,
 				damage = v.reAnger,
 				affectType = 3,
 				victim = v.target.victim,
@@ -83,6 +85,7 @@ function SkillSpAffectRule._calcSkillAffect9(attackData)
 	if reAngerCnt > 0 then
 		-- 给攻击者加怒
 		table.insert(results, {
+			suckAnger = true,
 			damage = reAngerCnt,
 			affectType = 4,
 			victim = attacker,

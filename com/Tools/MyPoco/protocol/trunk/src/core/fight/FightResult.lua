@@ -7,7 +7,10 @@ local floor = math.floor
 
 local FightResult = {}
 local SkillSpecialRule = load "core.rule.SkillSpecialRule"
+local EnergyRule = load "core.rule.EnergyRule"
 local BuffRule = load "core.rule.BuffRule"
+local BattleRecord = load "core.BattleRecord"
+local Parameters = load "core.Parameters"
 
 -- 创建一个伤害结果实例
 function FightResult.createFightResult(attacker, attackType, attackId, battleField)
@@ -16,7 +19,7 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 	local fightResult = {
 		-- 攻击者
 		attacker = attacker,
-		-- 1表示是武将出手，2表示是玩家释放技能,3表示变身召唤，4表示宠物技能
+		-- 1表示是武将出手，2表示是玩家释放技能,3表示变身召唤，4表示宠物技能, 5表示时空之力技能， 6是技能召唤物技能
 		attackType = attackType,
 		-- attackid表示所属的“技能”id，如果是1类型的，就是技能id，如果是2类型的，就是玩家释放技能的id
 		attackId = attackId,
@@ -33,6 +36,14 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 		-- addInfos = {},
 		-- 生成武将,用于变身召唤
 		knights = {},
+		-- 技能召唤
+		skillSummons = {},
+		-- 移除的召唤物
+		delSkillSummon = {},
+		-- 复活武将
+		reborns = {},
+		-- 特殊被动效果
+		spEffects = {},
 	}
 
 	fightResult.addAttackInfo = function(self, info)
@@ -42,6 +53,8 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 			vinfo.victim = value.victim
 			vinfo.effect_type = value.affectType
 			vinfo.effect_value = value.damage
+			vinfo.add_value = value.addDamage
+			vinfo.attacker = value.attacker	-- 伤害统计的attacker
 			-- local add_effects = {}
 			-- if value.crit then
 			-- 	insert(add_effects,{add_type=1})
@@ -57,6 +70,9 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 			vinfo.miss = value.miss
 			vinfo.block = value.block
 			vinfo.invincible = value.invincible
+			vinfo.suckAnger = value.suckAnger
+			vinfo.seckill = value.seckill
+			vinfo.hpLink = value.hpLink
 			insert(self.attackInfos,vinfo)
 		end
 
@@ -69,6 +85,7 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 		-- end
 
 		self.delBuffs = info.removeList or {}
+		self.delSkillSummon = info.delSkillSummon or {}
 	end
 
 	fightResult.addAttackEffect = function(self, effect, before)
@@ -99,8 +116,11 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 		end
 		local effectAfter = self.attackEffectAfter
 		for i, info in ipairs(effectAfter) do
-			FightResult.updateSkillEffect(self,self.attacker,self.attacker, info,battleField)
+			local attacker = info.attacker or self.attacker
+			local victim = info.victim or self.attacker
+			FightResult.updateSkillEffect(self,attacker,victim,info,battleField)
 		end
+
 		-- local addInfos = self.addInfos
 		-- for i, info in ipairs(addInfos) do
 		-- 	updateSkillEffect(self.attacker, info)
@@ -117,6 +137,9 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 			end
 			local serialId = victim:addBuff(buff.buffId, buff.buffTime, buff.attacker,buff.buffCheck)
 			buff.serialId = serialId
+		end
+		if #self.addBuffs > 0 then
+			battleField:getBattleData():excuteSpRule(SkillSpecialRule.TYPE.ADD_BUFF, self.addBuffs)
 		end
 
 		if self.attackType == 2 then
@@ -173,6 +196,15 @@ function FightResult.createFightResult(attacker, attackType, attackId, battleFie
 		end
 	end
 
+	fightResult.addSpEffectList = function (self, knight, spCfgIds)
+		for i, id in ipairs(spCfgIds) do
+			insert(self.spEffects, {
+				knight_serial_id = knight.serialId,
+				sp_effect_id = id,
+			})
+		end
+	end
+
 	return fightResult
 
 end
@@ -186,47 +218,95 @@ function FightResult.updateSkillEffect(self,attacker,victim,effect,battleField)
     if effectType == 1 or effectType == 2 then
         -- 先判断无敌
         local is_invincible = victim:doBuff(BuffRule.TYPE.INVINCIBLE)
-        if is_invincible and effectType == 1 then
+        if is_invincible and effectType == 1 and not effect.seckill then
             effectValue = 0
-        end
+		end
+		victim:checkBuffDisappear(BuffRule.DISAPPEAR.DAMAGE, effectValue)
         -- 判断锁血
-		if victim.isLock then
+		if victim.isLock or victim.isGhost then
 			-- 已锁血，只计算伤害,不会实际扣血
-			victim:excuteSpRule(SkillSpecialRule.TYPE.DAMAGE)
+			if not victim.isDead then
+				victim:excuteSpRule(SkillSpecialRule.TYPE.DAMAGE)
+			end
 			if effectType == 1 then
-				battleField:addRecord(attacker,effectValue)
+				-- 出现了诅咒分摊伤害，计算来源要算在诅咒释放者身上
+				local recordAttacker = attacker
+				if effect.attacker then
+					recordAttacker = effect.attacker
+				end
+				battleField:addRecord(recordAttacker, BattleRecord.TYPE_DAM, effectValue)
+				battleField:addRecord(victim, BattleRecord.TYPE_TAKE_DAM, effectValue)
+			elseif effectType == 2 then
+				battleField:addRecord(attacker, BattleRecord.TYPE_RECOVER, effectValue)
 			end
 			return
 		end
-		local value = effectType == 1 and effectValue * -1 or effectValue
-		local hpBefore = victim.baseInfo.INITIAL_HP
-		local hp = victim.baseInfo.INITIAL_HP + value
-		local maxHp = victim.originInfo.INITIAL_HP
-		if hp <= 0 then
-			victim.isDead = true
-			victim.baseInfo.INITIAL_HP = 0
 
-			local knights = battleField:getBattleData():getKnights()
-			for i, knight in knights:ipairs(identity) do
-				if not knight.isDead then
-					knight:excuteSpRule(SkillSpecialRule.TYPE.DYING,victim.identity)
+		local hpBefore = victim.baseInfo.INITIAL_HP
+		local shieldBefore = victim.baseInfo.SHIELD
+		-- 秒杀（使受击者一定死亡，无视无敌、傀儡术）
+		if effect.seckill then
+			-- 这里直接血量置0，防止秒杀公式计算出的伤害因为中间发生血量增长、护盾增加等原因没有杀死。
+			victim.baseInfo.INITIAL_HP = 0
+		else
+			local value = effectType == 1 and effectValue * -1 or effectValue
+			-- local hp = victim.baseInfo.INITIAL_HP + value
+			-- local maxHp = victim.originInfo.INITIAL_HP
+			victim:updateHp(value)
+			-- 傀儡术，抵抗死亡
+			if victim.baseInfo.INITIAL_HP <= 0 then
+				if victim:doBuff(BuffRule.TYPE.RESIST_DEAD, false) then
+					victim.baseInfo.INITIAL_HP = 1
+					local shield = victim.baseInfo.SHIELD
+					effectValue = (hpBefore - 1) + (shieldBefore - shield)
+					effect.effect_value = effectValue
 				end
 			end
-			battleField:getBattleData():excuteSpRule(SkillSpecialRule.TYPE.DYING,victim.identity)
-		elseif hp > maxHp then
-			-- effect.effect_value = effect.effect_value - hp + maxHp
-			victim.baseInfo.INITIAL_HP = maxHp
-		else
-			victim.baseInfo.INITIAL_HP = hp
+		end
+		if victim.baseInfo.INITIAL_HP <= 0 then
+			-- victim.isDead = true
+			victim:doDead()
+			-- victim.baseInfo.INITIAL_HP = 0
+
+			if hpBefore > 0 then
+				local knights = battleField:getBattleData():getAllKnightList()
+				for i, knight in ipairs(knights) do
+					if not knight.isDead then
+						knight:excuteSpRule(SkillSpecialRule.TYPE.DYING,victim.identity)
+						knight:checkBuffDisappear(BuffRule.DISAPPEAR.DEAD, victim.serialId)
+					elseif knight.serialId == victim.serialId then
+						knight:excuteSpRule(SkillSpecialRule.TYPE.SELF_DYING)
+					end
+				end
+				battleField:getBattleData():excuteSpRule(SkillSpecialRule.TYPE.DYING,victim.identity)
+			end
+		-- elseif hp > maxHp then
+		-- 	-- effect.effect_value = effect.effect_value - hp + maxHp
+		-- 	victim.baseInfo.INITIAL_HP = maxHp
+		-- else
+		-- 	victim.baseInfo.INITIAL_HP = hp
 		end
 		if not victim.isDead then
 			local hpAfter = victim.baseInfo.INITIAL_HP
 			victim:excuteSpRule(SkillSpecialRule.TYPE.DAMAGE)
+
+			if victim.baseInfo.SHIELD <= 0 then
+				victim:checkBuffDisappear(BuffRule.DISAPPEAR.SHIELD)
+			end
 		end
 		battleField:getBattleData():excuteSpRule(SkillSpecialRule.TYPE.DAMAGE,victim.identity)
 		if effectType == 1 then
 			local hpAfter = victim.baseInfo.INITIAL_HP
-			battleField:addRecord(attacker,hpBefore-hpAfter)
+			-- 出现了诅咒分摊伤害，计算来源要算在诅咒释放者身上
+			local recordAttacker = attacker
+			if effect.attacker then
+				recordAttacker = effect.attacker
+			end
+			battleField:addRecord(recordAttacker, BattleRecord.TYPE_DAM, hpBefore-hpAfter)
+			battleField:addRecord(victim, BattleRecord.TYPE_TAKE_DAM, hpBefore-hpAfter)
+		elseif effectType == 2 then
+			local hpAfter = victim.baseInfo.INITIAL_HP
+			battleField:addRecord(attacker, BattleRecord.TYPE_RECOVER, hpAfter - hpBefore)
 		end
 	-- 扣怒气/加怒气
 	elseif effectType == 3 or effectType == 4 then
@@ -247,19 +327,172 @@ function FightResult.updateSkillEffect(self,attacker,victim,effect,battleField)
 		local buffList = victim.buffs
 		local clearType = effectType == 7 and 2 or 1
 		local effected = false
+		local hasLimit = effectValue == 0
+		local leftNum = effectValue
 		for i = #buffList , 1 , -1 do
 			local buff = buffList[i]
 			local buffCfg = buff.buffCfg
 			if buffCfg.buff_increase_type == clearType and buffCfg.not_clear == 0 then
-				table.insert(self.delBuffs,#self.delBuffs+1,buff)
-				table.remove(buffList,i)
+				-- table.insert(self.delBuffs,#self.delBuffs+1,buff)
+				-- table.remove(buffList,i)
+				buff.isDone = true
 				effected = true
+				if hasLimit then
+					leftNum = leftNum - 1
+					if leftNum == 0 then
+						break
+					end
+				end
 			end
 		end
-		effect.buffClear = effect
+		effect.buffClear = effected
 	-- 吸怒气
 	elseif effectType == 9 then
 		-- 已拆分成 扣怒气/加怒气
+	elseif effectType == 10 then
+		-- 破冰
+		-- 伤害已经拆分，这里只清除敌方冰冻buff
+		local buffList = victim.buffs
+		for i = #buffList , 1 , -1 do
+			local buff = buffList[i]
+			local buffCfg = buff.buffCfg
+			if buffCfg.buff_effect_type == BuffRule.EFFECT_TYPE.FROZEN then
+				buff.isDone = true
+			end
+		end
+	elseif effectType == 11 then
+		-- 灼烧回合数+X
+		local buffList = victim.buffs
+		for i = #buffList , 1 , -1 do
+			local buff = buffList[i]
+			local buffCfg = buff.buffCfg
+			if buffCfg.buff_effect_type == BuffRule.EFFECT_TYPE.BURNING then
+				buff.buffTime = buff.buffTime + effectValue
+			end
+		end
+	-- 减必杀能量/加必杀能量
+	elseif effectType == 12 or effectType == 13 then
+		local value = effectType == 12 and effectValue * -1 or effectValue
+		local energy = victim.baseInfo.INITIAL_ENERGY + value
+		if energy < 0 then
+			energy = 0
+		end
+		if energy > Parameters.KILLING_VALUE_MAX then
+			energy = Parameters.KILLING_VALUE_MAX
+		end
+		victim.baseInfo.INITIAL_ENERGY = energy
+		-- 召唤无血条战斗单位
+	elseif effectType == 14 then
+		local num = effect.add_value or 0
+		if num > 0 then
+			local summonId = effectValue
+			if summonId > 0 then
+				for i = 1, num do
+					local skillSummon = battleField:getBattleData():addSkillSummon(summonId, attacker)
+					if skillSummon then
+						insert(self.skillSummons, skillSummon)
+					end
+				end
+			end
+		end
+	-- 加护盾
+	elseif effectType == 15 then
+		victim.baseInfo.SHIELD = victim.baseInfo.SHIELD + effectValue
+	-- 加标记/减标记
+	elseif effectType == 16 or effectType == 17 then
+		if effectType == 16 then
+			victim:addMark(effectValue,effect.add_value)
+		else
+			victim:removeMark(effectValue,effect.add_value)
+		end
+	-- 复活
+	elseif effectType == 18 then
+		if not victim.isDead then
+			return
+		end
+		-- 判断复活的位置上是否有召唤出来的武将
+		local knight = battleField:getBattleData():getKnightData(victim.serialId)
+		if not knight.isDead then
+			return
+		end
+		-- 记录复活的武将，用于一个特殊的技能作用范围 131, 132
+		battleField:getBattleData():addRebornKnight(victim)
+
+		victim.isDead = false
+		-- 按最大生命百分比恢复生命
+		victim.baseInfo.INITIAL_HP = floor(victim.originInfo.INITIAL_HP * effectValue / 1000)
+		-- 清空buff
+		victim:clearBuff()
+		-- 清空额外的被动
+		victim:clearPassiveSkill()
+		-- 清空buff附加的属性
+		victim:clearAdvanceInfo()
+		insert(self.reborns, {
+			serial_id = victim.serialId,
+			knight_hp = victim.baseInfo.INITIAL_HP,
+		})
+	-- 19-清除护盾
+	elseif effectType == 19 then
+		victim.baseInfo.SHIELD = 0
+	-- 20-获得额外行动回合
+	elseif effectType == 20 then
+		local disableComboRecover = effectValue == 1
+		local forceCommonSkill = effect.add_value == 1
+		battleField:addExtraAction({knight = victim, disableComboRecover = disableComboRecover, forceCommonSkill = forceCommonSkill})
+	-- 21-灼烧引爆，提前结算目标的灼烧效果，伤害值=灼烧单次伤害*回合数
+	elseif effectType == 21 then
+		local buffList = victim.buffs
+		for i = #buffList , 1 , -1 do
+			local buff = buffList[i]
+			local buffCfg = buff.buffCfg
+			if buffCfg.buff_effect_type == BuffRule.EFFECT_TYPE.BURNING then
+				buff.isDone = true
+			end
+		end
+	-- 22-灼烧传染 将目标身上的灼烧复制一份附加给周围单位
+	elseif effectType == 22 then
+		-- 目标身上的灼烧buff
+		local dots = {}
+		local buffs = victim:getBuffs()
+		for i, buff in ipairs(buffs) do
+			if buff.buffCfg.buff_type == BuffRule.TYPE.DHOT and buff.buffCfg.buff_effect_type == BuffRule.EFFECT_TYPE.BURNING then
+				insert(dots, buff)
+			end
+		end
+		if not next(dots) then return end
+		
+		-- 周围单位
+		local victimTargets = {}
+		local knights = battleField:getBattleData():getKnights()
+		local pos = victim.originInfo.pos
+		-- 检查前后方及左右
+		local list = {}
+		if pos ~= 4 then
+			list[#list+1] = pos-1
+		end
+		list[#list+1] = pos+3
+		if pos ~= 3 then
+			list[#list+1] = pos+1
+		end
+		list[#list+1] = pos-3
+		for i = 1 , #list do
+			local target = knights:getKnightByIdAndPos(victim.identity, list[i])
+			if target and target:isValid() then
+				insert(victimTargets, target)
+			end
+		end
+		for i, dot in ipairs(dots) do
+			for j, knight in ipairs(victimTargets) do
+				local buff = {
+					buffId = dot.buffCfg.id,
+					buffTime = dot.buffTime,
+					victim = knight,
+					attacker = attacker,
+					buffCheck = dot.buffCheckSkill,
+				}
+				self:addBuff(buff)
+			end
+		end
 	end
 end
 

@@ -15,15 +15,16 @@ record_guild_right_info.impeach = 0--是否有弹劾军团长权限
 record_guild_right_info.attorn = 0--是否有转让军团长权限
 record_guild_right_info.dissolve = 0--是否有解散军团的权限
 record_guild_right_info.mass = 0--是否有权限集结
+record_guild_right_info.target_set = 0--是否有权限设定进攻目标
 record_guild_right_info.icon =  ""--官职icon
 record_guild_right_info.description =  ""--详细描述
 
 local guild_right_info = {
    _data = {   
-    [1] = {1,"军团长",1,1,1,1,1,1,1,0,1,1,1,"0","军团的领袖和主心骨",},  
-    [2] = {2,"副军团长",2,1,1,1,1,1,1,3,0,0,1,"0","军团长的左右手",},  
-    [3] = {3,"军团精英",10,5,0,0,0,0,0,5,0,0,0,"0","军团中的骨干成员",},  
-    [4] = {4,"军团成员",20,50,0,0,0,0,0,7,0,0,0,"0","普通的军团成员",},
+    [1] = {1,"军团长",1,1,1,1,1,1,1,0,1,1,1,1,"0","军团的领袖和主心骨",},  
+    [2] = {2,"副军团长",2,1,1,1,1,1,1,3,0,0,1,1,"0","军团长的左右手",},  
+    [3] = {3,"军团精英",10,5,0,0,0,0,0,5,0,0,0,0,"0","军团中的骨干成员",},  
+    [4] = {4,"军团成员",20,50,0,0,0,0,0,7,0,0,0,0,"0","普通的军团成员",},
     }
 }
 
@@ -48,8 +49,9 @@ local __key_map = {
     attorn = 11,
     dissolve = 12,
     mass = 13,
-    icon = 14,
-    description = 15,
+    target_set = 14,
+    icon = 15,
+    description = 16,
 }
 
 local m = { 

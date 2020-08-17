@@ -36,6 +36,7 @@ function PlayerFactory.createPlayerCommand(command)
 		baseInfo = comboData.baseInfo,
 		advanceInfo = comboData.advanceInfo,
 		isPet = command.isPet,
+		isSpaceTime = command.isSpaceTime,
 		skillId = skillId,
 	}
 

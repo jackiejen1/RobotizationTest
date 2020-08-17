@@ -44,32 +44,49 @@ function UpdateComponent.update(attacker, battleData, battleField)
 
 	-- 特殊属性效果和被动触发技能
 	local spRules = attacker.spRules
-
-	-- 默认合击值回复
+	-- 放逐buff
+	local exile = attacker:doBuff(BuffRule.TYPE.EXILE)
+	
 	local identity = attacker.identity
-	local info = battleData:getComboInfo(identity)
-	local value = info.baseInfo.COMBO_RECOVER_ACTION
-	value = battleData:updateComboValue(value,identity,true)
 	commands.effect = {}
-	table.insert(commands.effect,{effect_type=6,effect_value=value})
-
-	-- 被动怒气回复
-	local angerGain = attacker.baseInfo.ANGER_RECOVER
-	if angerGain > 0 then
-		table.insert(commands.effect,{effect_type=4,effect_value=angerGain})
+	-- 被放逐不被动回怒，回合计值
+	if not exile then
+		-- 默认合击值回复
+		if not battleField.disableComboRecover then
+			local info = battleData:getComboInfo(identity)
+			local value = info.baseInfo.COMBO_RECOVER_ACTION
+			value = battleData:updateComboValue(value,identity,true)
+			table.insert(commands.effect,{effect_type=6,effect_value=value})
+		end
+		
+		-- 被动怒气回复
+		local angerGain = attacker.baseInfo.ANGER_RECOVER
+		if angerGain > 0 then
+			table.insert(commands.effect,{effect_type=4,effect_value=angerGain})
+		end
 	end
 
 	-- buff生效
-	-- dot判断
-	local dots = attacker:doBuff(BuffRule.TYPE.DHOT,{})
-	commands.buff = dots
 	-- 眩晕判断
 	local stun = attacker:doBuff(BuffRule.TYPE.ACT_LIMIT)
 	commands.stun = stun
 
-	-- buff回合
-	local removeList = attacker:doBuffRound(BuffRule.ROUND.BEFORE)
-	commands.removeList = removeList
+	commands.stun = commands.stun or exile
+
+	-- dot判断
+	if not exile then
+		local dots = attacker:doBuff(BuffRule.TYPE.DHOT,{})
+		commands.buff = dots
+
+		-- buff回合
+		local removeList = attacker:doBuffRound(BuffRule.ROUND.BEFORE)
+		commands.removeList = removeList
+	else
+		commands.buff = {}
+		local removeList = attacker:doSpBuffRound(BuffRule.ROUND.BEFORE,BuffRule.TYPE.EXILE)
+		commands.removeList = removeList
+	end
+
 
 	commands.attacker = attacker
 
@@ -92,9 +109,62 @@ function UpdateComponent.updateAttacker(attacker, commands,battleField)
 	if commands.stun or attacker.isDead then
 		return false
 	end
+	if attacker.isGhost then
+		return false
+	end
 
 	return true
 
+end
+
+-- 攻击后（不仅是武将）更新
+function UpdateComponent.updateAfterAttack(attacker, battleData, battleField)
+	local commands = {}
+	-- 需要移除的buff
+	local removeList = {}
+	local knights = battleData:getKnights()
+	for i, knight in knights:ipairs() do
+		local buffList = knight.buffs
+		for i = #buffList, 1, -1 do
+			local buff = buffList[i]
+			local buffCfg = buff.buffCfg
+			if buffCfg.buff_type == BuffRule.TYPE.FORCE_MISS then
+				-- 疾风buff，如果武将在本次攻击闪避后，会消耗闪避次数，闪避次数为0时，需要自行清除buff
+				buff.rule(true)
+			end
+			if buff.isDone then
+				table.insert(removeList, buff)
+				table.remove(buffList, i)
+				if buff.passive_skill_serial_id > 0 then
+					buff.victim:removePassiveSkill(buff.passive_skill_serial_id)
+				end
+			end
+		end
+	end
+
+	-- 检查放逐
+	-- 如果一方存活的全被放逐，则取消放逐状态
+	local exile = false
+	for identity = 1 , 2 do
+		exile = true
+		for i, knight in knights:ipairs(identity) do
+			if knight:isReal() then
+				exile = exile and knight.exile
+			end
+		end
+		if exile then
+			for i, knight in knights:ipairs(identity) do
+				local buff = knight:exitExile()
+				if buff then
+					table.insert(removeList, buff)
+				end
+			end
+		end
+	end
+
+	commands.removeList = removeList
+
+	return commands
 end
 
 return UpdateComponent

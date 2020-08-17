@@ -43,6 +43,13 @@ function CommandComponent:addUpdateCommand(command)
 	commands.attack_before = commands.attack_before or {}
 	commands.attack_before.buff = command.buff or {}
 
+	if commands.attack_before.buff then
+		for i , buff in ipairs(commands.attack_before.buff) do
+			-- 去掉多余信息
+			buff.attacker = nil
+		end
+	end
+
 	if command.removeList then
 		for i = 1 , #command.removeList do
 			local buff = command.removeList[i]
@@ -87,6 +94,10 @@ function CommandComponent:addFightCommand(command,isPassive)
 	local delBuffs				= command.delBuffs
 	-- local addInfos				= command.addInfos
 	local knights				= command.knights
+	local skillSummons			= command.skillSummons
+	local delSkillSummon		= command.delSkillSummon
+	local reborns				= command.reborns
+	local spEffects				= command.spEffects
 
 	local commands = self._commands
 
@@ -96,6 +107,7 @@ function CommandComponent:addFightCommand(command,isPassive)
 	end
 
 	tempCommand.attack_serial_id = attacker.serialId
+	tempCommand.add_serial_id = attacker.addSerialId	-- 附加的序号，如召唤物的序号
 	tempCommand.attack_type = attackType
 	tempCommand.attack_id = attackId
 
@@ -121,6 +133,7 @@ function CommandComponent:addFightCommand(command,isPassive)
 		local effect = {
 			effect_type = info.effect_type,
 			effect_value = info.effect_value,
+			add_value = info.add_value,
 		}
 		attackInfo.effect = effect
 		effect.add_effects = {}
@@ -144,9 +157,25 @@ function CommandComponent:addFightCommand(command,isPassive)
 		if info.invincible then
 			insert(effect.add_effects, {add_type = 7})
 		end
+		-- 吸怒气
+		if info.suckAnger then
+			insert(effect.add_effects, {add_type = 8})
+		end
+		-- 秒杀
+		if info.seckill then
+			insert(effect.add_effects, {add_type = 9})
+		end
+		-- 生命链接、诅咒的分摊伤害
+		if info.hpLink then
+			insert(effect.add_effects, {add_type = 10})
+		end
 
 		if info.victim.isDead then
 			attackInfo.is_dead = true
+		end
+
+		if info.victim.isGhost then
+			attackInfo.is_ghost = true
 		end
 		-- attackInfo.hp = victim:getBaseInfo("hp")
 		-- attackInfo.maxHp = victim:getBaseInfo("maxHp")
@@ -161,7 +190,15 @@ function CommandComponent:addFightCommand(command,isPassive)
 		tempCommand.attack_after.effect = tempCommand.attack_after.effect or {}
 		
 		for i, effect in ipairs(attackEffectAfter) do
-			insert(tempCommand.attack_after.effect, effect)
+			local effectData = {
+				effect_type = effect.effect_type,
+				effect_value = effect.effect_value,
+				add_effects = effect.add_effects,
+			}
+			if effect.victim then
+				effectData.victim_serial_id = effect.victim.serialId
+			end
+			insert(tempCommand.attack_after.effect, effectData)
 		end
 
 	end
@@ -198,12 +235,40 @@ function CommandComponent:addFightCommand(command,isPassive)
 
 	end
 
+	if #skillSummons > 0 then
+		tempCommand.attack_after = tempCommand.attack_after or {}
+		tempCommand.attack_after.skillSummons = tempCommand.attack_after.skillSummons or {}
+		for i, skillSummon in ipairs(skillSummons) do
+			insert(tempCommand.attack_after.skillSummons, {
+				serial_id = skillSummon.serialId,
+				summon_id = skillSummon.summonCfg.id,
+				owner_serial_id = skillSummon.owner.serialId,
+				summon_action = 1,
+			})
+		end
+	end
+
+	if #delSkillSummon > 0 then
+		tempCommand.attack_after = tempCommand.attack_after or {}
+		tempCommand.attack_after.skillSummons = tempCommand.attack_after.skillSummons or {}
+		for i, skillSummon in ipairs(delSkillSummon) do
+			insert(tempCommand.attack_after.skillSummons, {
+				serial_id = skillSummon.serialId,
+				summon_id = skillSummon.summonCfg.id,
+				owner_serial_id = skillSummon.owner.serialId,
+				summon_action = 2,
+			})
+		end
+	end
+
 	if attacker.isDead then
 		tempCommand.is_dead = true
 	end
 
 	tempCommand.knights = knights
-
+	tempCommand.reborns = reborns
+	tempCommand.spEffects = spEffects
+	
 	if isPassive then
 		if not commands.passive_infos then
 			commands.passive_infos = {}
@@ -218,6 +283,23 @@ function CommandComponent:addRoundCommand( command )
 	commands.round_start = {}
 	commands.round_start.combo_value = command.comboValue
 	commands.round_start.cd_list = command.cdList
+end
+
+-- 添加攻击结束更新操作
+function CommandComponent:addUpdateAfterAttackCommand(command)
+	local commads = self._commands
+	local removeList = command.removeList or {}
+	commads.attack_after = commads.attack_after or {}
+	commads.attack_after.buff = commads.attack_after.buff or {}
+	
+	for i, buff in ipairs(removeList) do
+		insert(commads.attack_after.buff, {
+			buff_id = buff.buffCfg.id,
+			buff_serial_id = buff.serialId,
+			knight_serial_id = buff.victim.serialId,
+			buff_action = 2,
+		})
+	end
 end
 
 function CommandComponent:setGameOver(winner)

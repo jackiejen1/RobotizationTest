@@ -18,24 +18,46 @@ local SkillSpecialRule = {}
 
 local insert = table.insert
 local passive_skill_info = loadCfg "cfg.passive_skill_info"
+local BuffRule = load "core.rule.BuffRule"
+local skill_special_effect_info = loadCfg "cfg.skill_special_effect_info"
 
 SkillSpecialRule.TYPE = {
 	ROUND_START = 1, --回合开始时触发
 	DAMAGE = 2, -- 受到伤害时触发
-	DYING = 3, -- 有人死亡时触发
+	DYING = 3, -- 有（别）人死亡时触发
 	SKILL = 4, -- 释放技能时触发
 	HIT = 5, --受击时触发
+	ACTION = 6,	--武将行动（没放出技能也算）
+	SELF_DYING = 7, -- 自己死亡时
+	ADD_BUFF = 8, -- 添加buff时
+	WILL_DAMAGE = 9, -- 即将受到伤害（计算过程中，未进结算）
+	BEFORE_SKILL = 10, -- 释放技能前（在出手前结算，仅限合并的被动）
+}
+
+SkillSpecialRule.SP_TYPE =  {
+	SKILL_MULTIPLE = 1,	-- 额外技能倍率
+	ENCHANT = 2,	-- 附魔
+	CONVERT_HITBACK = 1001,	-- 伤害按比例反弹
+	CONVERT_RECOVER = 1002,	-- 伤害按比例治疗
+}
+
+-- 显示时机
+SkillSpecialRule.SHOW_TIME = {
+	ATTACK = 1,	-- 攻击时
+	HIT = 2,	-- 受击时
 }
 
 -- 触发时机映射
 SkillSpecialRule.triggerTime = {
 	[1001] = 2,
 	[1002] = 2,
+	[1003] = {1,2},
 	[2001] = {1,3},
 	[2002] = {1,3},
 	[2003] = {1,3},
 	[2004] = {1,3},
 	[2005] = {1,3},
+	[2006] = {1,3},
 	[100001] = 4,
 	[100002] = 4,
 	[100003] = 4,
@@ -54,6 +76,18 @@ SkillSpecialRule.triggerTime = {
 	[100016] = 3,
 	[100017] = 2,
 	[100018] = 2,
+	[100019] = 6,
+	[100020] = 4,
+	[100021] = 4,
+	[100022] = 7,
+	[100023] = 1,
+	[100024] = 8,
+	[100025] = 6,
+	[100026] = 9,
+	[100027] = 9,
+	[100028] = 9,
+	[100029] = 5,
+	[100030] = 10,
 }
 
 SkillSpecialRule.disable = false
@@ -82,6 +116,16 @@ function SkillSpecialRule.addRule(rules,battleField,specialInfo,identity,knight)
 			end
 		end
 		return false
+	end
+	-- 特殊技能效果
+	if specialInfo.passive_skill_type == 4 then
+		local spEffectInfo = skill_special_effect_info.get(specialInfo.passive_skill_value)
+		rule.spEffectInfo = spEffectInfo
+		rule.spEffectRule = SkillSpecialRule["_initSpEffectType"..spEffectInfo.special_skill_type]({
+			knight = knight,
+			identity = identity,
+			spEffectInfo = spEffectInfo,
+		})
 	end
 	local trigger = SkillSpecialRule.triggerTime[rType] or 0
 	if type(trigger) == "table" then
@@ -112,8 +156,48 @@ function SkillSpecialRule.initRule(skills,identity,battleField,knight)
 		end
 	end
 
+	local skill_info = loadCfg "cfg.skill_info"
+	for mode, ruleList in pairs(rules) do
+		local orderMap = {}
+		for i, rule in ipairs(ruleList) do
+			local order = 0
+			if rule.info.passive_skill_type == 1 or rule.info.passive_skill_type == 3 then
+				local skillInfo = skill_info.get(rule.info.passive_skill_value)
+				if skillInfo.skill_type == 7 then
+					-- 时空之力技能排最前面
+					order = 1
+				end
+			end
+			orderMap[rule.info.id] = order
+		end
+		table.sort(ruleList, function (a, b)
+			local orderA = orderMap[a.info.id] or 0
+			local orderB = orderMap[b.info.id] or 0
+			if orderA ~= orderB then
+				return orderA > orderB
+			else
+				return a.info.id < b.info.id
+			end
+		end)
+	end
 	return rules
 
+end
+
+function SkillSpecialRule.isTrigger(specialInfo, rType)
+	local trigger = SkillSpecialRule.triggerTime[specialInfo.trigger_type] or 0
+	if type(trigger) == "table" then
+		for i , v in ipairs(trigger) do
+			if v == rType then
+				return true
+			end
+		end
+	else
+		if trigger == rType then
+			return true
+		end
+	end
+	return false
 end
 
 function SkillSpecialRule.getCheckFunc(rType,battleField,identity,knight)
@@ -129,6 +213,11 @@ function SkillSpecialRule.getCheckFunc(rType,battleField,identity,knight)
 		--自身血量小于等于X%
 		return function(self)
 			return math.floor(knight.baseInfo.INITIAL_HP * 1000 / knight.originInfo.INITIAL_HP) <= self.info.trigger_type_value
+		end
+	elseif rType == 1003 then
+		--自身血量大于等于X%（包括回合开始）
+		return function(self)
+			return math.floor(knight.baseInfo.INITIAL_HP * 1000 / knight.originInfo.INITIAL_HP) >= self.info.trigger_type_value
 		end
 	elseif rType == 2001 then
 		--敌方在场人数小于等于X人
@@ -161,6 +250,17 @@ function SkillSpecialRule.getCheckFunc(rType,battleField,identity,knight)
 			local count1 = knights:getAliveKnightCount(identity)
 			local count2 = knights:getAliveKnightCount(opIdentity)
 			return count1 >= count2
+		end
+	elseif rType == 2006 then
+		-- 己方前排存活时
+		return function (self)
+			for pos = 1, 3 do
+				local knight = knights:getKnightByIdAndPos(identity, pos)
+				if knight and not knight.isDead then
+					return true
+				end
+			end
+			return false
 		end
 	elseif rType == 100001 then
 		-- 普通攻击时
@@ -294,10 +394,175 @@ function SkillSpecialRule.getCheckFunc(rType,battleField,identity,knight)
 			end
 			return false
 		end
+	elseif rType == 100019 then
+		-- 己方第X个武将行动后
+		return function (self)
+			local actionCount = battleField:getActionCount(identity)
+			if actionCount == self.info.trigger_type_value then
+				return true
+			end
+			return false
+		end
+	elseif rType == 100020 then
+		-- 自身怒气大于等于X且任意攻击时
+		return function (self)
+			return knight.baseInfo.INITIAL_ANGER >= self.info.trigger_type_value
+		end
+	elseif rType == 100021 then
+		-- 自身怒气小于X且任意攻击时
+		return function (self)
+			return knight.baseInfo.INITIAL_ANGER < self.info.trigger_type_value
+		end
+	elseif rType == 100022 then
+		-- 自身死亡时，检查被动的埋点那里判断
+		return function (self)
+			return true
+		end
+	elseif rType == 100023 then
+		-- 第X回合结束
+		return function(self)
+			return battleField:getRoundCount() - 1 == self.info.trigger_type_value
+		end
+	elseif rType == 100024 then
+		-- 己方被控制时
+		return function (self, buffs)
+			local buff_info = loadCfg "cfg.buff_info"
+			for i, buff in ipairs(buffs) do
+				local buffCfg = buff_info.get(buff.buffId)
+				local victim = buff.victim
+				if victim.identity == identity and buffCfg.buff_type == BuffRule.TYPE.ACT_LIMIT then
+					return true
+				end
+			end
+			return false
+		end
+	elseif rType == 100025 then
+		-- 每个单位行动时
+		return function (self)
+			return true
+		end
+	elseif rType == 100026 then
+		-- 即将受到伤害时（结算之前）
+		return function (self)
+			return true
+		end
+	elseif rType == 100027 then
+		-- 即将受到物理伤害时
+		return function (self, data)
+			local attackData = data.attackData
+			local attacker = attackData.attacker
+			if not attacker.isPlayer then
+				if attacker.knightCfg.attack_type == 1 then
+					return true
+				end
+			end
+			return false
+		end
+	elseif rType == 100028 then
+		-- 即将受到法术伤害时
+		return function (self, data)
+			local attackData = data.attackData
+			local attacker = attackData.attacker
+			if not attacker.isPlayer then
+				if attacker.knightCfg.attack_type == 2 then
+					return true
+				end
+			end
+			return false
+		end
+	elseif rType == 100029 then
+		-- 受到被自己嘲讽单位攻击时
+		return function(self,info) 
+			if not info then
+				return false
+			end
+			if not info.attacker then
+				return false
+			end
+			local attacker = info.attacker
+			if attacker.isPlayer then
+				return false
+			end
+			if battleField.isExtraAction then
+				-- 额外回合不触发
+				return false
+			end
+			local tauntKnight = attacker:doBuff(BuffRule.TYPE.TAUNT)
+			if tauntKnight then
+				if tauntKnight.serialId == knight.serialId then
+					return true
+				end
+			end
+			return false
+		end
+	elseif rType == 100030 then
+		return function (self)
+			return true
+		end
 	else
 		return function( self )
 			return false
 		end
+	end
+end
+
+-- 基础伤害（治疗）提高X%
+function SkillSpecialRule._initSpEffectType1(spEffect)
+	local spEffectInfo = spEffect.spEffectInfo
+	local multiple = spEffectInfo.special_skill_value_1
+	return function (data)
+		data = data + multiple
+		return data
+	end
+end
+
+-- 附魔
+function SkillSpecialRule._initSpEffectType2(spEffect)
+	local spEffectInfo = spEffect.spEffectInfo
+	local skill_enchant_info = loadCfg "cfg.skill_enchant_info"
+	local enchantInfo = skill_enchant_info.get(spEffectInfo.special_skill_value_1)
+	return function (data)
+		insert(data, enchantInfo)
+		return data
+	end
+end
+
+-- 伤害按比例反弹
+function SkillSpecialRule._initSpEffectType1001(spEffect)
+	local spEffectInfo = spEffect.spEffectInfo
+	-- 反弹比例
+	local value1 = spEffectInfo.special_skill_value_1
+	return function (data)
+		local hitbackList = data.hitbackList
+		local result = data.result
+		local hitbackValue = math.floor(result.damage * value1 / 1000)
+		local attacker = data.attacker
+		insert(hitbackList, {
+			affectType = 1,
+			damage = hitbackValue,
+			victim = attacker,
+			attacker = spEffect.knight,
+		})
+		return data
+	end
+end
+
+-- 伤害按比例治疗
+function SkillSpecialRule._initSpEffectType1002(spEffect)
+	local spEffectInfo = spEffect.spEffectInfo
+	-- 治疗比例
+	local value1 = spEffectInfo.special_skill_value_1
+	return function (data)
+		local recoverList = data.recoverList
+		local result = data.result
+		local recoverValue = math.floor(result.damage * value1 / 1000)
+		insert(recoverList, {
+			affectType = 2,
+			damage = recoverValue,
+			victim = spEffect.knight,
+			attacker = spEffect.knight,
+		})
+		return data
 	end
 end
 

@@ -4,6 +4,7 @@ local BattleAttrRe = {
 	[3] = "PHY_DEFENCE",
 	[4] = "MAG_DEFENCE",
 	[5] = "DEFENCE",
+	[6] = "SHIELD",
 	[11] = "HP_PCT",
 	[12] = "ATTACK_PCT",
 	[13] = "PHY_DEFENCE_PCT",
@@ -79,6 +80,8 @@ local BattleAttrRe = {
 	[902] = "BATTLE_KTOM_DAMAGE_DESC", -- 怪物额外减免武将伤害
 	[903] = "BATTLE_UTOM_DAMAGE_ADD", -- 怪物额外受合击伤害
 	[904] = "BATTLE_UTOM_DAMAGE_DESC", -- 怪物额外减免合击伤害
+	[1001] = "QUALITY_SUPPRESSION", -- 品质减伤压制系数
+	[1101] = "INITIAL_ENERGY", -- 必杀技能量
 }
 
 return BattleAttrRe

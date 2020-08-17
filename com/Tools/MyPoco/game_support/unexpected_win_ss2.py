@@ -97,6 +97,9 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("巨兽-龙炮"):  # 副本龙炮
             if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):
                 self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
+        if self.make_poco_dic.is_in_dic("巨獸-龍炮"):  # 副本龙炮
+            if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):
+                self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
         if self.make_poco_dic.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("未命名0/popup/GodboxPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("将军抱歉，为了更好的体验，我们正在对服务器进行维护，请稍后重新登录哦~"):

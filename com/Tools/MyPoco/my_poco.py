@@ -20,7 +20,7 @@ from MyPoco.poco.xn_test_tools import XnTest
 from MyPoco.protocol.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject, time
 from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
-
+from airtest.core.api import stop_app
 
 class MyPoco:
     def __init__(self, game_name, phone_id,ui_path=None):
@@ -94,7 +94,7 @@ class MyPoco:
         """
         上阵武将
         :param pos: 坑位，2-6
-        :param id: 武将的道具ID
+        :param id: 武将名
         :return:
         """
         wujiang_id = self.get_resource_id(name)
@@ -216,6 +216,12 @@ class MyPoco:
         :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """
+        game_text =  self.my_poco_obj.get_game_run_text()
+        game_name_list = ["少三2","少西","少三","少三2台湾","少三2日本","少三2韩国",]
+        for game_name in game_name_list:
+            game_name_activities = self.info.get_config(game_name, "app_name")
+            if game_name_activities in game_text:
+                stop_app(game_name_activities)
         entry = EntryGame(self.game_name_key, self.phone_id)
         entry.entry_game(sever_name_input, game_account_input, password)
 
@@ -1215,7 +1221,7 @@ class MyPoco:
         :return:
         """
 
-        cishu = 1000  # 默认抽1000次十连
+        cishu = 50000  # 默认抽1000次十连
         resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("化身灵力")
         self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
@@ -1223,8 +1229,8 @@ class MyPoco:
             try:
                 self.protocol.GM_fengkuanghuashen(resource_type, resource_value, resource_num, activity_id, is_stop)
             except GmException:
-                print(resource_name + "抽到了")
-                break
+                print(resource_name + "在第"+str(i)+"次抽到了")
+                # break
 
     def GM_fengkuang_hengsaoqianjun(self, activity_id, resource_name, resource_num=1, is_stop=True):
         """

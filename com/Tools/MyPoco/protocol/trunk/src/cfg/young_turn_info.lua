@@ -28,8 +28,8 @@ record_young_turn_info.reward_box = 0--定时礼包
 record_young_turn_info.box_name =  ""--定时礼包名称
 record_young_turn_info.ready_title1 =  ""--预热标题1
 record_young_turn_info.ready_title2 =  ""--预热标题2
-record_young_turn_info.open_title1 =  ""--开启标题1
-record_young_turn_info.open_title2 =  ""--开启标题2
+record_young_turn_info.open_title1 =  ""--预热标题1
+record_young_turn_info.open_title2 =  ""--预热标题2
 record_young_turn_info.spacetime_type1 = 0--噩梦展示类型1
 record_young_turn_info.spacetime_value1 = 0--噩梦展示类型值1
 record_young_turn_info.spacetime_type2 = 0--噩梦展示类型2
@@ -42,15 +42,18 @@ record_young_turn_info.fight_image = 0--入口形象
 record_young_turn_info.figeht_name =  ""--入口人物名称
 record_young_turn_info.quality = 0--名称品质
 record_young_turn_info.bubble =  ""--人物气泡
+record_young_turn_info.spacetime_start = 0--时空外传开启时间
 
 local young_turn_info = {
    _data = {   
-    [1] = {1001,1,901,5,101,"少年庆典","庆典商城","限时掉落","镇魂成就","福利兑换","折扣商店","充值有礼","task_101","task_102","通关镇魂外传，获得丰厚奖励！","百万少年同协力，共铸神剑镇黄天！","https://sn.youzu.com/",10616,10000000,"组队战役",1592236800,1592928000,903,"庆典福袋","title_yuyue","title_yuyue2","title_kaiqi","title_kaiqi2",3,8005,3,8006,3,8007,3,8008,210012,"曹焱兵",6,"吾乃镇魂街镇魂将，罗刹街的曹焱兵是也！",},
+    [1] = {1001,1,901,5,101,"少年庆典","庆典商城","限时掉落","镇魂成就","福利兑换","折扣商店","充值有礼","task_101","task_102","通关镇魂外传，获得丰厚奖励！","百万少年同协力，共铸神剑镇黄天！","https://sn.youzu.com/",10616,10000000,"组队战役",1592236800,1592928000,903,"庆典福袋","title_yuyue","title_yuyue2","title_kaiqi","title_kaiqi2",3,8005,3,8006,3,8007,3,8008,210012,"曹焱兵",6,"吾乃镇魂街镇魂将，罗刹街的曹焱兵是也！",0,},  
+    [2] = {1002,2,905,5,102,"夏日狂欢","夏日商城","限时掉落","副本成就","福利兑换","折扣商店","充值有礼","task_101","task_103","通关时空外传，获得丰厚奖励！","0","https://sn.youzu.com/",10588,10000000,"组队战役",1596988800,1597852800,907,"夏日福袋","大乔相伴度盛夏","狂欢福利大放送","大乔相伴度盛夏","狂欢福利大放送",3,8009,3,8010,3,8011,3,8012,0,"0",0,"0",1596297600,},
     }
 }
 
 local __index_id = {   
-    [1001] = 1,
+    [1001] = 1,  
+    [1002] = 2,
 }
 
 local __key_map = { 
@@ -94,6 +97,7 @@ local __key_map = {
     figeht_name = 38,
     quality = 39,
     bubble = 40,
+    spacetime_start = 41,
 }
 
 local m = { 

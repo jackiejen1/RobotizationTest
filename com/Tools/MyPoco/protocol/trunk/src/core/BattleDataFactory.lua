@@ -5,6 +5,7 @@ local floor = math.floor
 local table = table
 local sort = table.sort
 local insert = table.insert
+local remove = table.remove
 
 local BattleAttr = load "const.BattleAttr"
 local Parameters = load("core.Parameters")
@@ -339,6 +340,110 @@ local function createPassiveData()
 	return passiveData
 end
 
+-- 技能召唤
+local function createSkillSummon(serialId, cfg, owner, battleField)
+	local skillSummon = {
+		serialId = serialId,
+		summonCfg = cfg,
+		triggerTimes = 0,	-- 被动触发次数
+		skillTimes = 0,		-- 技能释放次数
+		spRules = {},		-- 召唤物被动技能
+		identity = identity,
+		owner = owner,	-- 召唤者
+	}
+
+	-- 被动技能规则
+	local SkillSpecialRule = load "core.rule.SkillSpecialRule"
+	skillSummon.spRules = SkillSpecialRule.initRule({cfg.passive_skill_id}, identity, battleField)
+
+	skillSummon.excuteSpRule = function (self, mode, data)
+		if skillSummon.spRules[mode] then
+			for i, skill in ipairs(skillSummon.spRules[mode]) do
+				if skill:check(data) and skill:excute() then
+					local maxNum = self.summonCfg.act_max_num
+					if maxNum == 0 or self.triggerTimes < maxNum then
+						battleField:getBattleData():addPassive({info=skill.info, skillSummon = self})
+						self.triggerTimes = self.triggerTimes + 1
+					end
+				end
+			end
+		end
+	end
+
+	skillSummon.doSkillRelease = function (self)
+		self.skillTimes = self.skillTimes + 1
+	end
+
+	-- 召唤物攻击时的攻击者
+	skillSummon.getAttacker = function (self)
+		if not self.attacker then
+			local passiveSkillInfo = loadCfg("cfg.passive_skill_info").get(self.summonCfg.passive_skill_id)
+			local identity = self.owner.identity
+			local knight = {
+				knightCfg = self.owner.knightCfg,
+				identity = self.owner.identity,
+				opIdentity = 3 - identity,
+				serialId = (identity - 1) * 10 + 7,
+				multiple = self.owner.multiple,
+				isPlayer = true,
+				isDead = false,
+				originInfo = self.owner.originInfo,	-- 只在伤害计算中使用
+				baseInfo = self.owner.baseInfo,
+				advanceInfo = self.owner.advanceInfo,
+				isSummon = true,
+				skillCfg = loadCfg("cfg.skill_info").get(passiveSkillInfo.passive_skill_value),
+				addSerialId = self.serialId,
+			}
+			
+			self.attacker = knight
+		else
+			-- 属性 随动
+			self.attacker.baseInfo = self.owner.baseInfo
+			self.attacker.advanceInfo = self.owner.advanceInfo
+		end
+		return self.attacker
+	end
+
+	return skillSummon
+end
+
+-- 神兽
+local function createPet(identity, petId)
+	local pet_info = loadCfg("cfg.pet_info")
+	local petCfg = pet_info.get(petId)
+	local pet = {
+		petCfg = petCfg,
+		identity = identity,
+		extraSkills = {},
+	}
+
+	pet.hasPassiveSkill = function (self, skillId)
+		local id = self.petCfg.passive_skill_1
+		if id > 0 and id == skillId then
+			return true
+		end
+		id = self.petCfg.passive_skill_2
+		if id > 0 and id == skillId then
+			return true
+		end
+		return false
+	end
+
+	local extraSkills = {}
+	local skillId = petCfg.belong_passive_skill_1
+	if skillId > 0 then
+		local passiveSkillInfo = loadCfg("cfg.passive_skill_info").get(skillId)
+		insert(extraSkills, passiveSkillInfo)
+	end
+	skillId = petCfg.belong_passive_skill_2
+	if skillId > 0 then
+		local passiveSkillInfo = loadCfg("cfg.passive_skill_info").get(skillId)
+		insert(extraSkills, passiveSkillInfo)
+	end
+	pet.extraSkills = extraSkills
+	return pet
+end
+
 function BattleDataFactory.createBattleData(battleField)
 	
 	local knights = createKnights()
@@ -374,7 +479,16 @@ function BattleDataFactory.createBattleData(battleField)
 		_passiveData = createPassiveData(),
 		-- 立即触发技能序列
 		_fastPassiveData = createPassiveData(),
+		-- 必杀能量变化序列
+		_energyEffects = {},
+		-- 技能召唤物
+		_skillSummons = {{}, {}},
+		-- 神兽
+		pets = {{}, {}},
 		_battleField = battleField,
+		-- 记录当前出手中，复活的武将
+		_rebornAttackCount = 0,
+		_reborns = {},
 	}
 
 	-- 武将相关接口
@@ -397,6 +511,19 @@ function BattleDataFactory.createBattleData(battleField)
 				insert(list, knight)
 			end
 		end
+		return list
+	end
+	-- 获取所有武将列表，先出手的队伍优先
+	battleData.getAllKnightList = function (self)
+		local list = {}
+		local highIdentity = self:getHighIdentity()
+		for i, knight in self._knights:ipairs(highIdentity) do
+			insert(list, knight)
+		end
+		for i, knight in self._knights:ipairs(3 - highIdentity) do
+			insert(list, knight)
+		end
+		
 		return list
 	end
 
@@ -478,10 +605,7 @@ function BattleDataFactory.createBattleData(battleField)
 			return 
 		end
 		local battle_rating_info = loadCfg "cfg.battle_rating_info"
-        local info = battle_rating_info.get(id)
-        if not info then
-            return
-        end
+		local info = battle_rating_info.get(id)
 		local rateType = info.rating_type
 		local rateValue = info.rating_value
 		if rateType == 4 then
@@ -555,10 +679,10 @@ function BattleDataFactory.createBattleData(battleField)
 		local knights = self._knights
 		local isAttackerAllDead, isDefenderAllDead = true, true
 		for i, knight in knights:ipairs(1) do
-			isAttackerAllDead = isAttackerAllDead and not knight:isValid()
+			isAttackerAllDead = isAttackerAllDead and not knight:isReal()
 		end
 		for i, knight in knights:ipairs(2) do
-			isDefenderAllDead = isDefenderAllDead and not knight:isValid()
+			isDefenderAllDead = isDefenderAllDead and not knight:isReal()
 		end
 		local isGameOver = isAttackerAllDead or isDefenderAllDead
 		if isGameOver then
@@ -619,6 +743,29 @@ function BattleDataFactory.createBattleData(battleField)
 		self._knights:clear(identity)
 		self._passiveData:clear()
 		self._fastPassiveData:clear()
+		self._skillSummons = {{}, {}}
+	end
+
+	battleData.setPets = function (self, identity, petIds)
+		-- 神兽初始化
+		self.pets[identity] = {}
+		petIds = petIds or {}
+		for i, id in ipairs(petIds) do
+			local pet = createPet(identity, id)
+			insert(self.pets[identity], pet)
+		end
+	end
+
+	-- 检查神兽是否有额外触发的被动
+	battleData.checkPetExtraSkill = function(self, identity, skillId)
+		for i, pet in ipairs(self.pets[identity]) do
+			if pet:hasPassiveSkill(skillId) then
+				local extraSkills = pet.extraSkills
+				for j, info in ipairs(extraSkills) do
+					self:addFastPassive({identity=identity,info=info})
+				end
+			end
+		end
 	end
 
 	battleData.setPassiveSkills = function (self,identity,skills)
@@ -633,7 +780,10 @@ function BattleDataFactory.createBattleData(battleField)
 	end
 
 	battleData.excuteSpRule = function( self, mode , data )
-		for identity = 1 , 2 do
+		-- 优先触发先手玩家的被动
+		local highIdentity = self:getHighIdentity()
+		local offset = highIdentity == 1 and 1 or -1
+		for identity = highIdentity, 3 - highIdentity, offset do
 			if battleData.spRules[identity] and battleData.spRules[identity][mode] then
 				for i , skill in ipairs(battleData.spRules[identity][mode]) do
 					if skill:check(data) and skill:excute() then
@@ -645,6 +795,36 @@ function BattleDataFactory.createBattleData(battleField)
 							battleField:getBattleData():addFastPassive({identity=identity,info=skill.info})
 						else
 							battleField:getBattleData():addPassive({identity=identity,info=skill.info})
+						end
+					end
+				end
+			end
+			-- 队伍中召唤物的被动
+			for i, skillSummon in ipairs(self._skillSummons[identity]) do
+				skillSummon:excuteSpRule(mode, data)
+			end
+		end
+	end
+
+	-- 执行武将的全场被动
+	battleData.excuteKnightSpRule = function( self, mode , data )
+		-- 优先触发先手玩家的被动
+		local highIdentity = self:getHighIdentity()
+		local offset = highIdentity == 1 and 1 or -1
+		for identity = highIdentity, 3 - highIdentity, offset do
+			for i, knight in knights:ipairs(identity) do
+				if knight.spRules[mode] then
+					for i , skill in ipairs(knight.spRules[mode]) do
+						if skill:check(data) and skill:excute() then
+							if skill.info.passive_skill_type == 3 then
+								-- 属性类，目前以buff的形式来实现
+								-- 会有个问题，后上场的吃不到这个buff，这个目前不影响，以后再解决
+								battleField:getBattleData():addFastPassive({knight=knight,info=skill.info,check=skill})
+							elseif skill.info.passive_skill_type == 1 and skill.info.if_merge == 1 then
+								battleField:getBattleData():addFastPassive({knight=knight,info=skill.info})
+							else
+								battleField:getBattleData():addPassive({knight=knight,info=skill.info})
+							end
 						end
 					end
 				end
@@ -670,6 +850,69 @@ function BattleDataFactory.createBattleData(battleField)
 
 	battleData.getNextFastPassive = function (self)
 		return self._fastPassiveData:pop()
+	end
+
+	battleData.excuteEnergyRule = function (self, mode, data)
+		local knights = self:getAllKnightList()
+		for i, knight in ipairs(knights) do
+			if not knight.isDead then
+				knight:excuteEnergyRule(mode, data)
+			end
+		end
+	end
+
+	battleData.addEnergyEffect = function (self, victim, value)
+		insert(self._energyEffects, {
+			victim = victim,
+			effect_type = value < 0 and 12 or 13,
+			effect_value = value,
+		})
+	end
+
+	battleData.getEnergyEffect = function (self)
+		local tmp = self._energyEffects
+		self._energyEffects = {}
+		return tmp
+	end
+
+	-- 技能召唤
+	local summonSerialId = 1
+	battleData.addSkillSummon = function (self, id, owner)
+		identity = owner.identity
+		-- 判断该队伍 该类型召唤物的召唤上限
+		local count = 0
+		local summonCfg = loadCfg("cfg.skill_summon_info").get(id)
+		for i, v in ipairs(self._skillSummons[identity]) do
+			if v.summonCfg.advance_id == summonCfg.advance_id then
+				count = count + 1
+			end
+		end
+		if count >= summonCfg.summon_max_num then
+			return
+		end
+
+		local skillSummon = createSkillSummon(summonSerialId, summonCfg, owner, self._battleField)
+		summonSerialId = summonSerialId + 1
+		insert(self._skillSummons[identity], skillSummon)
+		return skillSummon
+	end
+
+	battleData.checkSkillSummonFinish = function (self)
+		local removeList = {}
+		for identity = 1, 2 do
+			for i = #self._skillSummons[identity], 1, -1 do
+				local skillSummon = self._skillSummons[identity][i]
+				if skillSummon.skillTimes >= skillSummon.summonCfg.act_max_num then
+					insert(removeList, skillSummon)
+					remove(self._skillSummons[identity], i)
+				end
+			end
+		end
+		return removeList
+	end
+
+	battleData.getSkillSummons = function (self, identity)
+		return self._skillSummons[identity]
 	end
 
 	battleData.setAssist = function( self,id )
@@ -713,6 +956,28 @@ function BattleDataFactory.createBattleData(battleField)
 				end
 			end
 		end
+	end
+
+	battleData.addRebornKnight = function (self, knight)
+		local attackCount = battleField:getAttackCount()
+		if self._rebornAttackCount ~= attackCount then
+			self._reborns = {}
+			self._rebornAttackCount = attackCount
+		end
+		insert(self._reborns, knight)
+	end
+
+	battleData.getRebornKnights = function (self)
+		local attackCount = battleField:getAttackCount()
+		if self._rebornAttackCount ~= attackCount then
+			self._reborns = {}
+			self._rebornAttackCount = attackCount
+		end
+		return self._reborns
+	end
+
+	battleData.getBattleField = function (self)
+		return self._battleField
 	end
 
 	return battleData

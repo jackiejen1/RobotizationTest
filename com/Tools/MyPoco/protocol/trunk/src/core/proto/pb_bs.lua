@@ -58,6 +58,7 @@ local _M = {
 	BATTLEUNIT_CARDID_F = pFD(),
 	BATTLEUNIT_DRESS_NUM_F = pFD(),
 	BATTLEUNIT_WINGID_F = pFD(),
+	BATTLEUNIT_ENERGY_SKILL_ID_F = pFD(),
 	BATTLETEAM_ME = pD(),
 	BATTLETEAM_UNITS_F = pFD(),
 	BATTLETEAM_COMBO_F = pFD(),
@@ -74,6 +75,10 @@ local _M = {
 	BATTLETEAM_SHOWS_F = pFD(),
 	BATTLETEAM_PETS_F = pFD(),
 	BATTLETEAM_PASSIVE_SKILLS_F = pFD(),
+	BATTLETEAM_DEMON_BOSS_MULTIPLE_F = pFD(),
+	DEMONBOSSTEAMMULTIPLE_ME = pD(),
+	DEMONBOSSTEAMMULTIPLE_TEAM_F = pFD(),
+	DEMONBOSSTEAMMULTIPLE_MULTIPLE_F = pFD(),
 	BATTLEREPORT_ME = pD(),
 	BATTLEREPORT_BATTLE_ID_F = pFD(),
 	BATTLEREPORT_ATK_TYPE_F = pFD(),
@@ -118,6 +123,8 @@ local _M = {
 	BATTLEUNITRESULT_ID_F = pFD(),
 	BATTLEUNITRESULT_AVARTAR_ID_F = pFD(),
 	BATTLEUNITRESULT_DAM_F = pFD(),
+	BATTLEUNITRESULT_RECOVER_F = pFD(),
+	BATTLEUNITRESULT_TAKE_DAM_F = pFD(),
 	BRIEFREPORT_ME = pD(),
 	BRIEFREPORT_OWN_TEAMS_F = pFD(),
 	BRIEFREPORT_ENEMY_TEAMS_F = pFD(),
@@ -197,7 +204,8 @@ pfnFD(_M.BATTLEUNIT_SKILL_LEVEL4_F, {"skill_level4", ".bs.BattleUnit.skill_level
 pfnFD(_M.BATTLEUNIT_CARDID_F, {"cardId", ".bs.BattleUnit.cardId", 17, 16, 1, false, 0, nil, nil, 13, 3})
 pfnFD(_M.BATTLEUNIT_DRESS_NUM_F, {"dress_num", ".bs.BattleUnit.dress_num", 18, 17, 1, false, 0, nil, nil, 13, 3})
 pfnFD(_M.BATTLEUNIT_WINGID_F, {"wingId", ".bs.BattleUnit.wingId", 19, 18, 1, false, 0, nil, nil, 13, 3})
-pfnD(_M.BATTLEUNIT_ME, {"BattleUnit", ".bs.BattleUnit", {}, {}, {_M.BATTLEUNIT_ID_F, _M.BATTLEUNIT_POS_F, _M.BATTLEUNIT_ATTRS_F, _M.BATTLEUNIT_SKILLS_F, _M.BATTLEUNIT_STAR_F, _M.BATTLEUNIT_SKILL_LEVEL1_F, _M.BATTLEUNIT_SKILL_LEVEL2_F, _M.BATTLEUNIT_NAME_F, _M.BATTLEUNIT_COMMON_SKILL_ID_F, _M.BATTLEUNIT_ACTIVE_SKILL_ID_F, _M.BATTLEUNIT_HP_F, _M.BATTLEUNIT_ADVANCE_LEVEL_F, _M.BATTLEUNIT_SKIN_F, _M.BATTLEUNIT_SKIN_TS_F, _M.BATTLEUNIT_ARTIFACTID_F, _M.BATTLEUNIT_SKILL_LEVEL4_F, _M.BATTLEUNIT_CARDID_F, _M.BATTLEUNIT_DRESS_NUM_F, _M.BATTLEUNIT_WINGID_F}, false, {}, nil})
+pfnFD(_M.BATTLEUNIT_ENERGY_SKILL_ID_F, {"energy_skill_id", ".bs.BattleUnit.energy_skill_id", 20, 19, 1, false, 0, nil, nil, 13, 3})
+pfnD(_M.BATTLEUNIT_ME, {"BattleUnit", ".bs.BattleUnit", {}, {}, {_M.BATTLEUNIT_ID_F, _M.BATTLEUNIT_POS_F, _M.BATTLEUNIT_ATTRS_F, _M.BATTLEUNIT_SKILLS_F, _M.BATTLEUNIT_STAR_F, _M.BATTLEUNIT_SKILL_LEVEL1_F, _M.BATTLEUNIT_SKILL_LEVEL2_F, _M.BATTLEUNIT_NAME_F, _M.BATTLEUNIT_COMMON_SKILL_ID_F, _M.BATTLEUNIT_ACTIVE_SKILL_ID_F, _M.BATTLEUNIT_HP_F, _M.BATTLEUNIT_ADVANCE_LEVEL_F, _M.BATTLEUNIT_SKIN_F, _M.BATTLEUNIT_SKIN_TS_F, _M.BATTLEUNIT_ARTIFACTID_F, _M.BATTLEUNIT_SKILL_LEVEL4_F, _M.BATTLEUNIT_CARDID_F, _M.BATTLEUNIT_DRESS_NUM_F, _M.BATTLEUNIT_WINGID_F, _M.BATTLEUNIT_ENERGY_SKILL_ID_F}, false, {}, nil})
 pfnFD(_M.BATTLETEAM_UNITS_F, {"units", ".bs.BattleTeam.units", 1, 0, 3, false, {}, _M.BATTLEUNIT_ME, nil, 11, 10})
 pfnFD(_M.BATTLETEAM_COMBO_F, {"combo", ".bs.BattleTeam.combo", 2, 1, 2, false, nil, _M.BATTLECOMBO_ME, nil, 11, 10})
 pfnFD(_M.BATTLETEAM_FIGHT_VALUE_F, {"fight_value", ".bs.BattleTeam.fight_value", 3, 2, 1, false, 0, nil, nil, 4, 4})
@@ -213,7 +221,11 @@ pfnFD(_M.BATTLETEAM_REBEL_ID_F, {"rebel_id", ".bs.BattleTeam.rebel_id", 12, 11, 
 pfnFD(_M.BATTLETEAM_SHOWS_F, {"shows", ".bs.BattleTeam.shows", 13, 12, 3, false, {}, _M.TOKENKNIGHTSHOW_ME, nil, 11, 10})
 pfnFD(_M.BATTLETEAM_PETS_F, {"pets", ".bs.BattleTeam.pets", 14, 13, 3, false, {}, nil, nil, 13, 3})
 pfnFD(_M.BATTLETEAM_PASSIVE_SKILLS_F, {"passive_skills", ".bs.BattleTeam.passive_skills", 15, 14, 3, false, {}, nil, nil, 13, 3})
-pfnD(_M.BATTLETEAM_ME, {"BattleTeam", ".bs.BattleTeam", {}, {}, {_M.BATTLETEAM_UNITS_F, _M.BATTLETEAM_COMBO_F, _M.BATTLETEAM_FIGHT_VALUE_F, _M.BATTLETEAM_WAVE_F, _M.BATTLETEAM_IS_BOSS_F, _M.BATTLETEAM_DROPS_F, _M.BATTLETEAM_USER_F, _M.BATTLETEAM_TOTAL_HP_F, _M.BATTLETEAM_MULTIPLE_F, _M.BATTLETEAM_REBEL_TALENT_F, _M.BATTLETEAM_MONSTER_TEAM_ID_F, _M.BATTLETEAM_REBEL_ID_F, _M.BATTLETEAM_SHOWS_F, _M.BATTLETEAM_PETS_F, _M.BATTLETEAM_PASSIVE_SKILLS_F}, false, {}, nil})
+pfnFD(_M.BATTLETEAM_DEMON_BOSS_MULTIPLE_F, {"demon_boss_multiple", ".bs.BattleTeam.demon_boss_multiple", 16, 15, 1, false, nil, _M.DEMONBOSSTEAMMULTIPLE_ME, nil, 11, 10})
+pfnD(_M.BATTLETEAM_ME, {"BattleTeam", ".bs.BattleTeam", {}, {}, {_M.BATTLETEAM_UNITS_F, _M.BATTLETEAM_COMBO_F, _M.BATTLETEAM_FIGHT_VALUE_F, _M.BATTLETEAM_WAVE_F, _M.BATTLETEAM_IS_BOSS_F, _M.BATTLETEAM_DROPS_F, _M.BATTLETEAM_USER_F, _M.BATTLETEAM_TOTAL_HP_F, _M.BATTLETEAM_MULTIPLE_F, _M.BATTLETEAM_REBEL_TALENT_F, _M.BATTLETEAM_MONSTER_TEAM_ID_F, _M.BATTLETEAM_REBEL_ID_F, _M.BATTLETEAM_SHOWS_F, _M.BATTLETEAM_PETS_F, _M.BATTLETEAM_PASSIVE_SKILLS_F, _M.BATTLETEAM_DEMON_BOSS_MULTIPLE_F}, false, {}, nil})
+pfnFD(_M.DEMONBOSSTEAMMULTIPLE_TEAM_F, {"team", ".bs.DemonBossTeamMultiple.team", 1, 0, 2, false, 0, nil, nil, 13, 3})
+pfnFD(_M.DEMONBOSSTEAMMULTIPLE_MULTIPLE_F, {"multiple", ".bs.DemonBossTeamMultiple.multiple", 2, 1, 2, false, 0, nil, nil, 13, 3})
+pfnD(_M.DEMONBOSSTEAMMULTIPLE_ME, {"DemonBossTeamMultiple", ".bs.DemonBossTeamMultiple", {}, {}, {_M.DEMONBOSSTEAMMULTIPLE_TEAM_F, _M.DEMONBOSSTEAMMULTIPLE_MULTIPLE_F}, false, {}, nil})
 pfnFD(_M.BATTLEREPORT_BATTLE_ID_F, {"battle_id", ".bs.BattleReport.battle_id", 1, 0, 2, false, 0, nil, nil, 4, 4})
 pfnFD(_M.BATTLEREPORT_ATK_TYPE_F, {"atk_type", ".bs.BattleReport.atk_type", 2, 1, 2, false, 0, nil, nil, 13, 3})
 pfnFD(_M.BATTLEREPORT_IS_AUTO_F, {"is_auto", ".bs.BattleReport.is_auto", 3, 2, 1, false, false, nil, nil, 8, 7})
@@ -257,7 +269,9 @@ pfnFD(_M.BATTLEUNITRESULT_TYPE_F, {"type", ".bs.BattleUnitResult.type", 1, 0, 2,
 pfnFD(_M.BATTLEUNITRESULT_ID_F, {"id", ".bs.BattleUnitResult.id", 2, 1, 1, false, 0, nil, nil, 13, 3})
 pfnFD(_M.BATTLEUNITRESULT_AVARTAR_ID_F, {"avartar_id", ".bs.BattleUnitResult.avartar_id", 3, 2, 1, false, 0, nil, nil, 13, 3})
 pfnFD(_M.BATTLEUNITRESULT_DAM_F, {"dam", ".bs.BattleUnitResult.dam", 4, 3, 1, false, 0, nil, nil, 4, 4})
-pfnD(_M.BATTLEUNITRESULT_ME, {"BattleUnitResult", ".bs.BattleUnitResult", {}, {}, {_M.BATTLEUNITRESULT_TYPE_F, _M.BATTLEUNITRESULT_ID_F, _M.BATTLEUNITRESULT_AVARTAR_ID_F, _M.BATTLEUNITRESULT_DAM_F}, false, {}, nil})
+pfnFD(_M.BATTLEUNITRESULT_RECOVER_F, {"recover", ".bs.BattleUnitResult.recover", 5, 4, 1, false, 0, nil, nil, 4, 4})
+pfnFD(_M.BATTLEUNITRESULT_TAKE_DAM_F, {"take_dam", ".bs.BattleUnitResult.take_dam", 6, 5, 1, false, 0, nil, nil, 4, 4})
+pfnD(_M.BATTLEUNITRESULT_ME, {"BattleUnitResult", ".bs.BattleUnitResult", {}, {}, {_M.BATTLEUNITRESULT_TYPE_F, _M.BATTLEUNITRESULT_ID_F, _M.BATTLEUNITRESULT_AVARTAR_ID_F, _M.BATTLEUNITRESULT_DAM_F, _M.BATTLEUNITRESULT_RECOVER_F, _M.BATTLEUNITRESULT_TAKE_DAM_F}, false, {}, nil})
 pfnFD(_M.BRIEFREPORT_OWN_TEAMS_F, {"own_teams", ".bs.BriefReport.own_teams", 1, 0, 3, false, {}, _M.BATTLETEAM_ME, nil, 11, 10})
 pfnFD(_M.BRIEFREPORT_ENEMY_TEAMS_F, {"enemy_teams", ".bs.BriefReport.enemy_teams", 2, 1, 3, false, {}, _M.BATTLETEAM_ME, nil, 11, 10})
 pfnFD(_M.BRIEFREPORT_IS_WIN_F, {"is_win", ".bs.BriefReport.is_win", 3, 2, 2, false, false, nil, nil, 8, 7})
@@ -305,6 +319,7 @@ _M.BriefReport = pM(_M.BRIEFREPORT_ME)
 _M.C2S_CheckBattleResult = pM(_M.C2S_CHECKBATTLERESULT_ME)
 _M.C2S_ClientTestBattle = pM(_M.C2S_CLIENTTESTBATTLE_ME)
 _M.CheckResult = pM(_M.CHECKRESULT_ME)
+_M.DemonBossTeamMultiple = pM(_M.DEMONBOSSTEAMMULTIPLE_ME)
 _M.PlayerCommand = pM(_M.PLAYERCOMMAND_ME)
 _M.S2C_CheckBattleResult = pM(_M.S2C_CHECKBATTLERESULT_ME)
 _M.S2C_ClientTestBattle = pM(_M.S2C_CLIENTTESTBATTLE_ME)

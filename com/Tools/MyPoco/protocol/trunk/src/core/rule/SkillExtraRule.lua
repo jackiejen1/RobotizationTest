@@ -42,7 +42,7 @@ function SkillExtraRule._initSpecialRule(skillCfg)
 	if effectType == 0 then return end
 
 	local initFunction = SkillExtraRule["_initSkillEffectType"..tostring(effectType)]
-	assert(initFunction, "Invalid skill_info.special_effect_type_1: "..tostring(skill.special_effect_type_1))
+	assert(initFunction, "Invalid skill_info.special_effect_type_1: "..tostring(effectType))
 
 	initFunction(skillCfg)
 

@@ -2,6 +2,10 @@
 
 local BattleRecord = {}
 
+BattleRecord.TYPE_DAM = 1
+BattleRecord.TYPE_RECOVER = 2
+BattleRecord.TYPE_TAKE_DAM = 3
+
 function BattleRecord:init()
     self._keyList = {}
     self._infoList = {{},{}}
@@ -19,14 +23,16 @@ end
 function BattleRecord:setRecord(atkType,identity,info)
 	-- local robot = info.user and (info.user.robot_type and info.user.robot_type ~= 0 and info.user.robot_type ~= 999)
 	-- local isMonster = robot or (atkType == 1 and identity == 2) or (atkType == 10)
-	local isMonster = info.monster_team_id
+	local isMonster = info.monster_team_id and info.monster_team_id > 0 or false
 	for i = 1 , #info.units do
 		local unit = info.units[i]
     	local key = "knight_"..identity.."_"..unit.id.."_"..unit.pos
     	local uinfo = {}
     	uinfo.type = 1 	-- 武将
     	uinfo.id = unit.id
-    	uinfo.dam = 0
+		uinfo.dam = 0
+		uinfo.recover = 0
+		uinfo.take_dam = 0
     	uinfo.pos = unit.pos
     	if not isMonster then
 	    	local knightInfo = loadCfg("cfg.knight_info").get(unit.id)
@@ -58,7 +64,9 @@ function BattleRecord:setRecord(atkType,identity,info)
 	    	local cinfo = {}
 	    	cinfo.type = 2	-- 合击
 	    	cinfo.id = combo
-	    	cinfo.dam = 0
+			cinfo.dam = 0
+			cinfo.recover = 0
+			cinfo.take_dam = 0
 	    	self._keyList[key] = cinfo
 	    	local iList = self._infoList[identity]
 	    	iList[#iList+1] = cinfo
@@ -71,7 +79,9 @@ function BattleRecord:setRecord(atkType,identity,info)
 	    	local cinfo = {}
 	    	cinfo.type = 3	-- 战宠
 	    	cinfo.id = pet
-	    	cinfo.dam = 0
+			cinfo.dam = 0
+			cinfo.recover = 0
+			cinfo.take_dam = 0
 	    	self._keyList[key] = cinfo
 	    	local iList = self._infoList[identity]
 	    	iList[#iList+1] = cinfo
@@ -83,50 +93,89 @@ function BattleRecord:setRecord(atkType,identity,info)
 	    	if petInfo.passive_skill_2 > 0 then
 		    	local skill2 = loadCfg("cfg.passive_skill_info").get(petInfo.passive_skill_2)
 		    	self._petSkills[skill2.passive_skill_value] = pet
-	    	end
+			end
+			if petInfo.belong_passive_skill_1 > 0 then
+				local skill = loadCfg("cfg.passive_skill_info").get(petInfo.belong_passive_skill_1)
+	    		self._petSkills[skill.passive_skill_value] = pet
+			end
+			if petInfo.belong_passive_skill_2 > 0 then
+				local skill = loadCfg("cfg.passive_skill_info").get(petInfo.belong_passive_skill_2)
+		    	self._petSkills[skill.passive_skill_value] = pet
+			end
 		end
 	end
 end
 
-function BattleRecord:addRecord(attacker,damage)
-    if attacker.isPlayer then
+function BattleRecord:addRecord(attacker, type, value)
+	local info = self:getInfoByAttacker(attacker)
+	if info then
+		if type == BattleRecord.TYPE_DAM then
+			-- 伤害
+			info.dam = info.dam + value
+		elseif type == BattleRecord.TYPE_RECOVER then
+			-- 治疗量
+			info.recover = info.recover + value
+		elseif type == BattleRecord.TYPE_TAKE_DAM then
+			-- 承受伤害
+			info.take_dam = info.take_dam + value
+		end
+	end
+end
+
+function BattleRecord:getInfoByAttacker(attacker)
+	if attacker.isPlayer then
     	if attacker.isPet then
     		local petId = self._petSkills[attacker.skillId]
 	    	local key = "pet_"..attacker.identity.."_"..petId
 	    	if self._keyList[key] then
-	    		self._keyList[key].dam = self._keyList[key].dam + damage
+	    		return self._keyList[key]
 	    	else
 		    	local info = {}
 		    	info.type = 3	-- 战宠
 		    	info.id = petId
-		    	info.dam = damage
+				info.dam = 0
+				info.recover = 0
+				info.take_dam = 0
 		    	self._keyList[key] = info
 		    	local iList = self._infoList[attacker.identity]
-		    	iList[#iList+1] = info
+				iList[#iList+1] = info
+				return info
 		    end
-    	else
+		elseif attacker.isSpaceTime then
+			-- 时光之力
+		elseif attacker.isSummon then
+			local key = "knight_"..attacker.identity.."_"..attacker.originInfo.id.."_"..attacker.originInfo.pos
+			if self._keyList[key] then
+				return self._keyList[key]
+			end
+		else
 	    	local key = "unite_"..attacker.identity.."_"..attacker.id
 	    	if self._keyList[key] then
-	    		self._keyList[key].dam = self._keyList[key].dam + damage
+	    		return self._keyList[key]
 	    	else
 		    	local info = {}
 		    	info.type = 2	-- 合击
 		    	info.id = attacker.id
-		    	info.dam = damage
+				info.dam = 0
+				info.recover = 0
+				info.take_dam = 0
 		    	self._keyList[key] = info
 		    	local iList = self._infoList[attacker.identity]
-		    	iList[#iList+1] = info
+				iList[#iList+1] = info
+				return info
 		    end
     	end
     else
     	local key = "knight_"..attacker.identity.."_"..attacker.originInfo.id.."_"..attacker.originInfo.pos
     	if self._keyList[key] then
-    		self._keyList[key].dam = self._keyList[key].dam + damage
+    		return self._keyList[key]
     	else
 	    	local info = {}
 	    	info.type = 1 	-- 武将
 	    	info.id = attacker.originInfo.id
-	    	info.dam = damage
+			info.dam = 0
+			info.recover = 0
+			info.take_dam = 0
 	    	if not attacker.isMonster then
 		    	local knightInfo = loadCfg("cfg.knight_info").get(attacker.originInfo.id)
 		    	if knightInfo.type == 1 then
@@ -138,7 +187,8 @@ function BattleRecord:addRecord(attacker,damage)
 		    end
 	    	self._keyList[key] = info
 	    	local iList = self._infoList[attacker.identity]
-	    	iList[#iList+1] = info
+			iList[#iList+1] = info
+			return info
 	    end
     end
 end
