@@ -788,7 +788,7 @@ class LoginGame:
 
 
 
-    def MSG_C2S_Recruit_RecruitKnight(self,activity_id,id_into, uid, sid):
+    def MSG_C2S_Recruit_RecruitKnight(self,activity_id,id_into, uid, sid,sub_type):
         """
         限时神将10连抽
         :param activity_id:  int 活动ID，GM后台配置
@@ -801,6 +801,7 @@ class LoginGame:
         C2S_Recruit_RecruitKnight.activity_id = activity_id
         C2S_Recruit_RecruitKnight.id = id_into
         C2S_Recruit_RecruitKnight.draw_type = 2
+        C2S_Recruit_RecruitKnight.sub_type = sub_type
         C2S_Recruit_RecruitKnight = C2S_Recruit_RecruitKnight.SerializeToString()
         C2S_Recruit_RecruitKnight_attr = {'name': "C2S_Recruit_RecruitKnight", 'protocol': 'protobuf-ss',
                                          'send_cmd': 12250, 'recv_cmd': 12251, 'uid': uid, 'sid': sid}
@@ -822,4 +823,56 @@ class LoginGame:
                          'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Flush, C2S_Flush_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Flush_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Richest_Draw(self,activity_id,sub_type, uid, sid):
+        """
+        富甲天下10连抽
+        :param activity_id:  int 活动ID，GM后台配置
+        :param sub_type: 1代表金卡池，2表示紫金卡池
+        :param type: 1表示单抽，2表示十抽
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Richest_Draw = cs_pb2.C2S_Richest_Draw()
+        C2S_Richest_Draw.activity_id = activity_id
+        C2S_Richest_Draw.sub_type = sub_type
+        C2S_Richest_Draw.type=2
+        C2S_Richest_Draw = C2S_Richest_Draw.SerializeToString()
+        C2S_Richest_Draw_attr = {'name': "C2S_Richest_Draw", 'protocol': 'protobuf-ss',
+                                         'send_cmd': 13632, 'recv_cmd': 13633, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Richest_Draw, C2S_Richest_Draw_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Richest_Draw_attr, 32)  # 发送协议
+        return flag, data
+
+
+    def MSG_C2S_PeakArena_Match(self, uid, sid):
+        """
+        王者竞技匹配
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_PeakArena_Match = cs_pb2.C2S_PeakArena_Match()
+        C2S_PeakArena_Match = C2S_PeakArena_Match.SerializeToString()
+        C2S_PeakArena_Match_attr = {'name': "C2S_PeakArena_Match", 'protocol': 'protobuf-ss',
+                                         'send_cmd': 13860, 'recv_cmd': 13861, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_PeakArena_Match, C2S_PeakArena_Match_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_PeakArena_Match_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_PeakArena_ChallengeBegin(self, uid, sid):
+        """
+        王者竞技战斗
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_PeakArena_ChallengeBegin = cs_pb2.C2S_PeakArena_ChallengeBegin()
+        C2S_PeakArena_ChallengeBegin = C2S_PeakArena_ChallengeBegin.SerializeToString()
+        C2S_PeakArena_ChallengeBegin_attr = {'name': "C2S_PeakArena_ChallengeBegin", 'protocol': 'protobuf-ss',
+                                         'send_cmd': 13862, 'recv_cmd': [13863,20000], 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_PeakArena_ChallengeBegin, C2S_PeakArena_ChallengeBegin_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_PeakArena_ChallengeBegin_attr, 32)  # 发送协议
         return flag, data

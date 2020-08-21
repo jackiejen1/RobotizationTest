@@ -322,6 +322,7 @@ enum RET {
   RET_MYSTERY_NEED_CHALLENGE = 424;	// 秘境副本-怪物未完成首次挑战
   RET_MYSTERY_LAST_NEED_CHALLENGE = 425;	// 秘境副本-需要先挑战前置怪物
   RET_MYSTERY_ELITE_KILL_LIMIT = 426;	// 秘境副本-每日挑战守将次数已满
+  RET_MYSTERY_ONEKEY_ATTACK_NUM_MAX_LIMIT = 427; // 秘境副本-小怪一键讨伐次数超出上限
 
   // 神兽装备
   RET_PET_EQUIPMENT_NOT_EXIST = 430; // 神兽装备不存在
@@ -329,9 +330,11 @@ enum RET {
   RET_PET_EQUIPMENT_LEVEL_MAX = 432; // 神兽装备强化等级已达最大
   RET_PET_EQUIPMENT_LOCKED = 433;   //已经加锁的神兽装备不能被消耗
   RET_PET_EQUIPMENT_EXP_LOCKED = 434;   //经验类神兽装备不能加锁
+
   // 神兽
   RET_PET_NOT_EXIST = 450; // 神兽不存在
   RET_PET_BAG_FULL = 451; // 神兽背包已满
+  RET_PET_REBORN_IS_HELP = 452; // 助战中的宠物不允许分解
 
   //秘境boss
   RET_MYSTERY_BOSS_NOT_CREATED = 460; //boss还未创建
@@ -488,7 +491,47 @@ enum RET {
   RET_DRESS_ENHANCE_MAX_LEVEL = 831; // 时装已强化至最大等级
   //精英副本
   RET_STATE_ELITE_DUNGEON_STAGE_NOT_FINISH = 832; //精英副本关卡未通关
+  //合击兵符一键升级
+  RET_STATE_TOKEN_LEVEL_NOT_EXIST = 840; // 合击兵符一键强化目标等级不存在
+  //装备幻化
+  RET_MAGIC_EQUIPMENT_NOT_EXIST = 850; //幻化的装备不存在
+  RET_EQUIPMENT_MAGIC_ROUTE_ILLEGAL = 851; //幻化路线不正确
+  RET_EQUIPMENT_NONE_MAGIC_ROUTE = 852; //装备未开启幻化
+  RET_EQUIPMENT_MAGIC_UNAVAILABLE = 853; //装备配置不可幻化
+  RET_EQUIPMENT_MAGIC_FRAGMENT_NOT_EXIST = 854;//幻化所需的碎片不存在
+  RET_EQUIPMENT_MAGIC_LEVEL_FULL = 855;//装备幻化到达最高阶
+
+  // 快速觉醒
+  RET_KNIGHT_AWAKE_QUICK_TASK_FINISHED = 870; // 任务已经全部完成 不能快速觉醒
+
+  // 无双地牢
+  RET_DEAD_TOWER_NOW_GRID_CHANGE = 879; // 当前格子位置已变化,请重新战斗
+  RET_DEAD_TOWER_GRID_NOT_WALK = 880;// 格子不可走
+  RET_DEAD_TOWER_GRID_IS_PASS = 881;// 已通过该格子
+  RET_DEAD_TOWER_CHALLENGE_NOT_NUM = 882;// 挑战次数不足
+  RET_DEAD_TOWER_CHALLENGE_FOLL_MAX = 883;// 今日前进层数已达上限
+  RET_DEAD_TOWER_NOT_MONSTER_GRID = 884;// 非怪物格子不可挑战
+  RET_DEAD_TOWER_NOT_BOSS_GRID = 885;// 非BOSS格子不可挑战
+  RET_DEAD_TOWER_GET_MONSTER_ERR = 886;// 获取怪物阵容失败
+  RET_DEAD_TOWER_CARD_NUM_MAX = 887; // 卡片使用数量超上限
+  RET_DEAD_TOWER_NOT_CARD_GRID = 888; // 非卡片格子不可获取
+  RET_DEAD_TOWER_HAS_TREASURE = 889; // 该地图宝藏已寻取
+
+
+    //乱世英杰
+    RET_WARLORD_NOT_IN_ACT = 890;// 不在活动时间
+    RET_WARLORD_ACHIEVEMENT_NOT_DONE = 891;// 成就未达成
+    RET_WARLORD_ACHIEVEMENT_AWARDED = 892;// 成就奖励已领取
+    RET_WARLORD_ALREADY_IN_MAP = 893;// 玩家已在地图中，不可重复进入
+    RET_WARLORD_BOSS_NOT_OPEN = 894;// BOSS 没有开启
+    RET_WARLORD_BOSS_DAMAGE_ERROR = 895;// 伤害数值校验不通过
+    RET_WARLORD_NET_ERROR = 896;//出现网络错误
   
+  // 月卡强化
+  RET_MONTH_CARD_ACTIVE_REWARD = 900; // 月卡活跃奖励已领取
+  RET_MONTH_CARD_ACTIVE_NOT_FINISH = 901; // 活跃点未完成，不可领取
+  RET_MONTH_CARD_ACTIVE_NOT_ENOUGH = 902; // 活跃点不够
+
   ///////////////// 1000-1100是客户端战斗代码返回错误 /////////////////
   RET_BATTLE_DATA_VERSION_CORRECT = 1000;//非数据版本问题
   RET_BATTLE_DATA_VERSION_ILLEGAL = 1001;//数据版本不一致

@@ -113,6 +113,7 @@ enum ATTR_TYPE {
   MONSTER_COMBO_DAMAGE_ADD = 903; //怪物额外受合击伤害
   MONSTER_COMBO_DAMAGE_DEC = 904; //怪物额外减免合击伤害
 
+  VIOLET_GOLD_VALUE = 1001; //紫金品质系数
 
   STAR_TRAIN_HP       = 10001;	//将星培养生命
   STAR_TRAIN_ATTACK       = 10002;	//将星培养攻击
@@ -238,6 +239,18 @@ enum RANK_ID_TYPE {
   DEMON_BOSS_TOTAL_HONOR_CROSS_WU = 50; // 讨伐魔将累计荣誉战区排行吴国
   DEMON_BOSS_TOTAL_HONOR_CROSS_QUN = 51; // 讨伐魔将累计荣誉战区排行群国
   DEMON_BOSS_GUILD_HONOR_CROSS = 52; // 讨伐魔将军团荣誉战区排行
+  ELITE_DUNGEON_STAR_ALL_SERVER = 53; // 精英副本全服星数榜
+  ELITE_DUNGEON_STAR_LOCAL = 54; // 精英副本服星数榜
+  DEAD_TOWER_FOOL_CROSS = 55;//无双地牢战区排行
+  DEAD_TOWER_FOOL_SERVER = 56;//无双地牢全服排行
+  WARLORD_BOSS_1 = 57; // 乱世英杰_1
+  WARLORD_BOSS_2 = 58; // 乱世英杰_2
+  WARLORD_BOSS_3 = 59; // 乱世英杰_3
+  RECRUIT_KNIGHT_BROTHER = 60;      //限时紫将排行榜
+  RECRUIT_KNIGHT_GM_BROTHER = 61;   //限时紫将gm排行榜
+  FLAME_CITY_GUILD_PROGRESS = 62; // 烽火连城军团进度排行榜
+  RECRUIT_RICHEST_BROTHER = 63; //富家天下积分排行榜
+  RECRUIT_RICHEST_GM_BROTHER = 64; //GM富家天下积分排行榜
 }
 
 enum HANDBOOK_TYPE {

@@ -1,5 +1,6 @@
-
 require "init"
+
+local json = require("lib.json")
 
 local field = require("core.BattleField").new()
 
@@ -39,11 +40,14 @@ function resetBattle( )
 end
 
 -- 自动战斗
-function autoBattleResult( )
-	fastExecuteBattle()
-	local data = getBattleResult()
-	local len = type(data) == "string" and string.len(data) or 0
-	return data,len
+function autoBattleResult(jsonStr)
+    local data = json.decode(jsonStr)
+
+    field:setInitData(data)
+    fastExecuteBattle()
+	local data = field:getBattleResult()
+    field:reset()
+	return json.encode(data)
 end
 
 -- 获取log

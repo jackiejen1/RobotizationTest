@@ -1168,6 +1168,15 @@ class MyPoco:
         for num in num_list:
             self.protocol.Biography_ExecuteMission(num, 1)
 
+    def GM_wangzhejingji(self):
+        """
+        打王者竞技
+        :return:
+        """
+        self.protocol.PeakArena_Match()
+        time.sleep(2.5)
+        self.protocol.PeakArena_ChallengeBegin()
+
     def GM_fengkuang_haoyou(self, num, account_into=None, sever_name_into=None):
         """
         指定服务器，创建一个拥有N个好友的账号
@@ -1220,8 +1229,9 @@ class MyPoco:
         :param is_stop: bool 是否抽到后就马上停止
         :return:
         """
-
-        cishu = 50000  # 默认抽1000次十连
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 99999999)
+        cishu = 5000  # 默认抽1000次十连
         resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("化身灵力")
         self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
@@ -1229,8 +1239,10 @@ class MyPoco:
             try:
                 self.protocol.GM_fengkuanghuashen(resource_type, resource_value, resource_num, activity_id, is_stop)
             except GmException:
-                print(resource_name + "在第"+str(i)+"次抽到了")
-                # break
+                log = resource_name + "在第"+str(i+1)+"0次抽到了"
+                print(log)
+                if is_stop:
+                    return log
 
     def GM_fengkuang_hengsaoqianjun(self, activity_id, resource_name, resource_num=1, is_stop=True):
         """
@@ -1241,7 +1253,9 @@ class MyPoco:
         :param is_stop: bool 是否抽到后就马上停止
         :return:
         """
-        cishu = 1000  # 默认抽1000次十连
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 99999999)
+        cishu = 5000  # 默认抽1000次十连
         resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("千军令")
         self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
@@ -1250,8 +1264,10 @@ class MyPoco:
                 self.protocol.GM_fengkuanghengsaoqianjun(resource_type, resource_value, resource_num, activity_id,
                                                          is_stop)
             except GmException:
-                print(resource_name + "抽到了")
-                break
+                log = resource_name + "在第"+str(i+1)+"0次抽到了"
+                print(log)
+                if is_stop:
+                    return log
 
     def GM_fengkuang_xianshijinjiang(self, activity_id, id_name_into, camps_name, resource_name, is_stop=True):
         """
@@ -1263,6 +1279,8 @@ class MyPoco:
         :param is_stop: bool 是否抽到后就马上停止
         :return:
         """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 99999999)
         # "GM后台汉字名字": "配置对应的期数ID"
         id_name_dic = {"限时金将第一期": "100000",
                        "限时金将第二期": "100001",
@@ -1274,7 +1292,8 @@ class MyPoco:
                        "金1(2.2.0)": "100007",
                        "金2(2.2.0)": "100008",
                        "金3(2.2.0)": "100009",
-                       "第六期金1-金5": "100010"}
+                       "第六期金1-金5": "100010",
+                       "紫金1双卡池": "100011"}
         # "配置对应的期数ID": "实际协议传输的ID",
         id_into_dic = {"100000": 1,
                        "100001": 5,
@@ -1287,28 +1306,102 @@ class MyPoco:
                        "100008": 33,
                        "100009": 37,
                        "100010": 41,
+                       "100011": 45,
                        }
         resource_type, resource_value = self.protocol.mri.get_type_id_from_name(resource_name)
         id_into_key = id_name_dic[id_name_into]
         if camps_name == "魏":
+            sub_type = 1
             id_into = id_into_dic[id_into_key]
         elif camps_name == "蜀":
+            sub_type = 1
             id_into = id_into_dic[id_into_key] + 1
         elif camps_name == "吴":
+            sub_type = 1
             id_into = id_into_dic[id_into_key] + 2
         elif camps_name == "群":
+            sub_type = 1
             id_into = id_into_dic[id_into_key] + 3
+        elif camps_name == "金":
+            id_into = id_into_dic[id_into_key]
+            sub_type = 1
+        elif camps_name == "紫金":
+            id_into = id_into_dic[id_into_key]+1
+            sub_type = 2
         else:
             raise GmException("阵营不存在")
-        cishu = 1000  # 默认抽10000次十连
+        cishu = 5000  # 默认抽10000次十连
         add_type, add_value = self.protocol.mri.get_type_id_from_name("金将令")
+        self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("紫金神将令")
         self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)
         for i in range(cishu):
             try:
-                self.protocol.GM_fengkuangxianshijinjiang(resource_type, resource_value, activity_id, id_into, is_stop)
+                self.protocol.GM_fengkuangxianshijinjiang(resource_type, resource_value, activity_id, id_into, is_stop,sub_type)
             except GmException:
-                print(resource_name + "抽到了")
-                break
+                log = resource_name + "在第"+str(i+1)+"0次抽到了"
+                print(log)
+                if is_stop:
+                    return log
+
+    def GM_fengkuang_fujia(self,  activity_id,sub_type, cishu):
+        """
+        富甲天下10连抽，抽完后统计所有奖励的个数
+        :param activity_id:  int 活动ID，GM后台配置
+        :param sub_type: 1代表金卡池，2表示紫金卡池
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
+        self.protocol.add_resource_pb(add_type, add_value, 99999999)
+        if sub_type == 1:
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("骰子")
+            self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
+        if sub_type == 2:
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("紫金骰子")
+            self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
+        resources_dic={}
+        resources_dic["事件"] = 0
+        for i in range(cishu):
+            award_list,event_num = self.protocol.fujiatianxia_shilian( activity_id,sub_type)
+            resources_dic["事件"] = resources_dic["事件"]+event_num
+            #每十次抽奖统计一次
+            for award_dic in award_list:
+                #获得道具名
+                query_dic = {}
+                query_dic['type'] =award_dic['type']
+                query_dic['id'] = award_dic['value']
+                resources_name = self.protocol.mri.get_name_from_type_id(query_dic)
+                name = resources_name+str(award_dic['size'])
+                #把名字和次数一一对应
+                if name not in resources_dic.keys():#第一次添加，初始化
+                    resources_name_dic ={}
+                    resources_name_dic["抽到次数"] =1
+                    resources_name_dic["道具名字"] = resources_name
+                    resources_name_dic["道具数量"] = award_dic['size']
+                    resources_dic[name] = resources_name_dic
+                else:
+                    resources_dic[name]["抽到次数"] = resources_dic[name]["抽到次数"]+1
+        shuliangtongji_dic = {}
+        log_str_z = ""
+        for name in resources_dic.keys():
+            if name !="事件":
+                log_dic = resources_dic[name]
+                resources_name = log_dic["道具名字"]
+                resources_shuliang=log_dic["道具数量"]
+                resources_zongcishu = log_dic["抽到次数"]
+                if str(resources_name) in shuliangtongji_dic.keys():
+                    shuliangtongji_dic[str(resources_name)] = shuliangtongji_dic[str(resources_name)] + int(resources_shuliang)*int(resources_zongcishu)
+                else:
+                    shuliangtongji_dic[str(resources_name)] = int(resources_shuliang) * int(resources_zongcishu)
+                log_str = "道具："+str(resources_name)+"，数量："+str(resources_shuliang)+"，一共抽到："+str(resources_zongcishu)+"次"
+                log_str_z = log_str_z+"\r\n"+log_str
+
+        shijiancishu = "抽到事件"+str(resources_dic["事件"]) +"次"
+        tongji_str_z = ""
+        for tongji in shuliangtongji_dic.keys():
+            tongji_str_z =tongji_str_z +"\r\n"+ tongji+":"+str(shuliangtongji_dic[tongji])+"个"
+        return log_str_z,tongji_str_z,shijiancishu
+
 class myThread (threading.Thread):
     def __init__(self, sever_name_into, account_into):
         threading.Thread.__init__(self)

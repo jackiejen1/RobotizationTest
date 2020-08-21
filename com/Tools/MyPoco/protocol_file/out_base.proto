@@ -1,5 +1,5 @@
 syntax = "proto2";
-package out_base; 
+package out_base;
 
 message EmptyMessage {
 }
@@ -226,6 +226,8 @@ message Equipment {
   optional uint32 castLevel =8; //铸灵等级
   optional uint32 castExp =9; //铸灵经验
   // repeated Status castCost =10; //铸灵已消耗,id:道具id,status:数量
+  optional EquipmentDotInfo dot_infos = 10;  //点化信息组
+  optional uint32 magic_route = 11; //幻化路线，0无1火2水
 }
 
 message Treasure {
@@ -282,6 +284,16 @@ message RedPoint {
   optional KSoulDrawHint ksoul_hint = 32; // 将灵抽卡红点
   optional DemonBossHint demon_boss_hint = 33; // 讨伐魔将红点
   optional EliteDungeonHint elite_dungeon_hint = 34; //精英副本红点
+  optional WarlordHint warlord_hint = 35; //乱世英杰红点
+  repeated uint32 month_card_active_hint = 36; //月卡活跃奖励红点
+  optional DeadTowerHint dead_tower_hint = 37; //无双地牢红点
+}
+
+// 无双地牢红点
+message DeadTowerHint {
+  optional uint32 challenge_num = 1;   //挑战次数
+  optional uint32 challenge_fool = 2;  //挑战层数
+  repeated uint32 treasure_has_id = 3; //寻宝进度
 }
 
 // 攻城新赛季红点
@@ -409,7 +421,7 @@ message ChapterHint {
 message CityHint {
   optional bool can_patrol = 1; //是否有城池可巡逻
   optional bool patrol_award = 2; //是否有巡逻奖励未领取
-  repeated out_base.TaskInfo common_tasks = 3; //成就信息
+  optional out_base.ActionTaskInfo common_tasks = 3; //成就信息
   repeated uint64 task_awarded = 4; //已领取成就id
 }
 
@@ -448,18 +460,18 @@ message GuildDungeonHint {
   repeated uint32 stage_finished = 4; //通关关卡
   repeated uint32 stage_awarded = 5; //已领取奖励关卡
   repeated uint32 mvp_award = 7; //可领取mvp奖励的关卡
-  repeated out_base.TaskInfo daily_tasks = 8; //每日任务状态
+  optional out_base.ActionTaskInfo daily_tasks = 8; //每日任务状态
   repeated uint64 daily_task_awarded = 9; //已领取奖励的任务
-  repeated out_base.TaskInfo weekly_tasks = 10; //每周任务状态
+  optional out_base.ActionTaskInfo weekly_tasks = 10; //每周任务状态
   repeated uint64 weekly_task_awarded = 11; //已领取奖励的任务
   repeated uint32 skill_id = 12; //副本技能id
 }
 
-message ModuleTaskHint { 
+message ModuleTaskHint {
   required uint32 module_id = 1; //模块id，关联action_task_info.xml
-  repeated out_base.TaskInfo common_tasks = 2; //永久任务
-  repeated out_base.TaskInfo daily_tasks = 3; //每日任务
-  repeated out_base.TaskInfo weekly_tasks = 4; //每周任务
+  optional out_base.ActionTaskInfo common_tasks = 2; //永久任务
+  optional out_base.ActionTaskInfo daily_tasks = 3; //每日任务
+  optional out_base.ActionTaskInfo weekly_tasks = 4; //每周任务
   repeated uint64 common_awards = 5; //已领取永久任务奖励
   repeated uint64 daily_awards = 6; //已领取每日任务奖励
   repeated uint64 weekly_awards = 7; //已领取每周任务奖励
@@ -533,6 +545,12 @@ message OpSkin {
 message OpRecruitKnight {
   repeated RecruitKnight insert = 1;
   repeated RecruitKnight update = 2;
+  repeated uint32 del = 3;
+}
+
+message OpRecruitAuKnight {
+  repeated RecruitAuKnight insert = 1;
+  repeated RecruitAuKnight update = 2;
   repeated uint32 del = 3;
 }
 
@@ -663,7 +681,7 @@ message Stage {
   required uint32 id = 1;//todo
   required uint32 star = 2;
   required uint32 reset_count = 3;
-  required uint32 challenge_count = 4;      
+  required uint32 challenge_count = 4;
   optional string min_round_name = 5; //最快通关玩家
   optional string min_fight_value_name = 6; //最低战力通关
 }
@@ -710,6 +728,11 @@ message ContendTreasureAward {
 message TaskInfo {
   required uint32 type = 1;
   required uint64 value = 2;
+}
+
+message ActionTaskInfo {
+  repeated TaskInfo task_info = 1;
+  optional uint32 user_level = 2; //玩家等级,action使用(common:当前玩家等级 daily:每日零点等级 weekly:每周零点等级)
 }
 
 message Mail {
@@ -820,7 +843,7 @@ message CampaignInvitation {
 
 message CardAward {
   required Award award = 1; //翻牌获得奖励
-  repeated Award shows = 2; //显示其他牌奖励 
+  repeated Award shows = 2; //显示其他牌奖励
 }
 
 message CampaignAward {
@@ -839,7 +862,7 @@ message TeammateCardAward {
 }
 
 message City {
-  required uint32 id = 1;//todo  
+  required uint32 id = 1;//todo
   required uint32 level = 2;
   required uint32 model_id = 3;
   optional uint32 knight_id = 4; //knight_info中的id
@@ -847,7 +870,7 @@ message City {
   optional CityRecommendEvent recommend_event = 6;
   repeated CityResourceEvent resource_event = 7;
   repeated CityTroubleEvent trouble_event = 8;
-} 
+}
 
 message CityResourceEvent {
   required uint32 time = 1;//todo
@@ -1158,7 +1181,7 @@ message OpOpenPurchase {
 message OpDayBox {
   repeated DayBox insert = 1;
   repeated DayBox update = 2;
-  repeated uint64 del = 3;  
+  repeated uint64 del = 3;
 }
 
 message OpMonthFund {
@@ -1283,7 +1306,7 @@ message CustomActivityRechargeInfo {
   required uint32 id = 1;
   required uint32 activity_id = 2;
   required uint32 type = 3; //任务类型1:每日充值2:充值大礼3:每日礼包
-  required uint32 value = 4; //每日充值=>充值金额 充值大礼=>0 每日礼包=>第几天 
+  required uint32 value = 4; //每日充值=>充值金额 充值大礼=>0 每日礼包=>第几天
   required uint32 NextId = 5; //下一个任务
   required uint32 price = 6; //奖励价值
   required uint32 is_open = 7; //是否开启任务 1:开启 2:关闭
@@ -1365,7 +1388,7 @@ message Client {
   optional string time_zone = 13; //时区
   optional uint64 timestamp = 14; //0时区时间戳
   optional string spare_one = 15; //备用字段(json格式)
-  optional uint64 op_id = 16; 
+  optional uint64 op_id = 16;
 }
 
 message QuestionnaireInfo {
@@ -1508,6 +1531,13 @@ message RecruitKnight {
   repeated uint32 ids = 3;            //已经领取的成就
   required uint32 times = 4;          //抽卡次数
   required uint32 lastFreeTime = 5;   //上一次免费领取的时间
+  required uint32 purple_score = 6;   //紫金抽将积分
+}
+
+message RecruitAuKnight {
+  required uint32 activity_id = 1;     //活动id
+  required uint32 times = 2;           //抽卡次数
+  required uint32 cost_times = 3;      //已消耗次数(用于阶段奖励)
 }
 
 message MonthFundInfo {
@@ -1605,7 +1635,7 @@ message RecruitEquip {
 message ConditionAct {
   required uint32 activity_value = 1; //活动关联ID
   required uint32 value = 2;          //进度
-  repeated uint32 finish_awards = 3;  //已领奖任务task_id   
+  repeated uint32 finish_awards = 3;  //已领奖任务task_id
 }
 
 message AuctionHint {
@@ -1826,6 +1856,7 @@ message Pet {
   optional uint32 exp = 4; // 经验
   optional uint32 position = 5; // 位置
   required uint32 star = 6; // 星级
+  repeated uint64 helps = 7; // 协战的宠物唯一ID
 }
 
 message OpPet {
@@ -2117,6 +2148,13 @@ message MonsterHpList {
   required uint32 monster_id = 1;//怪物id
   repeated uint64 hp = 2;//扣除的血量
 }
+
+// 噩梦副本升降台和控制台
+message StdLifts {
+  required uint32 grid_id = 1;//格子id
+  required uint32 status = 2; //状态
+}
+
 // 噩梦副本有效路径
 message EffectPos {
 	required out_base.Pos pos = 1;
@@ -2449,4 +2487,51 @@ message EliteDungeonStageState {
   optional uint32 diff_type = 1;
   repeated uint32 tps = 2;
   repeated uint64 states = 3;
+}
+
+// 幸运翻牌-奖励池
+message LuckyDrawAward {
+  required uint32 award_id = 1; // 配置表id
+  required uint32 index = 2; // 抽奖的顺序，如果有了就代表已经抽到了
+}
+
+
+message EquipmentDotInfo {
+  required uint32 stage_id = 1; //最高阶段
+  repeated uint32 node_ids = 2; //激活的属性点id
+}
+
+// 无双地牢
+message DeadTowerGrid {
+  required uint32 grid_id = 1;
+  required uint32 grid_status = 2;
+  required uint32 parcel_id = 3;
+}
+
+message DeadTowerProgress {
+  optional uint64 user_id = 1;     //玩家id
+  optional uint32 zone_id = 2;    //区域
+  optional uint32 fool_id = 3;    //层
+}
+
+message UseItem {
+  required uint32 id = 1;	// id
+  required uint32 num = 2;	// 数量
+  optional uint32 index = 3;  // 可选道具用于选择位置 非可选道具没用
+}
+//===================乱世英杰 活动=============================
+message WarlordAction {
+  required uint32 id = 1;
+  required uint64 value = 2;
+  required uint32 state = 3;
+}
+
+message WarlordDamage {
+  required uint32 enemy = 1; //warlordID
+  required uint32 skill_id = 2;
+  required uint64 damage = 3;
+}
+
+message WarlordHint {
+  optional uint32 ach_award = 1; //成就可领奖次数
 }
