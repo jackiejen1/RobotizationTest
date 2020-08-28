@@ -882,6 +882,26 @@ enum ID {
     MSG_S2C_Artifact_DrawRefresh = 12612;
     MSG_C2S_Artifact_DrawAward = 12613;  //领取神器积分宝箱
     MSG_S2C_Artifact_DrawAward = 12614;
+    MSG_C2S_Artifact_GetContinuePurify = 12615;	//获取连续洗炼条件
+    MSG_S2C_Artifact_GetContinuePurify = 12616;	
+    MSG_C2S_Artifact_SetContinuePurify = 12617;	//设置连续洗炼条件
+    MSG_S2C_Artifact_SetContinuePurify = 12618;	
+    MSG_C2S_Artifact_PurifyHoleLock = 12619;	//请求对孔位进行上锁或者解锁
+    MSG_S2C_Artifact_PurifyHoleLock = 12620;
+    MSG_C2S_Artifact_Purify = 12621;	//请求洗炼
+    MSG_S2C_Artifact_Purify = 12622;
+    MSG_C2S_Artifact_SpecialPurify = 12623;	//特殊洗炼
+    MSG_S2C_Artifact_SpecialPurify = 12624;	
+    MSG_C2S_Artifact_PurifyResultConfirm = 12625;	//洗炼结果确认
+    MSG_S2C_Artifact_PurifyResultConfirm = 12626;	
+    MSG_C2S_Artifact_PurifyResultCancle = 12627;	//洗炼结果取消
+    MSG_S2C_Artifact_PurifyResultCancle = 12628;	
+	MSG_C2S_Artifact_SpecialPurifySelect = 12631;	//神兵特殊洗炼孔位选择
+	MSG_S2C_Artifact_SpecialPurifySelect = 12632;
+    MSG_C2S_Artifact_HelpUp = 12633; //神兵协战-上阵
+    MSG_S2C_Artifact_HelpUp = 12634;
+    MSG_C2S_Artifact_HelpDown = 12635; //神兵协战-下阵
+    MSG_S2C_Artifact_HelpDown = 12636;
 
     // 拍卖行
     MSG_C2S_Auction_GetInfo = 12650; // 查询信息
@@ -1555,6 +1575,46 @@ enum ID {
   MSG_S2C_Recharge_MonthCard_GetInfo = 14311;
   MSG_C2S_Recharge_MonthCard_Award = 14312; // 请求获取月卡活跃宝箱奖励
   MSG_S2C_Recharge_MonthCard_Award = 14313;
+
+  MSG_C2S_Knight_Purplize = 14318; //武将幻紫
+  MSG_S2C_Knight_Purplize = 14319;
+
+  // 军团图腾
+  MSG_C2S_GuildTotem_GetInfo = 14320; // 获取图腾信息
+  MSG_S2C_GuildTotem_GetInfo = 14321;
+  MSG_C2S_GuildTotem_NodeUpgrade = 14322; // 节点升级
+  MSG_S2C_GuildTotem_NodeUpgrade = 14323;
+  MSG_C2S_GuildTotem_Upgrade = 14324; // 图腾品质提升
+  MSG_S2C_GuildTotem_Upgrade = 14325;
+  
+  // 烽火连城
+  MSG_C2S_FlameCity_GetInfo = 14400; // 获取信息
+  MSG_S2C_FlameCity_GetInfo = 14401;
+  MSG_C2S_FlameCity_EnterChapter = 14402; // 进入章节
+  MSG_S2C_FlameCity_EnterChapter = 14403;
+  MSG_C2S_FlameCity_AttackBegin = 14404; // 攻击
+  MSG_S2C_FlameCity_AttackBegin = 14405;
+  MSG_S2C_FlameCity_AttackFinish = 14406;
+  MSG_C2S_FlameCity_ChoseTarget = 14407; // 设置目标
+  MSG_S2C_FlameCity_ChoseTarget = 14408;
+  MSG_C2S_FlameCity_GetReport = 14409; // 查询战报
+  MSG_S2C_FlameCity_GetReport = 14410;
+  MSG_C2S_FlameCity_GetChapterAward = 14411; // 领取章节奖励
+  MSG_S2C_FlameCity_GetChapterAward = 14412;
+  MSG_C2S_FlameCity_GetBoxAward = 14413; // 领取宝箱奖励
+  MSG_S2C_FlameCity_GetBoxAward = 14414;
+  MSG_C2S_FlameCity_GetTreasureAward = 14415; // 领取宝藏奖励
+  MSG_S2C_FlameCity_GetTreasureAward = 14416;
+  MSG_C2S_FlameCity_GetCostHpRank = 14417; // 消耗血量排行榜
+  MSG_S2C_FlameCity_GetCostHpRank = 14418;
+  MSG_S2C_FlameCity_AttackNotify = 14419; // 攻击推送
+  MSG_C2S_FlameCity_FastAttack = 14420; // 快速挑战
+  MSG_S2C_FlameCity_FastAttack = 14421;
+  MSG_C2S_FlameCity_UserJoin = 14422; // 进出地图
+  MSG_S2C_FlameCity_UserJoin = 14423;
+  MSG_C2S_FlameCity_GetTreasureList = 14424; // 获取宝藏奖励领取情况
+  MSG_S2C_FlameCity_GetTreasureList = 14425;
+  MSG_S2C_FlameCity_ChapterNotify = 14426; // 章节信息推送
 }
 
 //跨服玩法聊天+弹幕
@@ -4740,7 +4800,7 @@ message S2C_Chat_LeftTimes{
 }
 
 message C2S_Reborn_Preview {
-    required uint32 sys_type = 1; //模块类型1:武将 2:兵符 3:装备 4:宝物 5:时装 6:神器 9:将灵图鉴
+    required uint32 sys_type = 1; //模块类型1:武将 2:兵符 3:装备 4:宝物 5:时装 6:神器 9:将灵图鉴 10:军团图腾
     required uint32 op_type = 2; //操作类型 1重生 2分解
     repeated uint64 ids = 3; //对应重生对象id
 }
@@ -6061,6 +6121,95 @@ message S2C_Artifact_DrawAward {
     required uint32 ret = 1;
     optional uint32 score = 2;    //剩余积分
     repeated out_base.Award awards = 3;
+}
+
+message C2S_Artifact_GetContinuePurify {
+}
+
+message S2C_Artifact_GetContinuePurify {
+	required uint32 ret = 1;		//结果提示
+	required uint32 qualify = 2;	//品质选项
+	required bool more_score = 3;	//洗炼评分；true:更高评分，停止；false:不停止
+	required uint32 qualify_num = 4;//洗炼品质数量高于当前数量
+}
+
+message C2S_Artifact_SetContinuePurify {
+	required uint32 qualify = 1;	//品质选项
+	required bool more_score = 2;	//洗炼评分；true:更高评分，停止；false:不停止
+	required uint32 qualify_num = 3;//洗炼品质数量高于当前数量
+}
+
+message S2C_Artifact_SetContinuePurify {
+	required uint32 ret = 1;		//结果提示
+	required uint32 qualify = 2;	//品质选项
+	required bool more_score = 3;	//洗炼评分；true:更高评分，停止；false:不停止
+	required uint32 qualify_num = 4;//洗炼品质数量高于当前数量
+}
+
+message C2S_Artifact_PurifyHoleLock{
+	required uint64 id = 1;			//神兵id
+	required uint32 hole_id = 2;	//孔位id
+	required bool lock_op = 3;		//true:加锁，false:解锁
+}
+
+message S2C_Artifact_PurifyHoleLock{
+	required uint32 ret = 1;	//结果提示
+	required uint64 id = 2;		//神兵id
+	required uint32 hole_id = 3;	//孔位id
+	required bool lock_op = 4;		//true:加锁，false:解锁
+}
+
+message C2S_Artifact_Purify{
+	required uint64 id = 1;		//神兵id
+}
+
+message S2C_Artifact_Purify{
+	required uint32 ret = 1;	//结果提示
+	required uint64 id = 2;		//神兵id
+}
+
+message C2S_Artifact_SpecialPurify{
+	required uint64 id = 1;		//神兵id
+	required uint32 purify_type = 2;//洗炼方式
+}
+
+message S2C_Artifact_SpecialPurify{
+	required uint32 ret = 1;	//结果提示
+	required uint64 id = 2;		//神兵id
+	required uint32 purify_type = 3;//洗炼方式
+}
+
+message C2S_Artifact_PurifyResultConfirm{
+	required uint64 id = 1;		//神兵id
+	required int32 hole_id = 2;//-1:保存孔位全部；>0：保存某个孔位的中间属性
+}
+
+message S2C_Artifact_PurifyResultConfirm{
+	required uint32 ret = 1;	//结果提示
+	required uint64 id = 2;		//神兵id
+	required int32 hole_id = 3;//0:保存孔位全部；>0：保存某个孔位的中间属性
+}
+
+message C2S_Artifact_PurifyResultCancle{
+	required uint64 id = 1;		//神兵id
+	required int32 hole_id = 2;//-1:取消孔位全部；>0：取消某个孔位的中间属性
+}
+
+message S2C_Artifact_PurifyResultCancle{
+	required uint32 ret = 1;	//结果提示
+	required uint64 id = 2;		//神兵id
+	required int32 hole_id = 3;//-1:取消孔位全部；>0：取消某个孔位的中间属性
+}
+
+message C2S_Artifact_SpecialPurifySelect{
+	required uint64 id = 1;	//神兵id
+	required uint32 hole_id = 2;	//孔位id
+}
+
+message S2C_Artifact_SpecialPurifySelect{
+	required uint32 ret = 1;	//结果提示
+	required uint64 id = 2;	//神兵id
+	required uint32 hole_id = 3;	//孔位id
 }
 
 message C2S_Auction_GetInfo {
@@ -9098,4 +9247,257 @@ message S2C_Recharge_MonthCard_Award {
   required uint32 id = 2;
   repeated out_base.Award awards = 3;
   optional bool is_clear = 4;//是否重置
+}
+
+// 军团图腾-获取图腾信息
+message C2S_GuildTotem_GetInfo {
+}
+
+message S2C_GuildTotem_GetInfo {
+  required uint32 ret = 1;
+  repeated out_base.GuildTotem totem_info = 2;
+}
+
+// 军团图腾-节点升级
+message C2S_GuildTotem_NodeUpgrade {
+  required uint32 totem_id = 1; // 图腾advanceId
+  required uint32 node_id = 2; // 节点id
+}
+
+message S2C_GuildTotem_NodeUpgrade {
+  required uint32 ret = 1;
+  required uint32 totem_id = 2; // 图腾advanceId
+  required uint32 node_id = 3; // 节点id
+  optional uint32 node_level = 4; // 节点等级
+}
+
+// 军团图腾-图腾品质提升
+message C2S_GuildTotem_Upgrade {
+  required uint32 totem_id = 1; // 图腾advanceId
+}
+
+message S2C_GuildTotem_Upgrade {
+  required uint32 ret = 1;
+  required uint32 totem_id = 2; // 图腾advanceId
+  optional uint32 totem_quality = 3; // 图腾品质
+}
+
+// 烽火连城-获取信息
+message C2S_FlameCity_GetInfo {
+}
+
+message S2C_FlameCity_GetInfo {
+  required uint32 ret = 1;
+  optional uint32 topic_id = 2; // 主题ID
+  repeated out_base.FlameCityChapter chapters = 3; // 章节信息
+  repeated uint32 main_chapter_award = 4; // 玩家主线章节通关奖励
+  repeated uint32 perfect_chapter_award = 5; // 玩家完美章节通关奖励
+}
+
+// 烽火连城-进入章节
+message C2S_FlameCity_EnterChapter {
+  required uint32 chapter_id = 1; // 章节ID
+}
+
+message S2C_FlameCity_EnterChapter {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节ID
+  optional out_base.FlameCityChapter chapter = 3; // 章节信息
+  optional uint32 attack_target = 4; // 进攻目标
+  repeated out_base.FlameCityBlock blocks = 5; // 格子数据
+  repeated uint32 unlock_blocks = 6; // 已解锁的格子id
+  repeated uint32 box_award = 7; // 玩家已领取章节内宝箱奖励
+  repeated uint32 treasure_award = 8; // 玩家已领取章节内宝藏奖励
+  repeated out_base.FlameCityBlockWinGrade block_win_grade = 9; // 玩家赢过的格子
+  repeated out_base.KV leader_attack_block = 10; // 军团长攻击的格子
+  repeated uint32 main_chapter_award = 11; // 玩家主线章节通关奖励
+  repeated uint32 perfect_chapter_award = 12; // 玩家完美章节通关奖励
+}
+
+// 烽火连城-攻击
+message C2S_FlameCity_AttackBegin {
+  required uint32 chapter_id = 1; // 章节id
+  required uint32 block_id = 2; // 格子id
+  required uint32 grade = 3; // 等级
+}
+
+message S2C_FlameCity_AttackBegin {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  required uint32 block_id = 3; // 格子id
+  required uint32 grade = 4; // 等级
+  optional uint64 battle_id = 5; // 战斗id
+}
+
+message S2C_FlameCity_AttackFinish {
+  required uint32 ret = 1;
+  optional uint32 chapter_id = 2; // 章节id
+  optional uint32 block_id = 3; // 格子id
+  optional uint32 grade = 4; // 等级
+  optional uint32 user_cost_hp = 5; // 本次消耗血量
+  optional uint32 cost_hp = 6; // 总消耗血量
+  repeated out_base.Award awards = 7; // 奖励
+  optional uint32 max_grade = 8; // 最大等级
+}
+
+// 烽火连城-设置目标
+message C2S_FlameCity_ChoseTarget {
+  required uint32 chapter_id = 1; // 章节id
+  required uint32 block_id = 2; // 格子id
+}
+
+message S2C_FlameCity_ChoseTarget {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  required uint32 block_id = 3; // 格子id
+}
+
+// 烽火连城-查询战报
+message C2S_FlameCity_GetReport {
+  required uint32 chapter_id = 1; // 章节id
+}
+
+message S2C_FlameCity_GetReport {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  repeated out_base.FlameCityReport reports = 3; // 战报
+}
+
+// 烽火连城-领取章节奖励
+message C2S_FlameCity_GetChapterAward {
+  required uint32 chapter_id = 1;// 章节id
+  required uint32 tp = 2; // 领奖类型（1:主线通关 2：完美通关）
+}
+
+message S2C_FlameCity_GetChapterAward {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  required uint32 tp = 3; // 领奖类型（1：主线通关 2：完美通关）
+  repeated out_base.Award awards = 4; // 奖励
+}
+
+// 烽火连城-领取宝箱奖励
+message C2S_FlameCity_GetBoxAward {
+  required uint32 chapter_id = 1; // 章节id
+  required uint32 block_id = 2; // 格子id
+}
+
+message S2C_FlameCity_GetBoxAward {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  required uint32 block_id = 3; // 格子id
+  repeated out_base.Award awards = 4; // 奖励
+}
+
+// 烽火连城-领取宝藏奖励
+message C2S_FlameCity_GetTreasureAward {
+  required uint32 chapter_id = 1; // 章节id
+  required uint32 block_id = 2; // 格子id
+  required uint32 index = 3; // 下标
+}
+
+message S2C_FlameCity_GetTreasureAward {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  required uint32 block_id = 3; // 格子id
+  required uint32 index = 4; // 下标
+  repeated out_base.Award awards = 5; // 奖励
+  optional uint32 award_id = 6; // 奖励id
+}
+
+// 烽火连城-获取个人贡献排行榜
+message C2S_FlameCity_GetCostHpRank {
+}
+
+message S2C_FlameCity_GetCostHpRank {
+  required uint32 ret = 1;
+  repeated out_base.FlameCityMember members = 2; // 玩家信息
+}
+
+// 烽火连城-攻击推送
+message S2C_FlameCity_AttackNotify {
+  required uint32 chapter_id = 1; // 章节id
+  required uint32 block_id = 2; // 格子id
+  required uint32 cost_hp = 3; // 格子扣除血量
+  repeated out_base.KV leader_attack_block = 4; // 军团长攻击的格子
+  optional uint64 user_id = 5; // 玩家id
+}
+
+// 烽火连城-快速挑战
+message C2S_FlameCity_FastAttack {
+  required uint32 chapter_id = 1; // 章节id
+  required uint32 block_id = 2; // 格子id
+  required uint32 grade = 3; // 怪物等级
+  required uint32 num = 4; // 挑战次数
+}
+
+message S2C_FlameCity_FastAttack {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  required uint32 block_id = 3; // 格子id
+  required uint32 grade = 4; // 等级
+  required uint32 num = 5; // 挑战次数
+  repeated out_base.FlameCityAttackAward atk_awards = 6; // 挑战奖励
+  repeated out_base.Award awards = 7; // 奖励
+  optional uint32 cost_hp = 8; // 格子扣除血量
+}
+
+// 烽火连城-玩家进入/退出
+message C2S_FlameCity_UserJoin {
+  required uint32 chapter_id = 1; // 章节id
+  required bool exit = 2; //是否退出
+}
+
+message S2C_FlameCity_UserJoin {
+  required uint32 ret = 1;
+  optional uint32 chapter_id = 2; // 章节id
+  optional bool exit = 3; //是否退出
+}
+
+// 烽火连城-获取宝藏奖励列表
+message C2S_FlameCity_GetTreasureList {
+  optional uint32 chapter_id = 1; // 章节id(0:查看所有章节)
+}
+
+message S2C_FlameCity_GetTreasureList {
+  required uint32 ret = 1; 
+  optional uint32 chapter_id = 2;
+  repeated out_base.FlameCityTreasure treasure = 3; // 宝藏奖励
+}
+
+// 烽火连城-章节信息推送
+message S2C_FlameCity_ChapterNotify {
+  optional out_base.FlameCityChapter chapter = 1; // 章节信息
+}
+
+//武将幻紫
+message C2S_Knight_Purplize {
+  required uint64 id = 1;  //武将id
+}
+
+message S2C_Knight_Purplize {
+  required uint32 ret = 1;
+  required uint64 id = 2;
+}
+
+//神兵协战-上阵
+message C2S_Artifact_HelpUp {
+  required uint64 artifact_id = 1;//主神兵ID
+  required uint64 helper_id = 2;//协战神兵ID
+}
+
+message S2C_Artifact_HelpUp{
+  required uint32 ret = 1;
+  required uint64 artifact_id = 2;//主神兵ID
+  required uint64 helper_id = 3;//协战神兵ID
+}
+
+//神兵协战-下阵
+message C2S_Artifact_HelpDown{
+  required uint64 artifact_id = 1;//主神兵ID
+}
+
+message S2C_Artifact_HelpDown{
+  required uint32 ret = 1;
+  required uint64 artifact_id = 2;//主神兵ID
 }

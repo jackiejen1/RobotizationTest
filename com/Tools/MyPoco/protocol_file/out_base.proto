@@ -213,6 +213,7 @@ message Knight {
   optional uint64 awake_task_value = 22; //觉醒任务进度
   optional uint32 pendant_level = 23; //饰品等级
   repeated uint64 adjutant  =24;//副将ID
+  optional uint64 purplize_id = 25;//幻紫后对应的武将id
 }
 
 message Equipment {
@@ -287,6 +288,13 @@ message RedPoint {
   optional WarlordHint warlord_hint = 35; //乱世英杰红点
   repeated uint32 month_card_active_hint = 36; //月卡活跃奖励红点
   optional DeadTowerHint dead_tower_hint = 37; //无双地牢红点
+  optional FlameCityHint flame_city_hint = 38; // 烽火连城红点
+}
+
+// 烽火连城红点
+message FlameCityHint {
+  optional bool pass_redpoint = 1; // 通关奖励红点
+  optional bool treasure_redpoint = 2; // 宝藏奖励可领
 }
 
 // 无双地牢红点
@@ -636,6 +644,7 @@ message UserSnapshot {
   optional uint32 param1 = 29;  //可以服用-在王者竞技相关的排行榜里表示出战次数
   optional uint32 param2 = 30;  //可以服用-在王者竞技相关的排行榜里表示胜率
   optional uint32 ksoul_book_num = 31; //激活将灵图鉴数
+  optional Artifact artifact = 32;	//洗炼评分最高神兵信息
 }
 
 // 老玩家数据
@@ -1567,14 +1576,29 @@ message StormCityUnit {
   optional uint32 streak = 7;//连任
 }
 
+message ArtifactPurifyHole{
+  required uint32 id = 1;		//孔位id
+  optional KV cur_attrs = 2;	//当前属性
+  optional KV tmp_attrs = 3;	//中间属性
+  optional KV tmp_special_attrs = 4;	//特殊洗炼中间属性
+  required bool lock = 5;		
+  required uint32 quality = 6;		//当前品质
+  required uint32 tmp_quality = 7;	//洗炼品质
+  required uint32 tmp_special_quality = 8;	//特殊洗炼中间品质
+}
+
 message Artifact {
-  required uint64 id = 1;//唯一id
-  required uint32 base_id = 2;//表里id
-  required uint32 level = 3;//等级
+  required uint64 id = 1; //唯一id
+  required uint32 base_id = 2; //表里id
+  required uint32 level = 3; //等级
   required uint32 star = 4; //星级
   required uint32 pos = 5; //阵位
-  optional uint32 castLevel =6; //铸灵等级
-  optional uint32 castExp =7; //铸灵经验
+  optional uint32 castLevel = 6; //铸灵等级
+  optional uint32 castExp = 7; //铸灵经验
+  optional uint64 helper_id = 8; //协战神兵ID
+  repeated ArtifactPurifyHole artifact_purify_holes = 9; //孔位信息
+  optional int32 select_special_hole = 10; //特殊洗炼选中的孔位id
+  optional uint32 purify_score = 11;	//洗炼评分
 }
 
 message ArtifactRecruit {
@@ -2534,4 +2558,68 @@ message WarlordDamage {
 
 message WarlordHint {
   optional uint32 ach_award = 1; //成就可领奖次数
+}
+
+// 军团图腾
+message GuildTotem {
+  required uint32 id = 1; // 图腾advanceId
+  required uint32 quality = 2; // 图腾品质
+  repeated NodeInfo node_info = 3; // 节点信息
+}
+
+message NodeInfo {
+  required uint32 id = 1; // 节点id
+  required uint32 level = 2; // 节点等级
+}
+
+// 烽火连城-章节信息
+message FlameCityChapter {
+  required uint32 id = 1; // 章节ID
+  required uint32 main_num = 2; // 主线通关数量
+  required uint32 branch_num = 3; // 支线通关数量
+}
+
+// 烽火连城-格子信息
+message FlameCityBlock {
+  required uint32 id = 1; // 格子ID
+  required uint32 cost_hp = 2; // 格子已扣除血量
+}
+
+// 烽火连城-战报
+message FlameCityReport {
+  optional uint32 block_id = 1; // 格子
+  optional uint32 time = 2; // 时间
+}
+
+// 烽火连城-宝藏
+message FlameCityTreasure {
+  required uint32 block_id = 1; // 格子id
+  repeated FlameCityTreasureAward awards = 2; // 奖励
+  optional uint32 chapter_id = 3; // 章节id
+}
+
+// 烽火连城-已领奖宝藏信息
+message FlameCityTreasureAward {
+  optional uint64 user_id = 1; // 玩家ID
+  optional uint32 award_id = 2; // 奖励id
+}
+
+// 烽火连城-军团成员信息
+message FlameCityMember {
+  optional UserSnapshot user = 1; // 玩家
+  optional uint32 cost_hp = 2; // 降低血量
+  optional uint32 challenge_num = 3; // 挑战次数
+  optional uint32 cost_hp_time = 4; // 降低血量时间
+}
+
+// 烽火连城-快速挑战奖励
+message FlameCityAttackAward {
+  required uint32 cost_hp = 1; // 降低血量
+  repeated out_base.Award awards = 2; // 每次的奖励
+}
+
+// 烽火连城-赢的格子难度
+message FlameCityBlockWinGrade {
+  required uint32 block_id = 1; // 格子id
+  required uint32 max_grade = 2; // 最高难度
 }

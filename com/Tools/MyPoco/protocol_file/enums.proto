@@ -147,6 +147,7 @@ enum AWARD_TYPE {
     PET               = 17; // 神兽
     PET_EQUIPMENT     = 18; // 神兽装备
     KSOUL             = 19; // 将灵
+    PURPLIZE          = 20; //幻紫
     GOLD              = 999; //元宝
     DROP							= 1000; //掉落
 	LIMIT 						= 10000;//所有定义不能超过这个值，所有type+LIMIT代表对于这个type的特殊处理
@@ -182,6 +183,7 @@ enum AWARD_VALUE_TYPE {
   GROUP_BATTLE_SCORE = 44; // 积分
   DEMON_BOSS_TIMES = 45; // 讨伐魔将攻击次数
   MONTH_CARD_ACTIVE_POINT = 46; // 月卡活跃点
+  FLAME_CITY_TIMES = 47; // 烽火连城攻击次数
   ATTR_TEST_POINT = 1001; //战斗属性
 
 }
@@ -251,6 +253,8 @@ enum RANK_ID_TYPE {
   FLAME_CITY_GUILD_PROGRESS = 62; // 烽火连城军团进度排行榜
   RECRUIT_RICHEST_BROTHER = 63; //富家天下积分排行榜
   RECRUIT_RICHEST_GM_BROTHER = 64; //GM富家天下积分排行榜
+  ARTIFACT_PURIFY_SCORE_CROSS = 65;//神兵洗炼积分战区排行榜
+  ARTIFACT_PURIFY_SCORE_ALL_SERVER = 66;//神兵洗炼积分全服排行榜
 }
 
 enum HANDBOOK_TYPE {
@@ -284,6 +288,7 @@ enum REBORN_SYS_TYPE {
   R_PET_EQUIPMENT = 7;
   R_PET = 8;
   R_KSOUL_BOOK = 9;
+  R_GUILD_TOTEM = 10; // 军团图腾
 }
  
 enum REBORN_OP_TYPE {

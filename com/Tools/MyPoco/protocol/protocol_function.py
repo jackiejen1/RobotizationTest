@@ -24,7 +24,7 @@ import lupa
 
 
 class ProtocolFunction:
-    def __init__(self, game_name, server_name, protocol_name, username,is_new_account,ui_path=None):
+    def __init__(self, game_name, server_name, protocol_name, username, is_new_account, ui_path=None):
         """
         用于协议测试使用，创建账号的协议方法单独实现
         开局指定测试哪个游戏的哪条协议
@@ -39,8 +39,8 @@ class ProtocolFunction:
         self.socket = None
         self.info = Information()
         self.game_name = self.info.get_config(game_name, "app_name")
-        self.mri = MakeResourceBody(game_name,ui_path)
-        self.pt = ProtocolTools(game_name,ui_path)
+        self.mri = MakeResourceBody(game_name, ui_path)
+        self.pt = ProtocolTools(game_name, ui_path)
         self.username = username
         self.protocol_name = protocol_name
         # 开始连接
@@ -116,29 +116,30 @@ class ProtocolFunction:
         :param region: 用来确定是登陆国内还是海外
         :return: 角色ID和服务器时间
         """
-        self.protocol = LoginGame(self.socket, self.server_id,self.username)
+        self.protocol = LoginGame(self.socket, self.server_id, self.username)
         flag, data = self.protocol.MSG_C2G_Login(region)
         G2C_Login = cg_pb2.G2C_Login()
         G2C_Login.ParseFromString(data)
-        print("账号登录成功,账号为"+str(self.username),G2C_Login)
+        print("账号登录成功,账号为" + str(self.username), G2C_Login)
         # 如果ret等于3则需要创角协议
         self.uid = G2C_Login.uid
         self.sid = G2C_Login.sid
         if self.uid != 0:
             add_msg_in_log("role_id:" + str(self.uid))
-            #需要是个新账号，但不是
+            # 需要是个新账号，但不是
             if self.is_new_account:
                 self.login_two = True
                 print("需要是个新账号，但不是,重新创号")
         if G2C_Login.ret == 5:
-            raise GmException("重复登录,创建角色失败"+str(self.username))
+            raise GmException("重复登录,创建角色失败" + str(self.username))
         elif G2C_Login.ret == 3:
             print("新账号，开始创建角色")
             flag_Create, data_Create = self.protocol.MSG_C2G_Create(0, G2C_Login.sid)
             G2C_Create = cg_pb2.G2C_Create()
             G2C_Create.ParseFromString(data_Create)
             if G2C_Create.ret == 1:
-                msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(self.server_id) + "，角色名：" + self.username+"，UID：" + str(G2C_Create.uid)
+                msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(
+                    self.server_id) + "，角色名：" + self.username + "，UID：" + str(G2C_Create.uid)
                 print(msg)
                 add_msg_in_log(msg)
                 self.uid = G2C_Create.uid
@@ -179,7 +180,16 @@ class ProtocolFunction:
                              "随机玩家": "S2C_FlushRandomPlayer",
                              "名将传道具": "S2C_FlushBiographyItem",
                              "皮肤": "S2C_FlushSkin",
-                             "特权": "S2C_FlushPrivilege", }
+                             "特权": "S2C_FlushPrivilege",
+                             "神兵": "S2C_FlushArtifact",
+                             "化身卡": "S2C_FlushCard",
+                             "化身組合": "S2C_FlushCardCompose",
+                             "翅膀": "S2C_FlushWing",
+                             "宠物": "S2C_FlushPet",
+                             "宠物装备": "S2C_FlushPetEquipment",
+                             "将灵": "S2C_FlushKSoul",
+                             "神兵测试": "S2C_FlushArtifact",
+                             }
         protocol_name = protocol_name_dic[find_name]
         self.Flush_id_dic = {"S2C_FlushRedPoint": "10103",
                              "S2C_FlushKnight": "10104",
@@ -196,7 +206,16 @@ class ProtocolFunction:
                              "S2C_FlushRandomPlayer": "10115",
                              "S2C_FlushBiographyItem": "10116",
                              "S2C_FlushSkin": "10117",
-                             "S2C_FlushPrivilege": "10118", }
+                             "S2C_FlushPrivilege": "10118",
+                             "S2C_FlushArtifact": "10119",
+                             "S2C_FlushCard": "10120",
+                             "S2C_FlushCardCompose": "10121",
+                             "S2C_FlushPet": "10122",
+                             "S2C_FlushPetEquipment": "10123",
+                             "S2C_FlushKSoul": "10124",
+                             "S2C_FlushWing": "13306",
+
+                             }
         recv_cmd_id = self.Flush_id_dic[protocol_name]
         flag_Flush, data_Flush = self.protocol.MSG_C2S_Flush(self.uid, self.sid, recv_cmd_id)
         # S2C_Flush = cs_pb2.S2C_Flush()  # 创建返回协议对象
@@ -216,6 +235,13 @@ class ProtocolFunction:
         S2C_FlushBiographyItem = cs_pb2.S2C_FlushBiographyItem()
         S2C_FlushSkin = cs_pb2.S2C_FlushSkin()
         S2C_FlushPrivilege = cs_pb2.S2C_FlushPrivilege()
+        S2C_FlushArtifact = cs_pb2.S2C_FlushArtifact()
+        S2C_FlushCard = cs_pb2.S2C_FlushCard()
+        S2C_FlushCardCompose = cs_pb2.S2C_FlushCardCompose()
+        S2C_FlushWing = cs_pb2.S2C_FlushWing()
+        S2C_FlushPet = cs_pb2.S2C_FlushPet()
+        S2C_FlushPetEquipment = cs_pb2.S2C_FlushPetEquipment()
+        S2C_FlushKSoul = cs_pb2.S2C_FlushKSoul()
         self.Flush_name_dic = {"S2C_FlushRedPoint": "S2C_FlushRedPoint.ParseFromString(data_Flush)",
                                "S2C_FlushKnight": "S2C_FlushKnight.ParseFromString(data_Flush)",
                                "S2C_FlushFragment": "S2C_FlushFragment.ParseFromString(data_Flush)",
@@ -231,7 +257,15 @@ class ProtocolFunction:
                                "S2C_FlushRandomPlayer": "S2C_FlushRandomPlayer.ParseFromString(data_Flush)",
                                "S2C_FlushBiographyItem": "S2C_FlushBiographyItem.ParseFromString(data_Flush)",
                                "S2C_FlushSkin": "S2C_FlushSkin.ParseFromString(data_Flush)",
-                               "S2C_FlushPrivilege": "S2C_FlushPrivilege.ParseFromString(data_Flush)", }
+                               "S2C_FlushPrivilege": "S2C_FlushPrivilege.ParseFromString(data_Flush)",
+                               "S2C_FlushArtifact": "S2C_FlushArtifact.ParseFromString(data_Flush)",
+                               "S2C_FlushCard": "S2C_FlushCard.ParseFromString(data_Flush)",
+                               "S2C_FlushCardCompose": "S2C_FlushCardCompose.ParseFromString(data_Flush)",
+                               "S2C_FlushPet": "S2C_FlushPet.ParseFromString(data_Flush)",
+                               "S2C_FlushPetEquipment": "S2C_FlushPetEquipment.ParseFromString(data_Flush)",
+                               "S2C_FlushKSoul": "S2C_FlushKSoul.ParseFromString(data_Flush)",
+                               "S2C_FlushWing": "S2C_FlushWing.ParseFromString(data_Flush)",
+                               }
 
         eval(self.Flush_name_dic[protocol_name])
         obj = eval(protocol_name)
@@ -242,13 +276,13 @@ class ProtocolFunction:
             return body
         if find_name == "装备":
             for equipment in obj.equipments:
-                if equipment.position==0:
+                if equipment.position == 0:
                     if str(equipment.base_id) not in body.keys():
                         equipment_list = []
                     else:
                         equipment_list = body[str(equipment.base_id)]
                     equipment_list.append(equipment.id)
-                    body[str(equipment.base_id)] =equipment_list
+                    body[str(equipment.base_id)] = equipment_list
             return body
         if find_name == "资源":
             resource_list = []
@@ -257,6 +291,15 @@ class ProtocolFunction:
                 resource_dic[str(resource.id)] = resource.num
                 resource_list.append(resource_dic)
             return resource_list
+        if find_name == "神兵":
+            artifacts_list = []
+            for artifact in obj.artifacts:
+                resource_dic = {}
+                resource_dic[str(artifact.base_id)] = artifact.id
+                artifacts_list.append(resource_dic)
+            return artifacts_list
+        if find_name == "神兵测试":
+            return obj
 
     def del_all_resource_pb(self):
         """
@@ -321,8 +364,7 @@ class ProtocolFunction:
         if S2C_Sell.ret == 1:
             print("出售成功")
         else:
-            print(str(self.uid) + "出售失败" + str(S2C_Sell.ret))
-            raise ProtocolException("出售失败")
+            raise ProtocolException(str(self.uid) + "出售失败" + str(S2C_Sell.ret))
 
     def shangzhenwujiang(self, pos, id):
         """
@@ -341,8 +383,8 @@ class ProtocolFunction:
             if S2C_ChangeFormation.ret == 1:
                 print("上阵成功")
             else:
-                print(str(self.uid) + "上阵失败" + str(S2C_ChangeFormation.ret))
-                raise ProtocolException("上阵失败")
+                print()
+                raise ProtocolException(str(self.uid) + "上阵失败" + str(S2C_ChangeFormation.ret))
         else:
             raise ValueException(str(self.uid) + "武将坑位数值超出范围")
 
@@ -353,7 +395,7 @@ class ProtocolFunction:
         :param id: 装备ID
         :return:
         """
-        if 0< pos and pos< 25 :
+        if 0 < pos and pos < 25:
             flag_ChangeFormation, data_ChangeFormation = self.protocol.MSG_C2S_Formation_ChangeFormation(3, pos, id,
                                                                                                          self.uid,
                                                                                                          self.sid)
@@ -363,8 +405,7 @@ class ProtocolFunction:
             if S2C_ChangeFormation.ret == 1:
                 print("穿戴成功")
             else:
-                print(str(self.uid) + "穿戴失败" + str(S2C_ChangeFormation.ret))
-                raise ProtocolException("穿戴失败")
+                raise ProtocolException(str(self.uid) + "穿戴失败" + str(S2C_ChangeFormation.ret))
         else:
             raise ValueException(str(self.uid) + "装备坑位数值超出范围")
 
@@ -420,8 +461,7 @@ class ProtocolFunction:
         if S2C_ChangeFormation.ret == 1:
             print("添加好友成功")
         else:
-            print(str(self.uid) + "添加好友失败" + str(S2C_ChangeFormation.ret))
-            raise ProtocolException("添加好友失败")
+            raise ProtocolException(str(self.uid) + "添加好友失败" + str(S2C_ChangeFormation.ret))
 
     def Dungeon_ChallengeStageBegin(self, fuben_id):
         """
@@ -449,8 +489,7 @@ class ProtocolFunction:
         if S2C_EliteDungeon_BeginChallenge.ret == 1:
             print("炼狱副本成功")
         else:
-            print(str(self.uid) + "炼狱副本失败" + str(S2C_EliteDungeon_BeginChallenge.ret))
-            raise ProtocolException("炼狱副本失败")
+            raise ProtocolException(str(self.uid) + "炼狱副本失败" + str(S2C_EliteDungeon_BeginChallenge.ret))
 
     def Biography_ExecuteMission(self, mingjiangzhuan_id, type_num):
         """
@@ -506,8 +545,7 @@ class ProtocolFunction:
         if S2C_PeakArena_Match.ret == 1:
             print("王者竞技匹配成功")
         else:
-            print(str(self.uid) + "王者竞技匹配失败" + str(S2C_PeakArena_Match.ret))
-            raise ProtocolException("王者竞技匹配失败")
+            raise ProtocolException(str(self.uid) + "王者竞技匹配失败" + str(S2C_PeakArena_Match.ret))
 
     def PeakArena_ChallengeBegin(self):
         """
@@ -515,7 +553,8 @@ class ProtocolFunction:
         :param name:
         :return:
         """
-        flag_PeakArena_ChallengeBegin, data_PeakArena_ChallengeBegin = self.protocol.MSG_C2S_PeakArena_ChallengeBegin(self.uid, self.sid)
+        flag_PeakArena_ChallengeBegin, data_PeakArena_ChallengeBegin = self.protocol.MSG_C2S_PeakArena_ChallengeBegin(
+            self.uid, self.sid)
         S2C_PeakArena_ChallengeBegin = cs_pb2.S2C_PeakArena_ChallengeBegin()  # 创建返回协议对象
         S2C_PeakArena_ChallengeBegin.ParseFromString(data_PeakArena_ChallengeBegin["13863"])  # 解析协议返回值
         battle_id = S2C_PeakArena_ChallengeBegin.battle_id
@@ -536,8 +575,7 @@ class ProtocolFunction:
         if S2C_Rebel_AttackBegin.ret == 1:
             print("讨伐巨兽成功")
         else:
-            print(str(self.uid) + "讨伐巨兽失败" + str(S2C_Rebel_AttackBegin.ret))
-            raise ProtocolException("讨伐巨兽失败")
+            raise ProtocolException(str(self.uid) + "讨伐巨兽失败" + str(S2C_Rebel_AttackBegin.ret))
 
     def ContendTreasure_OneKeyFast(self, id_into):
         """
@@ -553,8 +591,7 @@ class ProtocolFunction:
         if S2C_ContendTreasure_OneKeyFast.ret == 1:
             print("一键夺宝成功")
         else:
-            print(str(self.uid) + "一键夺宝失败" + str(S2C_ContendTreasure_OneKeyFast.ret))
-            raise ProtocolException("一键夺宝失败")
+            raise ProtocolException(str(self.uid) + "一键夺宝失败" + str(S2C_ContendTreasure_OneKeyFast.ret))
 
     def Arena_OneKeyChallenge(self, num_into):
         """
@@ -570,8 +607,7 @@ class ProtocolFunction:
         if S2C_Arena_OneKeyChallenge.ret == 1:
             print("一键竞技场成功")
         else:
-            print(str(self.uid) + "一键竞技场失败" + str(S2C_Arena_OneKeyChallenge.ret))
-            raise ProtocolException("一键竞技场失败")
+            raise ProtocolException(str(self.uid) + "一键竞技场失败" + str(S2C_Arena_OneKeyChallenge.ret))
 
     def Arena_ChallengeBegin(self, rank_into):
         """
@@ -587,8 +623,7 @@ class ProtocolFunction:
         if S2C_Arena_ChallengeBegin.ret == 1:
             print("竞技场挑战成功")
         else:
-            print(str(self.uid) + "竞技场挑战失败" + str(S2C_Arena_ChallengeBegin.ret))
-            raise ProtocolException("竞技场挑战失败")
+            raise ProtocolException(str(self.uid) + "竞技场挑战失败" + str(S2C_Arena_ChallengeBegin.ret))
 
     def Arena_GetMainInfo(self):
         """
@@ -635,8 +670,8 @@ class ProtocolFunction:
         if S2C_EliteDungeon_FastChallenge.ret == 1:
             print("炼狱副本扫荡成功")
         else:
-            print(str(self.uid) + "炼狱副本扫荡失败" + str(S2C_EliteDungeon_FastChallenge.ret))
-            raise ProtocolException("炼狱副本扫荡失败")
+
+            raise ProtocolException(str(self.uid) + "炼狱副本扫荡失败" + str(S2C_EliteDungeon_FastChallenge.ret))
 
     def Storm_Award(self, storm_id_into, cell_id_into, ):
         """
@@ -652,8 +687,7 @@ class ProtocolFunction:
         if S2C_Storm_Award.ret == 1:
             print("领取宝箱成功")
         else:
-            print(str(self.uid) + "领取宝箱失败" + str(S2C_Storm_Award.ret))
-            raise ProtocolException("领取宝箱失败")
+            raise ProtocolException(str(self.uid) + "领取宝箱失败" + str(S2C_Storm_Award.ret))
 
     def Storm_Reset(self, storm_id_into, ):
         """
@@ -667,8 +701,7 @@ class ProtocolFunction:
         if S2C_Storm_Reset.ret == 1:
             print("关卡重置成功")
         else:
-            print(str(self.uid) + "关卡重置失败" + str(S2C_Storm_Reset.ret))
-            raise ProtocolException("关卡重置失败")
+            raise ProtocolException(str(self.uid) + "关卡重置失败" + str(S2C_Storm_Reset.ret))
 
     def Storm_Break(self, storm_id_into, cell_id_into, ):
         """
@@ -684,8 +717,7 @@ class ProtocolFunction:
         if S2C_Storm_Break.ret == 1:
             print("清除障碍成功")
         else:
-            print(str(self.uid) + "清除障碍失败" + str(S2C_Storm_Break.ret))
-            raise ProtocolException("清除障碍失败")
+            raise ProtocolException(str(self.uid) + "清除障碍失败" + str(S2C_Storm_Break.ret))
 
     def Shop_Shopping(self, id_into, num_into, ):
         """
@@ -701,8 +733,7 @@ class ProtocolFunction:
         if S2C_Shop_Shopping.ret == 1:
             print("商城购买道具成功")
         else:
-            print(str(self.uid) + "商城购买道具失败" + str(S2C_Shop_Shopping.ret))
-            raise ProtocolException("商城购买道具失败")
+            raise ProtocolException(str(self.uid) + "商城购买道具失败" + str(S2C_Shop_Shopping.ret))
 
     def Create_Guild(self, name):
         """
@@ -716,8 +747,7 @@ class ProtocolFunction:
         if C2S_Guild_Create.ret == 1:
             print("创建军团成功")
         else:
-            print(str(self.uid) + "创建军团失败" + str(C2S_Guild_Create.ret))
-            raise ProtocolException("创建军团失败")
+            raise ProtocolException(str(self.uid) + "创建军团失败" + str(C2S_Guild_Create.ret))
 
     def Friend_SendGift(self, ):
         """
@@ -730,8 +760,7 @@ class ProtocolFunction:
         if S2C_Friend_SendGift.ret == 1:
             print("一键送礼成功")
         else:
-            print(str(self.uid) + "一键送礼失败" + str(S2C_Friend_SendGift.ret))
-            raise ProtocolException("一键送礼失败")
+            raise ProtocolException(str(self.uid) + "一键送礼失败" + str(S2C_Friend_SendGift.ret))
 
     def search_Guild(self, Guild_name):
         """
@@ -755,10 +784,9 @@ class ProtocolFunction:
         if S2C_Guild_ReqJoin.join:
             print("加入成功")
         else:
-            print(str(self.uid) + "加入失败" + str(S2C_Guild_ReqJoin.ret))
-            raise ProtocolException("军团加入失败")
+            raise ProtocolException(str(self.uid) +"军团加入失败" + str(S2C_Guild_ReqJoin.ret))
 
-    def Guild_Quit(self,):
+    def Guild_Quit(self, ):
         """
         退出军团
         :param Guild_name: string 军团名字
@@ -770,8 +798,7 @@ class ProtocolFunction:
         if S2C_Guild_Quit.ret == 1:
             print("退出军团成功")
         else:
-            print(str(self.uid) + "退出军团失败" + str(S2C_Guild_Quit.ret))
-            raise ProtocolException("退出军团失败")
+            raise ProtocolException(str(self.uid) +"退出军团失败"+ str(S2C_Guild_Quit.ret))
 
     def OrderWorld_Donate(self, num):
         """
@@ -817,8 +844,7 @@ class ProtocolFunction:
         if S2C_Formation_ChangePosition.ret == 1:
             print("更改上阵位置成功")
         else:
-            print(str(self.uid) + "更改上阵位置失败" + str(S2C_Formation_ChangePosition.ret))
-            raise ProtocolException("更改上阵位置失败")
+            raise ProtocolException(str(self.uid) + "更改上阵位置失败" + str(S2C_Formation_ChangePosition.ret))
 
     def DeadBattle_GetInfo(self, ):
         """
@@ -834,8 +860,7 @@ class ProtocolFunction:
         if S2C_DeadBattle_GetInfo.ret == 1:
             print("查询无双信息成功")
         else:
-            print(str(self.uid) + "查询无双信息失败" + str(S2C_DeadBattle_GetInfo.ret))
-            raise ProtocolException("查询无双信息失败")
+            raise ProtocolException(str(self.uid) + "查询无双信息失败" + str(S2C_DeadBattle_GetInfo.ret))
         history_id_list = S2C_DeadBattle_GetInfo.dbattle.history_id
         history_id = 0
         for history_id_in_list in history_id_list:
@@ -870,8 +895,7 @@ class ProtocolFunction:
         if S2C_DeadBattle_BoxAward.ret == 1:
             print("领取通关宝箱成功")
         else:
-            print(str(self.uid) + "领取通关宝箱失败" + str(S2C_DeadBattle_BoxAward.ret))
-            raise ProtocolException("领取通关宝箱失败")
+            raise ProtocolException(str(self.uid) + "领取通关宝箱失败" + str(S2C_DeadBattle_BoxAward.ret))
         buff_id_list = S2C_DeadBattle_BoxAward.dbattle.floor_buff
         buff_id = buff_id_list[2]
         return buff_id
@@ -891,8 +915,7 @@ class ProtocolFunction:
         if S2C_DeadBattle_PickBuff.ret == 1:
             print("领取通关buff成功")
         else:
-            print(str(self.uid) + "领取通关buff失败" + str(S2C_DeadBattle_PickBuff.ret))
-            raise ProtocolException("领取通关buff失败")
+            raise ProtocolException(str(self.uid) + "领取通关buff失败" + str(S2C_DeadBattle_PickBuff.ret))
 
     def Equipment_Upgrade(self, id_into, times_into):
         """
@@ -901,18 +924,17 @@ class ProtocolFunction:
         :param sid:
         :return:可选buff id
         """
-        flag_C2S_Equipment_Upgrade, data_C2S_Equipment_Upgrade = self.protocol.MSG_C2S_Equipment_Upgrade(id_into, times_into,
-                                                                                                               self.uid,
-                                                                                                               self.sid)
+        flag_C2S_Equipment_Upgrade, data_C2S_Equipment_Upgrade = self.protocol.MSG_C2S_Equipment_Upgrade(id_into,
+                                                                                                         times_into,
+                                                                                                         self.uid,
+                                                                                                         self.sid)
         S2C_Equipment_Upgrade = cs_pb2.S2C_Equipment_Upgrade()  # 创建返回协议对象
         S2C_Equipment_Upgrade.ParseFromString(data_C2S_Equipment_Upgrade)  # 解析协议返回值
         if S2C_Equipment_Upgrade.ret == 1:
-            print("强化装备成功，当前装备等级"+str(S2C_Equipment_Upgrade.level))
+            print("强化装备成功，当前装备等级" + str(S2C_Equipment_Upgrade.level))
         else:
-            print(str(self.uid) + "强化装备失败" + str(S2C_Equipment_Upgrade.ret))
-            raise ProtocolException("强化装备失败")
+            raise ProtocolException(str(self.uid) + "强化装备失败" + str(S2C_Equipment_Upgrade.ret))
         return S2C_Equipment_Upgrade.level[0]
-
 
     def huashen_shilian(self, activity_id):
         """
@@ -931,8 +953,7 @@ class ProtocolFunction:
             # print("金化身十连抽成功")
             pass
         else:
-            # print(str(self.uid) + "金化身十连抽失败" + str(S2C_Activity_Common_Draw.ret))
-            raise ProtocolException("金化身十连抽失败")
+            raise ProtocolException(str(self.uid) + "金化身十连抽失败" + str(S2C_Activity_Common_Draw.ret))
         award_list = []
         for award in S2C_Activity_Common_Draw.awards:
             award_dic = {}
@@ -957,8 +978,7 @@ class ProtocolFunction:
             # print("横扫千军十连抽成功")
             pass
         else:
-            # print(str(self.uid) + "横扫千军十连抽失败" + str(S2C_GoldEquip_Draw.ret))
-            raise ProtocolException("横扫千军十连抽失败")
+            raise ProtocolException(str(self.uid) + "横扫千军十连抽失败" + str(S2C_GoldEquip_Draw.ret))
         award_list = []
         for award in S2C_GoldEquip_Draw.awards:
             award_dic = {}
@@ -968,7 +988,7 @@ class ProtocolFunction:
             award_list.append(award_dic)
         return award_list
 
-    def xianshishenjiang_shilian(self, activity_id, id_into,sub_type):
+    def xianshishenjiang_shilian(self, activity_id, id_into, sub_type):
         """
         限时神将10连抽
         :param activity_id:  int 活动ID，GM后台配置
@@ -977,15 +997,14 @@ class ProtocolFunction:
         :return:抽到的东西
         """
         flag_Recruit_RecruitKnight, data_Recruit_RecruitKnight = self.protocol.MSG_C2S_Recruit_RecruitKnight(
-            activity_id, id_into, self.uid, self.sid,sub_type)
+            activity_id, id_into, self.uid, self.sid, sub_type)
         S2C_Recruit_RecruitKnight = cs_pb2.S2C_Recruit_RecruitKnight()  # 创建返回协议对象
         S2C_Recruit_RecruitKnight.ParseFromString(data_Recruit_RecruitKnight)  # 解析协议返回值
         if S2C_Recruit_RecruitKnight.ret == 1:
             # print("限时神将十连抽成功")
             pass
         else:
-            print(str(self.uid) + "限时神将十连抽失败" + str(S2C_Recruit_RecruitKnight.ret))
-            raise ProtocolException("限时神将十连抽失败")
+            raise ProtocolException(str(self.uid) + "限时神将十连抽失败" + str(S2C_Recruit_RecruitKnight.ret))
         award_list = []
         for award in S2C_Recruit_RecruitKnight.awards:
             award_dic = {}
@@ -995,7 +1014,7 @@ class ProtocolFunction:
             award_list.append(award_dic)
         return award_list
 
-    def fujiatianxia_shilian(self, activity_id,sub_type):
+    def fujiatianxia_shilian(self, activity_id, sub_type):
         """
         富甲天下10连抽
         :param activity_id:  int 活动ID，GM后台配置
@@ -1005,7 +1024,7 @@ class ProtocolFunction:
         :return:
         """
         flag_Richest_Draw, data_Richest_Draw = self.protocol.MSG_C2S_Richest_Draw(
-            activity_id, sub_type, self.uid, self.sid,)
+            activity_id, sub_type, self.uid, self.sid, )
         S2C_Richest_Draw = cs_pb2.S2C_Richest_Draw()  # 创建返回协议对象
         S2C_Richest_Draw.ParseFromString(data_Richest_Draw)  # 解析协议返回值
         if S2C_Richest_Draw.ret == 1:
@@ -1023,8 +1042,8 @@ class ProtocolFunction:
             award_list.append(award_dic)
         event_num = 0
         for event in S2C_Richest_Draw.events:
-            event_num = event_num+1
-        return award_list,event_num
+            event_num = event_num + 1
+        return award_list, event_num
 
     def add_resource_pb(self, type_into, value_into, size_into):
         """
@@ -1043,8 +1062,7 @@ class ProtocolFunction:
         if S2C_Test.ret == 1:
             print("添加道具成功")
         else:
-            print(str(self.uid) + "添加道具失败" + str(S2C_Test.ret))
-            raise ProtocolException("添加道具失败")
+            raise ProtocolException(str(self.uid) + "添加道具失败" + str(S2C_Test.ret))
 
     def del_resource_pb(self, type_into, value_into, size_into):
         """
@@ -1064,8 +1082,7 @@ class ProtocolFunction:
         if S2C_Test.ret == 1:
             print("消耗道具成功")
         else:
-            print(str(self.uid) + "消耗道具失败" + str(S2C_Test.ret))
-            raise ProtocolException("消耗道具失败")
+            raise ProtocolException(str(self.uid) + "消耗道具失败" + str(S2C_Test.ret))
 
     def get_resource_pb(self, find_name, ):
         """
@@ -1093,6 +1110,43 @@ class ProtocolFunction:
         yuanbaoshuliang = S2C_OpObject.user.gold
         return yuanbaoshuliang
 
+    def Artifact_Purify(self,id):
+        """
+        请求洗练神兵
+        :param id: 神兵的唯一ID
+        :return:
+        """
+        flag_Artifact_Purify, data_Artifact_Purify = self.protocol.MSG_C2S_Artifact_Purify(id,self.uid, self.sid)
+        S2C_Artifact_Purify =cs_pb2.S2C_Artifact_Purify()
+        # S2C_Artifact_Purify.ParseFromString(data_Artifact_Purify["12622"])
+        S2C_Artifact_Purify.ParseFromString(data_Artifact_Purify)
+        if S2C_Artifact_Purify.ret == 1:
+            # print("神兵洗练成功")
+            pass
+        else:
+            # print(str(self.uid) + "神兵洗练失败" + str(S2C_GoldEquip_Draw.ret))
+            raise ProtocolException("神兵洗练失败"+ str(S2C_Artifact_Purify.ret))
+        # S2C_FlushArtifact = cs_pb2.S2C_FlushArtifact()
+        # S2C_FlushArtifact.ParseFromString(data_Artifact_Purify["10119"])
+        S2C_FlushArtifact = self.Flush("神兵测试")
+        artifacts_list = []
+        for artifact in S2C_FlushArtifact.artifacts:
+            artifact_dic = {}
+            for purify_hole in artifact.artifact_purify_holes:#孔位信息
+                #空位：品质
+                artifact_dic[str(purify_hole.id)] = str(purify_hole.tmp_quality)
+            artifacts_list.append(artifact_dic)
+        flag_Artifact_PurifyResultConfirm, data_Artifact_PurifyResultConfirm = self.protocol.MSG_C2S_Artifact_PurifyResultConfirm(id,self.uid, self.sid,)
+        # S2C_Artifact_PurifyResultConfirm =cs_pb2.S2C_Artifact_PurifyResultConfirm()
+        # S2C_Artifact_PurifyResultConfirm.ParseFromString(data_Artifact_PurifyResultConfirm)
+        # if S2C_Artifact_PurifyResultConfirm.ret == 1:
+        #     # print("神兵洗练结果保存成功")
+        #     pass
+        # else:
+        #     # print(str(self.uid) + "神兵洗练结果保存失败" + str(S2C_GoldEquip_Draw.ret))
+        #     raise ProtocolException("神兵洗练结果保存失败"+ str(S2C_Artifact_PurifyResultConfirm.ret))
+        return artifacts_list
+
     def GM_fengkuanghaoling(self, Guild_name, num, join):
         """
         疯狂给军团-号令天下活动捐旗子
@@ -1118,66 +1172,6 @@ class ProtocolFunction:
         :return:
         """
         self.Dungeon_ChallengeStageBegin(fuben_id)
-
-    def GM_fengkuanghuashen(self, type_into, value_into, size_into, activity_id, is_stop):
-        """
-        十连抽化身，检测是否抽到指定的东西
-        :param type_into: int 道具type
-        :param value_into: int 道具 value
-        :param activity_id: int 活动ID，GM后台配置
-        :param is_stop: bool 是否抽到后就马上停止
-        :return:
-        """
-
-        award_list = self.huashen_shilian(activity_id)
-        for award in award_list:
-            award_type = award["type"]
-            award_value = award["value"]
-            award_size = award["size"]
-            if award_type == type_into and award_value == value_into and award_size == size_into:
-                if is_stop:
-                    raise GmException("抽到需要验证的道具了，终止抽奖")
-
-
-    def GM_fengkuanghengsaoqianjun(self, type_into, value_into, size_into, activity_id, is_stop):
-        """
-        横扫千军10连抽，检测是否抽到指定的东西
-        :param type_into: int 道具type
-        :param value_into: int 道具 value
-        :param activity_id: int 活动ID，GM后台配置
-        :param is_stop: bool 是否抽到后就马上停止
-        :return:
-        """
-        award_list = self.hengsaoqianjun_shilian(activity_id)
-        for award in award_list:
-            award_type = award["type"]
-            award_value = award["value"]
-            award_size = award["size"]
-            if award_type == type_into and award_value == value_into and award_size == size_into:
-                if is_stop:
-                    raise GmException("抽到需要验证的道具了，终止抽奖")
-
-
-
-    def GM_fengkuangxianshijinjiang(self, type_into, value_into, activity_id, id_into, is_stop,sub_type):
-        """
-        十连抽化身，检测是否抽到指定的东西
-        :param type_into: int 道具type
-        :param value_into: int 道具 value
-        :param activity_id: int 活动ID，GM后台配置
-        :param id_into: int 期数ID，GM后台配置
-        :param is_stop: bool 是否抽到后就马上停止
-        :return:
-        """
-
-        award_list = self.xianshishenjiang_shilian(activity_id, id_into,sub_type)
-        for award in award_list:
-            award_type = award["type"]
-            award_value = award["value"]
-            if award_type == type_into and award_value == value_into:
-                if is_stop:
-                    raise GmException("抽到需要验证的道具了，终止抽奖")
-
 
     def GM_yijian_guanai(self, checkpoint_id_list):
         """

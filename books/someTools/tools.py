@@ -10,7 +10,7 @@
 #Reference:********************************
 import re
 
-import xlrd
+from gm import xlrd
 import xlwt
 
 
