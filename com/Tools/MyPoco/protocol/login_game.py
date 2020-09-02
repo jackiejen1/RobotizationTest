@@ -912,3 +912,22 @@ class LoginGame:
         senddata = pack_data(C2S_PeakArena_ChallengeBegin, C2S_PeakArena_ChallengeBegin_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_PeakArena_ChallengeBegin_attr, 32)  # 发送协议
         return flag, data
+
+
+    def MSG_C2S_Chat(self, content_str_into,uid, sid):
+        """
+        聊天协议
+        :param content_str_into: str 聊天的内容，默认世界频道
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Chat = cs_pb2.C2S_Chat()
+        C2S_Chat.channel = 1#世界频道
+        C2S_Chat.content = content_str_into
+        C2S_Chat = C2S_Chat.SerializeToString()
+        C2S_Chat_attr = {'name': "C2S_Chat", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 10142, 'recv_cmd': 10143, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Chat, C2S_Chat_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Chat_attr, 32)  # 发送协议
+        return flag, data

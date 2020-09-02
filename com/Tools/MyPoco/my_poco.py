@@ -10,8 +10,6 @@
 #         辅助脚本使用MyPocoObject类编写
 # Reference:********************************
 import os
-import threading
-
 from MyPoco.foundation.MyException import *
 from MyPoco.foundation.information import Information
 from MyPoco.game_support.entry_game import EntryGame
@@ -1313,7 +1311,6 @@ class MyPoco:
         log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
         return log_str_z, tongji_str_z, shijiancishu
 
-
     def GM_fengkuang_xianshijinjiang(self, activity_id, id_name_into, camps_name, cishu):
         """
         限时神将10连抽，检测是否抽到指定的东西,默认抽到一次后就停止
@@ -1515,17 +1512,29 @@ class MyPoco:
             tongji_str_z = tongji_str_z + "\r\n" + tongji + ":" + str(shuliangtongji_dic[tongji]) + "个"
         return log_str_z, tongji_str_z, shijiancishu
 
+    def GM_World_Chat(self,instruction_str_into):
+        """
+        向世界频道发送聊天内容，一般用作GM指令
+        :param instruction_str_into:
+        :return:
+        """
+        self.protocol.GM_World_Chat(instruction_str_into)
 
-class myThread(threading.Thread):
-    def __init__(self, sever_name_into, account_into):
-        threading.Thread.__init__(self)
-        self.sever_name = sever_name_into
-        self.account = account_into
+    def GM_new_join_guild(self, Guild_name, num, join=False):
+        """
+        创建或者加入军团，提升军团等级
+        :param Guild_name: 军团名称
+        :param num: 提升的军团等级
+        :join bool: 加入/创建军团
+        :return:
+        """
+        # 先把消耗的道具加进去
+        if not join:
+            # 如果是创建军团，就需要加一些道具
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("贵族经验")
+            self.protocol.add_resource_pb(add_type, add_value, 500000)
+            add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
+            self.protocol.add_resource_pb(add_type, add_value, 200)
+        self.protocol.GM_new_join_guild(Guild_name,join)
+        self.GM_World_Chat("/set_guild_level "+str(num))
 
-    def run(self):
-        my_poco = MyPoco("少三2", None)
-        account = my_poco.get_random_account()
-        my_poco.make_new_role(self.sever_name, account)
-        my_poco.protocol.add_resource_pb(1, 1, 4899990)
-        my_poco.add_friend(self.account)
-        my_poco.protocol.socket_close()

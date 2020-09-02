@@ -1099,6 +1099,18 @@ class ProtocolFunction:
                     return resource_num
         return 0
 
+    def GM_World_Chat(self,instruction_str_into):
+        flag_C2S_Chat, data_C2S_Chat = self.protocol.MSG_C2S_Chat(instruction_str_into, self.uid,
+                                                                           self.sid)
+        S2C_Chat = cs_pb2.S2C_Chat()  # 创建返回协议对象
+        S2C_Chat.ParseFromString(data_C2S_Chat)  # 解析协议返回值
+        if S2C_Chat.ret == 1:
+            print("聊天框发送信息成功")
+        else:
+            raise ProtocolException(str(self.uid) + "聊天框发送信息失败" + str(S2C_Chat.ret))
+
+
+
     def get_resource_pb_yuanbao(self):
         """
         查询元宝数量
@@ -1156,13 +1168,32 @@ class ProtocolFunction:
         :join bool: 加入/创建军团
         :return:
         """
+        if join!="":
+            if join:
+                # 查询并加入军团
+                self.search_Guild(Guild_name)
+            else:
+                # 创建军团
+                self.Create_Guild(Guild_name)
+        self.OrderWorld_Donate(num)
+
+    def GM_new_join_guild(self, Guild_name,join):
+        """
+        疯狂给军团-号令天下活动捐旗子
+        会先创建军团，然后捐旗子
+        :param Guild_name: 军团名称
+        :param num: 捐献的数量
+        :join bool: 加入/创建军团
+        :return:
+        """
         if join:
             # 查询并加入军团
             self.search_Guild(Guild_name)
         else:
             # 创建军团
             self.Create_Guild(Guild_name)
-        self.OrderWorld_Donate(num)
+
+
 
     def GM_fengkuangfuben(self, fuben_id):
         """

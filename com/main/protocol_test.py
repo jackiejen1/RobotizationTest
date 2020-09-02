@@ -32,9 +32,10 @@ if __name__ == '__main__':
     # account = "18783278"
     sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
     my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
-    my_poco.add_resource({"角色经验": 4099909990,"测试属性": 999999999,"银币": 999999,"元宝": 999999,"贵族经验": 999999,})#添加资源，海外暂不支持
+    my_poco.add_resource({"角色经验": 4099909990,"测试属性": 999999999,"银币": 999999,})#添加资源，海外暂不支持
     # my_poco.add_resource({"倚天剑": 12,"天宫护符": 12,})
     my_poco.set_checkpoint(account, sever_name, {"副本": "副本-220-10"})#通关副本，海外暂不支持
+    # my_poco.GM_new_join_guild("sdasa",5,True)
     # my_poco.GM_fengkuang_shenbingxilian("倚天剑",100000)
     # my_poco.GM_yijian_chuanzhuangbei()
     # my_poco.GM_wangzhejingji()
@@ -51,7 +52,7 @@ if __name__ == '__main__':
 
     # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_hengsaoqianjun(524,1)
 
-    log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_xianshijinjiang(523,"紫金1双卡池","紫金",1)
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_xianshijinjiang(523,"紫金1双卡池","紫金",1)
 
 
 

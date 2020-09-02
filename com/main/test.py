@@ -13,6 +13,8 @@ import os
 import re
 import time
 
+import xlrd
+
 __author__ = "v.lidd"
 __title__ = '登录游戏'
 __desc__ = """ 1.
@@ -47,6 +49,19 @@ if __name__ == '__main__':
     # height= json.loads(height)
     # print(width)
     # print(height)
+    resource_name = 3
+    all_path = "D:\RobotizationTest\com\Tools\MyPoco\info_tab\少三2道具表.xlsx"
+    xl = xlrd.open_workbook(all_path)
+    table = xl.sheets()[0]
+    col = table.col_values(0)
+    print(col)
+    # if resource_name in col:
+    #     print(col.index(resource_name))
+    #     row = table.row_values(col.index(resource_name))
+    #     print(row)
+    #     # resource_type = int(row[1])
+    #     resource_id = int(row[2])
+    #     print(resource_id)
     pass
     # print(str(m))
     # print(re.findall(r"width:.*?,", str(m)))
