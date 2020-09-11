@@ -27,7 +27,7 @@ class myThread (threading.Thread):
 if __name__ == '__main__':
 
     my_poco = MyPoco("少三2",__phone_id__)
-    sever_name = "QA4"
+    sever_name = "QA1"
     account = my_poco.get_random_account()#随机账号
     # account = "18783278"
     sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
@@ -35,6 +35,8 @@ if __name__ == '__main__':
     my_poco.add_resource({"角色经验": 4099909990,"测试属性": 999999999,"银币": 999999,})#添加资源，海外暂不支持
     # my_poco.add_resource({"倚天剑": 12,"天宫护符": 12,})
     my_poco.set_checkpoint(account, sever_name, {"副本": "副本-220-10"})#通关副本，海外暂不支持
+    my_poco.protocol.Flush()
+    # my_poco.shangzhenwujiang(2, "陆逊")
     # my_poco.GM_new_join_guild("sdasa",5,True)
     # my_poco.GM_fengkuang_shenbingxilian("倚天剑",100000)
     # my_poco.GM_yijian_chuanzhuangbei()
@@ -45,17 +47,11 @@ if __name__ == '__main__':
     # my_poco.GM_yijian_mingjiangzhuan(10)
     # my_poco.GM_fengkuang_fuben("副本-195-9",5)
     # my_poco.quit_Guild()
-
     # my_poco.GM_fengkuang_haoling("sfasf",1,False)
     # my_poco.GM_fengkuang_fujia(512,1,10)
     # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_huashen(522,1)
-
     # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_hengsaoqianjun(524,1)
-
     # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_xianshijinjiang(523,"紫金1双卡池","紫金",1)
-
-
-
     # my_poco.GM_fengkuang_haoyou(50,sever_name_into=sever_name,)
     # my_poco.GM_yijian_account_v1(account)
     # my_poco.GM_yijian_account_v2(account)

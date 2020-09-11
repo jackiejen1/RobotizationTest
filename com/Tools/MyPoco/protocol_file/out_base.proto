@@ -2596,6 +2596,7 @@ message FlameCityTreasure {
   required uint32 block_id = 1; // 格子id
   repeated FlameCityTreasureAward awards = 2; // 奖励
   optional uint32 chapter_id = 3; // 章节id
+  optional bool is_award = 4; // 玩家是否领取
 }
 
 // 烽火连城-已领奖宝藏信息
@@ -2622,4 +2623,76 @@ message FlameCityAttackAward {
 message FlameCityBlockWinGrade {
   required uint32 block_id = 1; // 格子id
   required uint32 max_grade = 2; // 最高难度
+}
+
+//军团战-玩家action
+message GVGUserAction {
+  required uint32 id = 1;
+  optional uint64 value = 2;
+  optional uint32 state = 3;
+}
+
+//军团战-玩家成就
+message GVGUserAchieve {
+  required uint32 id = 1;
+  optional uint32 state = 2;
+}
+
+//军团战-比赛场景
+message GVGMatchInfo {
+  required uint32 id = 1; //比赛ID
+  required uint32 map_id = 2; //地图ID
+  required uint32 start_time = 3; //开始时间
+  required uint32 round = 4; //轮次
+  repeated GVGMatchGuild guilds = 5; //参战军团列表
+  optional GVGMatchUser mvp = 6; //mvp玩家
+  optional GVGMatchUser mars = 7; //战神玩家
+}
+
+//军团战-比赛中玩家身上的buff
+message GVGMatchBuff {
+  required uint32 buff_id = 1; //Buff编号
+  required uint32 remain_effect_times = 2; //剩余生效次数
+}
+
+//军团战-比赛中的玩家信息
+message GVGMatchUser {
+  required UserSnapshot user = 1; //玩家快照
+  required uint64 score = 2; //玩家积分
+  required uint32 kill_num = 3; //杀人数
+  required uint32 continuous_kill_num = 4; //连续杀人数
+  required uint32 power = 5; //当前兵力
+  optional uint32 pos_id = 6; //当前位置或移动目标位置ID
+  optional uint32 move_start_pos_id = 7; //移动目标起始位置ID 非移动中为空
+  optional uint32 move_arrive_time = 8; //到达时间 非移动中为空
+  optional GVGMatchBuff buff = 9; //当前持有buff
+  optional uint32 tower_protect_end_time = 10; //如果玩家在炮台占领位，则有炮台占领位保护结束时间
+  optional bool is_in_match = 11; //玩家是否在比赛中
+}
+
+//军团战-比赛中的军团
+message GVGMatchGuild {
+  required GuildSnapshot guild = 1; //军团快照
+  required uint32 index = 2; //比赛中的军团索引
+  optional uint32 user_num = 3; //参战人数
+  optional uint64 score = 4; //当前积分
+}
+
+//军团战-比赛中的炮台区
+message GVGMatchGridTower {
+  required uint32 grid_id = 1; //炮台所在区域ID
+  optional uint64 guild_id = 2; //占领者军团ID
+}
+
+//军团战-比赛中的buff区
+message GVGMatchGridBuff {
+  required uint32 grid_id = 1; //Buff所在区域ID
+  required uint32 buff_id = 2; //Buff编号
+  required uint32 end_time = 3; //消失时间
+}
+
+//军团战-比赛中的城门区
+message GVGMatchGridGate {
+  required uint32 grid_id = 1; //城门所在区域ID
+  required uint64 hp = 2; //当前耐久
 }

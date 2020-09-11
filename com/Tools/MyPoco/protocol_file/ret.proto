@@ -248,6 +248,8 @@ enum RET {
   RET_BUY_FAIL = 241; // 购买失败
   RET_SOLD_OUT = 242; // 已售罄
   RET_GUILD_LIMIT_TODAY = 243; // 今日加入军团人数已达上限
+  RET_ARTIFACT_REPEAT_CONFIRM = 244;//重复确定神兵属性
+  RET_ARTIFACT_SPECAIL_ATTR_EXIST = 245;//有特殊中間屬性存在
 
   //军团boss(250~259)
   RET_GUILD_BOSS_NOT_OPEN = 250; //军团Boss活动还未开放
@@ -546,20 +548,50 @@ enum RET {
   RET_FLAME_CITY_BLOCK_IS_OCCUPY = 914; // 格子已被占领
   RET_FLAME_CITY_BLOCK_CANNOT_REACH = 915; // 格子不可达
 
+    //神兵协战
+  RET_ARTIFACT_HAS_HELPED = 920; //神兵已参与协战
+  RET_NONE_HELPER_ARTIFACT = 921; //没有协战神兵
+
   // 军团图腾
   RET_GUILD_TOTEM_NOT_FOUND = 930; // 图腾不存在
 	RET_GUILD_TOTEM_NODE_NOT_UPGRADE = 931; // 图腾节点不可升级
   RET_GUILD_TOTEM_NOT_UPGRADE = 932; // 图腾品质不可提升
   RET_GUILD_TOTEM_NOT_AWAKE = 933; // 图腾不可解锁
   RET_GUILD_TOTEM_QUALITY_FULL = 934; // 图腾品质满级
+
+  //军团战
+  RET_GVG_USER_ALREADY_JOINED = 940; //玩家已参战
+  RET_GVG_GUILD_ALREADY_JOINED = 941; //军团已报名
+  RET_GVG_GUILD_USER_NOT_FOUND = 942; //未找到比赛中的玩家
+  RET_GVG_GUILD_NOT_JOINED = 943; //军团未报名
+  RET_GVG_MATCH_NOT_FOUND = 944; //未找到比赛
+  RET_GVG_MATCH_NOT_OPEN = 945; //比赛未开始
+  RET_GVG_ATTACK_IN_CD = 946; //进攻CD中
+  RET_GVG_INVALID_MOVE_TARGET = 947; //移动目标非法
+  RET_GVG_MOVE_IN_CD = 948; //移动CD中
+  RET_GVG_GATE_NOT_ACTIVATED = 949; //城门未激活
+  RET_GVG_GATE_DEAD = 950; //城门耐久已经为0
+  RET_GVG_USER_DEAD = 951; //玩家已阵亡
+  RET_GVG_ENEMY_SAME_GUILD = 952; //不能攻击同军团玩家
+  RET_GVG_ENEMY_DEAD = 953; //攻击目标已阵亡
+  RET_GVG_ENEMY_TOO_FAR = 954; //目标玩家不在同一个功能区，不能攻击
+  RET_GVG_ENEMY_INVINCIBLE = 955; //玩家不可攻击
+  RET_GVG_REVIVE_IN_CD = 956; //复活CD中
+  RET_GVG_USER_NOT_IN_MATCH = 957; //玩家不再比赛中
+  RET_GVG_MOVE_INVALID_SPEED = 958; //移动速度非法
+  RET_GVG_TOWER_OCCUPY_HAS_OWNER = 959; //炮台占领区已经有人
+  RET_GVG_USER_NOT_ON_SIEGE = 960; //玩家不在攻城区，不能攻击城门
+  RET_GVG_USER_IS_MOVING = 971; //玩家正在移动中
+  RET_GVG_USER_UNDER_ATTACK = 972; //玩家正在战斗中
+  RET_GVG_USER_ALIVE = 973; //玩家还活着
+  RET_GVG_BUFF_NOT_AVAILABLE = 974; //Buff不可拾取
+  RET_GVG_BUFF_ADD_MAX_TIMES = 975; //Buff拾取达到上限
+
   ///////////////// 1000-1100是客户端战斗代码返回错误 /////////////////
   RET_BATTLE_DATA_VERSION_CORRECT = 1000;//非数据版本问题
   RET_BATTLE_DATA_VERSION_ILLEGAL = 1001;//数据版本不一致
   RET_BATTLE_LUA_CODE_INTERRUPT = 1002;//lua代码报错
 
-  //神兵协战
-  RET_ARTIFACT_HAS_HELPED = 1003; //神兵已参与协战
-  RET_NONE_HELPER_ARTIFACT = 1004; //没有协战神兵
 	// 通用(和模块无关的加在这里)
   RET_ROOM_NOT_EXIST = 2000; //房间已关闭
   RET_MONSTER_NOT_EXIST = 2001;	// 攻击失败-怪物不存在

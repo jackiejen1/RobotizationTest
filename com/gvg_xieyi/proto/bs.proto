@@ -1,0 +1,182 @@
+syntax = "proto2";
+import "out_base.proto";
+package bs; 
+
+message Attr {
+    required uint32 type = 1;
+    required uint64 value = 2;
+}
+
+message BattleCombo {
+    repeated uint32 tokens = 1; // 合击技能列表
+    repeated Attr attrs = 2; // 合击战斗属性
+    repeated uint32 level = 3; // 技能等级
+}
+
+message BattleUnit {
+    required uint32 id = 1; // 武将id,对应knight_info
+    required uint32 pos = 2; // 武将位置,1-6
+    repeated Attr attrs = 3; // 战斗属性
+    repeated uint32 skills = 4; // 武将的被动技能
+    optional uint32 star = 5; // 武将星级
+    optional uint32 skill_level1 = 6;//普攻等级
+    optional uint32 skill_level2 = 7;//技能等级
+    optional string name = 8; //名字
+		optional uint32 common_skill_id = 9;//普通攻击 
+		optional uint32 active_skill_id = 10;//特殊技能
+    optional uint64 hp = 11;	// 最大血量
+    optional uint32 advance_level = 12; //进阶大等级
+    optional uint32 skin = 13; //变装
+    optional uint32 skin_ts = 14; //变装失效时间
+    optional uint32 artifactId = 15; //神器baseId
+    optional uint32 skill_level4 = 16;//神器星级
+    optional uint32 cardId = 17;//穿戴幻化卡
+    optional uint32 dress_num = 18;//时装数量
+    optional uint32 wingId = 19;//穿戴翅膀
+		optional uint32 energy_skill_id = 20;//必杀技能
+}
+
+message BattleTeam {
+    repeated BattleUnit units = 1; // 武将
+    required BattleCombo combo = 2; // 合击数据
+    optional uint64 fight_value = 3; // 总战力，pvp时需要
+    optional uint32 wave = 4; //第几波
+    optional bool is_boss = 5; //是否是boss
+    repeated out_base.Award drops = 6; //掉落
+    optional out_base.UserSnapshot user = 7; //玩家显示数据
+    optional uint64 total_hp = 8;	// 总血量
+    optional int32 multiple = 9;	// 最终伤害倍数，千分比
+    optional uint32 rebel_talent = 10;	// 叛军天赋技能
+    optional uint32 monster_team_id = 11; //怪物组id
+    optional uint32 rebel_id = 12; //叛军id
+    repeated TokenKnightShow  shows = 13; //兵符对应武将显示信息
+    repeated uint32 pets = 14; // 神兽id
+    repeated uint32 passive_skills = 15; //被动技能
+    optional DemonBossTeamMultiple demon_boss_multiple = 16; //讨伐魔将阵营伤害倍数
+}
+
+// 讨伐魔将阵营伤害倍数
+message DemonBossTeamMultiple {
+  required uint32 team = 1; // 阵营
+  required uint32 multiple = 2; // 伤害倍数
+}
+
+// 战斗数据，会有多波战斗
+message BattleReport {
+    required uint64 battle_id = 1; // 战斗唯一id
+    required uint32 atk_type = 2; // 战斗类型 1 pve 2 pvp
+    optional bool is_auto = 3; // 是否自动战斗
+    optional uint32 random_seed = 4; // 随机数种子(废弃)
+    repeated BattleTeam own_teams = 5; // 己方阵容,会有多个的情况
+    repeated BattleTeam enemy_teams = 6; // 敌方阵容,会有多个的情况
+    optional uint32 win_condition = 7; // 胜利条件
+    repeated uint32 random_seeds = 8; // 随机数种子序列
+    optional uint32 reward_id = 9;	// daily_dungeon_reward_preview表id
+    optional uint32 assistance_id = 10; //助战id
+}
+
+message PlayerCommand {
+    required uint32 identity = 1;
+    required uint32 id = 2;
+    required uint32 attack_count = 3;
+}
+
+message UnitCheck {
+    required uint32 identity = 1;
+    required uint32 pos = 2;
+    required uint64 hp = 3; // 只校验hp
+}
+
+message BattleVideo {
+  required uint64 version = 1;
+  required BattleReport battle_report = 2;
+  repeated PlayerCommand player_command = 3;
+}
+
+// 战斗结果,用于校验
+message BattleResult{
+    required uint64 battle_id = 1; // 战斗唯一id
+    required bool is_win = 2; //是否胜利
+    repeated PlayerCommand command = 3; // 用户操作
+    repeated UnitCheck units1 = 4; // 用于校验的额外数据-己方
+    repeated UnitCheck units2 = 5; // 用于校验的额外数据-敌方
+    required uint32 round = 6; //回合数
+    optional uint32 result = 7;	//关联battle_rating_info的评价类型值
+    optional uint32 cur_own_wave = 8; //当前我方怪物波数
+    optional uint32 cur_enemy_wave = 9; //当前敌方怪物波数
+    optional string data_version = 10; //配置表版本
+    optional string own_name = 11;
+    optional string enemy_name = 12;
+    repeated BattleUnitResult own_teams = 13;
+    repeated BattleUnitResult enemy_teams = 14;
+    optional uint64 attack_total_damage = 15; //攻击方造成总伤害
+}
+
+// 战斗单位伤害信息--用于展示
+message BattleUnitResult {
+    required uint32 type = 1; //对应enums.UNIT_TYPE枚举
+    optional uint32 id = 2;
+    optional uint32 avartar_id = 3; //头像id
+    optional uint64 dam = 4;  //伤害--数值
+    optional uint64 recover = 5;  //治疗--数值
+    optional uint64 take_dam = 6;  //受到伤害--数值
+}
+
+message BriefReport {
+    repeated BattleTeam own_teams = 1; // 己方阵容,会有多个的情况
+    repeated BattleTeam enemy_teams = 2; // 敌方阵容,会有多个的情况
+    required bool is_win = 3; //是否胜利
+    repeated UnitCheck units1 = 4; // 用于校验的额外数据-己方
+    repeated UnitCheck units2 = 5; // 用于校验的额外数据-敌方
+    required uint32 round = 6; //回合数
+    optional uint32 result = 7;	//关联battle_rating_info的评价类型值
+}
+
+// 兵符对应武将显示信息
+message TokenKnightShow {
+  required uint32 base_id = 1; //武将id
+  required uint32 skin_id = 2; //变装id
+  required uint32 skin_tm = 3; //变装时间
+}
+
+message CheckResult{
+    required uint64 battle_id = 1; // 战斗唯一id
+    required bool is_win = 2; //是否胜利
+    required bool check = 3 ; //检查结果
+    repeated UnitCheck units1 = 4; // 用于校验的额外数据-己方
+    repeated UnitCheck units2 = 5; // 用于校验的额外数据-敌方
+    optional string log = 6; 
+    optional uint32 ret = 7; //校验结果(返回值用ret.proto中的) 
+    optional string data_version = 8; //配置表版本 
+}
+
+enum ID {
+    MSG_S2C_ReplyBattleReport = 20000;
+    MSG_C2S_CheckBattleResult = 20001;
+    MSG_S2C_CheckBattleResult = 20002;
+    MSG_C2S_ClientTestBattle = 20003;
+    MSG_S2C_ClientTestBattle = 20004;
+}
+
+message S2C_ReplyBattleReport {
+    required bytes report = 1;
+}
+
+message C2S_CheckBattleResult {
+    required bytes result = 1;
+}
+
+message S2C_CheckBattleResult {
+    required uint32 ret = 1;
+    optional bytes result = 2;
+}
+
+message C2S_ClientTestBattle {
+	required bytes report = 1;
+	required bytes result = 2;
+}
+
+message S2C_ClientTestBattle {
+  required uint32 ret = 1;
+  optional bytes result = 2;
+}

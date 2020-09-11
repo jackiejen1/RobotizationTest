@@ -13,14 +13,89 @@ import time
 import requests
 
 from gm.gm_method import GmMethod
-from proto_tool.proto_recv import ProtocolFunction
+from proto_tool.proto_method import ProtocolFunction
 
 if __name__ == '__main__':
-    version = 50010#版本号
     account = str(int(time.time()))[-6:]
-    game_name ="少西"
     server_name="QA2"
-    pr = ProtocolFunction(game_name,server_name,account)
-    gm = pr.Login(version)
+    pr = ProtocolFunction(server_name,account)
+    gm = pr.Login()
     gm.add_resources({"元宝":1})
+    #神将
+
+        # 升魂（除主角）
+        # 觉醒
+        # 吞噬
+        # 悟道
+        # 炼魂
+        # 修行（限主角）
+        # 经脉（限主角）
+        # 涅槃（限主角）
+
+    #法宝
+        # 升级
+        # 觉醒
+        # 化灵
+        # 铸魂
+        # 炼器
+        # 锻魄（限赤金及以上品质）
+        # 封灵（限主角）
+
+    #仙灵
+        # 图腾护佑
+        # 仙灵图鉴
+        # 轮回孵化
+        # 五行炼体
+        # 八卦通神
+
+    #神器
+        # 升级
+        # 升星
+
+    #星君
+        # 升星
+        # 星格
+        # 图鉴突破
+
+    #神符
+        # 强化
+        # 进阶
+        # 镶嵌
+        # 护阵
+        # 图鉴突破
+
+    #法术
+        # 强化
+        # 升星
+        # 增幅
+        # 辅修
+        # 奇门
+
+    #神兽
+        # 升级
+        # 渡劫
+        # 通神
+        # 吞噬
+        # 炼魂
+        # 化身
+
+    #宝物
+        # 升级
+        # 精炼
+        # 觉醒
+        # 淬炼
+        # 赤炼
+
+    #神翼
+        # 羽化
+        # 强化
+        # 护阵
+
+    #宝石
+        # 合成
+        # 凝炼
+        # 升华
+
+    #时装
+        # 强化
 

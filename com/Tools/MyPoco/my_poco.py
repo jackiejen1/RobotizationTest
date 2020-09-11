@@ -104,6 +104,19 @@ class MyPoco:
         only_id = self.Flush_body[str(wujiang_id)]
         self.protocol.shangzhenwujiang(pos, only_id)
 
+    def wujiangshengxing(self, pos, name):
+        """
+        上阵武将
+        :param pos: 坑位，2-6
+        :param id: 武将名
+        :return:
+        """
+        wujiang_id = self.get_resource_id(name)
+        if (self.Flush_body == None) or (str(wujiang_id) not in self.Flush_body.keys()):
+            self.Flush_body = self.protocol.Flush("武将")
+        only_id = self.Flush_body[str(wujiang_id)]
+        self.protocol.wujiangshengxing(pos, only_id)
+
     def chuandaizhuangbei(self, pos, name):
         """
         上阵装备,武器1，鞋子2，头盔3，战甲4，逆时针顺序，第二个武将武器5，鞋子6.....
@@ -705,6 +718,38 @@ class MyPoco:
         self.chuandaizhuangbei(22, "测试战靴")
         self.chuandaizhuangbei(23, "测试战甲")
         self.chuandaizhuangbei(24, "测试头盔")
+        # add_type, add_value = self.protocol.mri.get_type_id_from_name("不灭神镰")
+        # self.protocol.add_resource_pb(add_type, add_value, 6)
+        # add_type, add_value = self.protocol.mri.get_type_id_from_name("不灭飞履")
+        # self.protocol.add_resource_pb(add_type, add_value, 6)
+        # add_type, add_value = self.protocol.mri.get_type_id_from_name("不灭玄铠")
+        # self.protocol.add_resource_pb(add_type, add_value, 6)
+        # add_type, add_value = self.protocol.mri.get_type_id_from_name("不灭灵盔")
+        # self.protocol.add_resource_pb(add_type, add_value, 6)
+        # self.chuandaizhuangbei(1, "不灭神镰")
+        # self.chuandaizhuangbei(2, "不灭飞履")
+        # self.chuandaizhuangbei(3, "不灭玄铠")
+        # self.chuandaizhuangbei(4, "不灭灵盔")
+        # self.chuandaizhuangbei(5, "不灭神镰")
+        # self.chuandaizhuangbei(6, "不灭飞履")
+        # self.chuandaizhuangbei(7, "不灭玄铠")
+        # self.chuandaizhuangbei(8, "不灭灵盔")
+        # self.chuandaizhuangbei(9, "不灭神镰")
+        # self.chuandaizhuangbei(10, "不灭飞履")
+        # self.chuandaizhuangbei(11, "不灭玄铠")
+        # self.chuandaizhuangbei(12, "不灭灵盔")
+        # self.chuandaizhuangbei(13, "不灭神镰")
+        # self.chuandaizhuangbei(14, "不灭飞履")
+        # self.chuandaizhuangbei(15, "不灭玄铠")
+        # self.chuandaizhuangbei(16, "不灭灵盔")
+        # self.chuandaizhuangbei(17, "不灭神镰")
+        # self.chuandaizhuangbei(18, "不灭飞履")
+        # self.chuandaizhuangbei(19, "不灭玄铠")
+        # self.chuandaizhuangbei(20, "不灭灵盔")
+        # self.chuandaizhuangbei(21, "不灭神镰")
+        # self.chuandaizhuangbei(22, "不灭飞履")
+        # self.chuandaizhuangbei(23, "不灭玄铠")
+        # self.chuandaizhuangbei(24, "不灭灵盔")
 
     def GM_yijian_fuben(self, zhangjie_id):
         """

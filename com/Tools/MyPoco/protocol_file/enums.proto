@@ -255,6 +255,9 @@ enum RANK_ID_TYPE {
   RECRUIT_RICHEST_GM_BROTHER = 64; //GM富家天下积分排行榜
   ARTIFACT_PURIFY_SCORE_CROSS = 65;//神兵洗炼积分战区排行榜
   ARTIFACT_PURIFY_SCORE_ALL_SERVER = 66;//神兵洗炼积分全服排行榜
+  GVG_GUILD_SCORE_CROSS = 67; //军团战军团积分排行榜
+  GVG_USER_MVP_CROSS = 68; //军团战玩家MVP次数排行榜
+  GVG_USER_MARS_CROSS = 69; //军团战玩家战神次数排行榜
 }
 
 enum HANDBOOK_TYPE {

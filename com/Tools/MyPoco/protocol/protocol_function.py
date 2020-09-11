@@ -1109,8 +1109,6 @@ class ProtocolFunction:
         else:
             raise ProtocolException(str(self.uid) + "聊天框发送信息失败" + str(S2C_Chat.ret))
 
-
-
     def get_resource_pb_yuanbao(self):
         """
         查询元宝数量

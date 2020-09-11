@@ -160,6 +160,30 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_Formation_ChangeFormation_attr, 32)  # 发送协议
         return flag, data
 
+    def MSG_C2S_Knight_StarTrain(self, tp, pos, id, uid, sid):
+        """
+        上阵协议
+        :param tp: 上阵类型，武将1，装备3，宝物4
+        :param pos: 位置
+        :param id: 唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Formation_ChangeFormation = cs_pb2.C2S_Formation_ChangeFormation()
+        C2S_Formation_ChangeFormation.tp = tp
+        C2S_Formation_ChangeFormation.pos = pos
+        C2S_Formation_ChangeFormation.id = id
+        C2S_Formation_ChangeFormation = C2S_Formation_ChangeFormation.SerializeToString()
+        C2S_Formation_ChangeFormation_attr = {'name': "C2S_Formation_ChangeFormation", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 10162, 'recv_cmd': 10163, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Formation_ChangeFormation, C2S_Formation_ChangeFormation_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Formation_ChangeFormation_attr, 32)  # 发送协议
+        return flag, data
+
+
+
+
     def MSG_C2S_Friend_AddFriend(self, name, uid, sid):
         """
         添加好友

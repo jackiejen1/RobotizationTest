@@ -1615,6 +1615,43 @@ enum ID {
   MSG_C2S_FlameCity_GetTreasureList = 14424; // 获取宝藏奖励领取情况
   MSG_S2C_FlameCity_GetTreasureList = 14425;
   MSG_S2C_FlameCity_ChapterNotify = 14426; // 章节信息推送
+
+  // 军团战
+  MSG_C2S_GVG_GetInfo = 14430; //获取军团战信息
+  MSG_SGC_GVG_GetInfo = 14431;
+  MSG_C2S_GVG_GetMatchInfo = 14432; //获取军团战比赛信息
+  MSG_SGC_GVG_GetMatchInfo = 14433;
+  MSG_C2S_GVG_Join = 14434; //参战
+  MSG_S2C_GVG_Join = 14435;
+  MSG_C2S_GVG_GetAchieve = 14436;//获取赛季成就信息
+  MSG_S2C_GVG_GetAchieve = 14437;
+  MSG_C2S_GVG_GetAchieveAward = 14438;//领取赛季成就奖励
+  MSG_S2C_GVG_GetAchieveAward = 14439;
+  MSG_C2S_GVG_GetKingHistory = 14440; //获取历代王者
+  MSG_S2C_GVG_GetKingHistory = 14441;
+  MSG_C2S_GVG_EnterMatch = 14442; //进入比赛
+  MSG_S2C_GVG_EnterMatch = 14443;
+  MSG_S2C_GVG_NotifyUserEnter = 14444; //玩家进入比赛推送
+  MSG_C2S_GVG_LeaveMatch = 14445; //离开比赛
+  MSG_S2C_GVG_LeaveMatch = 14446;
+  MSG_S2C_GVG_NotifyUserLeave = 14447; //玩家离开比赛推送
+  MSG_C2S_GVG_Move = 14448; //玩家移动
+  MSG_S2C_GVG_Move = 14449;
+  MSG_S2C_GVG_NotifyMove = 14450; //玩家移动推送
+  MSG_C2S_GVG_AttackUser = 14451; //攻击玩家
+  MSG_S2C_GVG_AttackUser = 14452;
+  MSG_S2C_GVG_NotifyAttackUser = 14453; //攻击玩家推送
+  MSG_C2S_GVG_AttackGate = 14454; //攻击城门
+  MSG_S2C_GVG_AttackGate = 14455;
+  MSG_S2C_GVG_NotifyAttackGate = 14456; //攻击城门推送
+  MSG_C2S_GVG_Revive = 14457; //复活
+  MSG_S2C_GVG_Revive = 14458;
+  MSG_S2C_GVG_NotifyRevive = 14459; //玩家复活
+  MSG_C2S_GVG_AddBuff = 14460; //获取Buff
+  MSG_S2C_GVG_AddBuff = 14461;
+  MSG_S2C_GVG_NotifyAddBuff = 14462; //获取Buff推送
+  MSG_S2C_GVG_NotifyRemoveBuff = 14463; //移除Buff推送
+  MSG_S2C_GVG_NotifyNewBuff = 14464; //刷新Buff推送
 }
 
 //跨服玩法聊天+弹幕
@@ -9338,6 +9375,7 @@ message S2C_FlameCity_AttackFinish {
   optional uint32 cost_hp = 6; // 总消耗血量
   repeated out_base.Award awards = 7; // 奖励
   optional uint32 max_grade = 8; // 最大等级
+  optional bool is_win = 9; // 是否输赢
 }
 
 // 烽火连城-设置目标
@@ -9501,3 +9539,211 @@ message S2C_Artifact_HelpDown{
   required uint32 ret = 1;
   required uint64 artifact_id = 2;//主神兵ID
 }
+
+//军团战-获取军团战信息
+message C2S_GVG_GetInfo {
+}
+
+message S2C_GVG_GetInfo {
+  required uint32 ret = 1;
+  optional uint32 start_time = 2; //活动开始时间
+  optional uint32 joined_user_num = 3; //参战人数
+  optional bool is_joined = 4; //当前玩家是否已参战
+  optional bool is_guild_joined = 5; //军团是否已报名
+  optional out_base.GVGMatchInfo my_match = 6; //己方军团比赛信息
+}
+
+// 军团战-获取赛季成就
+message C2S_GVG_GetAchieve {
+}
+
+message S2C_GVG_GetAchieve {
+  required uint32 ret = 1;
+  repeated out_base.GVGUserAction actions = 2;
+  repeated out_base.GVGUserAchieve achieves = 3;
+}
+
+// 军团战-领取成就奖励
+message C2S_GVG_GetAchieveAward {
+  required uint32 id = 1; //成就ID
+}
+
+message S2C_GVG_GetAchieveAward {
+  required uint32 ret = 1;
+  required uint32 id = 2;
+  repeated out_base.Award awards = 3;
+}
+
+//军团战-获取比赛详情
+message C2S_GVG_GetMatchInfo {
+  required uint32 id = 1; //比赛id
+}
+
+message S2C_GVG_GetMatchInfo {
+  required uint32 ret = 1;
+  required uint32 id = 2;
+  optional out_base.GVGMatchInfo match_info = 3; //GVG对战信息
+}
+
+//军团战-报名 自动判断报名者身份执行玩家参战或军团报名逻辑
+message C2S_GVG_Join {
+}
+
+message S2C_GVG_Join {
+  required uint32 ret = 1;
+  required bool is_guild_joined = 2; //军团是否报名
+}
+
+//军团战-获取历代王者
+message C2S_GVG_GetKingHistory {
+}
+
+message S2C_GVG_GetKingHistory {
+  required uint32 ret = 1;
+  required uint32 activitiy_id = 2;
+  required out_base.GuildSnapshot guild = 3; //军团快照
+}
+
+//军团战-进入比赛
+message C2S_GVG_EnterMatch {
+}
+
+message S2C_GVG_EnterMatch {
+  required uint32 ret = 1;
+  required out_base.GVGMatchInfo info = 2; //比赛信息
+  repeated out_base.GVGMatchGuild guilds = 3; //公会列表
+  repeated out_base.GVGMatchUser users = 4; //比赛中的玩家列表
+  repeated out_base.GVGMatchGridGate gates = 5; //城门
+  repeated out_base.GVGMatchGridBuff buffs = 6; //BUFF点
+  repeated out_base.GVGMatchGridTower towers = 7; //炮台
+}
+
+//军团战-离开比赛
+message C2S_GVG_LeaveMatch {
+}
+
+message S2C_GVG_LeaveMatch {
+  required uint32 ret = 1;
+}
+
+//军团战-玩家移动
+message C2S_GVG_Move {
+  required uint32 target_pos_id = 1; //终点位置ID
+  required uint32 cost_time = 2; //需要时间
+}
+
+message S2C_GVG_Move {
+  required uint32 ret = 1;
+  required uint32 arrive_time = 2; //到达目的地时间
+}
+
+//军团战-玩家复活
+message C2S_GVG_Revive {
+
+}
+
+message S2C_GVG_Revive {
+  required uint32 ret = 1;
+}
+
+//军团战-攻击玩家
+message C2S_GVG_AttackUser {
+  required uint64 user_id = 1; //目标玩家ID
+}
+
+message S2C_GVG_AttackUser {
+  required uint32 ret = 1;
+  required uint64 user_id = 2; //目标玩家ID
+}
+
+//军团战-攻击玩家推送
+message S2C_GVG_NotifyAttackUser {
+  required uint64 attacker_user_id = 1; //攻击方玩家ID
+  required uint64 attacker_score = 2; //攻击方当前积分
+  required uint32 attacker_power = 3; //攻击方当前兵力
+  required uint32 attacker_cont_kill_num = 4; //连续杀人数
+  required uint64 defender_user_id = 5; //被攻击方玩家ID
+  required uint64 defender_score = 6; //被攻击方当前积分
+  required uint32 defender_power = 7; //被攻击方当前兵力
+  required uint32 defender_cont_kill_num = 8; //被攻击方连续杀人数
+  optional uint32 attacker_protect_end_time = 9; //如果是攻占炮台占领位，则返回保护到期时间
+  optional uint64 owner_guild_id = 10; //如果是炮台占领区占领军团，则返回当前占领者
+}
+
+//军团战-攻击城门
+message C2S_GVG_AttackGate {
+}
+
+message S2C_GVG_AttackGate {
+  required uint32 ret = 1;
+}
+
+//军团战-攻击城门推送
+message S2C_GVG_NotifyAttackGate {
+  required uint64 user_id = 1; //玩家ID
+  required uint64 score = 2; //当前积分
+  required uint32 gate_grid_id = 3; //城门格子ID
+  optional uint64 gate_hp = 4; //城门当前耐久
+}
+
+//军团战-产生新buff推送
+message S2C_GVG_NotifyNewBuff {
+  required out_base.GVGMatchGridBuff grid_buff = 1; //Buff区域
+}
+
+//军团战-使用炮台攻击
+message S2C_GVG_NotifyTowerAttack {
+  required uint64 user_id = 1; //玩家ID
+  required uint64 score = 2; //当前积分
+  optional uint32 gate_hp = 3; //城门当前耐久
+}
+
+//军团战-玩家进入推送
+message S2C_GVG_NotifyUserEnter {
+  required out_base.GVGMatchUser user = 1; //比赛玩家信息
+}
+
+//军团战-玩家离开推送
+message S2C_GVG_NotifyUserLeave {
+  required uint64 user_id = 1; //玩家ID
+}
+
+//军团战-复活推送
+message S2C_GVG_NotifyRevive {
+  required uint64 user_id = 1; //玩家ID
+}
+
+//军团战-玩家获得Buff
+message C2S_GVG_AddBuff {
+}
+
+message S2C_GVG_AddBuff {
+  required uint32 ret = 1;
+}
+
+//军团战-玩家获得Buff推送
+message S2C_GVG_NotifyAddBuff {
+  required uint64 user_id = 1; //玩家ID
+  required uint32 buff_id = 2; //Buff ID
+}
+
+//军团战-玩家移除Buff推送
+message S2C_GVG_NotifyRemoveBuff {
+  required uint64 user_id = 1; //玩家ID
+  required uint32 buff_id = 2; //Buff ID
+}
+
+//军团战-移动推送
+message S2C_GVG_NotifyMove {
+  required uint64 user_id = 1; //玩家ID
+  required uint32 pos_id = 2; //目标位置
+  optional uint32 arrive_time = 3; //到达时间 无此值时表示立即到达
+  optional uint64 owner_guild_id = 4; //炮塔拥有者是发生变更时，返回当前炮台占领的军团
+  optional uint32 protect_end_time = 5; //如果是站上炮台占领位，则返回保护到期时间
+}
+
+//军团战-比赛结束通知
+message S2C_GVG_NotifyMatchEnd {
+  required out_base.GVGMatchInfo match_info = 4; //GVG战斗结果
+}
+
