@@ -172,7 +172,7 @@ class MyPoco:
 
     def add_Guild(self, Guild_name):
         """
-        查询并加入军团
+        查询并加入军团,没有军团就创建一个军团
         :param Guild_name: string 军团名字
         :return:
         """
@@ -1580,6 +1580,6 @@ class MyPoco:
             self.protocol.add_resource_pb(add_type, add_value, 500000)
             add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
             self.protocol.add_resource_pb(add_type, add_value, 200)
-        self.protocol.GM_new_join_guild(Guild_name,join)
+        self.protocol.search_Guild(Guild_name)
         self.GM_World_Chat("/set_guild_level "+str(num))
 

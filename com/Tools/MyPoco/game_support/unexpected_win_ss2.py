@@ -52,7 +52,8 @@ class UnexpectedWinSs2:
                     if self.make_poco_dic.is_in_dic("InputName"):
                         break
                     time.sleep(15)
-        if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
+        # if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
+        if self.make_poco_dic.is_in_dic("未命名0/popup/GodboxPop/__view/Label_title"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")
             time.sleep(1)
         # if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 首页广告
@@ -68,7 +69,7 @@ class UnexpectedWinSs2:
             self.make_poco_dic.my_touch("rewardComp/receiveBtn")# 删除
             if self.make_poco_dic.is_in_dic("List_mail/未命名1"):# 如果存在第二封，一键领取
                 self.make_poco_dic.my_touch("__view/receiveBtn")
-                self.make_poco_dic.my_touch("点击屏幕继续")
+                self.make_poco_dic.my_touch("ontinue")
                 self.make_poco_dic.my_touch("removeBtn")# 一键删除
                 self.make_poco_dic.my_touch("ok")
             self.make_poco_dic.my_touch("MailLayer/__view/n0/btn0")
@@ -77,7 +78,7 @@ class UnexpectedWinSs2:
             self.make_poco_dic.my_touch("btn0")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1002"):
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1002")
-            self.make_poco_dic.my_touch("点击屏幕继续")
+            self.make_poco_dic.my_touch("ontinue")
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/1003"):
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/1003")
             self.make_poco_dic.my_touch("FloatHotTimePop/__view/Comp_panel/btn0")
@@ -103,6 +104,9 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("未命名0/popup/GodboxPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("将军抱歉，为了更好的体验，我们正在对服务器进行维护，请稍后重新登录哦~"):
+            self.make_poco_dic.my_touch("未命名0/未命名3/ComAssistPop/__view/Btn_cancel")
+            raise GameServerMaintenanceException("服务器维护")
+        if self.make_poco_dic.is_in_dic("장군님, 죄송합니다. 더 나은 게임 환경을 위해 서버 점검 중입니다. 잠시 후 다시 로그인하세요~"):
             self.make_poco_dic.my_touch("未命名0/未命名3/ComAssistPop/__view/Btn_cancel")
             raise GameServerMaintenanceException("服务器维护")
         # if self.make_poco_dic.is_in_dic("推荐[color=#FFE71A]普通月卡[/color]"):

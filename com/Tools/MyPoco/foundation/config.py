@@ -96,7 +96,7 @@ class Config:
         "close_game_poco_name": "HomeLayer"
     }
     shaosan2xm = {
-        "app_name": "",
+        "app_name": "com.yoozoogames.ss2game",
         "uid": None,
         "sid": None,
         "c2sname": "MSG_C2S",

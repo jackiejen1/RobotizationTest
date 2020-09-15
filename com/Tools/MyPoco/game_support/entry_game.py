@@ -45,5 +45,8 @@ class EntryGame:
         elif self.game_name == "com.gamesword.twsst":
             egss2 = EntryGameSs2(self.phone_id,self.game_name)
             egss2.entry_game_ss2(sever_name_input, game_account_input)
+        elif self.game_name == "com.yoozoogames.ss2game":
+            egss2 = EntryGameSs2(self.phone_id,self.game_name)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
         else:
             pass

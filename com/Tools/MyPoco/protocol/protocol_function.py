@@ -746,6 +746,9 @@ class ProtocolFunction:
         C2S_Guild_Create.ParseFromString(data_Guild_Create)  # 解析协议返回值
         if C2S_Guild_Create.ret == 1:
             print("创建军团成功")
+            for guild in C2S_Guild_Create.guilds:
+                guild_id = guild.id
+            return guild_id
         else:
             raise ProtocolException(str(self.uid) + "创建军团失败" + str(C2S_Guild_Create.ret))
 
@@ -764,21 +767,30 @@ class ProtocolFunction:
 
     def search_Guild(self, Guild_name):
         """
-        查询并加入军团
+        查询并加入军团,没有军团就创建一个军团
         :param Guild_name: string 军团名字
         :return:
         """
+        if len(Guild_name) > 8:
+            print("军团名字过长")
+            return ""
         flag_search_Guild, data_search_Guild = self.protocol.MSG_C2S_Guild_Search(Guild_name, self.uid, self.sid)
-        S2C_search_Guild = cs_pb2.S2C_Guild_Search()  # 创建返回协议对象
-        S2C_search_Guild.ParseFromString(data_search_Guild)  # 解析协议返回值
-        for guild in S2C_search_Guild.guilds:
-            guild_id = guild.id
-        if S2C_search_Guild.ret == 1:
+        S2C_Guild_Search = cs_pb2.S2C_Guild_Search()  # 创建返回协议对象
+        S2C_Guild_Search.ParseFromString(data_search_Guild)  # 解析协议返回值
+        if S2C_Guild_Search.ret == 1:
             print("查询成功")
+            for guild in S2C_Guild_Search.guilds:
+                self.guild_id = guild.id
+                member_num = guild.member_num
+                print(member_num)
+                if member_num >= 30:
+                    raise ProtocolException("军团人数已满")
+        elif S2C_Guild_Search.ret == 87 or S2C_Guild_Search.ret == 104:#军团不存在
+            self.guild_id = self.Create_Guild(Guild_name)#创建军团
         else:
-            print(str(self.uid) + "查询失败" + str(S2C_search_Guild.ret))
+            print(str(self.uid) + "查询失败" + str(S2C_Guild_Search.ret))
             raise ProtocolException("军团不存在")
-        flag_Guild_ReqJoin, data_Guild_ReqJoin = self.protocol.MSG_C2S_Guild_ReqJoin(guild_id, self.uid, self.sid)
+        flag_Guild_ReqJoin, data_Guild_ReqJoin = self.protocol.MSG_C2S_Guild_ReqJoin(self.guild_id, self.uid, self.sid)
         S2C_Guild_ReqJoin = cs_pb2.S2C_Guild_ReqJoin()  # 创建返回协议对象
         S2C_Guild_ReqJoin.ParseFromString(data_Guild_ReqJoin)  # 解析协议返回值
         if S2C_Guild_ReqJoin.join:
@@ -1174,23 +1186,6 @@ class ProtocolFunction:
                 # 创建军团
                 self.Create_Guild(Guild_name)
         self.OrderWorld_Donate(num)
-
-    def GM_new_join_guild(self, Guild_name,join):
-        """
-        疯狂给军团-号令天下活动捐旗子
-        会先创建军团，然后捐旗子
-        :param Guild_name: 军团名称
-        :param num: 捐献的数量
-        :join bool: 加入/创建军团
-        :return:
-        """
-        if join:
-            # 查询并加入军团
-            self.search_Guild(Guild_name)
-        else:
-            # 创建军团
-            self.Create_Guild(Guild_name)
-
 
 
     def GM_fengkuangfuben(self, fuben_id):
