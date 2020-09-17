@@ -321,6 +321,16 @@ class MakePocoDic:
         game_running_str = self.gpd.get_device_adb_shell("shell dumpsys activity processes")
         return game_running_str
 
+    def get_adb_info(self,adb_shell):
+        """
+        获得adb返回值
+        :param adb_shell: adb命令
+        :return:
+        """
+        game_running_str = self.gpd.get_device_adb_shell(adb_shell)
+        return game_running_str
+
+
     def touch_pos(self, pos_list_int, is_sleep=True):
         """
         点击方法

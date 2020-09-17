@@ -76,6 +76,15 @@ class MyPocoObject():
         """
         return self.make_poco_dic.get_game_run_text()
 
+    def get_adb_info(self,adb_shell):
+        """
+        获得adb返回值
+        :param adb_shell: adb命令
+        :return:
+        """
+        game_running_str = self.make_poco_dic.get_adb_info(adb_shell)
+        return game_running_str
+
     def my_swipe(self, start_path, end_path, timein=2):
         """
         传入两个坐标进行滑动
@@ -365,6 +374,23 @@ class MyPocoObject():
         number_list = re.findall("\](.*)\）", number_str1)
         return int(number_list[0])
 
+    def close_all_app(self):
+        """
+        解锁屏幕
+        关闭当前界面运行的软件
+        :return:
+        """
+        phone_adb_info = self.get_adb_info("shell dumpsys window | findstr mCurrentFocus")#通过adb获取当前界面活动app
+        if "StatusBar" in phone_adb_info:
+            os.system("adb shell input keyevent 26")
+            time.sleep(2)
+            os.system("adb shell input keyevent 82")
+            time.sleep(2)
+        if "AppActivity" in phone_adb_info:
+            new_game_name = re.search("u0 .*/",phone_adb_info).group()[3:-1]
+            stop_app(new_game_name)
+            time.sleep(2)
+
     def close_game(self):
         """
         关闭游戏
@@ -373,17 +399,15 @@ class MyPocoObject():
         snapshot(msg="关闭游戏")
         #从配置表中读取主界面唯一元素
         close_game_poco_name = self.info.get_config(self.game_name_key, "close_game_poco_name")
+        stop_app(self.game_name)
         if close_game_poco_name == None:
-            stop_app(self.game_name)
             if self.is_pass > 0:
                 raise GameNotPassException("数值判定部分未通过")
         else:
             if self.is_in_dic(close_game_poco_name):
-                stop_app(self.game_name)
                 if self.is_pass>0:
                     raise GameNotPassException("数值判定部分未通过")
             else:
-                stop_app(self.game_name)
                 raise NoneException("最后一步异常,"+close_game_poco_name)
 
     def get_poco_any_value(self, poco_path, value_name_str):

@@ -231,12 +231,14 @@ class MyPoco:
         :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """
-        game_text = self.my_poco_obj.get_game_run_text()
-        game_name_list = ["少三2", "少西", "少三", "少三2台湾", "少三2日本", "少三2韩国", ]
-        for game_name in game_name_list:
-            game_name_activities = self.info.get_config(game_name, "app_name")
-            if game_name_activities in game_text:
-                stop_app(game_name_activities)
+        # game_text = self.my_poco_obj.get_game_run_text()
+        # game_name_list = ["少三2", "少西", "少三", "少三2台湾", "少三2日本", "少三2韩国", ]
+        # for game_name in game_name_list:
+        #     game_name_activities = self.info.get_config(game_name, "app_name")
+        #     if game_name_activities in game_text:
+        #         stop_app(game_name_activities)
+        self.my_poco_obj.close_all_app()
+        print("关闭app")
         entry = EntryGame(self.game_name_key, self.phone_id)
         entry.entry_game(sever_name_input, game_account_input, password)
 
@@ -1574,12 +1576,12 @@ class MyPoco:
         :return:
         """
         # 先把消耗的道具加进去
-        if not join:
+
             # 如果是创建军团，就需要加一些道具
-            add_type, add_value = self.protocol.mri.get_type_id_from_name("贵族经验")
-            self.protocol.add_resource_pb(add_type, add_value, 500000)
-            add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
-            self.protocol.add_resource_pb(add_type, add_value, 200)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("贵族经验")
+        self.protocol.add_resource_pb(add_type, add_value, 500000)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
+        self.protocol.add_resource_pb(add_type, add_value, 200)
         self.protocol.search_Guild(Guild_name)
         self.GM_World_Chat("/set_guild_level "+str(num))
 

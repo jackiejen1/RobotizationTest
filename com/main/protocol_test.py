@@ -8,10 +8,14 @@
 # @Function:使用协议快速准备账号
 # @Method:
 # Reference:********************************
+import os
 import threading
 import time
+from airtest.core.api import *
+auto_setup(__file__)
+__phone_id__=device().uuid
 from MyPoco.my_poco import MyPoco
-__phone_id__ = None
+# __phone_id__ = None
 
 class myThread (threading.Thread):
     def __init__(self, sever_name_into, account_into):
@@ -28,15 +32,16 @@ if __name__ == '__main__':
 
     my_poco = MyPoco("少三2",__phone_id__)
     sever_name = "QA1"
-    account = my_poco.get_random_account()#随机账号
-    # account = "18783278"
-    sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
-    my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
-    my_poco.add_resource({"角色经验": 4099909990,"测试属性": 999999999,"银币": 999999,})#添加资源，海外暂不支持
-    # my_poco.add_resource({"倚天剑": 12,"天宫护符": 12,})
-    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-120-10"})#通关副本，海外暂不支持
-    # my_poco.protocol.Flush()
-
+    # account = my_poco.get_random_account()#随机账号
+    account = "78499933"
+    my_poco.open_game(sever_name, account)
+    # sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
+    # my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
+    # my_poco.add_resource({"角色经验": 4099909990,"测试属性": 999999999,"银币": 999999,})#添加资源，海外暂不支持
+    # # my_poco.add_resource({"倚天剑": 12,"天宫护符": 12,})
+    # my_poco.set_checkpoint(account, sever_name, {"副本": "副本-120-10"})#通关副本，海外暂不支持
+    # # my_poco.protocol.Flush()
+    # my_poco.GM_new_join_guild(account[2:], 5, False)
     # my_poco.shangzhenwujiang(2, "陆逊")
     # my_poco.GM_new_join_guild("sdasa",5,True)
     # my_poco.GM_fengkuang_shenbingxilian("倚天剑",100000)

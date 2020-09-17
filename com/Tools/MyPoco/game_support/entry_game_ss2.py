@@ -56,12 +56,15 @@ class EntryGameSs2:
         self.my_poco_obj.touch_poco("未命名0/popup/LoginAccountPop/__view/ButtonConfirm/title")
         time.sleep(1)
         self.my_poco_obj.touch_poco("AnnoCloseBtn")
+        time.sleep(3)
+        if self.my_poco_obj.is_in_dic("未命名0/popup/LoginLawJpPop/__view/btn_ok/title"):
+            self.my_poco_obj.touch_poco("未命名0/popup/LoginLawJpPop/__view/label0/btn0")
         self.my_poco_obj.touch_poco("未命名0/module/LoginLayer2/__view/Btn_server/TextServerTip")
-        self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
+        self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",click_list=[0.95, 0.15])  #切第一个区服列表# todo 不同游戏可能要改
         if self.my_poco_obj.is_in_dic(sever_name_input):
             self.my_poco_obj.touch_poco(sever_name_input)
         else:
-            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title"):
+            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title"):#切第二个区服列表
                 self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title",
                                             click_list=[0.95, 0.15])
                 if self.my_poco_obj.is_in_dic(sever_name_input):
@@ -86,9 +89,23 @@ class EntryGameSs2:
             text(game_account_input)
             self.my_poco_obj.touch_poco("未命名0/popup/LoginAccountPop/__view/ButtonConfirm/title")
             self.my_poco_obj.touch_poco("AnnoCloseBtn")
+            time.sleep(1)
+            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginLawJpPop/__view/btn_ok/title"):
+                self.my_poco_obj.touch_poco("未命名0/popup/LoginLawJpPop/__view/label0/btn0")
             self.my_poco_obj.touch_poco("未命名0/module/LoginLayer2/__view/Btn_server/TextServerTip")
-            self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",click_list=[0.95, 0.15])  # todo 不同游戏可能要改
-            self.my_poco_obj.touch_poco(sever_name_input)
+            self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",
+                                        click_list=[0.95, 0.15])  # 切第一个区服列表# todo 不同游戏可能要改
+            if self.my_poco_obj.is_in_dic(sever_name_input):
+                self.my_poco_obj.touch_poco(sever_name_input)
+            else:
+                if self.my_poco_obj.is_in_dic(
+                        "未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title"):  # 切第二个区服列表
+                    self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title",
+                                                click_list=[0.95, 0.15])
+                    if self.my_poco_obj.is_in_dic(sever_name_input):
+                        self.my_poco_obj.touch_poco(sever_name_input)
+                else:
+                    raise ValueException("区服选择错误")
             self.my_poco_obj.touch_poco("Txt_guide")  # 关闭新手引导
             self.my_poco_obj.touch_poco("Btn_login")  # 开始游戏
             if self.my_poco_obj.is_in_dic("LoginLawPop/__view/btn_ok"):

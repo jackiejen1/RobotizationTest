@@ -109,6 +109,9 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("장군님, 죄송합니다. 더 나은 게임 환경을 위해 서버 점검 중입니다. 잠시 후 다시 로그인하세요~"):
             self.make_poco_dic.my_touch("未命名0/未命名3/ComAssistPop/__view/Btn_cancel")
             raise GameServerMaintenanceException("服务器维护")
+        if self.make_poco_dic.is_in_dic("未命名0/popup/JumpReviewPop/__view/Label_desc"):
+            if self.make_poco_dic.is_this_text("未命名0/popup/JumpReviewPop/__view/Label_desc","評価"):
+                self.make_poco_dic.my_touch("未命名0/popup/JumpReviewPop/__view/n0/btn0")
         # if self.make_poco_dic.is_in_dic("推荐[color=#FFE71A]普通月卡[/color]"):
         #     self.make_poco_dic.my_touch("未命名0/popup/FirstChargeMainPop/__view/btn3")
 

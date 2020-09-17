@@ -742,15 +742,15 @@ class ProtocolFunction:
         :return:
         """
         flag_Guild_Create, data_Guild_Create = self.protocol.MSG_C2S_Guild_Create(name, self.uid, self.sid)
-        C2S_Guild_Create = cs_pb2.S2C_Guild_Create()  # 创建返回协议对象
-        C2S_Guild_Create.ParseFromString(data_Guild_Create)  # 解析协议返回值
-        if C2S_Guild_Create.ret == 1:
+        S2C_Guild_Create = cs_pb2.S2C_Guild_Create()  # 创建返回协议对象
+        S2C_Guild_Create.ParseFromString(data_Guild_Create)  # 解析协议返回值
+        if S2C_Guild_Create.ret == 1:
             print("创建军团成功")
-            for guild in C2S_Guild_Create.guilds:
-                guild_id = guild.id
-            return guild_id
+            if "guild" in dir(S2C_Guild_Create):
+                guild_id = S2C_Guild_Create.guild.id
+                return guild_id
         else:
-            raise ProtocolException(str(self.uid) + "创建军团失败" + str(C2S_Guild_Create.ret))
+            raise ProtocolException(str(self.uid) + "创建军团失败" + str(S2C_Guild_Create.ret))
 
     def Friend_SendGift(self, ):
         """
@@ -787,6 +787,10 @@ class ProtocolFunction:
                     raise ProtocolException("军团人数已满")
         elif S2C_Guild_Search.ret == 87 or S2C_Guild_Search.ret == 104:#军团不存在
             self.guild_id = self.Create_Guild(Guild_name)#创建军团
+            return ""
+        elif S2C_Guild_Search.ret == 82:
+            print("玩家已加入军团")
+            return ""
         else:
             print(str(self.uid) + "查询失败" + str(S2C_Guild_Search.ret))
             raise ProtocolException("军团不存在")
@@ -809,6 +813,8 @@ class ProtocolFunction:
         S2C_Guild_Quit.ParseFromString(data_Guild_Quit)  # 解析协议返回值
         if S2C_Guild_Quit.ret == 1:
             print("退出军团成功")
+        elif S2C_Guild_Quit.ret == 95:
+            pass
         else:
             raise ProtocolException(str(self.uid) +"退出军团失败"+ str(S2C_Guild_Quit.ret))
 
