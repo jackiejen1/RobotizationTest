@@ -289,12 +289,30 @@ message RedPoint {
   repeated uint32 month_card_active_hint = 36; //月卡活跃奖励红点
   optional DeadTowerHint dead_tower_hint = 37; //无双地牢红点
   optional FlameCityHint flame_city_hint = 38; // 烽火连城红点
+  optional GVGHint gvg_hint = 39; // 军团战红点
+  optional FundHint fund_hint = 40; //基金红点
+  optional DebateHint debate_hint = 41; //学宫红点
+}
+
+// 学宫论战红点
+message DebateHint {
+  optional uint32 doctor_num = 1;       // 战胜五经博士数量
+  repeated uint32 doctor_awarded = 2;   // 已领取五经博士奖励
+}
+
+// 军团战红点
+message GVGHint {
+  optional uint32 activity_id = 1; //配置表里的活动ID
+  optional uint32 start_time = 2; //活动开始时间
+  optional uint32 end_time = 3; //活动结束时间
+  optional bool is_joined = 4; //当前玩家是否已参战
+  optional bool is_guild_joined = 5; //军团是否已报名
 }
 
 // 烽火连城红点
 message FlameCityHint {
   optional bool pass_redpoint = 1; // 通关奖励红点
-  optional bool treasure_redpoint = 2; // 宝藏奖励可领
+  optional bool treasure_redpoint = 2; // 宝藏奖励可领(包含小宝箱) 
 }
 
 // 无双地牢红点
@@ -502,6 +520,11 @@ message FightingHint {
   repeated uint32 ids = 2;	// 已领取过的战力奖励id
 }
 
+//基金红点
+message FundHint {
+  optional uint32 dead_battle = 1;	// 无双历史最高层数
+}
+
 message OpKnight {
 	repeated Knight insert = 1;
 	repeated Knight update = 2;
@@ -610,6 +633,8 @@ message Formation {
   repeated uint64 artifact_id = 6;//上阵神器
   repeated uint64 pet_id = 7; // 上阵神兽
   repeated uint64 pet_equipment_id = 8; // 上阵神兽装备
+  repeated uint32 purplize_lv = 9; //原始武将星级
+  repeated uint64 magic_id = 10; //上阵战法
 }
 
 message UserSnapshot {
@@ -784,7 +809,7 @@ message DeadBattle {
 	optional uint32 week_star = 9;//本周星数
 	repeated uint32 history_id = 10;//所有关卡id
 	repeated uint32 history_star = 11;//所有关卡历史最高星
-	optional bool is_award = 12;//本层是否领奖
+  optional bool is_award = 12;//本层是否领奖
 }
 
 message DeadBattleShop {
@@ -949,6 +974,7 @@ message BattleUser {
   repeated PetEquipment petEquipments = 17; // 神兽装备
  // repeated KSoulBook kSoulBooks = 18; //将灵图鉴
  // optional KSoulHonor kSoulHonors = 19; //将灵荣誉
+  repeated out_base.Magic magics = 20;  // 战法
 }
 
 message GrowKnight {
@@ -1204,6 +1230,13 @@ message OpNewTotalRecharge {
   repeated NewTotalRecharge update = 2;
   repeated uint64 del = 3;
 }
+
+message OpMagic {
+  repeated Magic insert = 1;
+  repeated Magic update = 2;
+  repeated uint64 del = 3;
+}
+
 
 message CustomActivityHideInfo {
   required uint32 id = 1; //活动id
@@ -1547,6 +1580,14 @@ message RecruitAuKnight {
   required uint32 activity_id = 1;     //活动id
   required uint32 times = 2;           //抽卡次数
   required uint32 cost_times = 3;      //已消耗次数(用于阶段奖励)
+  optional uint32 refresh_time = 4;    //上一次刷新时间
+  repeated RecruitAuKnightRecharge recharges = 5;
+}
+
+message RecruitAuKnightRecharge {
+  required uint32 id = 1;              //对应充值配置里的id
+  required uint32 recharge_times = 2;  //已充值次数-对于每日刷新的充值档位，表示该档位当天已充值的次数
+  required uint32 award_times = 3;     //可领取次数-只要大于0就可以领取充值档位奖励
 }
 
 message MonthFundInfo {
@@ -1839,22 +1880,23 @@ message Wing {
 
 //广告页信息
 message AbvertPage {
-  required uint32 id = 1;            //广告id
-  required string title = 2;         //广告标题
-  required string pic = 3;           //广告图片url地址-到公告系统里去拉取图片
-  required uint32 function_id = 4;   //功能开启id-前端判断是否满足function_info里的条件进行弹出广告页
-  required string skip_id = 5;       //跳转id
-  required string skip_content = 6;  //跳转提示
-  required uint32 preview_time = 7;  //活动预览时间-跟可配置活动一样，服务器只推送符合预览时间内的广告页
-  required uint32 start_time = 8;    //活动开始时间
-  required uint32 finish_time = 9;   //活动结束时间
-  required uint32 expire_time = 10;  //活动过期时间
-  required uint32 order = 11;        //优先级-数字越小越先弹出-前端自己判断
-  required uint32 server_limit = 12; //开服时间限制
-  optional uint32 view_type = 13 ;   //道具类型
-  optional uint32 view_value = 14;   //道具id
-  optional uint32 skip_type = 15;    //跳转类型,1功能跳转；2游戏内打开外链；3游戏外打开外链
-  optional string effect = 16;       //特效路径
+  required uint32 id = 1;             //广告id
+  required string title = 2;          //广告标题
+  required string pic = 3;            //广告图片url地址-到公告系统里去拉取图片
+  required uint32 function_id = 4;    //功能开启id-前端判断是否满足function_info里的条件进行弹出广告页
+  required string skip_id = 5;        //跳转id
+  required string skip_content = 6;   //跳转提示
+  required uint32 preview_time = 7;   //活动预览时间-跟可配置活动一样，服务器只推送符合预览时间内的广告页
+  required uint32 start_time = 8;     //活动开始时间
+  required uint32 finish_time = 9;    //活动结束时间
+  required uint32 expire_time = 10;   //活动过期时间
+  required uint32 order = 11;         //优先级-数字越小越先弹出-前端自己判断
+  required uint32 server_limit = 12;  //开服时间限制
+  optional uint32 view_type = 13 ;    //道具类型
+  optional uint32 view_value = 14;    //道具id
+  optional uint32 skip_type = 15;     //跳转类型,1功能跳转；2游戏内打开外链；3游戏外打开外链
+  optional string effect = 16;        //特效路径
+  optional uint32 screen_orient = 17; //屏幕方向,1竖屏;2横屏
 }
 
 //广告页隐藏信息(当前时间)
@@ -2112,7 +2154,8 @@ message StaticGmGodBoxInfo {
   required uint32 expire = 3;//持续时间
   required uint32 warnning = 4;//预警时间
   repeated StaticGmGodBoxPackageInfo packages = 5;
-}
+  optional string group_name = 6; //礼包组名称
+} 
 
 //GM天公赐福宝箱信息
 message StaticGmGodBoxPackageInfo {
@@ -2187,14 +2230,15 @@ message EffectPos {
 
 // 噩梦副本关卡进度
 message StdChapterProgress {
-	required uint32 chapterId = 1;
-	repeated uint32 awards = 2;
+  required uint32 chapterId = 1;
+  repeated uint32 awards = 2;
 }
 
 //屏蔽活动
 message BlockActivity{
-  required uint32 id = 1;
-  required uint32 openDay = 2;
+  required uint32 id = 1; //功能ID
+  required uint32 openDay = 2; //开服天数
+  repeated uint32 act_ids = 3; //活动ID，为空则表示屏蔽整个功能
 }
 
 //===============================攻城略地新赛季================================
@@ -2577,6 +2621,7 @@ message FlameCityChapter {
   required uint32 id = 1; // 章节ID
   required uint32 main_num = 2; // 主线通关数量
   required uint32 branch_num = 3; // 支线通关数量
+  optional bool redpoint = 4; // 红点
 }
 
 // 烽火连城-格子信息
@@ -2589,6 +2634,7 @@ message FlameCityBlock {
 message FlameCityReport {
   optional uint32 block_id = 1; // 格子
   optional uint32 time = 2; // 时间
+  optional uint32 tp = 3; // 类型(0：占领格子  1:设置攻击目标)
 }
 
 // 烽火连城-宝藏
@@ -2625,28 +2671,30 @@ message FlameCityBlockWinGrade {
   required uint32 max_grade = 2; // 最高难度
 }
 
-//军团战-玩家action
-message GVGUserAction {
+//军团战-玩家成就
+message GVGUserAchieve {
   required uint32 id = 1;
   optional uint64 value = 2;
   optional uint32 state = 3;
 }
 
-//军团战-玩家成就
-message GVGUserAchieve {
-  required uint32 id = 1;
-  optional uint32 state = 2;
+//GVG赛季结果
+message GVGSeasonResult {
+  required uint32 config_id = 1; //配置编号
+  required out_base.GuildSnapshot king = 2; //王者军团
+  optional uint32 start_time = 3; //赛季开始时间
 }
 
 //军团战-比赛场景
 message GVGMatchInfo {
-  required uint32 id = 1; //比赛ID
+  required uint64 id = 1; //比赛ID
   required uint32 map_id = 2; //地图ID
   required uint32 start_time = 3; //开始时间
   required uint32 round = 4; //轮次
-  repeated GVGMatchGuild guilds = 5; //参战军团列表
-  optional GVGMatchUser mvp = 6; //mvp玩家
-  optional GVGMatchUser mars = 7; //战神玩家
+  required uint32 match_tp = 5; //比赛类型 1:海选赛 2:晋级赛 3:决赛 4:特殊海选赛
+  repeated GVGMatchGuild guilds = 6; //参战军团列表
+  optional GVGMatchUser mvp = 7; //mvp玩家
+  optional GVGMatchUser mars = 8; //战神玩家
 }
 
 //军团战-比赛中玩家身上的buff
@@ -2657,25 +2705,27 @@ message GVGMatchBuff {
 
 //军团战-比赛中的玩家信息
 message GVGMatchUser {
-  required UserSnapshot user = 1; //玩家快照
-  required uint64 score = 2; //玩家积分
-  required uint32 kill_num = 3; //杀人数
-  required uint32 continuous_kill_num = 4; //连续杀人数
-  required uint32 power = 5; //当前兵力
+  required uint64 user_id = 1; //玩家ID
+  optional uint64 score = 2; //玩家积分
+  optional uint32 kill_num = 3; //杀人数
+  optional uint32 continuous_kill_num = 4; //连续杀人数
+  optional uint32 power = 5; //当前兵力
   optional uint32 pos_id = 6; //当前位置或移动目标位置ID
   optional uint32 move_start_pos_id = 7; //移动目标起始位置ID 非移动中为空
   optional uint32 move_arrive_time = 8; //到达时间 非移动中为空
   optional GVGMatchBuff buff = 9; //当前持有buff
   optional uint32 tower_protect_end_time = 10; //如果玩家在炮台占领位，则有炮台占领位保护结束时间
-  optional bool is_in_match = 11; //玩家是否在比赛中
+  optional UserSnapshot snapshot = 11; //玩家快照
+  optional bool is_in_match = 12; //是否在比赛中
 }
 
 //军团战-比赛中的军团
 message GVGMatchGuild {
   required GuildSnapshot guild = 1; //军团快照
-  required uint32 index = 2; //比赛中的军团索引
+  required uint32 revive_grid_id = 2; //复活区格子ID
   optional uint32 user_num = 3; //参战人数
   optional uint64 score = 4; //当前积分
+  optional uint32 rank = 5; //排名
 }
 
 //军团战-比赛中的炮台区
@@ -2696,3 +2746,51 @@ message GVGMatchGridGate {
   required uint32 grid_id = 1; //城门所在区域ID
   required uint64 hp = 2; //当前耐久
 }
+
+//比赛对阵概况
+message GVGMatchSummary {
+  required uint32 index = 1; //序号
+  repeated out_base.GuildSnapshot guilds = 2; //军团列表
+  optional uint64 winner_guild_id = 3; //胜利者军团
+}
+
+//学宫论战匹配玩家
+message DebateUser {
+  optional uint32 index = 1;          // 玩家编号
+  repeated uint32 line_up = 2;        // 学宫布阵
+  optional UserSnapshot user = 3;     // 玩家基础信息
+  optional uint64 first_ability = 4;  // 首阵战力
+  optional uint64 second_ability = 5; // 次阵战力
+}
+
+//战法
+message Magic {
+	required uint64	id			= 1;	//唯一id
+	required uint32 base_id		= 2;	//配置id
+	required uint32 level_base_id = 3;	//等级配置id
+	required uint32 position	  = 4;	//神兵在阵位中的位置，0，未上阵
+}
+
+//预抽卡
+message PreDrawActInfo {
+  required string title = 1; //活动标题
+  required string icon = 2; //icon
+  required string banner = 3; //资源图
+  required uint32 start_time = 4; //开始时间
+  required uint32 end_time = 5; //结束时间
+  repeated Award login_award = 6; //直登奖励
+  required uint32 act_id = 7; //活动ID
+  optional string url = 8; //外链跳转地址
+}
+
+//预抽卡用户数据
+message UserPreDraw {
+  required bool login_received = 1;
+  required bool final_received = 2;
+  required uint32 already_login_day = 3;
+  repeated Award final_awards = 4; //用户奖励
+  required uint32 need_login_day = 5; //需要累登多少天可以领取大奖
+}
+
+
+

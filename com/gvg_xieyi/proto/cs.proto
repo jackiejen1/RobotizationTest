@@ -32,6 +32,7 @@ enum ID {
 	MSG_S2C_FlushPet=10122;
 	MSG_S2C_FlushPetEquipment=10123;
 	MSG_S2C_FlushKSoul=10124;
+	MSG_S2C_FlushMagic=10125;
 	MSG_C2S_GetUserConfig = 10130;//玩家通用设置
 	MSG_S2C_GetUserConfig = 10131;
 	MSG_C2S_SetUserConfig = 10132;//设置玩家通用设置
@@ -168,6 +169,8 @@ enum ID {
   MSG_S2C_Dungeon_FastChallengeStage = 10412;
   MSG_C2S_Dungeon_FinishAchievement = 10413; //星数成就领奖
   MSG_S2C_Dungeon_FinishAchievement = 10414;
+  MSG_C2S_Dungeon_OneKey_GetChapterChestAward = 10415; // 主线副本星数/章节宝箱奖励一键领取
+  MSG_S2C_Dungeon_OneKey_GetChapterChestAward = 10416;
 
   MSG_C2S_Shop_GetShopInfo = 10420;//获取通用商店信息
   MSG_S2C_Shop_GetShopInfo = 10421;
@@ -1552,6 +1555,8 @@ enum ID {
   MSG_S2C_Recruit_GetRecruitAuKnightInfo = 14273;
   MSG_C2S_Recruit_GetRecruitAuKnightAward = 14274; //请求领取阶段奖励
   MSG_S2C_Recruit_GetRecruitAuKnightAward = 14275;
+  MSG_C2S_Recruit_GetRechargeAward = 14276;       //领取充值奖励
+  MSG_S2C_Recruit_GetRechargeAward = 14277;
 
   //乱世英杰活动
   MSG_C2S_WarLord_GetInfo = 14280; //乱世英杰活动获取信息
@@ -1615,20 +1620,23 @@ enum ID {
   MSG_C2S_FlameCity_GetTreasureList = 14424; // 获取宝藏奖励领取情况
   MSG_S2C_FlameCity_GetTreasureList = 14425;
   MSG_S2C_FlameCity_ChapterNotify = 14426; // 章节信息推送
+  MSG_C2S_FlameCity_OneKeyBoxAward = 14427; // 一键领取宝箱奖励
+  MSG_S2C_FlameCity_OneKeyBoxAward = 14428;
+  MSG_S2C_FlameCity_TargetNotify = 14429; // 攻击目标推送
 
   // 军团战
   MSG_C2S_GVG_GetInfo = 14430; //获取军团战信息
-  MSG_SGC_GVG_GetInfo = 14431;
-  MSG_C2S_GVG_GetMatchInfo = 14432; //获取军团战比赛信息
-  MSG_SGC_GVG_GetMatchInfo = 14433;
+  MSG_S2C_GVG_GetInfo = 14431;
+  MSG_C2S_GVG_GetAdvanceMatches = 14432; //获取淘汰赛以后的比赛信息
+  MSG_S2C_GVG_GetAdvanceMatches = 14433;
   MSG_C2S_GVG_Join = 14434; //参战
   MSG_S2C_GVG_Join = 14435;
   MSG_C2S_GVG_GetAchieve = 14436;//获取赛季成就信息
   MSG_S2C_GVG_GetAchieve = 14437;
   MSG_C2S_GVG_GetAchieveAward = 14438;//领取赛季成就奖励
   MSG_S2C_GVG_GetAchieveAward = 14439;
-  MSG_C2S_GVG_GetKingHistory = 14440; //获取历代王者
-  MSG_S2C_GVG_GetKingHistory = 14441;
+  MSG_C2S_GVG_GetSeasonHistory = 14440; //获取历史赛季
+  MSG_S2C_GVG_GetSeasonHistory = 14441;
   MSG_C2S_GVG_EnterMatch = 14442; //进入比赛
   MSG_S2C_GVG_EnterMatch = 14443;
   MSG_S2C_GVG_NotifyUserEnter = 14444; //玩家进入比赛推送
@@ -1652,6 +1660,51 @@ enum ID {
   MSG_S2C_GVG_NotifyAddBuff = 14462; //获取Buff推送
   MSG_S2C_GVG_NotifyRemoveBuff = 14463; //移除Buff推送
   MSG_S2C_GVG_NotifyNewBuff = 14464; //刷新Buff推送
+  MSG_S2C_GVG_NotifyTowerAttack = 14465; //炮台攻击推送
+  MSG_C2S_GVG_GetUserSnapshots = 14466; //获取比赛中的指定玩家的快照
+  MSG_S2C_GVG_GetUserSnapshots = 14467;
+  MSG_C2S_GVG_GetGuildRankList = 14468; //获取军团排行榜
+  MSG_S2C_GVG_GetGuildRankList = 14469;
+  MSG_S2C_GVG_NotifyMatchEnd = 14470; //比赛结束通知
+
+  // 18加信息
+  MSG_C2S_EighteenPlus_Info = 14500;  // 18加信息
+  MSG_S2C_EighteenPlus_Info = 14501;
+  MSG_S2C_EighteenPlus_Notify = 14502; // 18加推送
+
+  // 学宫论战
+  MSG_C2S_Debate_EnterInfo = 14550;    // 进入玩法
+  MSG_S2C_Debate_EnterInfo = 14551;
+  MSG_C2S_Debate_LineUp = 14552;       // 学宫布阵
+  MSG_S2C_Debate_LineUp = 14553;
+  MSG_C2S_Debate_BattleStart = 14554;  // 战斗
+  MSG_S2C_Debate_BattleStart = 14555;
+  MSG_S2C_Debate_BattleFinish = 14556; // 战斗完成
+  MSG_C2S_Debate_RefreshMatch = 14557; // 手动匹配
+  MSG_S2C_Debate_RefreshMatch = 14558;
+  MSG_C2S_Debate_DoctorReward = 14559; // 领取五经博士奖励
+  MSG_S2C_Debate_DoctorReward = 14560;
+  MSG_C2S_Debate_TestLineUp = 14561;   //获取测试玩家阵位
+  MSG_S2C_Debate_TestLineUp = 14562;
+
+  // 战法
+  MSG_C2S_Magic_Upgrade = 14600;	// 战法升级
+  MSG_S2C_Magic_Upgrade = 14601;
+  MSG_C2S_Magic_Advance = 14602;	// 战法升阶
+  MSG_S2C_Magic_Advance = 14603;
+  
+  // 军团头像框
+  MSG_C2S_Guild_FrameInfo = 14650;  // 军团头像框
+  MSG_S2C_Guild_FrameInfo = 14651;
+
+  //预抽卡
+  MSG_C2S_PreDraw_GetInfo = 14660;//获取活动详情
+  MSG_S2C_PreDraw_GetInfo = 14661;
+  MSG_C2S_PreDraw_ReceiveLoginAward = 14662;//领取直登奖励
+  MSG_S2C_PreDraw_ReceiveLoginAward = 14663;
+  MSG_C2S_PreDraw_ReceiveFinalAward = 14664;//领取最终奖励
+  MSG_S2C_PreDraw_ReceiveFinalAward = 14665;
+  MSG_S2C_PreDraw_ChangeNotify = 14666;
 }
 
 //跨服玩法聊天+弹幕
@@ -2062,6 +2115,7 @@ message C2S_Flush {
     optional bool pet = 23; // 宠物
     optional bool pet_equipment = 24; // 宠物装备
     optional bool kSoul = 25; // 将灵
+	optional bool magic = 26; // 战法
 
 }
 
@@ -2092,6 +2146,7 @@ message S2C_Flush {
     optional bool pet = 24; // 宠物
     optional bool pet_equipment = 25; // 宠物装备
     optional bool kSoul = 26; // 将灵
+	optional bool magic = 27; // 战法
 
     repeated out_base.Knight knights = 104;
     repeated out_base.KV fragments = 105;
@@ -2111,6 +2166,7 @@ message S2C_Flush {
     repeated out_base.CardCompose cardcomposes = 119;	// 化身組合
     repeated out_base.Wing wings = 120;	// 翅膀
     repeated out_base.WingRefine wing_refines = 121;	// 翅膀精炼
+	repeated out_base.Magic magics = 122;	// 战法
 }
 
 
@@ -2194,6 +2250,10 @@ message S2C_FlushKSoul {
     repeated out_base.KV kSouls = 1;
 }
 
+message S2C_FlushMagic {
+    repeated out_base.Magic magics = 1;
+}
+
 
 message S2C_OpObject {
     optional out_base.OpKnight knight = 2;
@@ -2221,6 +2281,7 @@ message S2C_OpObject {
     optional out_base.OpPetEquipment pet_equipment = 24;
     optional out_base.OpKV kSoul = 25;
     optional out_base.OpRecruitAuKnight recruit_au_knight = 26;
+	optional out_base.OpMagic magic = 27;
 }
 
 message C2S_ModifyUserInfo {
@@ -2614,6 +2675,16 @@ message S2C_Dungeon_FinishAchievement {
     required uint32 index = 3;
     repeated out_base.Award awards = 4; //本次成就奖励
     repeated uint32 flags = 5; //已领取的成就标记
+}
+
+// 主线副本-星数/章节宝箱一键领奖
+message C2S_Dungeon_OneKey_GetChapterChestAward {
+}
+
+message S2C_Dungeon_OneKey_GetChapterChestAward {
+    required uint32 ret = 1;
+    repeated out_base.Award awards = 2;
+    repeated out_base.Chapter chapters = 3;
 }
 
 message C2S_Item_Use {
@@ -3127,6 +3198,7 @@ message S2C_DeadBattle_ChallengeFinish {
     optional uint32 result = 8; //评价用战斗结果
     optional uint32 origin_rank = 9;//原来排名
     optional uint32 new_rank = 10;//现有排名
+    optional uint32 max_floor = 11;//历史最高层
 }
 
 message C2S_DeadBattle_PickBuff {
@@ -5696,6 +5768,7 @@ message C2S_Recharge_GetFundRecharge {
 message S2C_Recharge_GetFundRecharge {
     required uint32 ret = 1;
     repeated out_base.FundRecharge fund_recharge = 2;
+    optional uint32 dead_battle = 3; //无双历史最高层数
 }
 
 //领取天天充值奖励
@@ -7848,6 +7921,7 @@ message C2S_SpaceTimeDungeon_Enter {
 message S2C_SpaceTimeDungeon_Enter {
     required uint32 ret = 1;
     repeated out_base.StdChapterProgress progress = 2; // 关卡进度
+    repeated uint32 play_chapters = 3; //已消耗疲劳值的关卡
 }
 
 //噩梦副本-进入关卡
@@ -7866,6 +7940,7 @@ message S2C_SpaceTimeDungeon_EnterChapter {
     repeated uint64 hp_list = 8;                     //玩家剩余血量百分比
     repeated uint32 new_events = 9;                  //进入关卡触发的事件
     repeated out_base.StdLifts lifts = 10;           //升降台和控制台状态
+    repeated uint32 play_chapters = 11;              //已消耗疲劳值的关卡-有变化才给数据
 }
 
 //噩梦副本-重置关卡
@@ -9186,6 +9261,19 @@ message S2C_Recruit_GetRecruitAuKnightAward {
     repeated out_base.Award awards = 3;
 }
 
+//时空召唤-领取充值奖励
+message C2S_Recruit_GetRechargeAward {
+    required uint32 activity_id = 1;   //活动id
+    required uint32 id = 2;            //充值配置id
+}
+
+message S2C_Recruit_GetRechargeAward {
+    required uint32 ret = 1;
+    required uint32 activity_id = 2;
+    required uint32 id = 3;
+    repeated out_base.Award awards = 4;
+}
+
 //==========================乱世英杰活动==============================
 //请求活动信息
 message C2S_WarLord_GetInfo {
@@ -9425,6 +9513,7 @@ message S2C_FlameCity_GetBoxAward {
   required uint32 chapter_id = 2; // 章节id
   required uint32 block_id = 3; // 格子id
   repeated out_base.Award awards = 4; // 奖励
+  optional out_base.FlameCityChapter chapter = 5; // 章节
 }
 
 // 烽火连城-领取宝藏奖励
@@ -9508,6 +9597,27 @@ message S2C_FlameCity_ChapterNotify {
   optional out_base.FlameCityChapter chapter = 1; // 章节信息
 }
 
+// 烽火连城-一键领取宝箱奖励
+message C2S_FlameCity_OneKeyBoxAward {
+  required uint32 chapter_id = 1; //章节id
+  repeated uint32 block_ids = 2; // 格子id
+}
+
+message S2C_FlameCity_OneKeyBoxAward {
+  required uint32 ret = 1;
+  required uint32 chapter_id = 2; // 章节id
+  repeated uint32 block_ids = 3; // 格子id
+  repeated uint32 box_award = 4; // 玩家已领取章节内宝箱奖励
+  repeated out_base.Award awards = 5; // 奖励
+  optional out_base.FlameCityChapter chapter = 6; // 章节
+}
+
+// 烽火连城-攻击目标推送
+message S2C_FlameCity_TargetNotify {
+  required uint32 chapter_id = 1; // 章节id
+  required uint32 block_id = 2; // 格子id
+}
+
 //武将幻紫
 message C2S_Knight_Purplize {
   required uint64 id = 1;  //武将id
@@ -9540,6 +9650,7 @@ message S2C_Artifact_HelpDown{
   required uint64 artifact_id = 2;//主神兵ID
 }
 
+//*************************************************军团战************************************************************
 //军团战-获取军团战信息
 message C2S_GVG_GetInfo {
 }
@@ -9551,6 +9662,8 @@ message S2C_GVG_GetInfo {
   optional bool is_joined = 4; //当前玩家是否已参战
   optional bool is_guild_joined = 5; //军团是否已报名
   optional out_base.GVGMatchInfo my_match = 6; //己方军团比赛信息
+  optional uint32 mvp_num = 7; //mvp次数
+  optional uint32 kill_num = 8; //杀人次数
 }
 
 // 军团战-获取赛季成就
@@ -9559,8 +9672,7 @@ message C2S_GVG_GetAchieve {
 
 message S2C_GVG_GetAchieve {
   required uint32 ret = 1;
-  repeated out_base.GVGUserAction actions = 2;
-  repeated out_base.GVGUserAchieve achieves = 3;
+  repeated out_base.GVGUserAchieve achieves = 2;
 }
 
 // 军团战-领取成就奖励
@@ -9574,34 +9686,22 @@ message S2C_GVG_GetAchieveAward {
   repeated out_base.Award awards = 3;
 }
 
-//军团战-获取比赛详情
-message C2S_GVG_GetMatchInfo {
-  required uint32 id = 1; //比赛id
-}
-
-message S2C_GVG_GetMatchInfo {
-  required uint32 ret = 1;
-  required uint32 id = 2;
-  optional out_base.GVGMatchInfo match_info = 3; //GVG对战信息
-}
-
 //军团战-报名 自动判断报名者身份执行玩家参战或军团报名逻辑
 message C2S_GVG_Join {
 }
 
 message S2C_GVG_Join {
   required uint32 ret = 1;
-  required bool is_guild_joined = 2; //军团是否报名
+  optional bool is_guild_joined = 2; //军团是否报名
 }
 
-//军团战-获取历代王者
-message C2S_GVG_GetKingHistory {
+//军团战-获取历史赛季
+message C2S_GVG_GetSeasonHistory {
 }
 
-message S2C_GVG_GetKingHistory {
+message S2C_GVG_GetSeasonHistory {
   required uint32 ret = 1;
-  required uint32 activitiy_id = 2;
-  required out_base.GuildSnapshot guild = 3; //军团快照
+  repeated out_base.GVGSeasonResult history = 2; //各赛季历史
 }
 
 //军团战-进入比赛
@@ -9610,12 +9710,13 @@ message C2S_GVG_EnterMatch {
 
 message S2C_GVG_EnterMatch {
   required uint32 ret = 1;
-  required out_base.GVGMatchInfo info = 2; //比赛信息
-  repeated out_base.GVGMatchGuild guilds = 3; //公会列表
-  repeated out_base.GVGMatchUser users = 4; //比赛中的玩家列表
-  repeated out_base.GVGMatchGridGate gates = 5; //城门
-  repeated out_base.GVGMatchGridBuff buffs = 6; //BUFF点
-  repeated out_base.GVGMatchGridTower towers = 7; //炮台
+  optional out_base.GVGMatchInfo info = 2; //比赛信息
+  repeated out_base.GVGMatchUser users = 3; //比赛中的玩家列表
+  repeated out_base.GVGMatchGridGate gates = 4; //城门
+  repeated out_base.GVGMatchGridBuff buffs = 5; //BUFF点
+  repeated out_base.GVGMatchGridTower towers = 6; //炮台
+  optional uint32 revive_enable_time = 7; //下一次可复活时间
+  optional uint64 message_index = 8; //消息序号
 }
 
 //军团战-离开比赛
@@ -9634,7 +9735,19 @@ message C2S_GVG_Move {
 
 message S2C_GVG_Move {
   required uint32 ret = 1;
-  required uint32 arrive_time = 2; //到达目的地时间
+  required uint32 target_pos_id = 2; //终点位置ID
+  required uint32 cost_time = 3; //需要时间
+  optional uint32 arrive_time = 4; //到达目的地时间
+}
+
+//军团战-移动推送
+message S2C_GVG_NotifyMove {
+  required uint64 user_id = 1; //玩家ID
+  required uint32 pos_id = 2; //目标位置
+  optional uint32 arrive_time = 3; //到达时间 无此值时表示立即到达
+  optional uint64 owner_guild_id = 4; //炮塔拥有者是发生变更时，返回当前炮台占领的军团
+  optional uint32 protect_end_time = 5; //如果是站上炮台占领位，则返回保护到期时间
+  required uint64 message_index = 6; //消息序号
 }
 
 //军团战-玩家复活
@@ -9668,6 +9781,11 @@ message S2C_GVG_NotifyAttackUser {
   required uint32 defender_cont_kill_num = 8; //被攻击方连续杀人数
   optional uint32 attacker_protect_end_time = 9; //如果是攻占炮台占领位，则返回保护到期时间
   optional uint64 owner_guild_id = 10; //如果是炮台占领区占领军团，则返回当前占领者
+  required uint64 attacker_guild_id = 11; //防守方军团ID
+  required uint64 attacker_guild_score = 12;//攻击方军团积分
+  required uint64 defender_guild_id = 13; //攻击方军团ID
+  required uint64 defender_guild_score = 14;//防守方方军团积分
+  required uint64 message_index = 15; //消息序号
 }
 
 //军团战-攻击城门
@@ -9684,6 +9802,9 @@ message S2C_GVG_NotifyAttackGate {
   required uint64 score = 2; //当前积分
   required uint32 gate_grid_id = 3; //城门格子ID
   optional uint64 gate_hp = 4; //城门当前耐久
+  required uint64 guild_id = 5; //军团ID
+  required uint64 guild_score = 6; //军团积分
+  required uint64 message_index = 7; //消息序号
 }
 
 //军团战-产生新buff推送
@@ -9693,14 +9814,17 @@ message S2C_GVG_NotifyNewBuff {
 
 //军团战-使用炮台攻击
 message S2C_GVG_NotifyTowerAttack {
-  required uint64 user_id = 1; //玩家ID
-  required uint64 score = 2; //当前积分
-  optional uint32 gate_hp = 3; //城门当前耐久
+  repeated out_base.KV users = 1; //炮台攻击的玩家列表 id:玩家ID num:玩家当前积分
+  optional uint32 tower_grid_id = 2; //炮台区域ID
+  required uint64 guild_id = 3; //军团ID
+  required uint64 guild_score = 4; //军团积分
+  required uint64 message_index = 5; //消息序号
 }
 
 //军团战-玩家进入推送
 message S2C_GVG_NotifyUserEnter {
   required out_base.GVGMatchUser user = 1; //比赛玩家信息
+  required uint64 message_index = 5; //消息序号
 }
 
 //军团战-玩家离开推送
@@ -9711,6 +9835,8 @@ message S2C_GVG_NotifyUserLeave {
 //军团战-复活推送
 message S2C_GVG_NotifyRevive {
   required uint64 user_id = 1; //玩家ID
+  required uint32 pos_id = 2; //所在位置
+  required uint64 message_index = 8; //消息序号
 }
 
 //军团战-玩家获得Buff
@@ -9730,20 +9856,217 @@ message S2C_GVG_NotifyAddBuff {
 //军团战-玩家移除Buff推送
 message S2C_GVG_NotifyRemoveBuff {
   required uint64 user_id = 1; //玩家ID
-  required uint32 buff_id = 2; //Buff ID
-}
-
-//军团战-移动推送
-message S2C_GVG_NotifyMove {
-  required uint64 user_id = 1; //玩家ID
-  required uint32 pos_id = 2; //目标位置
-  optional uint32 arrive_time = 3; //到达时间 无此值时表示立即到达
-  optional uint64 owner_guild_id = 4; //炮塔拥有者是发生变更时，返回当前炮台占领的军团
-  optional uint32 protect_end_time = 5; //如果是站上炮台占领位，则返回保护到期时间
 }
 
 //军团战-比赛结束通知
 message S2C_GVG_NotifyMatchEnd {
   required out_base.GVGMatchInfo match_info = 4; //GVG战斗结果
+}
+
+//军团战-获取玩家快照
+message C2S_GVG_GetUserSnapshots {
+  repeated uint64 user_ids = 1; //请求的玩家ID列表
+}
+
+message S2C_GVG_GetUserSnapshots {
+  required uint32 ret = 1;
+  repeated uint64 user_ids = 2; //请求的玩家ID列表
+  repeated out_base.UserSnapshot snapshots = 3; //比赛中的玩家列表
+}
+
+//获取赛季军团排名
+message C2S_GVG_GetGuildRankList {
+  required uint32 size = 1; //排行长度
+}
+
+message S2C_GVG_GetGuildRankList {
+  required uint32 ret = 1;
+  required uint32 size = 2; //排行长度
+  optional uint32 self_rank = 3; //自己的排名
+  optional uint64 self_score = 4; //我的积分
+  repeated out_base.RankUnit list = 5; //军团列表
+}
+
+//淘汰赛以后的对阵
+message C2S_GVG_GetAdvanceMatches {
+}
+
+message S2C_GVG_GetAdvanceMatches {
+  required uint32 ret = 1;
+  repeated out_base.GVGMatchSummary advance_matches = 2; //晋级赛
+  optional out_base.GVGMatchSummary final_match = 3; //决赛
+}
+
+//****************************************************************************************************************
+
+// 18加-获取信息
+message C2S_EighteenPlus_Info {
+}
+
+message S2C_EighteenPlus_Info {
+    required uint32 ret = 1;
+      optional bool is_open = 2; // 是否开启
+}
+
+// 18加-推送
+message S2C_EighteenPlus_Notify {
+    optional bool is_open = 1; // 是否开启 
+}
+
+/****************************************************学宫论战***************************************************************/
+//学宫论战-进入玩法
+message C2S_Debate_EnterInfo {
+}
+
+message S2C_Debate_EnterInfo {
+  required uint32 ret = 1;
+  repeated uint32 line_up = 2;          // 学宫阵位: 数组下标为武将上阵阵位,数组元素未1-12的学宫阵位,0-6为首阵,7-12为次阵
+  optional uint32 doctor_num = 3;       // 战胜五经博士数量
+  optional uint32 score = 4;            // 积分
+  optional uint32 score_rank = 5;       // 积分排名
+  repeated uint32 doctor_awarded = 6;   // 已领取五经博士奖励
+  optional bool is_match = 7;           // 是否自动刷新匹配
+  repeated out_base.DebateUser match_users = 8;  // 匹配玩家
+}
+
+//学宫论战-布阵保存
+message C2S_Debate_LineUp {
+  repeated uint32 line_up = 1;     // 学宫阵位
+}
+
+message S2C_Debate_LineUp {
+  required uint32 ret = 1;
+  repeated uint32 line_up = 2;     // 学宫阵位
+}
+
+//学宫论战-战斗
+message C2S_Debate_BattleStart {
+  required uint32 enemy_index = 1;     // out_base.DebateUser中的index
+}
+
+message S2C_Debate_BattleStart {
+  required uint32 ret = 1;
+  required uint32 enemy_index = 2;
+  optional uint64 battle_id  = 3;   // 战斗id
+}
+
+//学宫论战-战斗完成
+message S2C_Debate_BattleFinish {
+    required uint32 ret = 1;
+    required uint32 enemy_index = 2;         // 敌人
+    optional uint32 score = 3;               // 积分
+    required bool is_win = 4;                // 是否获胜
+    optional bool is_match = 5;              // 是否自动刷新匹配
+    repeated uint32 multi_result = 6;        // 多轮战斗结果
+    repeated out_base.Award awards = 7;      // 奖励
+    optional uint32 score_rank = 8;          // 积分排名
+}
+
+//学宫论战-手动匹配
+message C2S_Debate_RefreshMatch {
+}
+
+message S2C_Debate_RefreshMatch {
+  required uint32 ret = 1;
+  repeated out_base.DebateUser match_users = 2;  // 匹配玩家
+}
+
+//学宫论战-领取博士奖励
+message C2S_Debate_DoctorReward {
+  required uint32 stage_id = 1;            // 领奖阶段
+}
+
+message S2C_Debate_DoctorReward {
+  required uint32 ret = 1;
+  required uint32 stage_id = 2;
+  repeated out_base.Award awards = 3;      // 奖励
+}
+
+//学宫论战-获取测试玩家阵位
+message C2S_Debate_TestLineUp {
+  required uint64 player_id = 1;            // 玩家id
+}
+
+message S2C_Debate_TestLineUp {
+ required uint32 ret = 1;
+ required uint64 player_id = 2;
+ repeated uint32 line_up = 3;     // 学宫阵位
+ repeated out_base.GrowKnight knights = 4;     // 上阵武将
+}
+
+//战法升级-->req
+message C2S_Magic_Upgrade{
+	required uint64 id = 1;				//战法id
+	required uint32 upgrade_count = 2;	//升级次数
+}
+
+//战法升级-->ret
+message S2C_Magic_Upgrade{
+	required uint32  ret = 1;			//结果码
+	required uint64 id = 2;				//战法id
+	required uint32 upgrade_count = 3;	//升级次数
+}
+
+//战法升阶-->req
+message C2S_Magic_Advance{
+	required uint64 id = 1;		//战法id
+	repeated uint64 consumes1 = 2;	//孔位1选择材料列表
+	repeated uint64 consumes2 = 3;	//孔位2选择材料列表
+	repeated uint64 consumes3 = 4;	//孔位3选择材料列表
+}
+
+//战法升阶-->ret
+message S2C_Magic_Advance{
+	required uint32 ret	= 1;		//结果码
+	required uint64 id   = 2;		//战法id
+	repeated uint64 consumes1 = 3;	//孔位1选择材料列表
+	repeated uint64 consumes2 = 4;	//孔位2选择材料列表
+	repeated uint64 consumes3 = 5;	//孔位3选择材料列表
+}
+/**************************************************************************************************************************/
+
+// 军团头像框
+message C2S_Guild_FrameInfo {
+}
+
+message S2C_Guild_FrameInfo {
+  required uint32 ret = 1;
+  repeated out_base.LimitFrameInfo frames = 2;  // 已激活的边框和图像
+}
+
+//预抽卡-获取活动详情
+message C2S_PreDraw_GetInfo {
+}
+
+message S2C_PreDraw_GetInfo {
+  required uint32 ret = 1;
+  optional out_base.PreDrawActInfo info = 2;
+  optional out_base.UserPreDraw user_data = 3;
+}
+
+//预抽卡-领取直登奖励
+message C2S_PreDraw_ReceiveLoginAward {
+
+}
+
+message S2C_PreDraw_ReceiveLoginAward {
+  required uint32 ret = 1;
+  repeated out_base.Award award = 2;
+}
+
+//预抽卡-领取最终奖励
+message C2S_PreDraw_ReceiveFinalAward {
+
+}
+
+message S2C_PreDraw_ReceiveFinalAward {
+  required uint32 ret = 1;
+  repeated out_base.Award award = 2;
+}
+
+//预抽卡-活动配置更新推送
+message S2C_PreDraw_ChangeNotify {
+  optional out_base.PreDrawActInfo update = 1;
+  optional uint32 delete = 2;
 }
 

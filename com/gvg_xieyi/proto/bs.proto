@@ -34,6 +34,7 @@ message BattleUnit {
     optional uint32 dress_num = 18;//时装数量
     optional uint32 wingId = 19;//穿戴翅膀
 		optional uint32 energy_skill_id = 20;//必杀技能
+	optional uint32 magic_id = 21;	// 战法baseId
 }
 
 message BattleTeam {
@@ -64,7 +65,7 @@ message DemonBossTeamMultiple {
 // 战斗数据，会有多波战斗
 message BattleReport {
     required uint64 battle_id = 1; // 战斗唯一id
-    required uint32 atk_type = 2; // 战斗类型 1 pve 2 pvp
+    required uint32 atk_type = 2; // 战斗类型 1 pve 2 pvp 3 多轮3v3
     optional bool is_auto = 3; // 是否自动战斗
     optional uint32 random_seed = 4; // 随机数种子(废弃)
     repeated BattleTeam own_teams = 5; // 己方阵容,会有多个的情况
@@ -110,6 +111,7 @@ message BattleResult{
     repeated BattleUnitResult own_teams = 13;
     repeated BattleUnitResult enemy_teams = 14;
     optional uint64 attack_total_damage = 15; //攻击方造成总伤害
+    repeated uint32 multi_result = 16; //多轮战斗结果
 }
 
 // 战斗单位伤害信息--用于展示

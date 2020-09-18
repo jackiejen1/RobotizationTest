@@ -49,12 +49,11 @@ if __name__ == '__main__':
     # height= json.loads(height)
     # print(width)
     # print(height)
-    resource_name = 3
-    all_path = "D:\RobotizationTest\com\Tools\MyPoco\info_tab\少三2道具表.xlsx"
-    xl = xlrd.open_workbook(all_path)
-    table = xl.sheets()[0]
-    col = table.col_values(0)
-    print(col)
+
+    text_dic = {1:11,2:2,3:3,4:4,}
+    print(text_dic)
+    text_dic.pop(2,0)
+    print(text_dic[1])
     # if resource_name in col:
     #     print(col.index(resource_name))
     #     row = table.row_values(col.index(resource_name))

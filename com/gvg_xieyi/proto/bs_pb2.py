@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='bs',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=b'\n\x08\x62s.proto\x12\x02\x62s\x1a\x0eout_base.proto\"#\n\x04\x41ttr\x12\x0c\n\x04type\x18\x01 \x02(\r\x12\r\n\x05value\x18\x02 \x02(\x04\"E\n\x0b\x42\x61ttleCombo\x12\x0e\n\x06tokens\x18\x01 \x03(\r\x12\x17\n\x05\x61ttrs\x18\x02 \x03(\x0b\x32\x08.bs.Attr\x12\r\n\x05level\x18\x03 \x03(\r\"\x80\x03\n\nBattleUnit\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0b\n\x03pos\x18\x02 \x02(\r\x12\x17\n\x05\x61ttrs\x18\x03 \x03(\x0b\x32\x08.bs.Attr\x12\x0e\n\x06skills\x18\x04 \x03(\r\x12\x0c\n\x04star\x18\x05 \x01(\r\x12\x14\n\x0cskill_level1\x18\x06 \x01(\r\x12\x14\n\x0cskill_level2\x18\x07 \x01(\r\x12\x0c\n\x04name\x18\x08 \x01(\t\x12\x17\n\x0f\x63ommon_skill_id\x18\t \x01(\r\x12\x17\n\x0f\x61\x63tive_skill_id\x18\n \x01(\r\x12\n\n\x02hp\x18\x0b \x01(\x04\x12\x15\n\radvance_level\x18\x0c \x01(\r\x12\x0c\n\x04skin\x18\r \x01(\r\x12\x0f\n\x07skin_ts\x18\x0e \x01(\r\x12\x12\n\nartifactId\x18\x0f \x01(\r\x12\x14\n\x0cskill_level4\x18\x10 \x01(\r\x12\x0e\n\x06\x63\x61rdId\x18\x11 \x01(\r\x12\x11\n\tdress_num\x18\x12 \x01(\r\x12\x0e\n\x06wingId\x18\x13 \x01(\r\x12\x17\n\x0f\x65nergy_skill_id\x18\x14 \x01(\r\"\xac\x03\n\nBattleTeam\x12\x1d\n\x05units\x18\x01 \x03(\x0b\x32\x0e.bs.BattleUnit\x12\x1e\n\x05\x63ombo\x18\x02 \x02(\x0b\x32\x0f.bs.BattleCombo\x12\x13\n\x0b\x66ight_value\x18\x03 \x01(\x04\x12\x0c\n\x04wave\x18\x04 \x01(\r\x12\x0f\n\x07is_boss\x18\x05 \x01(\x08\x12\x1e\n\x05\x64rops\x18\x06 \x03(\x0b\x32\x0f.out_base.Award\x12$\n\x04user\x18\x07 \x01(\x0b\x32\x16.out_base.UserSnapshot\x12\x10\n\x08total_hp\x18\x08 \x01(\x04\x12\x10\n\x08multiple\x18\t \x01(\x05\x12\x14\n\x0crebel_talent\x18\n \x01(\r\x12\x17\n\x0fmonster_team_id\x18\x0b \x01(\r\x12\x10\n\x08rebel_id\x18\x0c \x01(\r\x12\"\n\x05shows\x18\r \x03(\x0b\x32\x13.bs.TokenKnightShow\x12\x0c\n\x04pets\x18\x0e \x03(\r\x12\x16\n\x0epassive_skills\x18\x0f \x03(\r\x12\x36\n\x13\x64\x65mon_boss_multiple\x18\x10 \x01(\x0b\x32\x19.bs.DemonBossTeamMultiple\"7\n\x15\x44\x65monBossTeamMultiple\x12\x0c\n\x04team\x18\x01 \x02(\r\x12\x10\n\x08multiple\x18\x02 \x02(\r\"\xf8\x01\n\x0c\x42\x61ttleReport\x12\x11\n\tbattle_id\x18\x01 \x02(\x04\x12\x10\n\x08\x61tk_type\x18\x02 \x02(\r\x12\x0f\n\x07is_auto\x18\x03 \x01(\x08\x12\x13\n\x0brandom_seed\x18\x04 \x01(\r\x12!\n\town_teams\x18\x05 \x03(\x0b\x32\x0e.bs.BattleTeam\x12#\n\x0b\x65nemy_teams\x18\x06 \x03(\x0b\x32\x0e.bs.BattleTeam\x12\x15\n\rwin_condition\x18\x07 \x01(\r\x12\x14\n\x0crandom_seeds\x18\x08 \x03(\r\x12\x11\n\treward_id\x18\t \x01(\r\x12\x15\n\rassistance_id\x18\n \x01(\r\"C\n\rPlayerCommand\x12\x10\n\x08identity\x18\x01 \x02(\r\x12\n\n\x02id\x18\x02 \x02(\r\x12\x14\n\x0c\x61ttack_count\x18\x03 \x02(\r\"6\n\tUnitCheck\x12\x10\n\x08identity\x18\x01 \x02(\r\x12\x0b\n\x03pos\x18\x02 \x02(\r\x12\n\n\x02hp\x18\x03 \x02(\x04\"r\n\x0b\x42\x61ttleVideo\x12\x0f\n\x07version\x18\x01 \x02(\x04\x12\'\n\rbattle_report\x18\x02 \x02(\x0b\x32\x10.bs.BattleReport\x12)\n\x0eplayer_command\x18\x03 \x03(\x0b\x32\x11.bs.PlayerCommand\"\x8d\x03\n\x0c\x42\x61ttleResult\x12\x11\n\tbattle_id\x18\x01 \x02(\x04\x12\x0e\n\x06is_win\x18\x02 \x02(\x08\x12\"\n\x07\x63ommand\x18\x03 \x03(\x0b\x32\x11.bs.PlayerCommand\x12\x1d\n\x06units1\x18\x04 \x03(\x0b\x32\r.bs.UnitCheck\x12\x1d\n\x06units2\x18\x05 \x03(\x0b\x32\r.bs.UnitCheck\x12\r\n\x05round\x18\x06 \x02(\r\x12\x0e\n\x06result\x18\x07 \x01(\r\x12\x14\n\x0c\x63ur_own_wave\x18\x08 \x01(\r\x12\x16\n\x0e\x63ur_enemy_wave\x18\t \x01(\r\x12\x14\n\x0c\x64\x61ta_version\x18\n \x01(\t\x12\x10\n\x08own_name\x18\x0b \x01(\t\x12\x12\n\nenemy_name\x18\x0c \x01(\t\x12\'\n\town_teams\x18\r \x03(\x0b\x32\x14.bs.BattleUnitResult\x12)\n\x0b\x65nemy_teams\x18\x0e \x03(\x0b\x32\x14.bs.BattleUnitResult\x12\x1b\n\x13\x61ttack_total_damage\x18\x0f \x01(\x04\"p\n\x10\x42\x61ttleUnitResult\x12\x0c\n\x04type\x18\x01 \x02(\r\x12\n\n\x02id\x18\x02 \x01(\r\x12\x12\n\navartar_id\x18\x03 \x01(\r\x12\x0b\n\x03\x64\x61m\x18\x04 \x01(\x04\x12\x0f\n\x07recover\x18\x05 \x01(\x04\x12\x10\n\x08take_dam\x18\x06 \x01(\x04\"\xc2\x01\n\x0b\x42riefReport\x12!\n\town_teams\x18\x01 \x03(\x0b\x32\x0e.bs.BattleTeam\x12#\n\x0b\x65nemy_teams\x18\x02 \x03(\x0b\x32\x0e.bs.BattleTeam\x12\x0e\n\x06is_win\x18\x03 \x02(\x08\x12\x1d\n\x06units1\x18\x04 \x03(\x0b\x32\r.bs.UnitCheck\x12\x1d\n\x06units2\x18\x05 \x03(\x0b\x32\r.bs.UnitCheck\x12\r\n\x05round\x18\x06 \x02(\r\x12\x0e\n\x06result\x18\x07 \x01(\r\"D\n\x0fTokenKnightShow\x12\x0f\n\x07\x62\x61se_id\x18\x01 \x02(\r\x12\x0f\n\x07skin_id\x18\x02 \x02(\r\x12\x0f\n\x07skin_tm\x18\x03 \x02(\r\"\xad\x01\n\x0b\x43heckResult\x12\x11\n\tbattle_id\x18\x01 \x02(\x04\x12\x0e\n\x06is_win\x18\x02 \x02(\x08\x12\r\n\x05\x63heck\x18\x03 \x02(\x08\x12\x1d\n\x06units1\x18\x04 \x03(\x0b\x32\r.bs.UnitCheck\x12\x1d\n\x06units2\x18\x05 \x03(\x0b\x32\r.bs.UnitCheck\x12\x0b\n\x03log\x18\x06 \x01(\t\x12\x0b\n\x03ret\x18\x07 \x01(\r\x12\x14\n\x0c\x64\x61ta_version\x18\x08 \x01(\t\"\'\n\x15S2C_ReplyBattleReport\x12\x0e\n\x06report\x18\x01 \x02(\x0c\"\'\n\x15\x43\x32S_CheckBattleResult\x12\x0e\n\x06result\x18\x01 \x02(\x0c\"4\n\x15S2C_CheckBattleResult\x12\x0b\n\x03ret\x18\x01 \x02(\r\x12\x0e\n\x06result\x18\x02 \x01(\x0c\"6\n\x14\x43\x32S_ClientTestBattle\x12\x0e\n\x06report\x18\x01 \x02(\x0c\x12\x0e\n\x06result\x18\x02 \x02(\x0c\"3\n\x14S2C_ClientTestBattle\x12\x0b\n\x03ret\x18\x01 \x02(\r\x12\x0e\n\x06result\x18\x02 \x01(\x0c*\xa7\x01\n\x02ID\x12\x1f\n\x19MSG_S2C_ReplyBattleReport\x10\xa0\x9c\x01\x12\x1f\n\x19MSG_C2S_CheckBattleResult\x10\xa1\x9c\x01\x12\x1f\n\x19MSG_S2C_CheckBattleResult\x10\xa2\x9c\x01\x12\x1e\n\x18MSG_C2S_ClientTestBattle\x10\xa3\x9c\x01\x12\x1e\n\x18MSG_S2C_ClientTestBattle\x10\xa4\x9c\x01'
+  serialized_pb=b'\n\x08\x62s.proto\x12\x02\x62s\x1a\x0eout_base.proto\"#\n\x04\x41ttr\x12\x0c\n\x04type\x18\x01 \x02(\r\x12\r\n\x05value\x18\x02 \x02(\x04\"E\n\x0b\x42\x61ttleCombo\x12\x0e\n\x06tokens\x18\x01 \x03(\r\x12\x17\n\x05\x61ttrs\x18\x02 \x03(\x0b\x32\x08.bs.Attr\x12\r\n\x05level\x18\x03 \x03(\r\"\x92\x03\n\nBattleUnit\x12\n\n\x02id\x18\x01 \x02(\r\x12\x0b\n\x03pos\x18\x02 \x02(\r\x12\x17\n\x05\x61ttrs\x18\x03 \x03(\x0b\x32\x08.bs.Attr\x12\x0e\n\x06skills\x18\x04 \x03(\r\x12\x0c\n\x04star\x18\x05 \x01(\r\x12\x14\n\x0cskill_level1\x18\x06 \x01(\r\x12\x14\n\x0cskill_level2\x18\x07 \x01(\r\x12\x0c\n\x04name\x18\x08 \x01(\t\x12\x17\n\x0f\x63ommon_skill_id\x18\t \x01(\r\x12\x17\n\x0f\x61\x63tive_skill_id\x18\n \x01(\r\x12\n\n\x02hp\x18\x0b \x01(\x04\x12\x15\n\radvance_level\x18\x0c \x01(\r\x12\x0c\n\x04skin\x18\r \x01(\r\x12\x0f\n\x07skin_ts\x18\x0e \x01(\r\x12\x12\n\nartifactId\x18\x0f \x01(\r\x12\x14\n\x0cskill_level4\x18\x10 \x01(\r\x12\x0e\n\x06\x63\x61rdId\x18\x11 \x01(\r\x12\x11\n\tdress_num\x18\x12 \x01(\r\x12\x0e\n\x06wingId\x18\x13 \x01(\r\x12\x17\n\x0f\x65nergy_skill_id\x18\x14 \x01(\r\x12\x10\n\x08magic_id\x18\x15 \x01(\r\"\xac\x03\n\nBattleTeam\x12\x1d\n\x05units\x18\x01 \x03(\x0b\x32\x0e.bs.BattleUnit\x12\x1e\n\x05\x63ombo\x18\x02 \x02(\x0b\x32\x0f.bs.BattleCombo\x12\x13\n\x0b\x66ight_value\x18\x03 \x01(\x04\x12\x0c\n\x04wave\x18\x04 \x01(\r\x12\x0f\n\x07is_boss\x18\x05 \x01(\x08\x12\x1e\n\x05\x64rops\x18\x06 \x03(\x0b\x32\x0f.out_base.Award\x12$\n\x04user\x18\x07 \x01(\x0b\x32\x16.out_base.UserSnapshot\x12\x10\n\x08total_hp\x18\x08 \x01(\x04\x12\x10\n\x08multiple\x18\t \x01(\x05\x12\x14\n\x0crebel_talent\x18\n \x01(\r\x12\x17\n\x0fmonster_team_id\x18\x0b \x01(\r\x12\x10\n\x08rebel_id\x18\x0c \x01(\r\x12\"\n\x05shows\x18\r \x03(\x0b\x32\x13.bs.TokenKnightShow\x12\x0c\n\x04pets\x18\x0e \x03(\r\x12\x16\n\x0epassive_skills\x18\x0f \x03(\r\x12\x36\n\x13\x64\x65mon_boss_multiple\x18\x10 \x01(\x0b\x32\x19.bs.DemonBossTeamMultiple\"7\n\x15\x44\x65monBossTeamMultiple\x12\x0c\n\x04team\x18\x01 \x02(\r\x12\x10\n\x08multiple\x18\x02 \x02(\r\"\xf8\x01\n\x0c\x42\x61ttleReport\x12\x11\n\tbattle_id\x18\x01 \x02(\x04\x12\x10\n\x08\x61tk_type\x18\x02 \x02(\r\x12\x0f\n\x07is_auto\x18\x03 \x01(\x08\x12\x13\n\x0brandom_seed\x18\x04 \x01(\r\x12!\n\town_teams\x18\x05 \x03(\x0b\x32\x0e.bs.BattleTeam\x12#\n\x0b\x65nemy_teams\x18\x06 \x03(\x0b\x32\x0e.bs.BattleTeam\x12\x15\n\rwin_condition\x18\x07 \x01(\r\x12\x14\n\x0crandom_seeds\x18\x08 \x03(\r\x12\x11\n\treward_id\x18\t \x01(\r\x12\x15\n\rassistance_id\x18\n \x01(\r\"C\n\rPlayerCommand\x12\x10\n\x08identity\x18\x01 \x02(\r\x12\n\n\x02id\x18\x02 \x02(\r\x12\x14\n\x0c\x61ttack_count\x18\x03 \x02(\r\"6\n\tUnitCheck\x12\x10\n\x08identity\x18\x01 \x02(\r\x12\x0b\n\x03pos\x18\x02 \x02(\r\x12\n\n\x02hp\x18\x03 \x02(\x04\"r\n\x0b\x42\x61ttleVideo\x12\x0f\n\x07version\x18\x01 \x02(\x04\x12\'\n\rbattle_report\x18\x02 \x02(\x0b\x32\x10.bs.BattleReport\x12)\n\x0eplayer_command\x18\x03 \x03(\x0b\x32\x11.bs.PlayerCommand\"\xa3\x03\n\x0c\x42\x61ttleResult\x12\x11\n\tbattle_id\x18\x01 \x02(\x04\x12\x0e\n\x06is_win\x18\x02 \x02(\x08\x12\"\n\x07\x63ommand\x18\x03 \x03(\x0b\x32\x11.bs.PlayerCommand\x12\x1d\n\x06units1\x18\x04 \x03(\x0b\x32\r.bs.UnitCheck\x12\x1d\n\x06units2\x18\x05 \x03(\x0b\x32\r.bs.UnitCheck\x12\r\n\x05round\x18\x06 \x02(\r\x12\x0e\n\x06result\x18\x07 \x01(\r\x12\x14\n\x0c\x63ur_own_wave\x18\x08 \x01(\r\x12\x16\n\x0e\x63ur_enemy_wave\x18\t \x01(\r\x12\x14\n\x0c\x64\x61ta_version\x18\n \x01(\t\x12\x10\n\x08own_name\x18\x0b \x01(\t\x12\x12\n\nenemy_name\x18\x0c \x01(\t\x12\'\n\town_teams\x18\r \x03(\x0b\x32\x14.bs.BattleUnitResult\x12)\n\x0b\x65nemy_teams\x18\x0e \x03(\x0b\x32\x14.bs.BattleUnitResult\x12\x1b\n\x13\x61ttack_total_damage\x18\x0f \x01(\x04\x12\x14\n\x0cmulti_result\x18\x10 \x03(\r\"p\n\x10\x42\x61ttleUnitResult\x12\x0c\n\x04type\x18\x01 \x02(\r\x12\n\n\x02id\x18\x02 \x01(\r\x12\x12\n\navartar_id\x18\x03 \x01(\r\x12\x0b\n\x03\x64\x61m\x18\x04 \x01(\x04\x12\x0f\n\x07recover\x18\x05 \x01(\x04\x12\x10\n\x08take_dam\x18\x06 \x01(\x04\"\xc2\x01\n\x0b\x42riefReport\x12!\n\town_teams\x18\x01 \x03(\x0b\x32\x0e.bs.BattleTeam\x12#\n\x0b\x65nemy_teams\x18\x02 \x03(\x0b\x32\x0e.bs.BattleTeam\x12\x0e\n\x06is_win\x18\x03 \x02(\x08\x12\x1d\n\x06units1\x18\x04 \x03(\x0b\x32\r.bs.UnitCheck\x12\x1d\n\x06units2\x18\x05 \x03(\x0b\x32\r.bs.UnitCheck\x12\r\n\x05round\x18\x06 \x02(\r\x12\x0e\n\x06result\x18\x07 \x01(\r\"D\n\x0fTokenKnightShow\x12\x0f\n\x07\x62\x61se_id\x18\x01 \x02(\r\x12\x0f\n\x07skin_id\x18\x02 \x02(\r\x12\x0f\n\x07skin_tm\x18\x03 \x02(\r\"\xad\x01\n\x0b\x43heckResult\x12\x11\n\tbattle_id\x18\x01 \x02(\x04\x12\x0e\n\x06is_win\x18\x02 \x02(\x08\x12\r\n\x05\x63heck\x18\x03 \x02(\x08\x12\x1d\n\x06units1\x18\x04 \x03(\x0b\x32\r.bs.UnitCheck\x12\x1d\n\x06units2\x18\x05 \x03(\x0b\x32\r.bs.UnitCheck\x12\x0b\n\x03log\x18\x06 \x01(\t\x12\x0b\n\x03ret\x18\x07 \x01(\r\x12\x14\n\x0c\x64\x61ta_version\x18\x08 \x01(\t\"\'\n\x15S2C_ReplyBattleReport\x12\x0e\n\x06report\x18\x01 \x02(\x0c\"\'\n\x15\x43\x32S_CheckBattleResult\x12\x0e\n\x06result\x18\x01 \x02(\x0c\"4\n\x15S2C_CheckBattleResult\x12\x0b\n\x03ret\x18\x01 \x02(\r\x12\x0e\n\x06result\x18\x02 \x01(\x0c\"6\n\x14\x43\x32S_ClientTestBattle\x12\x0e\n\x06report\x18\x01 \x02(\x0c\x12\x0e\n\x06result\x18\x02 \x02(\x0c\"3\n\x14S2C_ClientTestBattle\x12\x0b\n\x03ret\x18\x01 \x02(\r\x12\x0e\n\x06result\x18\x02 \x01(\x0c*\xa7\x01\n\x02ID\x12\x1f\n\x19MSG_S2C_ReplyBattleReport\x10\xa0\x9c\x01\x12\x1f\n\x19MSG_C2S_CheckBattleResult\x10\xa1\x9c\x01\x12\x1f\n\x19MSG_S2C_CheckBattleResult\x10\xa2\x9c\x01\x12\x1e\n\x18MSG_C2S_ClientTestBattle\x10\xa3\x9c\x01\x12\x1e\n\x18MSG_S2C_ClientTestBattle\x10\xa4\x9c\x01'
   ,
   dependencies=[out__base__pb2.DESCRIPTOR,])
 
@@ -53,8 +53,8 @@ _ID = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=2710,
-  serialized_end=2877,
+  serialized_start=2750,
+  serialized_end=2917,
 )
 _sym_db.RegisterEnumDescriptor(_ID)
 
@@ -297,6 +297,13 @@ _BATTLEUNIT = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='magic_id', full_name='bs.BattleUnit.magic_id', index=20,
+      number=21, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -310,7 +317,7 @@ _BATTLEUNIT = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=141,
-  serialized_end=525,
+  serialized_end=543,
 )
 
 
@@ -445,8 +452,8 @@ _BATTLETEAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=528,
-  serialized_end=956,
+  serialized_start=546,
+  serialized_end=974,
 )
 
 
@@ -483,8 +490,8 @@ _DEMONBOSSTEAMMULTIPLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=958,
-  serialized_end=1013,
+  serialized_start=976,
+  serialized_end=1031,
 )
 
 
@@ -577,8 +584,8 @@ _BATTLEREPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1016,
-  serialized_end=1264,
+  serialized_start=1034,
+  serialized_end=1282,
 )
 
 
@@ -622,8 +629,8 @@ _PLAYERCOMMAND = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1266,
-  serialized_end=1333,
+  serialized_start=1284,
+  serialized_end=1351,
 )
 
 
@@ -667,8 +674,8 @@ _UNITCHECK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1335,
-  serialized_end=1389,
+  serialized_start=1353,
+  serialized_end=1407,
 )
 
 
@@ -712,8 +719,8 @@ _BATTLEVIDEO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1391,
-  serialized_end=1505,
+  serialized_start=1409,
+  serialized_end=1523,
 )
 
 
@@ -829,6 +836,13 @@ _BATTLERESULT = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='multi_result', full_name='bs.BattleResult.multi_result', index=15,
+      number=16, type=13, cpp_type=3, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -841,8 +855,8 @@ _BATTLERESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1508,
-  serialized_end=1905,
+  serialized_start=1526,
+  serialized_end=1945,
 )
 
 
@@ -907,8 +921,8 @@ _BATTLEUNITRESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1907,
-  serialized_end=2019,
+  serialized_start=1947,
+  serialized_end=2059,
 )
 
 
@@ -980,8 +994,8 @@ _BRIEFREPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2022,
-  serialized_end=2216,
+  serialized_start=2062,
+  serialized_end=2256,
 )
 
 
@@ -1025,8 +1039,8 @@ _TOKENKNIGHTSHOW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2218,
-  serialized_end=2286,
+  serialized_start=2258,
+  serialized_end=2326,
 )
 
 
@@ -1105,8 +1119,8 @@ _CHECKRESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2289,
-  serialized_end=2462,
+  serialized_start=2329,
+  serialized_end=2502,
 )
 
 
@@ -1136,8 +1150,8 @@ _S2C_REPLYBATTLEREPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2464,
-  serialized_end=2503,
+  serialized_start=2504,
+  serialized_end=2543,
 )
 
 
@@ -1167,8 +1181,8 @@ _C2S_CHECKBATTLERESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2505,
-  serialized_end=2544,
+  serialized_start=2545,
+  serialized_end=2584,
 )
 
 
@@ -1205,8 +1219,8 @@ _S2C_CHECKBATTLERESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2546,
-  serialized_end=2598,
+  serialized_start=2586,
+  serialized_end=2638,
 )
 
 
@@ -1243,8 +1257,8 @@ _C2S_CLIENTTESTBATTLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2600,
-  serialized_end=2654,
+  serialized_start=2640,
+  serialized_end=2694,
 )
 
 
@@ -1281,8 +1295,8 @@ _S2C_CLIENTTESTBATTLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2656,
-  serialized_end=2707,
+  serialized_start=2696,
+  serialized_end=2747,
 )
 
 _BATTLECOMBO.fields_by_name['attrs'].message_type = _ATTR

@@ -92,7 +92,7 @@ class ProtocolFunction:
 
     def send_protocol(self, arg_dic):
         """
-        用作协议自动化，todo
+        用作协议自动化
         传入参数组，发送协议，并获取返回值
         :param arg_dic: {} 参数集
         :return: 返回值

@@ -13,9 +13,9 @@ import threading
 import time
 from airtest.core.api import *
 auto_setup(__file__)
-__phone_id__=device().uuid
+# __phone_id__=device().uuid
 from MyPoco.my_poco import MyPoco
-# __phone_id__ = None
+__phone_id__ = None
 
 class myThread (threading.Thread):
     def __init__(self, sever_name_into, account_into):
@@ -29,12 +29,29 @@ class myThread (threading.Thread):
         my_poco.GM_yijian_account_v2(self.account)
 
 if __name__ == '__main__':
-
-    my_poco = MyPoco("少三2",__phone_id__)
-    sever_name = "QA1"
+    my_poco = MyPoco("少三2", __phone_id__)
+    sever_name = "QA3"
+    account = my_poco.get_random_account()
+    sever_time = my_poco.make_new_role(sever_name, account)
+    my_poco.set_account_information_gm(account, sever_name)
+    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-80-10"})
+    my_poco.add_resource(
+        {"角色经验": 99999999999, "配饰强化石": 1000, "培养丹": 1000000, "刘备": 1, "赤帝天威": 1, "马超": 1, "白衣胜雪": 1, "赵云": 1, "江湖游龙": 1,
+         "朋克少年": 1, "龙胆武生": 1, "江湖墨龙": 1,
+         "典韦": 1, "陆战精英": 1, "郭嘉": 1, "玉虚转世": 1, "陆逊": 1, "望族骑士": 1, "小乔": 1, "霓光科技": 1, "貂蝉": 1, "冰雪公主": 1, "贾诩": 1,
+         "暗夜伯爵": 1, })
+    my_poco.add_resource({"吕玲绮": 2, "袁绍": 2, "天威袁绍幻晶": 1000, })
+    add_wujiang_type, add_wujiang_value = my_poco.protocol.mri.get_type_id_from_name("配饰强化石")
+    my_poco.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1000)
+    add_wujiang_type, add_wujiang_value = my_poco.protocol.mri.get_type_id_from_name("孙尚香碎片")
+    my_poco.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 2000)
+    my_poco.shangzhenwujiang(2, "陆逊")
+    my_poco.shangzhenwujiang(3, "吕玲绮")
+    # my_poco = MyPoco("少三2",__phone_id__)
+    # sever_name = "QA3"
+    # account = "78499933"
     # account = my_poco.get_random_account()#随机账号
-    account = "78499933"
-    my_poco.open_game(sever_name, account)
+    # # my_poco.open_game(sever_name, account)
     # sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
     # my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
     # my_poco.add_resource({"角色经验": 4099909990,"测试属性": 999999999,"银币": 999999,})#添加资源，海外暂不支持

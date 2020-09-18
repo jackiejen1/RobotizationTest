@@ -399,16 +399,21 @@ class MyPocoObject():
         snapshot(msg="关闭游戏")
         #从配置表中读取主界面唯一元素
         close_game_poco_name = self.info.get_config(self.game_name_key, "close_game_poco_name")
+        is_home = self.is_in_dic(close_game_poco_name)
         stop_app(self.game_name)
         if close_game_poco_name == None:
             if self.is_pass > 0:
                 raise GameNotPassException("数值判定部分未通过")
         else:
-            if self.is_in_dic(close_game_poco_name):
+            if is_home:
                 if self.is_pass>0:
                     raise GameNotPassException("数值判定部分未通过")
             else:
-                raise NoneException("最后一步异常,"+close_game_poco_name)
+                if self.is_pass > 0:
+                    err_str = "数值判定部分未通过,最后一步异常,"
+                else:
+                    err_str = "最后一步异常,"
+                raise NoneException(err_str+close_game_poco_name)
 
     def get_poco_any_value(self, poco_path, value_name_str):
         """
