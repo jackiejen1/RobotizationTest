@@ -1470,6 +1470,7 @@ class ProtocolFunction:
             print(function_name+"成功")
         else:
             raise ProtocolException(str(self.uid) + function_name+"失败" + str(S2C.ret))
+        return S2C.level
 
     def Pet_StarUp(self,id,cost_id):
         """

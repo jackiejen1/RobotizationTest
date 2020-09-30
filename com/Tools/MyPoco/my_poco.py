@@ -144,21 +144,20 @@ class MyPoco:
             only_id_list = self.pet_list[daoju_id]
             only_id = only_id_list[0]
             self.protocol.shangzhenshenshou(pos,only_id)#上阵
-            self.protocol.Pet_OneKey_LevelUp(only_id,240)#升级
+            for i in range(47):
+                level = self.protocol.Pet_OneKey_LevelUp(only_id,5)#升级
+                if level > 234:
+                    break
             only_id_list.pop(0)#都操作完了之后把该装备从列表里删除
-            for i in range(7):
-                self.protocol.Pet_StarUp(only_id,only_id_list[0:1])
-                self.protocol.Pet_StarUp(only_id, only_id_list[1:2])
-                self.protocol.Pet_StarUp(only_id, only_id_list[2:3])
-                self.protocol.Pet_StarUp(only_id, only_id_list[3:4])
-                self.protocol.Pet_StarUp(only_id, only_id_list[4:6])
-                self.protocol.Pet_StarUp(only_id, only_id_list[6:8])
-                self.protocol.Pet_StarUp(only_id, only_id_list[-3:])
+            self.protocol.Pet_StarUp(only_id,only_id_list[0:1])
+            self.protocol.Pet_StarUp(only_id, only_id_list[1:2])
+            self.protocol.Pet_StarUp(only_id, only_id_list[2:3])
+            self.protocol.Pet_StarUp(only_id, only_id_list[3:4])
+            self.protocol.Pet_StarUp(only_id, only_id_list[4:6])
+            self.protocol.Pet_StarUp(only_id, only_id_list[6:8])
+            self.protocol.Pet_StarUp(only_id, only_id_list[-3:])
         else:
             raise GmException("请先添加神兽"+name)
-
-
-
 
     def chuandaizhuangbei(self, pos, name):
         """
