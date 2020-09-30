@@ -13,7 +13,7 @@ record_artifact_purify_info.attribute_group = 0--属性组
 
 local artifact_purify_info = {
    _data = {   
-    [1] = {1,5,3,232,100,50,50,1,},
+    [1] = {1,6,3,232,5,5,0,1,},
     }
 }
 

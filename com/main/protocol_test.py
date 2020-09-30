@@ -11,53 +11,108 @@
 import os
 import threading
 import time
-from airtest.core.api import *
-auto_setup(__file__)
+# from airtest.core.api import *
+# auto_setup(__file__)
 # __phone_id__=device().uuid
 from MyPoco.my_poco import MyPoco
 __phone_id__ = None
+import sqlite3
 
-class myThread (threading.Thread):
-    def __init__(self, sever_name_into, account_into):
-        threading.Thread.__init__(self)
-        self.sever_name = sever_name_into
-        self.account = account_into
 
-    def run(self):
-        my_poco = MyPoco("少三2", None)
-        my_poco.make_new_role(self.sever_name, self.account,is_new_account_into=True)  # 创建或登录已有账号
-        my_poco.GM_yijian_account_v2(self.account)
+def new_sql():
+    conn = sqlite3.connect('GVG_account.db')
+    cursor = conn.cursor()
+    cursor.execute('create table user(account varchar(20) primary key,is_login varchar(20),sever_name varchar(20))')  # 创建表
+    cursor.close()
+    conn.commit()
+    conn.close()
+
+def set_account_sql(account_into,sever_name):
+    """
+    保存账号，用于创建账号使用
+    :param account_into:
+    :return:
+    """
+    sever_name = sever_name[-1:]
+    account_into = str(account_into) + sever_name
+    conn = sqlite3.connect('GVG_account.db')
+    cursor = conn.cursor()
+    cursor.execute('insert into user (account, is_login) values (' + account_into + ',0)')
+    cursor.close()
+    conn.commit()
+    conn.close()
+
+def get_account_sql():
+    """
+    获取账号，然后设置账号登录状态
+    :return:
+    """
+    conn = sqlite3.connect('GVG_account.db')
+    cursor = conn.cursor()
+    cursor.execute('select *from user where is_login=0')
+    values = cursor.fetchall()
+    account = values[0][0]
+    cursor.execute('UPDATE user SET is_login =1  WHERE account = ' + account)  # 更新登录状态
+    cursor.close()
+    conn.commit()
+    conn.close()
+    return account
+
+def login():
+
+    for i in range(500):
+        my_poco = MyPoco("少三2",__phone_id__)
+        account_sever_name = get_account_sql()
+        if len(account_sever_name)==7:
+            sever_name =account_sever_name[-1:]
+            sever_name = "新QA"+sever_name
+            account = account_sever_name[:-1]
+            sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
+            my_poco.protocol.Debate_EnterInfo()  # 进入
+            my_poco.protocol.Debate_BattleStart(2)
+
+def new_account(sever_name):
+    # new_sql()
+    for i in range(100):
+        my_poco = MyPoco("少三2",__phone_id__)
+        account = my_poco.get_random_account()[2:]#随机账号
+        sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
+        set_account_sql(account,sever_name)
+        my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
+        my_poco.add_resource({"角色经验": 4099909990,"测试属性": 1,"银币": 999999,})#添加资源，海外暂不支持
+        my_poco.set_checkpoint(account, sever_name, {"副本": "副本-220-10"})#通关副本，海外暂不支持
+        my_poco.GM_yijian_chuanzhuangbei()
+        my_poco.protocol.Debate_EnterInfo()#进入
+        my_poco.protocol.Debate_LineUp()#布阵
+        my_poco.protocol.Debate_RefreshMatch()#手动匹配
+
 
 if __name__ == '__main__':
-    my_poco = MyPoco("少三2", __phone_id__)
-    sever_name = "QA3"
-    account = my_poco.get_random_account()
-    sever_time = my_poco.make_new_role(sever_name, account)
-    my_poco.set_account_information_gm(account, sever_name)
-    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-80-10"})
-    my_poco.add_resource(
-        {"角色经验": 99999999999, "配饰强化石": 1000, "培养丹": 1000000, "刘备": 1, "赤帝天威": 1, "马超": 1, "白衣胜雪": 1, "赵云": 1, "江湖游龙": 1,
-         "朋克少年": 1, "龙胆武生": 1, "江湖墨龙": 1,
-         "典韦": 1, "陆战精英": 1, "郭嘉": 1, "玉虚转世": 1, "陆逊": 1, "望族骑士": 1, "小乔": 1, "霓光科技": 1, "貂蝉": 1, "冰雪公主": 1, "贾诩": 1,
-         "暗夜伯爵": 1, })
-    my_poco.add_resource({"吕玲绮": 2, "袁绍": 2, "天威袁绍幻晶": 1000, })
-    add_wujiang_type, add_wujiang_value = my_poco.protocol.mri.get_type_id_from_name("配饰强化石")
-    my_poco.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1000)
-    add_wujiang_type, add_wujiang_value = my_poco.protocol.mri.get_type_id_from_name("孙尚香碎片")
-    my_poco.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 2000)
-    my_poco.shangzhenwujiang(2, "陆逊")
-    my_poco.shangzhenwujiang(3, "吕玲绮")
-    # my_poco = MyPoco("少三2",__phone_id__)
-    # sever_name = "QA3"
-    # account = "78499933"
-    # account = my_poco.get_random_account()#随机账号
-    # # my_poco.open_game(sever_name, account)
-    # sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
-    # my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
-    # my_poco.add_resource({"角色经验": 4099909990,"测试属性": 999999999,"银币": 999999,})#添加资源，海外暂不支持
-    # # my_poco.add_resource({"倚天剑": 12,"天宫护符": 12,})
-    # my_poco.set_checkpoint(account, sever_name, {"副本": "副本-120-10"})#通关副本，海外暂不支持
+    # sever_name = "新QA5"
+    # new_account(sever_name)
+    # login()
+
+    my_poco = MyPoco("少三2",__phone_id__)
+    sever_name = "QA1"
+    account = my_poco.get_random_account()[2:]#随机账号
+    # account = "716419"
+    sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
+    my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
+    my_poco.add_resource({"角色经验": 4099909990,"测试属性": 1,"银币": 999999,})#添加资源，海外暂不支持
+    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-220-10"})#通关副本，海外暂不支持
+    my_poco.GM_yijian_chuanzhuangbei()
+    my_poco.shangzhenshenshou(1,"碧水麒麟")
+    my_poco.shangzhenshenshou(2, "神木青鸾")
+    my_poco.shangzhenshenshou(3, "九天应龙")
+    my_poco.shangzhenshenshou(4, "狱火穷奇")
+    my_poco.shangzhenshenshou(5, "苍鸣雷君")
+    my_poco.shangzhenshenshou(6, "撼地灵犀")
+    # my_poco.xue_gong_lun_zhan()
+
+
+
     # # my_poco.protocol.Flush()
+    # my_poco.taofamojiang()
     # my_poco.GM_new_join_guild(account[2:], 5, False)
     # my_poco.shangzhenwujiang(2, "陆逊")
     # my_poco.GM_new_join_guild("sdasa",5,True)
@@ -70,11 +125,12 @@ if __name__ == '__main__':
     # my_poco.GM_yijian_mingjiangzhuan(10)
     # my_poco.GM_fengkuang_fuben("副本-195-9",5)
     # my_poco.quit_Guild()
-    # my_poco.GM_fengkuang_haoling("sfasf",1,False)
-    # my_poco.GM_fengkuang_fujia(512,1,10)
-    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_huashen(522,1)
-    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_hengsaoqianjun(524,1)
-    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_xianshijinjiang(523,"紫金1双卡池","紫金",1)
+    # my_poco.GM_fengkuang_haoling("sfasf",99999999,"")
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_fujia(580,2,10000)
+    # my_poco.GM_fengkuang_shikongzhaohuan(582, 10000)
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_xianshijinjiang(583,"紫金1双卡池","紫金",10000)
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_huashen(555,10000)
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_hengsaoqianjun(553,10000)
     # my_poco.GM_fengkuang_haoyou(50,sever_name_into=sever_name,)
     # my_poco.GM_yijian_account_v1(account)
     # my_poco.GM_yijian_account_v2(account)
@@ -94,22 +150,6 @@ if __name__ == '__main__':
     #     sever_time = my_poco.make_new_role(sever_name, account)  # 创建或登录已有账号
     #     my_poco.GM_fengkuang_haoyou(50, sever_name_into=sever_name, )
     # my_poco.protocol.add_resource_pb(999,0,1)
-
-    num = 0
-    account_list = []
-    Thread_list = []
-    for i in range(num):
-        my_poco = MyPoco("少三2",__phone_id__)
-        sever_name = "QA4"
-        account = my_poco.get_random_account()
-        account_list.append(account)
-        print(account_list)
-        thread = myThread(sever_name, account)
-        # 开启新线程
-        thread.start()
-        # Thread_list.append(thread)
-    # for thread in Thread_list:
-    #     thread.join()
 
 
 

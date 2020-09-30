@@ -30,6 +30,7 @@ record_young_turn_info.ready_title1 =  ""--预热标题1
 record_young_turn_info.ready_title2 =  ""--预热标题2
 record_young_turn_info.open_title1 =  ""--预热标题1
 record_young_turn_info.open_title2 =  ""--预热标题2
+record_young_turn_info.title_3 =  ""--标题3
 record_young_turn_info.spacetime_type1 = 0--噩梦展示类型1
 record_young_turn_info.spacetime_value1 = 0--噩梦展示类型值1
 record_young_turn_info.spacetime_type2 = 0--噩梦展示类型2
@@ -43,17 +44,23 @@ record_young_turn_info.figeht_name =  ""--入口人物名称
 record_young_turn_info.quality = 0--名称品质
 record_young_turn_info.bubble =  ""--人物气泡
 record_young_turn_info.spacetime_start = 0--时空外传开启时间
+record_young_turn_info.recharge_money_type = 0--充值货币类型
+record_young_turn_info.recharge_money_value = 0--充值货币值
+record_young_turn_info.active_money_type = 0--活跃货币类型
+record_young_turn_info.active_money_value = 0--活跃货币值
 
 local young_turn_info = {
    _data = {   
-    [1] = {1001,1,901,5,101,"少年庆典","庆典商城","限时掉落","镇魂成就","福利兑换","折扣商店","充值有礼","task_101","task_102","通关镇魂外传，获得丰厚奖励！","百万少年同协力，共铸神剑镇黄天！","https://sn.youzu.com/",10616,10000000,"组队战役",1592236800,1592928000,903,"庆典福袋","title_yuyue","title_yuyue2","title_kaiqi","title_kaiqi2",3,8005,3,8006,3,8007,3,8008,210012,"曹焱兵",6,"吾乃镇魂街镇魂将，罗刹街的曹焱兵是也！",0,},  
-    [2] = {1002,2,905,5,102,"夏日狂欢","夏日商城","限时掉落","副本成就","福利兑换","折扣商店","充值有礼","task_101","task_103","通关时空外传，获得丰厚奖励！","0","https://sn.youzu.com/",10588,10000000,"组队战役",1596988800,1597852800,907,"夏日福袋","大乔相伴度盛夏","狂欢福利大放送","大乔相伴度盛夏","狂欢福利大放送",3,8009,3,8010,3,8011,3,8012,0,"0",0,"0",1596297600,},
+    [1] = {1001,1,901,5,101,"少年庆典","庆典商城","限时掉落","镇魂成就","福利兑换","折扣商店","充值有礼","task_101","task_102","通关镇魂外传，获得丰厚奖励！","百万少年同协力，共铸神剑镇黄天！","https://sn.youzu.com/",10616,10000000,"组队战役",1592236800,1592928000,903,"庆典福袋","title_yuyue","title_yuyue2","title_kaiqi","title_kaiqi2","0",3,8005,3,8006,3,8007,3,8008,210012,"曹焱兵",6,"吾乃镇魂街镇魂将，罗刹街的曹焱兵是也！",0,3,188,3,194,},  
+    [2] = {1002,2,905,5,102,"夏日狂欢","夏日商城","限时掉落","副本成就","福利兑换","折扣商店","充值有礼","task_101","task_103","通关时空外传，获得丰厚奖励！","0","https://sn.youzu.com/",10588,10000000,"组队战役",1596988800,1597852800,907,"夏日福袋","大乔相伴度盛夏","狂欢福利大放送","大乔相伴度盛夏","狂欢福利大放送","清凉夏日赢好礼",3,8009,3,8010,3,8011,3,8012,0,"0",0,"0",1596297600,3,217,3,216,},  
+    [3] = {1003,3,908,5,103,"一战封神","太公商城","限时掉落","太公秘闻","福利兑换","折扣商店","充值有礼","task_101","task_104","通关太公秘闻，获得丰厚奖励！","0","https://sn.youzu.com/",10588,10000000,"组队战役",1602259200,1603123200,909,"太公礼盒","聚神力召唤太公","百亿豪礼大放送","聚神力召唤太公","百亿豪礼大放送","庆双节豪礼不停",3,8015,3,8016,3,8017,3,8018,0,"0",0,"0",1601568000,3,249,3,248,},
     }
 }
 
 local __index_id = {   
     [1001] = 1,  
-    [1002] = 2,
+    [1002] = 2,  
+    [1003] = 3,
 }
 
 local __key_map = { 
@@ -85,19 +92,24 @@ local __key_map = {
     ready_title2 = 26,
     open_title1 = 27,
     open_title2 = 28,
-    spacetime_type1 = 29,
-    spacetime_value1 = 30,
-    spacetime_type2 = 31,
-    spacetime_value2 = 32,
-    spacetime_type3 = 33,
-    spacetime_value3 = 34,
-    spacetime_type4 = 35,
-    spacetime_value4 = 36,
-    fight_image = 37,
-    figeht_name = 38,
-    quality = 39,
-    bubble = 40,
-    spacetime_start = 41,
+    title_3 = 29,
+    spacetime_type1 = 30,
+    spacetime_value1 = 31,
+    spacetime_type2 = 32,
+    spacetime_value2 = 33,
+    spacetime_type3 = 34,
+    spacetime_value3 = 35,
+    spacetime_type4 = 36,
+    spacetime_value4 = 37,
+    fight_image = 38,
+    figeht_name = 39,
+    quality = 40,
+    bubble = 41,
+    spacetime_start = 42,
+    recharge_money_type = 43,
+    recharge_money_value = 44,
+    active_money_type = 45,
+    active_money_value = 46,
 }
 
 local m = { 

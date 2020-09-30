@@ -41,13 +41,20 @@ function CommandComponent:addUpdateCommand(command)
 
 	local commands = self._commands
 	commands.attack_before = commands.attack_before or {}
-	commands.attack_before.buff = command.buff or {}
+	commands.attack_before.buff = {}
 
-	if commands.attack_before.buff then
-		for i , buff in ipairs(commands.attack_before.buff) do
-			-- 去掉多余信息
-			buff.attacker = nil
-		end
+	local buffs = command.buff or {}
+	for i , buff in ipairs(buffs) do
+		local data = {
+			buff_id = buff.buff_id,
+			buff_serial_id = buff.buff_serial_id,
+			knight_serial_id = buff.victim.serialId,
+			buff_action = buff.buff_action,
+			buff_effect = buff.buff_effect,
+			is_dead = buff.victim.isDead,
+			is_ghost = buff.victim.isGhost,
+		}
+		insert(commands.attack_before.buff, data)
 	end
 
 	if command.removeList then
@@ -136,7 +143,7 @@ function CommandComponent:addFightCommand(command,isPassive)
 			add_value = info.add_value,
 		}
 		attackInfo.effect = effect
-		effect.add_effects = {}
+		effect.add_effects = info.add_effects or {}
 		-- 暴击
 		if info.crit then
 			insert(effect.add_effects, {add_type = 1})
@@ -169,7 +176,19 @@ function CommandComponent:addFightCommand(command,isPassive)
 		if info.hpLink then
 			insert(effect.add_effects, {add_type = 10})
 		end
-
+		-- 斩杀
+		if info.behead then
+			insert(effect.add_effects, {add_type = 11})
+		end
+		-- 引爆
+		if info.detonate then
+			insert(effect.add_effects, {add_type = 12})
+		end
+		-- 吸收
+		if info.absorb then
+			local absorbValue = info.absorbValue or 0
+			insert(effect.add_effects, {add_type = 13, add_value = absorbValue})
+		end
 		if info.victim.isDead then
 			attackInfo.is_dead = true
 		end
@@ -197,6 +216,10 @@ function CommandComponent:addFightCommand(command,isPassive)
 			}
 			if effect.victim then
 				effectData.victim_serial_id = effect.victim.serialId
+				effectData.is_dead = effect.victim.isDead
+				if effect.victim.isGhost then
+					effectData.is_ghost = true
+				end
 			end
 			insert(tempCommand.attack_after.effect, effectData)
 		end
@@ -260,6 +283,19 @@ function CommandComponent:addFightCommand(command,isPassive)
 			})
 		end
 	end
+	-- 战斗场景
+	local addScenes = command.addScenes
+	if #addScenes > 0 then
+		tempCommand.attack_after = tempCommand.attack_after or {}
+		tempCommand.attack_after.add_scenes = tempCommand.attack_after.add_scenes or {}
+		for i, scene in ipairs(addScenes) do
+			insert(tempCommand.attack_after.add_scenes, {
+				serial_id = scene.serialId,
+				scene_id = scene.sceneId,
+				attack_serial_id = scene.attacker.serialId,
+			})
+		end
+	end
 
 	if attacker.isDead then
 		tempCommand.is_dead = true
@@ -283,6 +319,15 @@ function CommandComponent:addRoundCommand( command )
 	commands.round_start = {}
 	commands.round_start.combo_value = command.comboValue
 	commands.round_start.cd_list = command.cdList
+	commands.round_start.scene_list = {}
+	local sceneRemoveList = command.sceneRemoveList or {}
+	for i, scene in ipairs(sceneRemoveList) do
+		table.insert(commands.round_start.scene_list, {
+			scene_id = scene.sceneCfg.id,
+			scene_serial_id = scene.serialId,
+			knight_serial = scene.attacker.serialId,
+		})
+	end
 end
 
 -- 添加攻击结束更新操作
@@ -317,10 +362,24 @@ function CommandComponent:setWaveOver(winner)
 	commands.winner = winner
 end
 
+-- 设置回合回血数据
+function CommandComponent:setWaveRecover(recoverList)
+	local commands = self._commands
+	
+	commands.wave_recover = recoverList
+end
+
 function CommandComponent:addAssist()
 	local commands = self._commands
 	
 	commands.assist = true
+end
+
+function CommandComponent:addRestart(restartInfos)
+	local commands = self._commands
+	
+	commands.restart = true
+	commands.restart_infos = restartInfos
 end
 
 function CommandComponent:pack()

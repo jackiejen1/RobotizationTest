@@ -3,6 +3,7 @@ local record_recruit_au_knight_show_info = {}
 
 
 record_recruit_au_knight_show_info.id = 0--ID
+record_recruit_au_knight_show_info.type = 0--活动类型
 record_recruit_au_knight_show_info.open = 0--活动id
 record_recruit_au_knight_show_info.name =  ""--活动名称
 record_recruit_au_knight_show_info.knight_id = 0--武将ID
@@ -15,33 +16,44 @@ record_recruit_au_knight_show_info.recruit_knight_20 = 0--20连保底
 record_recruit_au_knight_show_info.show_type = 0--背景显示类型
 record_recruit_au_knight_show_info.show_value = 0--背景显示类型值
 record_recruit_au_knight_show_info.show_logo = 0--标题显示类型
+record_recruit_au_knight_show_info.discount = 0--折扣
+record_recruit_au_knight_show_info.game_type = 0--显示包体
 
 local recruit_au_knight_show_info = {
    _data = {   
-    [1] = {1,0,"",0,0,0,0,0,0,0,0,0,0,},  
-    [2] = {2,0,"",0,0,0,0,0,0,0,0,0,0,},
+    [1] = {1,2,100001,"新服联动测试",510020,1,25,26,19,23,27,1,510020,510020,70,1,},  
+    [2] = {2,2,100010,"联动测试",510020,1,25,26,19,23,27,1,510020,510020,70,1,},  
+    [3] = {3,2,100001,"联动12测试",510010,1,25,26,19,23,27,1,510010,510010,70,1,},  
+    [4] = {1000001,2,1000001,"时空召唤（可配置）",700130,1000001,25,26,3001001,3001002,3001003,3,3000002,3000002,70,1,},  
+    [5] = {1000002,2,1000002,"时空召唤（新服）",700130,1000002,25,26,3001001,3001002,3001003,3,3000002,3000002,70,1,},
     }
 }
 
 local __index_id = {   
     [1] = 1,  
-    [2] = 2,
+    [2] = 2,  
+    [3] = 3,  
+    [1000001] = 4,  
+    [1000002] = 5,
 }
 
 local __key_map = { 
     id = 1,
-    open = 2,
-    name = 3,
-    knight_id = 4,
-    reward_view = 5,
-    cost_gain_1 = 6,
-    cost_gain_10 = 7,
-    recruit_knight_1 = 8,
-    recruit_knight_10 = 9,
-    recruit_knight_20 = 10,
-    show_type = 11,
-    show_value = 12,
-    show_logo = 13,
+    type = 2,
+    open = 3,
+    name = 4,
+    knight_id = 5,
+    reward_view = 6,
+    cost_gain_1 = 7,
+    cost_gain_10 = 8,
+    recruit_knight_1 = 9,
+    recruit_knight_10 = 10,
+    recruit_knight_20 = 11,
+    show_type = 12,
+    show_value = 13,
+    show_logo = 14,
+    discount = 15,
+    game_type = 16,
 }
 
 local m = { 

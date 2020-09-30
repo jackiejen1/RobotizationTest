@@ -479,6 +479,25 @@ enum RET {
     RET_YOUNG_ACT_SHOP_REACH_LIMIT = 752; //兑换到达上限
     RET_YOUNG_ACT_TASK_REWARD_UNAVAILABLE = 753; //任务奖励不可领取
     RET_YOUNG_ACT_WRONG_EXCHANGE_NUM = 754; //兑换数量为0
+	
+	//战法
+	RET_MAGIC_NOT_EXIST = 760;		// 战法不存在
+	RET_MAGIC_EQUIP     = 761;		// 战法已装备
+	RET_MAGIC_CONFIG_NOT_EXSIT = 763;	//战法配置文件不存在
+	RET_MAGIC_LEVEL_CONFIG_NOT_EXSIT = 764;	// 战法等级配置不存在
+	RET_MAGIC_NEXT_LEVEL_CONFIG_NOT_EXSIT = 765; //战法下一个等级的配置不存在
+	RET_MAGIC_NOT_FULL = 766;	//战法材料不足
+	RET_MAGIC_CONSUMES1_NOT_ENOUGH = 767;	// 孔位1材料不满足
+	RET_MAGIC_CONSUMES2_NOT_ENOUGH = 768;	// 孔位2材料不满足
+	RET_MAGIC_CONSUMES3_NOT_ENOUGH = 769;	// 孔位3材料不满足
+	RET_MAGIC_IS_ON_FORMATION = 770;		// 战法在陣上
+	RET_MAGIC_NOT_DECOMPOSE   = 771;		// 战法不能被分解
+	RET_MAGIC_IS_UNIVERAL	  = 772;		// 战法是萬能材料，不可以進行升級，升堦，上陣
+	RET_MAGIC_UPGRADED		  = 773;		// 战法升过级
+	RET_MAGIC_REAPTED		  = 775;		// 输入的战法重复了
+	RET_MAGIC_TYPE_IS_NOT_RIGHT = 776;		// 战法类型不满足条件
+	RET_MAGIC_QUALIFY_IS_NOT_RIGHT = 777;	// 战法品质不满足条件
+	RET_MAGIC_NUM_IS_NOT_ENOUGH = 778;		// 战法数量不满足条件
 
   // 讨伐魔将
   RET_DEMON_BOSS_ALREADY_CHOSE_TEAM = 800; // 已经选择阵营
@@ -548,9 +567,17 @@ enum RET {
   RET_FLAME_CITY_BLOCK_IS_OCCUPY = 914; // 格子已被占领
   RET_FLAME_CITY_BLOCK_CANNOT_REACH = 915; // 格子不可达
 
-    //神兵协战
+  //神兵协战
   RET_ARTIFACT_HAS_HELPED = 920; //神兵已参与协战
   RET_NONE_HELPER_ARTIFACT = 921; //没有协战神兵
+
+  //预抽卡
+  RET_PRE_DRAW_HAS_RECEIVED_LOGIN_AWARD = 922; //已经领取登录奖励
+  RET_PRE_DRAW_HAS_RECEIVED_FINAL_AWARD = 923; //已经领取最终奖励
+  RET_PRE_DRAW_LOGIN_AWARD_UNAVAILABLE = 924; //登录奖励不可领取
+  RET_PRE_DRAW_FINAL_AWARD_UNAVAILABLE = 925; //最终奖励不可领取
+  RET_PRE_DRAW_LOGIN_AWARD_NIL = 926; //登录奖励为空
+  RET_PRE_DRAW_FINAL_AWARD_NIL = 927; //最终奖励为空
 
   // 军团图腾
   RET_GUILD_TOTEM_NOT_FOUND = 930; // 图腾不存在
@@ -586,6 +613,26 @@ enum RET {
   RET_GVG_USER_ALIVE = 973; //玩家还活着
   RET_GVG_BUFF_NOT_AVAILABLE = 974; //Buff不可拾取
   RET_GVG_BUFF_ADD_MAX_TIMES = 975; //Buff拾取达到上限
+  RET_GVG_ACHIEVE_NOT_FINISH = 976; //GVG任务未完成
+  RET_GVG_ALREADY_REWARDED = 977; //奖励已领取
+  RET_GUILD_CANT_DISMISS_IN_GVG_ACTIVITY = 978; //军团战期间参战军团不允许解散
+  RET_GUILD_CANT_KICK_USER_IN_GVG_MATCH = 979; //军团战比赛期间不允许踢人
+  RET_GUILD_CANT_QUIT_IN_GVG_MATCH = 980; //军团战比赛期间不允许退出
+
+
+  // 军团头像框
+  RET_GUILD_FRAME_IS_EXPIRED = 990; // 军团边框过期
+
+
+  // 学宫论战
+  RET_DEBATE_DAILY_RESET = 991;       // 每日数据已重置,请重进玩法
+  RET_DEBATE_LINE_UP_NOT_LEGAL = 992; // 布阵位置不合法
+  RET_DEBATE_BOX_AWARD_HAS = 993;     // 宝箱奖励已领取
+  RET_DEBATE_BOX_NOT_FINISH = 994;    // 宝箱进度未完成
+  RET_DEBATE_BATTLE_TIMES_NOT = 995;  // 挑战次数不足
+  RET_DEBATE_REFRESH_TIMES_NOT = 996; // 刷新次数不足
+  RET_DEBATE_ENEMY_TEAM_NOT = 997;    // 获取地方阵容失败
+
 
   ///////////////// 1000-1100是客户端战斗代码返回错误 /////////////////
   RET_BATTLE_DATA_VERSION_CORRECT = 1000;//非数据版本问题

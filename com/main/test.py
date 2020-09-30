@@ -10,6 +10,7 @@
 # Reference:********************************
 import json
 import os
+import random
 import re
 import time
 
@@ -35,7 +36,8 @@ import requests
 from MyPoco.poco.my_poco_object import MyPocoObject
 from MyPoco.poco.my_poco_object import MakePocoDic
 # from MyPoco.my_poco import MyPoco
-
+import sqlite3
+from MyPoco.foundation.tools import new_excel_tab
 if __name__ == '__main__':
     # s = os.popen("adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -i ; echo ---$?---")
     # s = s.readlines()
@@ -49,11 +51,10 @@ if __name__ == '__main__':
     # height= json.loads(height)
     # print(width)
     # print(height)
-
-    text_dic = {1:11,2:2,3:3,4:4,}
-    print(text_dic)
-    text_dic.pop(2,0)
-    print(text_dic[1])
+    a = [0,1,2,3,4,5,6,7,8,9,10,11]
+    print(a[5:6])
+    print(a[7:9])
+    print(a[-3:])
     # if resource_name in col:
     #     print(col.index(resource_name))
     #     row = table.row_values(col.index(resource_name))

@@ -41,6 +41,10 @@ BuffRule.TYPE = {
 	SIPHON_ATTR = 20,	-- 属性吸取
 	RESIST_SILENCE = 21, -- 免疫沉默
 	RESIST_STUN = 22, -- 免疫眩晕
+	SHIELD = 23, -- 护盾
+	RESIST_CONTROL = 24, -- 免疫控制类
+	DISABLE_RECOVER_ANGER = 25, -- 无法回复怒气
+	TARGET_ACCURACY_RATE = 26, -- 目标命中率
 }
 
 BuffRule.EFFECT_TYPE = {
@@ -50,6 +54,7 @@ BuffRule.EFFECT_TYPE = {
 	FROZEN = 1009,	-- 冰冻
 	SIPHON_ATTR_DESC = 1023,	-- 属性吸取 被吸取方
 	SIPHON_ATTR_ADD = 1024,	-- 属性吸取，吸取方
+	BLAST_BURNING = 1033, -- 爆炎
 }
 
 BuffRule.ROUND = {
@@ -64,6 +69,12 @@ BuffRule.DISAPPEAR = {
 	AFFECT_ROUND = 3, --生效一回合
 	SHIELD = 4, --护盾消失时移除
 	DAMAGE = 5, -- 受到一定生命百分比伤害
+}
+
+-- buff被动触发类型
+BuffRule.SKILL_TRIGGER_TYPE = {
+	AFFECT = 1,	-- 生效时
+	DISAPPEAR = 2,	-- 消失时
 }
 
 local insert = table.insert
@@ -121,7 +132,7 @@ function BuffRule._initBuffType1(buff)
 end
 
 -- 2 dot,hot类buff
-function BuffRule._initBuffType2(buff)
+function BuffRule._initBuffType2(buff, battleField)
 	local buffInfo = buff.buffCfg
 	local attacker = buff.attacker
 	local victim = buff.victim
@@ -143,6 +154,13 @@ function BuffRule._initBuffType2(buff)
 	elseif buffType == 1012 then
 		--  中毒
 		damage = math.floor(attack*buffInfo.buff_value_1/1000)
+	elseif buffType == 1029 then
+		-- 怒气灼烧
+		effectType = 3
+		damage = buffInfo.buff_value_1
+	elseif buffType == BuffRule.EFFECT_TYPE.BLAST_BURNING then
+		-- 爆炎灼烧，按生命百分比X%扣血，有50%概率造成Z倍暴击伤害
+		damage = math.min(math.floor(victim.originInfo.INITIAL_HP*buffInfo.buff_value_1/1000),math.floor(attack*buffInfo.buff_value_2/1000))
 	end
 	-- 导出DOT, HOT伤害数值（如灼烧引爆效果，需要获取灼伤伤害）
 	buff.exports.damage = damage
@@ -154,6 +172,26 @@ function BuffRule._initBuffType2(buff)
 		if is_invincible and effectType == 1 then
 			value = 0
 		end
+		if buffType == BuffRule.EFFECT_TYPE.BLAST_BURNING then
+			-- 爆炎灼烧，按生命百分比X%扣血，有50%概率造成Z倍暴击伤害
+			if battleField:bingo(500) then
+				value = math.floor(value * buffInfo.buff_value_3 / 1000)
+				-- 爆炎暴击同时对周围目标单位造成50%的额外伤害
+				local knightList = battleField:getBattleData():getNearKnightList(victim)
+				for i, knight in ipairs(knightList) do
+					local effect = {effect_type = effectType,effect_value = math.floor(value / 2)}
+					local battleBuff = {
+						buff_id = buffInfo.id,
+						buff_serial_id = buff.serialId,
+						victim = knight,
+						buff_action = 3,
+						buff_effect = effect,
+						attacker = attacker,
+					}
+					table.insert(data,#data+1,battleBuff)
+				end
+			end
+		end
 		local effect = {effect_type = effectType,effect_value = value}
 		if effectType == 1 then
 			victim:doBuff(BuffRule.TYPE.DOT_DAMAGE_DES, {
@@ -164,12 +202,13 @@ function BuffRule._initBuffType2(buff)
 		local battleBuff = {
 			buff_id = buffInfo.id,
 			buff_serial_id = buff.serialId,
-			knight_serial_id = victim.serialId,
+			victim = victim,
 			buff_action = 3,
 			buff_effect = effect,
 			attacker = attacker,
 		}
 		table.insert(data,#data+1,battleBuff)
+		
         return true, data
     end
 end
@@ -363,48 +402,17 @@ function BuffRule._initBuffType15(buff)
 				local rate = buffInfo.buff_attribute_type == 2 and -1 or 1
 				result.damage = math.floor(result.damage * (1000 + buffInfo.buff_value_1 * rate) / 1000)
 			end
+			return true, data
 		end
-		return true, data
+		return false
 	end
 end
 
--- 伤害吸收
+-- 绑定被动
 function BuffRule._initBuffType16(buff, battleField)
-	local buffInfo = buff.buffCfg
-	local victim = buff.victim
-	local identity = victim.identity
-	local battleData = battleField:getBattleData()
-	local maxValue = math.floor(buffInfo.buff_value_1 * victim.baseInfo.INITIAL_HP / 1000)
-	local curValue = 0
-	local absorb = function (data)
-		local damage = data
-		local retain = maxValue - curValue
-		if data > retain then
-			-- 超过上限
-			curValue = maxValue
-			damage = data - retain
-			buff.isDone = true
-		else
-			curValue = curValue + data
-			damage = 0
-		end
-
-		return true, curValue
+	return function (data)
+		return true
 	end
-	local release = function (data)
-		local knightList = battleData:getKnightList()
-		-- 根据吸收的伤害，平均治疗我方所有存活单位
-		local recoverValue = math.floor(curValue * buffInfo.buff_value_2 / 1000 / #knightList)
-		for i, v in ipairs(knightList) do
-			insert(data, {
-				victim = v,
-				affectType = 2,
-				damage = recoverValue,
-			})
-		end
-		return true, data
-	end
-	return {[16] = absorb, [17] = release}
 end
 
 -- DOT伤害变化
@@ -538,6 +546,50 @@ end
 function BuffRule._initBuffType22(buff)
 	return function (data)
 		return true, true
+	end
+end
+
+-- 23-护盾
+function BuffRule._initBuffType23(buff)
+	local buffInfo = buff.buffCfg
+	local victim = buff.victim
+	local shield = math.floor(victim.originInfo.INITIAL_HP * buffInfo.buff_value_1 / 1000)
+	return function (data)
+		local damage = data
+		local shieldBefore = shield
+		shield = math.max(0, shield - damage)
+		if shield == 0 then
+			buff.isDone = true
+		end
+		damage = damage - (shieldBefore - shield)
+		return true, damage
+	end
+end
+
+-- 24-免疫控制类
+function BuffRule._initBuffType24(buff)
+	return function (data)
+		return true, true
+	end
+end
+
+-- 25-无法回复怒气
+function BuffRule._initBuffType25(buff)
+	return function (data)
+		return true, true
+	end
+end
+
+-- 26-带有此效果的 最终命中率进行二次判断
+function BuffRule._initBuffType26(buff, battleField)
+	local buffInfo = buff.buffCfg
+	local rate = buffInfo.buff_value_1
+	local attacker = buff.attacker
+	local attackerId = attacker.serialId
+	return function (data)
+		data[attackerId] = data[attackerId] or 1000
+		data[attackerId] = math.floor(data[attackerId] * rate / 1000)
+		return true, data
 	end
 end
 

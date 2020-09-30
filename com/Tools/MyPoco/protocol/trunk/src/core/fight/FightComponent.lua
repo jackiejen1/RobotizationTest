@@ -89,7 +89,7 @@ function FightComponent.fightPassive(passiveSkill, battleData, battleField)
 		-- 变身召唤
 		local attackType = 3
 		local skillId = info.passive_skill_value
-		local fightResult = FightResult.createFightResult(knight, attackType, skillId, battleField)
+		local fightResult = FightResult.createFightResult(knight, attackType, skillId, battleField, true)
 		local skillInfo = skill_image_info.get(skillId)
 		if skillInfo.image_type == 1 then
 			-- 变身
@@ -153,7 +153,7 @@ function FightComponent._knightFight(attacker, battleData, battleField,skillId,b
 	-- 这里可能有三重的效果
 
 	-- 最后伤害结果
-	local fightResult = FightResult.createFightResult(attacker, attackType, skillCfg.id, battleField)
+	local fightResult = FightResult.createFightResult(attacker, attackType, skillCfg.id, battleField, isPassive)
 
 	-- 首先更新技能怒气值
 	FightComponent._updateSkillEnergy(attacker, skillCfg, fightResult, battleField)
@@ -279,6 +279,9 @@ function FightComponent._knightFight(attacker, battleData, battleField,skillId,b
 			buffData.buffCheck = buffCheck
 
 			buffData.victims = FightComponent._getVictimTargets(buffData)
+			-- 记录攻击目标
+			insert(targets,buffData.victims)
+			
 			FightComponent._addBuff(buffData)
 			if next(buffData.victims) and enchantIndex > 0 then
 				enchantEffectMap[enchantIndex] = true
@@ -324,12 +327,13 @@ function FightComponent._knightFight(attacker, battleData, battleField,skillId,b
 		end
 	end
 
+	-- 判断可触发的被动
+	FightComponent.calcPassiveSkill(attacker,fightResult,skillCfg,firstResults,battleField,isPassive)
+
 	if not isPassive then
-		-- 判断可触发的被动
-		FightComponent.calcPassiveSkill(attacker,fightResult,skillCfg,firstResults,battleField)
 		-- 必杀技能量
 		if not attacker.isPlayer then
-			if not battleField.isExtraAction then
+			if not battleField:isExtraAction() then
 				battleField:getBattleData():excuteEnergyRule(EnergyRule.TYPE.SKILL, attacker)
 			end
 		end
@@ -340,12 +344,12 @@ function FightComponent._knightFight(attacker, battleData, battleField,skillId,b
 		-- 只对第一段攻击计算吸血和反伤
 		FightComponent.calcAddInfo(attacker,skillCfg,fightResult,firstResults,battleField)
 		
-		-- buff回合计算
-		local removeList = {}
-		if not isPassive then
-			removeList = attacker:doBuffRound(BuffRule.ROUND.AFTER)
-		end
-		results.removeList = removeList
+		-- -- buff回合计算
+		-- local removeList = {}
+		-- if not isPassive then
+		-- 	removeList = attacker:doBuffRound(BuffRule.ROUND.AFTER)
+		-- end
+		-- results.removeList = removeList
 	end
 	if attackType == 6 then
 		-- 召唤物攻击，判断是否技能次数用尽，准备移除
@@ -441,19 +445,23 @@ function FightComponent.calcAddInfo(attacker,skillCfg,fightResult,firstResults,b
 	end
 end
 
-function FightComponent.calcPassiveSkill( attacker,fightResult,skillCfg,firstResults,battleField )
+function FightComponent.calcPassiveSkill( attacker,fightResult,skillCfg,firstResults,battleField, isPassive)
 	-- 计算被动技能触发
 
-	-- 攻击方触发
-	if attacker.excuteSpRule then
-		attacker:excuteSpRule(SkillSpecialRule.TYPE.SKILL,{cfg=skillCfg,result=firstResults})
+	if not isPassive then
+		-- 攻击方触发
+		if attacker.excuteSpRule then
+			attacker:excuteSpRule(SkillSpecialRule.TYPE.SKILL,{cfg=skillCfg,result=firstResults})
+		end
+		battleField:getBattleData():excuteSpRule(SkillSpecialRule.TYPE.SKILL,{cfg=skillCfg, result=firstResults})
 	end
-	battleField:getBattleData():excuteSpRule(SkillSpecialRule.TYPE.SKILL,{cfg=skillCfg, result=firstResults})
 
 	-- 受击方触发
 	for i , result in ipairs(firstResults) do
-		result.victim:excuteSpRule(SkillSpecialRule.TYPE.HIT,{cfg=skillCfg,result=result,attacker = attacker})
-		result.victim:excuteEnergyRule(EnergyRule.TYPE.HIT)
+		result.victim:excuteSpRule(SkillSpecialRule.TYPE.HIT,{cfg=skillCfg,result=result,attacker = attacker,isPassive = isPassive})
+		if not isPassive then
+			result.victim:excuteEnergyRule(EnergyRule.TYPE.HIT)
+		end
 	end
 end
 
@@ -472,8 +480,9 @@ function FightComponent._chooseSkill(attacker,battleData,skillId)
 		-- 是否变身，用变身的技能
 		local transformData = attacker:doBuff(BuffRule.TYPE.TRANSFORM, {})
 
-		if battleData:getBattleField().forceCommonSkill then
-			skillCfg = transformData.commonSkillCfg or attacker.commonSkillCfg
+		local battleField = battleData:getBattleField()
+		if not next(transformData) and battleField:getExtraActionSkillId() > 0 then
+			skillCfg = loadCfg("cfg.skill_info").get(battleField:getExtraActionSkillId())
 		elseif attacker:canReleaseEnergySkill() then	-- 必杀技，不受封技影响
 			skillCfg = transformData.energySkillCfg or attacker.energySkillCfg
 		else
@@ -566,12 +575,17 @@ function FightComponent._chooseSkill(attacker,battleData,skillId)
 				battleField = battleData:getBattleField(),
 				targets = {},
 			}
-			local victims = FightComponent._getVictimTargets(attackData)
-			for i, victim in ipairs(victims) do
-				if victim:hasBuffByEffectType(BuffRule.EFFECT_TYPE.BURNING) then
+			local targets = FightComponent._getVictimTargets(attackData)
+			for i, target in ipairs(targets) do
+				if target.victim:hasBuffByEffectType(BuffRule.EFFECT_TYPE.BURNING) then
 					skillCfg = skill_info.get(skillCfg.new_skill_id)
 					break
 				end
+			end
+		elseif skillCfg.sp_type == 10 then
+			-- 概率触发
+			if battleData:getBattleField():bingo(skillCfg.sp_type_value) then
+				skillCfg = skill_info.get(skillCfg.new_skill_id)
 			end
 		end
 	end
@@ -1097,17 +1111,22 @@ function FightComponent._getVictimTargets(attackData)
 	elseif range == 32 then
 		-- 敌方处于标记id=1状态下标记最多的单位
 		local knightList = attackData.battleData:getKnightList(targetIdentity)
-		local maxLevel = 0
-		local maxKnight = knightList[1]
+		local maxLevel = -1
+		local indexList = {}
 		for i = 1 , #knightList do
 			local knight = knightList[i]
 			local level = knight:getMarkLevel(1)
 			if level > maxLevel then
-				maxKnight = knight
 				maxLevel = level
+				indexList = {i}
+			elseif level == maxLevel then
+				insert(indexList, i)
 			end
 		end
-		insert(victimTargets, createVictimTarget(maxKnight)) 
+		if next(indexList) then
+			local winner = FightComponent._random(1, #indexList, battleField)
+			insert(victimTargets, createVictimTarget(knightList[indexList[winner]])) 
+		end
 	elseif range == 33 then
 		-- 敌方处于标记id=1状态下标记最多的2个单位
 		local knightList = attackData.battleData:getKnightList(targetIdentity)
@@ -1121,6 +1140,7 @@ function FightComponent._getVictimTargets(attackData)
 			for i = 1 , #knightList do
 				indexList[i] = i
 			end
+			indexList = FightComponent._getRandomN(indexList, #indexList, battleField)
 			for i = 1 , 2 do
 				for j = #knightList - 1 , i , -1 do
 					if knightList[indexList[j+1]]:getMarkLevel(1) > knightList[indexList[j]]:getMarkLevel(1) then
@@ -1133,7 +1153,12 @@ function FightComponent._getVictimTargets(attackData)
 			insert(victimTargets, createVictimTarget(knightList[indexList[1]])) 
 			insert(victimTargets, createVictimTarget(knightList[indexList[2]])) 
 		end
-		
+	elseif range == 34 then
+		-- 敌方生命最高2人
+		local victims = FightComponent._getMaxTargetsN(attackData,targetIdentity,"INITIAL_HP",true,2)
+		for i = 1 , #victims do
+			insert(victimTargets, createVictimTarget(victims[i]))
+		end
 	elseif range == 101 then
 		-- 自身
 		local victim = attacker
@@ -1402,6 +1427,38 @@ function FightComponent._getVictimTargets(attackData)
 				end
 			end
 		end
+	elseif range == 133 then
+		-- 133-我方攻击力最高单位
+		local victim = FightComponent._getRandomMaxTargets(attackData,selfIdentity,"ATTACK",true)
+		insert(victimTargets, createVictimTarget(victim))
+	elseif range == 134 then
+		-- 134-我方被控制的人
+		local ControlBuffWeight = load("core.ControlBuffWeight")
+		local totalWeight = 0
+		local min, max = 0, 0
+		local pool = {}
+		local kngihtsList = attackData.battleData:getKnightList(selfIdentity)
+		for i, knight in ipairs(kngihtsList) do
+			local buffs = knight:getBuffs()
+			for i, buff in ipairs(buffs) do
+				if buff.buffCfg.buff_control_type == 1 then
+					local weight = ControlBuffWeight.getWeight(buff.buffCfg)
+					min = totalWeight
+					totalWeight = totalWeight + weight
+					max = totalWeight
+					insert(pool, {min = min, max= max, knight = knight})
+				end
+			end
+		end
+		-- 按权重随机
+		local randNum = battleField:boundedrand(1, totalWeight)
+		-- 在区间列表里找命中的 (min, max]
+		for i, v in ipairs(pool) do
+			if v.min < randNum and randNum <= v.max then
+				insert(victimTargets, createVictimTarget(v.knight))
+				break
+			end
+		end
 	elseif range == 201 then
 		-- 201-继承伤害1的范围
 		local lastRange = lastTargets[1]
@@ -1662,11 +1719,39 @@ function FightComponent._getVictimTargets(attackData)
 				insert(victimTargets,copyTarget(ktor[victim]))
 			end
 		end
+	elseif range == 230 then
+		-- 230-继承第一组效果范围中处于爆炎buff状态下的单位
+		local lastRange = lastTargets[1]
+		local knights, ktor = FightComponent._getRangeKnights(lastRange)
+		for i = 1, #knights do
+			local knight = knights[i]
+			if knight:hasBuffByEffectType(BuffRule.EFFECT_TYPE.BLAST_BURNING) then
+				insert(victimTargets, copyTarget(ktor[knight]))
+			end
+		end
 	end
 	-- assert(#victimTargets > 0, string.format("Invalid or Unsupport range %s", range))
 
 	return victimTargets
 
+end
+
+-- list随机出n个元素
+function FightComponent._getRandomN(list, n, battleField)
+	local cloneList = {}
+	local newList = {}
+	for i, v in ipairs(list) do
+		insert(cloneList, v)
+	end
+	local len = #cloneList
+	for i = len, max(len-n+1, 1), -1 do
+		local index = FightComponent._random(1, i, battleField)
+		local tmp = cloneList[index]
+		insert(newList, tmp)
+		cloneList[i], cloneList[index] = cloneList[index], cloneList[i]
+	end
+
+	return newList
 end
 
 function FightComponent._getRangeKnights(range)
@@ -1876,12 +1961,14 @@ function FightComponent._createVictimTarget(victim)
 end
 
 function FightComponent._copyTarget( victimTarget )
-	local target = FightComponent._createVictimTarget(victimTarget.victim)
-	target.miss = victimTarget.miss
-	target.crit = victimTarget.crit
-	target.block = victimTarget.block
-	target.inherit = true
-	return target
+	if victimTarget then
+		local target = FightComponent._createVictimTarget(victimTarget.victim)
+		target.miss = victimTarget.miss
+		target.crit = victimTarget.crit
+		target.block = victimTarget.block
+		target.inherit = true
+		return target
+	end
 end
 
 -- 数据在这里处理后再通过公式计算
@@ -1949,7 +2036,6 @@ function FightComponent._calcFight( attackData )
 		if isLimit then
 			affectRate = 0
 		end
-		
 		if attackData.battleField:bingo(affectRate) then
 			-- 处理受击者的buff和被动技能
 			local victim = target.victim
@@ -1958,16 +2044,8 @@ function FightComponent._calcFight( attackData )
 
 			local result
 			if affectType == 1 then
-				-- -- 计算是否无敌,若无敌,则不用计算下面的伤害
-				-- -- 看是否无敌
-				-- local isInvincible = victim:doBuff(BuffRule.TYPE.INVINCIBLE, false)
-				-- if isInvincible then
-				-- 	result = {
-				-- 		invincible = true,
-				-- 		damage = 0,
-				-- 		crit = false,
-				-- 	}
-				-- else
+				-- 秒杀公式无视疾风
+				if attackData.formula ~= 12 then
 					-- 是否是强制闪避
 					local forceMiss = victim:doBuff(BuffRule.TYPE.FORCE_MISS, false)
 					if forceMiss then
@@ -1977,7 +2055,7 @@ function FightComponent._calcFight( attackData )
 							damage = 0,
 						}
 					end
-				-- end
+				end
 			end
 			if not result then
 				-- 计算用的数据
@@ -2008,7 +2086,9 @@ function FightComponent._calcFight( attackData )
 				if not attacker.isPlayer and attackData.attackIndex == 1 then
 					if result then
 						-- 首个技能作用效果，伤害、治疗倍率计算
-						result.damage = floor(result.damage * (1000 + firstMultiple) / 1000)
+						if affectType == 1 or affectType == 2 then
+							result.damage = floor(result.damage * (1000 + firstMultiple) / 1000)
+						end
 					end
 				end
 			end
@@ -2038,6 +2118,12 @@ function FightComponent._afterFormula(attackData, target, results, result)
 	end
 	if affectType == 1 then
 		if result.damage > 0 and not result.seckill then
+			-- 无敌
+			local isInvincible = victim:doBuff(BuffRule.TYPE.INVINCIBLE, false)
+			if isInvincible then
+				result.damage = 0
+			end
+			
 			-- 伤害按比例转成反弹
 			local hitbackInfo = {
 				attacker = attackData.attacker,
@@ -2077,6 +2163,25 @@ function FightComponent._afterFormula(attackData, target, results, result)
 			for i, v in ipairs(recoverInfo.recoverList) do
 				attackData.fightResult:addAttackEffect({effect_type = 2, effect_value = v.damage, attacker = victim, victim = victim}, false)
 			end
+			-- 伤害反弹，反弹伤害分摊给敌方全体
+			local hitbackInfo = {
+				attacker = attackData.attacker,
+				hitbackList = {},
+				result = result,
+			}
+			hitbackInfo = FightComponent._excuteSpEffect({
+				knight = victim,
+				fightResult = attackData.fightResult,
+				rType = SkillSpecialRule.TYPE.WILL_DAMAGE, 
+				rValue = {attackData = attackData}, 
+				spType = SkillSpecialRule.SP_TYPE.HITBACK_VICTIMS, 
+				spData = hitbackInfo,
+			})
+			-- 反弹效果加到结果里
+			for i, v in ipairs(hitbackInfo.hitbackList) do
+				attackData.fightResult:addAttackEffect({effect_type = 1, effect_value = v.damage, attacker = victim, victim = v.victim, add_effects={{add_type=5}}}, false)
+			end
+
 			-- 计算伤害分摊，不分摊秒杀
 			-- 生命诅咒
 			local list = victim:doBuff(BuffRule.TYPE.OP_HP_LINK, {})
@@ -2195,6 +2300,12 @@ function FightComponent._fightFormula1(attackInfo)
 		-- 判断是否命中
 		-- 命中率=1+攻击方养成命中率-防守方最终闪避率+技能命中率，修正区间
 		local rate = 1000 + attackerInfo.ACCURACY_RATE - victimInfo.DODGE_RATE
+		-- 新增一个命中修正buff，buff持有人对buff施法者的命中降低
+		if not attacker.isPlayer then
+			local targetRates = attacker:doBuff(BuffRule.TYPE.TARGET_ACCURACY_RATE, {})
+			rate = rate - (targetRates[victim.serialId] or 0)
+		end
+
 		rate = range(Parameters.HIT_LOW,Parameters.HIT_HIGH,rate)
 		rate = rate + extraData[BattleAttr["ACCURACY_RATE"]]
 		hit = battleField:bingo(rate)
@@ -2311,7 +2422,8 @@ function FightComponent._fightFormula1(attackInfo)
 	-- 抗灭增伤
 	local mie = 0
 	-- 主角不算抗灭
-	if defCfg.group > 0 and knightCfg.group > 0 then
+	if defCfg.group > 0 and knightCfg.group > 0 and defCfg.group <= 4 and knightCfg.group <= 4 then
+		-- TODO 时空将 抗灭
 		local mieList = {"WEI_DAMAGE_","SHU_DAMAGE_","WU_DAMAGE_","QUN_DAMAGE_"}
 		mie = attackerInfo[mieList[defCfg.group].."ADD"] - victimInfo[mieList[knightCfg.group].."DEC"]
 		mie = range(Parameters.GROUP_LOW,Parameters.GROUP_HIGH,mie)
@@ -3042,10 +3154,11 @@ function FightComponent._fightFormula12(attackInfo)
 	if victim.isMonster then
 		return
 	end
-	if inherit and target.miss then
-		-- 之前就miss了，此处也要miss
-		return
-	end
+	-- 无视闪避
+	-- if inherit and target.miss then
+	-- 	-- 之前就miss了，此处也要miss
+	-- 	return
+	-- end
 	local hp = victim.originInfo.INITIAL_HP
 	local shield = victim.baseInfo.SHIELD
 	local hpRate = victim.baseInfo.hpRate
@@ -3170,7 +3283,7 @@ function FightComponent._fightFormula17(attackInfo)
 		end
 	end
 	if totalDamage > 0 then
-		return {damage = totalDamage}
+		return {damage = totalDamage, detonate = true}
 	end
 end
 
@@ -3188,12 +3301,12 @@ function FightComponent._fightFormula18(attackInfo)
 	if hpRate >= attackInfo.formulaValue1 then
 		return
 	end
-	local leftHp = victim.originInfo.INITIAL_HP - victim.baseInfo.INITIAL_HP
+	local leftHp = victim.baseInfo.INITIAL_HP
 	local maxDamage = floor(attacker.originInfo.INITIAL_HP * Parameters.SECKILL_SELF_HP_LIMIT / 1000)
 	if leftHp < maxDamage then
-		return {damage = leftHp, seckill = true}
+		return {damage = leftHp, seckill = true, behead = true}
 	else
-		return {damage = maxDamage}
+		return {damage = maxDamage, behead = true}
 	end
 end
 
@@ -3204,6 +3317,7 @@ function FightComponent._fightFormula19(attackInfo)
 	local victim = target.victim
 	local firstResults = attackInfo.firstResults or {}
 	local inherit = target.inherit -- 是否继承
+	local victims = attackInfo.victims or {}
 
 	if inherit and target.miss then
 		-- 之前就miss了，此处也要miss
@@ -3270,6 +3384,12 @@ function FightComponent._checkBuffBingo(attackData, target)
 	local victim = target.victim
 	if victim.isMonster then
 		if victim.knightCfg.if_immune_control == 1 and buffInfo.buff_control_type == 1 then
+			return false
+		end
+	end
+	-- 判断是否有免疫控制buff
+	if buffInfo.buff_control_type == 1 then
+		if victim:doBuff(BuffRule.TYPE.RESIST_CONTROL) then
 			return false
 		end
 	end

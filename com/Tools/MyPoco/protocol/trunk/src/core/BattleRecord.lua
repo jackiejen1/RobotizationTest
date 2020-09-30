@@ -13,16 +13,26 @@ function BattleRecord:init()
     self._petSkills = {}
 end
 
-function BattleRecord:initRecord(atkType,owns,enemys)
+function BattleRecord:initRecord(owns,enemys)
 	self._keyList = {}
 	self._infoList = {{},{}}
-	self:setRecord(atkType,1,owns)
-	self:setRecord(atkType,2,enemys)
+	self:setRecord(1,owns)
+	self:setRecord(2,enemys)
 end
 
-function BattleRecord:setRecord(atkType,identity,info)
-	-- local robot = info.user and (info.user.robot_type and info.user.robot_type ~= 0 and info.user.robot_type ~= 999)
-	-- local isMonster = robot or (atkType == 1 and identity == 2) or (atkType == 10)
+-- 初始化全部的波数据
+function BattleRecord:initRecordAll(owns,enemys)
+	self._keyList = {}
+	self._infoList = {{},{}}
+	for i , own in ipairs(owns) do
+		self:setRecord(1,own,i>1)
+	end
+	for i , enemy in ipairs(enemys) do
+		self:setRecord(2,enemy,i>1)
+	end
+end
+
+function BattleRecord:setRecord(identity,info,onlyKnight)
 	local isMonster = info.monster_team_id and info.monster_team_id > 0 or false
 	for i = 1 , #info.units do
 		local unit = info.units[i]
@@ -52,10 +62,16 @@ function BattleRecord:setRecord(atkType,identity,info)
     	iList[#iList+1] = uinfo
 	end
 	table.sort(self._infoList[identity],function( a,b )
-		return a.pos < b.pos
+		if a.pos and b.pos then
+			return a.pos < b.pos
+		end
+		return false
 	end)
 	for i , v in ipairs(self._infoList[identity]) do
 		v.pos = nil
+	end
+	if onlyKnight then
+		return
 	end
 	if info.combo.tokens then
 		for i = 1 , #info.combo.tokens do
@@ -214,6 +230,17 @@ function BattleRecord:getAttackerDamage()
     	damage = damage + v.dam
     end
     return damage
+end
+
+-- 存下战报，用于后续显示
+function BattleRecord:storeRecord()
+	if clone then
+    	self._storeRecord = clone(self._infoList)
+    end
+end
+
+function BattleRecord:getStoredRecord( )
+	return self._storeRecord
 end
 
 return BattleRecord

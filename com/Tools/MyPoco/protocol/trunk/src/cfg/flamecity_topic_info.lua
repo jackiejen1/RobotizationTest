@@ -18,7 +18,7 @@ record_flamecity_topic_info.chapter_10 = 0--章节10
 
 local flamecity_topic_info = {
    _data = {   
-    [1] = {101,"攻讨董卓",1,1,2,3,4,0,0,0,0,0,0,},
+    [1] = {101,"诸侯伐董",1,1,2,3,4,5,6,7,8,0,0,},
     }
 }
 

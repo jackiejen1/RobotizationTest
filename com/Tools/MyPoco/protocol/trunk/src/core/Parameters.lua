@@ -93,6 +93,7 @@ local Parameters = {
     SECKILL_SELF_HP_LIMIT = 2051, -- 斩杀伤害的上限（自身最大生命值的X%）
     FIGHTVALUE_PROTECT_VALUE1 = 2052, -- 战力免伤保护系数1
     FIGHTVALUE_PROTECT_VALUE2 = 2053, -- 战力免伤保护系数2
+    CONTROL_BUFF_DEFAULT_WEIGHT = 2054, -- 控制buff默认权重
 }
 
 local param_info = loadCfg("cfg.battle_parameter_info")

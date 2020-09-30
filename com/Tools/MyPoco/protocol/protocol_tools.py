@@ -113,14 +113,15 @@ def _recv_data(s, api_attr, buffersize, limittime):
             recvtime = time.time()
             if isinstance(recvcmd,list):
                 #需要多条返回协议的处理
-                for rec in recvcmd:
-                    if head_data[1] == rec:  # 这里对返回数据进行校验，只返回要求协议ID的数据
-                        recvtime = time.time()
-                        recvdata = tmpdata
-                        recvdata_dic[str(rec)] = recvdata
-                        then_len = then_len + 1
-                if then_len == len(recvcmd):
-                    return recvdata_dic,recvtime
+                if head_data[1] in recvcmd:
+                    for rec in recvcmd:
+                        if head_data[1] == rec:  # 这里对返回数据进行校验，只返回要求协议ID的数据
+                            recvtime = time.time()
+                            recvdata = tmpdata
+                            recvdata_dic[str(rec)] = recvdata
+                            then_len = then_len + 1
+                    if then_len == len(recvcmd):
+                        return recvdata_dic,recvtime
             else:
                 if head_data[1] == recvcmd:#这里对返回数据进行校验，只返回要求协议ID的数据
                     recvtime = time.time()

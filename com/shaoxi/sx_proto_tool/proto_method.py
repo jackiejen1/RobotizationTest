@@ -18,8 +18,8 @@ from proto import cs_pb2
 
 # from google.protobuf.json_format import MessageToJson
 from gm.gm_method import GmMethod
-from proto_tool.protocol_tools import pack_data, send_receive
-import requests
+from sx_proto_tool.protocol_tools import pack_data, send_receive
+import requests,base64
 
 
 class ProtocolFunction:
@@ -43,7 +43,7 @@ class ProtocolFunction:
             self.server_id = 2246440001
         elif "2" in server_name:
             self.server_id = 2246440002
-        self.host = "g1.snxyj.uuzuonline.net"
+        # self.host = "g1.snxyj.uuzuonline.net"
         self.host = "120.92.248.137"
         self.port = 38422
         try:
@@ -60,7 +60,7 @@ class ProtocolFunction:
         :param version: 版本号
         :return:
         """
-        get_acctoun_url = "http:#gm.snxyj.youzu.com/tools/token.php?op_id=1&uid=" + self.username
+        get_acctoun_url = "http://gm.snxyj.youzu.com/tools/token.php?op_id=1&uid=" + self.username
         r = requests.get(url=get_acctoun_url)
         tocken_dic = r.json()
         C2S_Login = cs_pb2.C2S_Login()
@@ -114,7 +114,6 @@ class ProtocolFunction:
         :return:
         """
         C2S_Flush = cs_pb2.C2S_Flush()
-        C2S_Flush.id = True
         C2S_Flush.user = True  # 玩家基本信息
         C2S_Flush.equipment = True  # 装备
         C2S_Flush.knight = True  # 神将
@@ -150,8 +149,7 @@ class ProtocolFunction:
         C2S_Flush.star_knight = True  # 星君
         C2S_Flush.pulse = True  # 主角升紫金
         C2S_Flush.artifact = True  # 神器
-
-        recv_cmd_list = [10007, ]
+        recv_cmd_list = [10007,10008,10029,10010,10042,16114,10044,16108,10024,10025,10016,10043,10023,10026,10338]
         C2S_Flush_attr = {'name': "C2S_Flush", 'protocol': 'protobuf-ss', 'send_cmd': 10006, 'recv_cmd': recv_cmd_list,
                           'uid': self.uid, 'sid': self.sid}
         senddata = pack_data(C2S_Flush, C2S_Flush_attr)
@@ -163,20 +161,20 @@ class ProtocolFunction:
         else:
             raise GmException(str(self.uid) + "信息拉取失败" + str(S2C_Flush.ret))
         # todo 其他协议后续补齐
-        S2C_GetUser
-        S2C_GetEquipment
-        S2C_GetKnight
-        S2C_GetTreasure
-        S2C_GetSoulScore
-        S2C_GetSoul
-        S2C_GetActivedSouls
-        S2C_GetFragment
-        S2C_GetGem
-        S2C_FightKnight
-        S2C_FightResource
-        S2C_GetItem
-        S2C_GetInstrument
-        S2C_GetFirstKill
+        # S2C_GetUser 10008
+        # S2C_GetEquipment 10029
+        # S2C_GetKnight 10010
+        # S2C_GetTreasure 10042
+        # S2C_GetSoulScore 16114
+        # S2C_GetSoul 10044
+        # S2C_GetActivedSouls 16108
+        # S2C_GetFragment 10024
+        # S2C_GetGem 10025
+        # S2C_FightKnight 10016
+        # S2C_FightResource 10043
+        # S2C_GetItem 10023
+        # S2C_GetInstrument 10026
+        # S2C_GetFirstKill 10338
 
     def ID_C2S_KnightLevelUp(self, id, materials):
         """

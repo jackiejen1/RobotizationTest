@@ -15,6 +15,9 @@ function RoundComponent.roundStart( battleData )
     component.cdList = list
     battleData:setRoundFinish(false)
 
+    local sceneRemoveList = battleData:doSceneRound()
+    component.sceneRemoveList = sceneRemoveList
+
     return component
 end
 

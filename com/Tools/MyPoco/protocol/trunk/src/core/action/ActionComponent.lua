@@ -16,8 +16,8 @@ local BattleConst = load "const.BattleConst"
 
 local ActionComponent = {}
 
-function ActionComponent:init(battleData)
-	local firstIdentity = battleData:getHighIdentity()
+function ActionComponent:init(battleData,firstIdentity)
+	local firstIdentity = firstIdentity or battleData:getHighIdentity()
 	battleData.firstAttackId = firstIdentity
 	self.order = {}
 	for i = 1 , 6 do
@@ -36,7 +36,7 @@ function ActionComponent:next()
 		local params = {
 			isExtra = true,
 			disableComboRecover = extraAction.disableComboRecover == true,
-			forceCommonSkill = extraAction.forceCommonSkill == true,
+			skillId = extraAction.skillId,
 		}
 		return extraAction.knight, params
 	end
@@ -44,20 +44,24 @@ function ActionComponent:next()
 	-- 新助战要额外出手
 	for i = 1 , 12 do
 		local info = self.order[i]
-		local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
-		if knight and knight:isReal() and knight.assisting then
-			knight.assisting = false
-			return knight
+		if info then
+			local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
+			if knight and knight:isReal() and knight.assisting then
+				knight.assisting = false
+				return knight
+			end
 		end
 	end
 
 	-- 现在规则改为按站位顺序出手
 	for i = self.attackIndex + 1 , 12 do
 		local info = self.order[i]
-		local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
-		if knight and knight:isReal() then
-			self.attackIndex = i
-			return knight
+		if info then
+			local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
+			if knight and knight:isReal() then
+				self.attackIndex = i
+				return knight
+			end
 		end
 	end
 end
@@ -65,10 +69,15 @@ end
 function ActionComponent:checkFinish()
 	for i = self.attackIndex + 1 , 12 do
 		local info = self.order[i]
-		local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
-		if knight and knight:isReal() then
-			return false
+		if info then
+			local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
+			if knight and knight:isReal() then
+				return false
+			end
 		end
+	end
+	if self:hasExtraAction() then
+		return false
 	end
 	self.attackIndex = 0 -- 重置
 	return true
@@ -83,9 +92,11 @@ end
 function ActionComponent:getNextKnight()
 	for i = self.attackIndex + 1 , 12 do
 		local info = self.order[i]
-		local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
-		if knight and knight:isReal() then
-			return knight
+		if info then
+			local knight = self.battleData:getKnightByIdAndPos(info.identity,info.pos)
+			if knight and knight:isReal() then
+				return knight
+			end
 		end
 	end
 end
@@ -96,7 +107,7 @@ end
 	local params = {
 		knight,	-- 额外出手的武将
 		disableComboRecover, -- 是否禁止合击值恢复
-		forceCommonSkill, -- 是否强制释放普攻
+		skillId, -- 额外回合指定的技能
 	}
 
 ]========================]
@@ -130,6 +141,27 @@ end
 
 function ActionComponent:clearExtraAction()
 	self.extraActions = {}
+end
+
+-- 改为轮流出手模式
+function ActionComponent:changeTurns(battleData,firstIdentity)
+	-- 调整出手顺序
+	local firstIdentity = firstIdentity or battleData:getHighIdentity()
+	local oppoIdentity = 3 - firstIdentity
+	local pos1, pos2 = 1,2
+	self.order = {}
+	for i = 1 , 6 do
+		local knight = self.battleData:getKnightByIdAndPos(firstIdentity,i)
+		if knight and knight:isReal() then
+			self.order[pos1] = {identity = firstIdentity, pos = i}
+			pos1 = pos1 + 2
+		end
+		local knight = self.battleData:getKnightByIdAndPos(oppoIdentity,i)
+		if knight and knight:isReal() then
+			self.order[pos2] = {identity = oppoIdentity, pos = i}
+			pos2 = pos2 + 2
+		end
+	end
 end
 
 return ActionComponent

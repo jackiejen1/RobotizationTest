@@ -25,16 +25,13 @@ local CommandComponent = load "core.command.CommandComponent"
 local RoundComponent = load "core.round.RoundComponent"
 local BattleConst = load "const.BattleConst"
 local SkillSpecialRule = load "core.rule.SkillSpecialRule"
+local BattleAttr = load "const.BattleAttr"
 
 local BattleField = class("BattleField")
 
 BattleField.BATTLE_FIGHTING = 0	-- 战斗中
 BattleField.BATTLE_FINISH = 1	-- 战斗完成
 BattleField.BATTLE_FAILURE = 2	-- 战斗失败
-
-BattleField.isExtraAction = false
-BattleField.disableComboRecover = false
-BattleField.forceCommonSkill = false
 
 function BattleField:ctor()
 
@@ -66,7 +63,7 @@ function BattleField:init()
 
 	-- 回合数
 	self._roundCount = 0
-
+	
 	-- 武将行动数（即使因为眩晕等没出手也算）
 	self._actionCount = {0, 0}
 
@@ -105,6 +102,30 @@ function BattleField:init()
 	-- 伤害记录，用于结算
 	self._record = load("core.BattleRecord")
 	self._record:init()
+
+	-- 发起重启游戏的一方，如果该队伍在当前回合战斗失败，重启战斗
+	self._restartInfos = {}
+	-- 每一方每场战斗仅能触发一次重启
+	self._restartedIdentity = {false, false}
+	-- -- 重置全局的技能触发次数
+	SkillSpecialRule.globalTriggerTimes = {}
+	-- 上场直接变身的武将，即使重启战斗也依旧生效
+	self._openingTransform = {}
+	self._initKnightsHp = {{}, {}} -- 战斗开始武将的血量缓存，用于重开战斗
+
+	self._isExtraAction = false			-- 是否是额外回合
+	self._disableComboRecover = false	-- 是否禁止合计值回复
+	self._extraActionSkillId = 0		-- 额外回合技能id
+
+	self._allNewWave = false -- 每一波看做全新战斗
+	self._drawable = false -- 允许平局
+	self._recoverList = {} -- 每一波的回血量
+	self._recoverIndex = 0 -- 当前回血的波数
+	self._mutiResult = {} -- 多波的战斗结果记录，1胜2负3平
+	self._summaryAll = false -- 是否统计所有波的伤害，默认只统计最后一波
+	self._roundList = {} -- 缓存每波的回合数，用于测试统计用
+	self._storedKnightsHp = {} -- 缓存的武将血量，用于显示
+	self._aliveKnights = {} -- 团灭前存活的武将
 end
 
 function BattleField:addRecord(attacker, type, value)
@@ -129,7 +150,23 @@ function BattleField:reset()
 
 	-- 重新初始化
 	self:init()
+end
 
+-- 重开战斗
+function BattleField:restart()
+
+	if self._atkType ~= 4 then
+		self._attackIndex = {1, 0}
+	else
+		self._attackIndex[2] = self._attackIndex[2] - 1
+	end
+	local isComboInherit = self._battleData:isComboInherit()
+	self._battleData:setComboInherit(false)
+	self:updateNewPlayer(1, true)
+	self._battleData:setComboInherit(isComboInherit)
+	self._action:reset()
+	-- 改一下随机数序列
+	table.insert(self._randoms, table.remove(self._randoms, 1))
 end
 
 --[=================[
@@ -252,12 +289,77 @@ end
 -- 设置全部数据
 -- 随机数种子, 武将，合击
 -- 要先设置武将数据，后设置合击数据
+-- atk_type 为战斗类型
+-- 目前分为四种情况
+-- 1 普通pve战斗，大部分战斗都是此类型,默认己方先手
+-- 2 正常pvp战斗，根据战力判断先后手
+-- 3 对手为机器人的pvp战斗，不处理战力系数
+-- 4 学宫论战特殊3v3多波战斗，完全定制
 function BattleField:setInitData(initData)
-	if initData.assistance_id and initData.assistance_id > 0 then
-		initData.atk_type = 10
+	-- 此类型弃用,无意义
+	-- if initData.assistance_id and initData.assistance_id > 0 then
+	-- 	initData.atk_type = 10
+	-- end
+	if initData.atk_type == 4 then
+		-- 学宫论战战斗，需要一些特殊处理
+		local debate_parameter_info = loadCfg("cfg.debate_parameter_info")
+		self._allNewWave = true -- 每波重置被动技能
+		self._battleData:setComboInherit(false) -- 设置合击数据不要继承 
+		-- 每波剩下的人会有一次回血
+		self._recoverList[1] = debate_parameter_info.get(3).parameter -- 第一波战斗后回血
+		self._recoverList[2] = debate_parameter_info.get(4).parameter -- 第二波战斗后回血
+		self._recoverIndex = 1 -- 先设置为第一波
+		-- 先后手逻辑调整，第二波开始以上一场胜方先手
+		self._needSpecialFirst = true
+		-- 需要处理平局，平局双方一起死亡
+		-- 暂时先不处理
+		-- self._drawable = true
+		-- 伤害统计时需要统计所有波的伤害
+		self._summaryAll = true
+		-- 初始武将血量系数，按阵营武将伤害系数
+		for identity = 1 , 2 do
+			local infos = identity == 1 and initData.own_teams or initData.enemy_teams
+			for i , info in ipairs(infos) do
+				local isMonster = info.monster_team_id and info.monster_team_id > 0 or false
+				for i , v in ipairs(info.units) do
+					local infoName = isMonster and "monster_info" or "knight_info"
+					local knight_info = loadCfg("cfg."..infoName)
+					local knightCfg = knight_info.get(v.id)
+					-- 分阵营武将加成
+					if knightCfg.group == 0 then
+						v.multiple = debate_parameter_info.get(12).parameter -- 主角加成系数
+					elseif knightCfg.group == 1 then
+						v.multiple = debate_parameter_info.get(6).parameter -- 魏加成系数
+					elseif knightCfg.group == 2 then
+						v.multiple = debate_parameter_info.get(7).parameter -- 蜀加成系数
+					elseif knightCfg.group == 3 then
+						v.multiple = debate_parameter_info.get(8).parameter -- 吴加成系数
+					elseif knightCfg.group == 4 then
+						v.multiple = debate_parameter_info.get(9).parameter -- 群加成系数
+					elseif knightCfg.group == 5 then
+						v.multiple = debate_parameter_info.get(13).parameter -- 时空将加成系数
+					end
+					if info.multiple then
+						v.multiple = (v.multiple or 0) + info.multiple
+					end
+					-- 血量加成
+					local hpParam = debate_parameter_info.get(5).parameter
+					if v.hp then
+						v.hp = math.floor(v.hp * (1000 + hpParam)/1000)
+					end
+					for i , attr in ipairs(v.attrs) do
+						if attr.type == BattleAttr.INITIAL_HP then
+							attr.value = math.floor(attr.value * (1000 + hpParam)/1000)
+						elseif attr.type == BattleAttr.BATTLE_HP then
+							attr.value = math.floor(attr.value * (1000 + hpParam)/1000)
+						end
+					end
+				end
+			end
+		end
 	end
 	self._randoms = initData.random_seeds
-	local isPvp = initData.atk_type == 2 or initData.atk_type == 3
+	local isPvp = initData.atk_type == 2 or initData.atk_type == 3 or initData.atk_type == 4
 	self._atkType = initData.atk_type
 	self._battleData.isPvp = isPvp
 	self._battleData.isRobot = initData.atk_type == 3
@@ -281,7 +383,7 @@ function BattleField:setInitData(initData)
 				local knight_info = loadCfg("cfg."..infoName)
 				local knightCfg = knight_info.get(v.id)
 				-- 主角或该阵营武将加成
-				if groupMultiple.team == knightCfg.group or knightCfg.type == 1 then
+				if groupMultiple.team == knightCfg.group or knightCfg.group == 0 or knightCfg.group == 5 then
 					v.multiple = groupMultiple.multiple
 				end
 			end
@@ -302,13 +404,21 @@ function BattleField:setInitData(initData)
 	end
 	self._initData = initData
 	self._attackIndex = {1,1}
-	self._record:initRecord(self._atkType,self._initData.own_teams[self._attackIndex[1]],self._initData.enemy_teams[self._attackIndex[2]])
-
+	if self._summaryAll then
+		-- 全部的武将，第一波的合击神兽
+		self._record:initRecordAll(self._initData.own_teams,self._initData.enemy_teams)
+	else
+		self._record:initRecord(self._initData.own_teams[self._attackIndex[1]],self._initData.enemy_teams[self._attackIndex[2]])
+	end
 
 	self._action:init(self._battleData)
+	if initData.atk_type == 4 then
+		-- 学宫论战战斗，需要一些特殊处理
+		self._action:changeTurns(self._battleData) -- 特殊出手机制，按战力判断先手，之后双方按站位轮流出手
+	end
 end
 
-function BattleField:updateNewPlayer(winner)
+function BattleField:updateNewPlayer(winner, isRestart)
 	local loser = 3 - winner
 	local nextIndex = self._attackIndex[loser] + 1
 	self._attackIndex[loser] = nextIndex
@@ -317,10 +427,67 @@ function BattleField:updateNewPlayer(winner)
 	if not newData then
 		return false
 	end
-	self._record:initRecord(self._atkType,self._initData.own_teams[self._attackIndex[1]],self._initData.enemy_teams[self._attackIndex[2]])
+	
+	if not self._summaryAll then
+		self._record:initRecord(self._initData.own_teams[self._attackIndex[1]],self._initData.enemy_teams[self._attackIndex[2]])
+	else
+		-- 虽然汇总了，需要记一下第一波的数据用于统计
+		if self._attackIndex[winner] == 1 and self._attackIndex[loser] == 2 then
+			self._record:storeRecord()
+		end
+	end
 
+	-- 清除额外行动次数
+	self._action:clearExtraAction()
+	self._battleData:setRoundFinish(true)
+	self._roundCount = 0
+	self._curAttackCount = 0
 	self._battleData:clear(loser)
-	local robot = newData.user and (newData.user.robot_type and newData.user.robot_type ~= 0 and newData.user.robot_type ~= 999)
+	self._aliveKnights = {}
+
+	-- 判断是否需要重置所有的合击和被动技能
+	if self._allNewWave or isRestart then
+		-- 需要重置的数据太多 重新初始化战场
+		-- 先记一下获胜方的血量，做血量继承
+		local hpData,knightsData = self._battleData:packKnightData(winner)
+		for identity = 1 , 2 do
+			local info = identity == 1 and self._initData.own_teams[self._attackIndex[1]] or self._initData.enemy_teams[self._attackIndex[2]]
+			local isMonster = info.monster_team_id and info.monster_team_id > 0 or false
+			self:setFightKnights(info.units,identity,isMonster,info.user)
+			self:setEnabledCommands(info.combo,identity)
+	        self._battleData:setFightValue(info.fight_value,identity)
+	        self._battleData:setAssist(self._initData.assistance_id)
+			self._battleData:setPassiveSkills(identity,info.passive_skills)
+			self._battleData:setPets(identity, info.pets)
+			-- 上场直接变身
+			self:openingTransform(self._attackIndex[1], 1)
+			self:openingTransform(self._attackIndex[2], 2)
+
+			if isRestart then
+				local knightsData = self._initKnightsHp[identity]
+				self._battleData:setKnightHp(identity,knightsData)
+			else
+				if identity == winner then
+					-- 获胜方还原血量
+					self._battleData:setKnightHp(identity,knightsData)
+				end
+			end
+		end
+		-- 缓存双方血量，用于从当前波数重启战斗
+		for identity = 1, 2 do
+			self._storedKnightsHp[identity] = self._battleData:packKnightData(identity)
+		end
+
+		if self._needSpecialFirst then
+			-- 先后手逻辑调整，第二波开始以上一场胜方先手
+			self._battleData:setHighIdentity(winner)
+			self._action:changeTurns(self._battleData,winner)
+		end
+		return true
+	end
+
+	-- self._battleData:clear(loser)
+	-- local robot = newData.user and (newData.user.robot_type and newData.user.robot_type ~= 0 and newData.user.robot_type ~= 999)
 	local isMonster = newData.monster_team_id and newData.monster_team_id > 0 or false
 	local groupMultiple = newData.demon_boss_multiple
 	for i , v in ipairs(newData.units) do
@@ -346,18 +513,16 @@ function BattleField:updateNewPlayer(winner)
 	self._battleData:setFightValue(newData.fight_value,loser)
 	self._battleData:setPassiveSkills(loser,newData.passive_skills)
 	self._battleData:setPets(loser, newData.pets)
+	-- 上场直接变身
+	self:openingTransform(self._attackIndex[loser], loser)
 
 	-- 清掉胜利方的buff
 	local list = self._battleData:getKnightList(winner)
 	for i , v in ipairs(list) do
 		v:clearBuff()
 		v:clearPassiveSkill()
+		v:clearMark()
 	end
-	-- 清除额外行动次数
-	self._action:clearExtraAction()
-	self._battleData:setRoundFinish(true)
-	self._roundCount = 0
-	self._curAttackCount = 0
 	return true
 end
 
@@ -455,7 +620,7 @@ end
 
 ]=================]
 
-function BattleField:execute(onlyResult,skillInfo)
+function BattleField:execute(onlyResult,skillInfo,needHpStore)
 	
 	if self._state == BattleField.BATTLE_FINISH then
 		return self._state
@@ -467,7 +632,7 @@ function BattleField:execute(onlyResult,skillInfo)
 	local battleData = self._battleData
 
 	-- 是否战斗结束
-	local isGameOver, winner = false, nil
+	local isGameOver, winner,isDraw = false, nil,false
 
 	-- 本次操作的命令集合
 	local commands = CommandComponent.create()
@@ -475,14 +640,19 @@ function BattleField:execute(onlyResult,skillInfo)
 	-- 是否有额外行动次数
 	local isExtraAction, extraAction = self._action:hasExtraAction()
 	if isExtraAction then
-		BattleField.isExtraAction = true
-		BattleField.disableComboRecover = extraAction.disableComboRecover == true
-		BattleField.forceCommonSkill = extraAction.forceCommonSkill == true
+		self._isExtraAction = true
+		self._disableComboRecover = extraAction.disableComboRecover == true
+		self._extraActionSkillId = extraAction.skillId or 0
 	end
 
-
+	-- 可能有一队全部死亡，但是还有触发被动未触发
+	local anyTeamAllDead = battleData:isTeamAllDead(1) or battleData:isTeamAllDead(2)
+	if not anyTeamAllDead then
+		-- 缓存团灭前的存活武将
+		self._aliveKnights = battleData:getKnightList()
+	end
 	-- 一回合刚开始
-	if not BattleField.isExtraAction then
+	if not self._isExtraAction and not anyTeamAllDead then
 		local roundStart = battleData:getRoundFinish()
 		if roundStart then
 			-- 回合数加1
@@ -507,7 +677,7 @@ function BattleField:execute(onlyResult,skillInfo)
 	local attacker = nil
 	local isReady, command = true, nil
 
-	if not BattleField.isExtraAction then
+	if not self._isExtraAction and not anyTeamAllDead then
 		-- 此处判断ai逻辑
 		-- 不能在第一轮
 		if not skillInfo and self._attackCount > 0 then
@@ -564,7 +734,7 @@ function BattleField:execute(onlyResult,skillInfo)
 			-- 找出当前出手的武将
 			attacker = self._action:next()
 			-- 额外回合不算队伍的武将行动次数，防止提前触发应龙神兽这类被动
-			if not BattleField.isExtraAction then
+			if not self._isExtraAction then
 				self._actionCount[attacker.identity] = self._actionCount[attacker.identity] + 1
 			end
 
@@ -603,15 +773,14 @@ function BattleField:execute(onlyResult,skillInfo)
 		local passiveCommands = {}
 		SkillSpecialRule.disable = true
 		while passiveSkill do
-			isGameOver, winner = battleData:isGameOver(self._roundCount)
-			if isGameOver then
-				break
-			end
+			-- isGameOver, winner = battleData:isGameOver(self._roundCount)
+			-- if isGameOver then
+			-- 	break
+			-- end
 			local passiveCommand = FightComponent.fightPassive(passiveSkill, battleData, self)
 			if passiveCommand then
 				passiveCommands[#passiveCommands+1] = passiveCommand
 			end
-			
 			passiveSkill = battleData:getNextFastPassive()
 		end
 		SkillSpecialRule.disable = false
@@ -633,8 +802,8 @@ function BattleField:execute(onlyResult,skillInfo)
 	-- 提前
 	if attacker and not attacker.isPlayer then
 		-- 武将行动结束（即使没出手攻击）
-		battleData:excuteSpRule(SkillSpecialRule.TYPE.ACTION)
-		battleData:excuteKnightSpRule(SkillSpecialRule.TYPE.ACTION)
+		battleData:excuteSpRule(SkillSpecialRule.TYPE.ACTION, {identity = attacker.identity})
+		battleData:excuteKnightSpRule(SkillSpecialRule.TYPE.ACTION, {identity = attacker.identity, attacker = attacker})
 	end
 
 	local passiveSkill = battleData:getNextFastPassive()
@@ -642,15 +811,14 @@ function BattleField:execute(onlyResult,skillInfo)
 		local passiveCommands = {}
 		SkillSpecialRule.disable = true
 		while passiveSkill do
-			isGameOver, winner = battleData:isGameOver(self._roundCount)
-			if isGameOver then
-				break
-			end
+			-- isGameOver, winner = battleData:isGameOver(self._roundCount)
+			-- if isGameOver then
+			-- 	break
+			-- end
 			local passiveCommand = FightComponent.fightPassive(passiveSkill, battleData, self)
 			if passiveCommand then
 				passiveCommands[#passiveCommands+1] = passiveCommand
 			end
-			
 			passiveSkill = battleData:getNextFastPassive()
 		end
 		
@@ -663,6 +831,20 @@ function BattleField:execute(onlyResult,skillInfo)
 		-- update后可能触发新被动
 		passiveSkill = battleData:getNextFastPassive()
 	end
+	-- 确保没有被动使武将又复活
+	if not battleData:hasNextPassive() then
+		local isTeamDead = {battleData:isTeamAllDead(1), battleData:isTeamAllDead(2)}
+		if isTeamDead[1] or isTeamDead[2] then
+			for i, knight in ipairs(self._aliveKnights) do
+				if isTeamDead[knight.identity] then
+					-- 团灭
+					-- 本次行动前还存活的武将触发
+					knight:excuteSpRule(SkillSpecialRule.TYPE.ALL_DEAD)
+				end
+			end
+		end
+	end
+
 	-- 攻击结束
 	local command = UpdateComponent.updateAfterAttack(attacker, battleData, self)
 	commands:addUpdateAfterAttackCommand(command)
@@ -670,18 +852,61 @@ function BattleField:execute(onlyResult,skillInfo)
 	local lastAttack = self._action:checkFinish()
 	-- 判断一下是否战斗结束了
 	if lastAttack then
-		isGameOver, winner = battleData:isGameOver(self._roundCount + 1)
+		isGameOver, winner,isDraw = battleData:isGameOver(self._roundCount + 1)
 	else
-		isGameOver, winner = battleData:isGameOver(self._roundCount)
+		isGameOver, winner,isDraw = battleData:isGameOver(self._roundCount)
 	end
-	
 	battleData:setRoundFinish(lastAttack)
+
+	-- local bothDead = false
+	-- if self._drawable and isDraw then
+	-- 	-- 允许平局，平局需要特殊处理
+	-- 	-- 如果不是最后一波，双方一起阵亡
+	-- 	-- 暂时先去掉
+	-- 	bothDead = true
+	-- end
 
 	-- 将操作记录保存下来
 	self:_addCommand(commands)
 
+	-- "最后一个死亡时重启战斗"包括当前出手所有的伤害（包括合并的）造成的该队伍所有存活的人被击杀
+	-- 如果队伍全部阵亡，需要看阵亡一方是否发起了重启战斗的请求
+	local isRestart = false
+	local restartInfos = {}
+	-- 有重启战斗的请求
+	for i, v in ipairs(self._restartInfos) do
+		if not self._restartedIdentity[v.identity] then
+			isRestart = true
+			table.insert(restartInfos, v)
+			-- 重开游戏直接变身
+			if v.skillImageId > 0 then
+				local attackIndex = self:getAttackIndex(v.identity)
+				-- self._openingTransform[v.knightSerialId] = v.skillImageId
+				self:setOpeningTransform(attackIndex, v.knightSerialId, v.skillImageId)
+			end
+			self._restartedIdentity[v.identity] = true
+		end
+	end
+
+	local waveFinish = false
+	if isRestart then
+		commands:addRestart(restartInfos)
+		self:restart()
+		self._state = BattleField.BATTLE_FIGHTING
 	-- 如果战斗结束了，则直接保存数据，然后返回
-	if isGameOver then
+	elseif isGameOver then
+		-- 要重置了，记一下当前的回合数
+		self._roundList[#self._roundList+1] = self._roundCount
+
+		-- 记录一下结果
+		if isDraw then
+			self._mutiResult[#self._mutiResult+1] = 3
+		elseif winner == 1 then
+			self._mutiResult[#self._mutiResult+1] = 1
+		else
+			self._mutiResult[#self._mutiResult+1] = 2
+		end
+		local curRound = self._roundCount
 		if not self:updateNewPlayer(winner) then
 			-- 没有下一波了
 			commands:setGameOver(winner)
@@ -695,19 +920,43 @@ function BattleField:execute(onlyResult,skillInfo)
 			local enemy_name = enemyUser and enemyUser.name
 			self._record:setWinInfo(winner,own_name,enemy_name)
 		else
+			waveFinish = true
 			commands:setWaveOver(winner)
 			self._action:reset()
 			self._state = BattleField.BATTLE_FIGHTING
 		end
+
+		-- 如果有下一波，处理可能的回血
+		-- 回血前先记录一下之前的血量
+		if self._state == BattleField.BATTLE_FIGHTING then
+			if needHpStore then
+				local result,fullResult = self._battleData:packKnightData()
+				self._storedKnightsHp = fullResult
+				self._storedKnightsHp.round = curRound
+			end
+			if self._recoverIndex > 0 then
+				local per = self._recoverList[self._recoverIndex]
+				if per and per > 0 then
+					-- 胜利方全体回复千分之per的血量
+					local recoverList = self._battleData:recoverKnightsHp(winner,per)
+					commands:setWaveRecover(recoverList)
+				end
+				self._recoverIndex = self._recoverIndex + 1
+			end
+		end
 	else
 		self._state = BattleField.BATTLE_FIGHTING
 	end
-	BattleField.isExtraAction = false
-	BattleField.disableComboRecover = false
-	BattleField.forceCommonSkill = false
+	self._isExtraAction = false
+	self._disableComboRecover = false
+	self._extraActionSkillId = 0
+	self._restartInfos = {}	-- 清除这次出手发起的重启战斗请求
 
-	return self._state, not onlyResult and commands:pack() or nil
+	return self._state, not onlyResult and commands:pack() or nil,waveFinish
+end
 
+function BattleField:getState()
+	return self._state
 end
 
 -- 跳过额外行动次数
@@ -771,6 +1020,24 @@ function BattleField:autoExecuteAll()
 	until state ~= BattleField.BATTLE_FIGHTING
 end
 
+function BattleField:getStoredKnightsHp()
+	return self._storedKnightsHp
+end
+
+-- 自动执行完一波
+-- 除了学宫特殊处理需要，别的玩法不要使用
+function BattleField:autoExecuteWave()
+	local state = BattleField.BATTLE_FIGHTING
+	local waveFinish = false
+	local lastAttack = nil
+	-- 执行到一波结束为止，然后返回结果
+	repeat
+		state,lastAttack,waveFinish = self:execute(false,nil,true)
+	until state ~= BattleField.BATTLE_FIGHTING or waveFinish
+
+	return lastAttack
+end
+
 -- 获取战斗结果，用于发给服务器
 function BattleField:getBattleResult()
 	local result = {}
@@ -793,6 +1060,7 @@ function BattleField:getBattleResult()
     result.own_teams = record[1]
     result.enemy_teams = record[2]
     result.attack_total_damage = self._record:getAttackerDamage()
+    result.multi_result = self._mutiResult
     return result
 end
 
@@ -885,6 +1153,7 @@ function BattleField:getRoundCount() return self._roundCount end
 function BattleField:getCommands() return self._commands end
 function BattleField:getWinner() return self._winner end
 function BattleField:getBattleData() return self._battleData end
+function BattleField:getRoundList() return self._roundList end
 
 function BattleField:setAuto(bool)
 	if self._isAuto then
@@ -996,6 +1265,10 @@ function BattleField:getWave()
 	return self._attackIndex[2] - 1
 end
 
+function BattleField:getWaveInfo()
+	return self._attackIndex
+end
+
 function BattleField:setVideoInfo(operations)
 	local commands = {}
 	for i , v in ipairs(operations) do
@@ -1026,6 +1299,57 @@ end
 
 function BattleField:hasExtraAction()
 	return self._action:hasExtraAction()
+end
+
+function BattleField:isExtraAction()
+	return self._isExtraAction
+end
+
+function BattleField:isDisableComboRecover()
+	return self._disableComboRecover
+end
+
+function BattleField:getExtraActionSkillId()
+	return self._extraActionSkillId
+end
+
+function BattleField:addRestartInfo(identity, knightSerialId, skillImageId)
+	insert(self._restartInfos, {
+		identity = identity,
+		knightSerialId = knightSerialId,
+		skillImageId = skillImageId,
+	})
+end
+
+function BattleField:setOpeningTransform(attackIndex, knightSerialId, skillImageId)
+	local key = attackIndex .. "_" .. knightSerialId
+	self._openingTransform[key]	= skillImageId
+end
+
+function BattleField:getOpeningTransform(attackIndex, knightSerialId)
+	local key = attackIndex .. "_" .. knightSerialId
+	return self._openingTransform[key]
+end
+
+-- 上场武将直接变身
+function BattleField:openingTransform(attackIndex, identity)
+	local knightList = self._battleData:getKnightList(identity)
+	for i, knight in ipairs(knightList) do
+		local skillImageId = self:getOpeningTransform(attackIndex, knight.serialId)
+		if skillImageId then
+			local skill_image_info = loadCfg("cfg.skill_image_info")
+			local info = skill_image_info.get(skillImageId)
+			knight:transform(info)
+		end
+	end
+end
+
+function BattleField:getStoredRecord()
+	return self._record:getStoredRecord()
+end
+
+function BattleField:getAllNewWave()
+	return self._allNewWave
 end
 
 return BattleField

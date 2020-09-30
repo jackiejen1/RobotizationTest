@@ -24,7 +24,8 @@ local float_message_info = {
     [9] = {4003,"icon/function/icon_shenshoutiaozhan.png","讨伐神兽",202,1,0,0,9999,},  
     [10] = {5001,"icon/function/icon_juezhandingjunshan.png","决战定军山",2026,2,0,0,60,},  
     [11] = {5002,"icon/function/icon_juezhandingjunshan.png","决战定军山",2025,1,10,1,120,},  
-    [12] = {5003,"icon/function/icon_juezhandingjunshan.png","决战定军山",2025,1,10,2,120,},
+    [12] = {5003,"icon/function/icon_juezhandingjunshan.png","决战定军山",2025,1,10,2,120,},  
+    [13] = {6001,"icon/function/icon_juntuan.png","军团战",2041,1,0,0,120,},
     }
 }
 
@@ -40,7 +41,8 @@ local __index_id = {
     [4003] = 9,  
     [5001] = 10,  
     [5002] = 11,  
-    [5003] = 12,
+    [5003] = 12,  
+    [6001] = 13,
 }
 
 local __key_map = { 

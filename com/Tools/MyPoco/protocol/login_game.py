@@ -142,7 +142,7 @@ class LoginGame:
     def MSG_C2S_Formation_ChangeFormation(self, tp, pos, id, uid, sid):
         """
         上阵协议
-        :param tp: 上阵类型，武将1，装备3，宝物4
+        :param tp: 上阵类型，1武将 3装备 4宝物 6 神兽 7 神兽装备
         :param pos: 位置
         :param id: 唯一ID
         :param uid:
@@ -180,9 +180,6 @@ class LoginGame:
         senddata = pack_data(C2S_Formation_ChangeFormation, C2S_Formation_ChangeFormation_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Formation_ChangeFormation_attr, 32)  # 发送协议
         return flag, data
-
-
-
 
     def MSG_C2S_Friend_AddFriend(self, name, uid, sid):
         """
@@ -506,6 +503,53 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_DeadBattle_ChallengeBegin_attr, 32)  # 发送协议
         return flag, data
 
+    def MSG_C2S_DemonBoss_BeginChallenge(self, uid, sid):
+        """
+        发起讨伐魔将战斗
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_DemonBoss_BeginChallenge = cs_pb2.C2S_DemonBoss_BeginChallenge()
+        C2S_DemonBoss_BeginChallenge = C2S_DemonBoss_BeginChallenge.SerializeToString()
+        C2S_DemonBoss_BeginChallenge_attr = {'name': "C2S_DemonBoss_BeginChallenge", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 14204, 'recv_cmd': [14205, 20000], 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_DemonBoss_BeginChallenge, C2S_DemonBoss_BeginChallenge_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_DemonBoss_BeginChallenge_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_DemonBoss_UserJoin(self, uid, sid):
+        """
+        讨伐魔将玩家进入
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_DemonBoss_UserJoin = cs_pb2.C2S_DemonBoss_UserJoin()
+        C2S_DemonBoss_UserJoin.exit = True
+        C2S_DemonBoss_UserJoin = C2S_DemonBoss_UserJoin.SerializeToString()
+        C2S_DemonBoss_UserJoin_attr = {'name': "C2S_DemonBoss_UserJoin", 'protocol': 'protobuf-ss',
+                                        'send_cmd': 14209, 'recv_cmd': 14210, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_DemonBoss_UserJoin, C2S_DemonBoss_UserJoin_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_DemonBoss_UserJoin_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_DemonBoss_ChoseTeam(self, uid, sid):
+        """
+        讨伐魔将选择阵营
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_DemonBoss_ChoseTeam = cs_pb2.C2S_DemonBoss_ChoseTeam()
+        C2S_DemonBoss_ChoseTeam.team = 1
+        C2S_DemonBoss_ChoseTeam = C2S_DemonBoss_ChoseTeam.SerializeToString()
+        C2S_DemonBoss_ChoseTeam_attr = {'name': "C2S_DemonBoss_ChoseTeam", 'protocol': 'protobuf-ss',
+                                        'send_cmd': 14202, 'recv_cmd': 14203, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_DemonBoss_ChoseTeam, C2S_DemonBoss_ChoseTeam_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_DemonBoss_ChoseTeam_attr, 32)  # 发送协议
+        return flag, data
+
     def MSG_C2S_DeadBattle_BoxAward(self, uid, sid):
         """
         无双试炼领取通关宝箱
@@ -572,7 +616,7 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_Friend_SendGift_attr, 32)  # 发送协议
         return flag, data
 
-    def MSG_C2S_CheckBattleResult(self, result_into, uid, sid):
+    def MSG_C2S_CheckBattleResult(self, result_into, uid, sid,wait_recv_cmd_id =None):
         """
         向服务器发送战斗结果用于校验，通用战斗校验协议
         :param result_into:
@@ -580,11 +624,15 @@ class LoginGame:
         :param sid:
         :return:
         """
+        if wait_recv_cmd_id == None:
+            recv_cmd = 20002
+        else:
+            recv_cmd = [20002,wait_recv_cmd_id]
         C2S_CheckBattleResult = bs_pb2.C2S_CheckBattleResult()
         C2S_CheckBattleResult.result = result_into
         C2S_Dungeon_ChallengeStageBegin = C2S_CheckBattleResult.SerializeToString()
         C2S_CheckBattleResult_attr = {'name': "C2S_CheckBattleResult", 'protocol': 'protobuf-ss',
-                                      'send_cmd': 20001, 'recv_cmd': 20002, 'uid': uid, 'sid': sid}
+                                      'send_cmd': 20001, 'recv_cmd': recv_cmd, 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Dungeon_ChallengeStageBegin, C2S_CheckBattleResult_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_CheckBattleResult_attr, 32)  # 发送协议
         return flag, data
@@ -907,6 +955,28 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_Richest_Draw_attr, 32)  # 发送协议
         return flag, data
 
+    def MSG_C2S_Recruit_RecruitAuKnight(self, activity_id, id, uid, sid):
+        """
+        时空召唤-抽卡 10
+        :param activity_id:  int 活动ID，GM后台配置
+        :param id: 抽卡配置id
+        :param type: 1表示单抽，2表示十抽
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Recruit_RecruitAuKnight = cs_pb2.C2S_Recruit_RecruitAuKnight()
+        C2S_Recruit_RecruitAuKnight.activity_id = activity_id
+        C2S_Recruit_RecruitAuKnight.id = id
+        C2S_Recruit_RecruitAuKnight.draw_type = 2
+        C2S_Recruit_RecruitAuKnight = C2S_Recruit_RecruitAuKnight.SerializeToString()
+        C2S_Recruit_RecruitAuKnight_attr = {'name': "C2S_Recruit_RecruitAuKnight", 'protocol': 'protobuf-ss',
+                                 'send_cmd': 14270, 'recv_cmd': 14271, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Recruit_RecruitAuKnight, C2S_Recruit_RecruitAuKnight_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Recruit_RecruitAuKnight_attr, 32)  # 发送协议
+        return flag, data
+
+
     def MSG_C2S_PeakArena_Match(self, uid, sid):
         """
         王者竞技匹配
@@ -955,3 +1025,167 @@ class LoginGame:
         senddata = pack_data(C2S_Chat, C2S_Chat_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Chat_attr, 32)  # 发送协议
         return flag, data
+
+    def MSG_C2S_Debate_EnterInfo(self,uid, sid):
+        """
+        学宫论战-进入玩法
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Debate_EnterInfo = cs_pb2.C2S_Debate_EnterInfo()
+        C2S_Debate_EnterInfo = C2S_Debate_EnterInfo.SerializeToString()
+        C2S_Debate_EnterInfo_attr = {'name': "C2S_Debate_EnterInfo", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 14550, 'recv_cmd': 14551, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Debate_EnterInfo, C2S_Debate_EnterInfo_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Debate_EnterInfo_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Debate_RefreshMatch(self,uid, sid):
+        """
+        手动匹配
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Debate_RefreshMatch = cs_pb2.C2S_Debate_RefreshMatch()
+        C2S_Debate_RefreshMatch = C2S_Debate_RefreshMatch.SerializeToString()
+        C2S_Debate_RefreshMatch_attr = {'name': "C2S_Debate_RefreshMatch", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 14557, 'recv_cmd': 14558, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Debate_RefreshMatch, C2S_Debate_RefreshMatch_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Debate_RefreshMatch_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Debate_LineUp(self,uid, sid):
+        """
+        学宫布阵
+        :param line_up: 武将id列表，12位
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Debate_LineUp = cs_pb2.C2S_Debate_LineUp()
+        C2S_Debate_LineUp.line_up.append(1)
+        C2S_Debate_LineUp.line_up.append(2)
+        C2S_Debate_LineUp.line_up.append(3)
+        C2S_Debate_LineUp.line_up.append(7)
+        C2S_Debate_LineUp.line_up.append(8)
+        C2S_Debate_LineUp.line_up.append(9)
+        C2S_Debate_LineUp = C2S_Debate_LineUp.SerializeToString()
+        C2S_Debate_LineUp_attr = {'name': "C2S_Debate_LineUp", 'protocol': 'protobuf-ss',
+                                                'send_cmd': 14552, 'recv_cmd': 14553, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Debate_LineUp, C2S_Debate_LineUp_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Debate_LineUp_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Debate_BattleStart(self,enemy_index, uid, sid):
+        """
+        发起学宫论战战斗
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Debate_BattleStart = cs_pb2.C2S_Debate_BattleStart()
+        C2S_Debate_BattleStart.enemy_index = enemy_index
+        C2S_Debate_BattleStart = C2S_Debate_BattleStart.SerializeToString()
+        C2S_Debate_BattleStart_attr = {'name': "C2S_Debate_BattleStart", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 14554, 'recv_cmd': [14555, 14556], 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Debate_BattleStart, C2S_Debate_BattleStart_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Debate_BattleStart_attr, 32)  # 发送协议
+        return flag, data
+
+
+    def MSG_C2S_Knight_StarIncrease(self,id, uid, sid):
+        """
+        武将升星
+        :param id:武将唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Knight_StarIncrease = cs_pb2.C2S_Knight_StarIncrease()
+        C2S_Knight_StarIncrease.id = id
+        C2S_Knight_StarIncrease = C2S_Knight_StarIncrease.SerializeToString()
+        C2S_Knight_StarIncrease_attr = {'name': "C2S_Knight_StarIncrease", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 10252, 'recv_cmd': 10253, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Knight_StarIncrease, C2S_Knight_StarIncrease_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Knight_StarIncrease_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Equipment_RefiningOneLevel(self,id, uid, sid):
+        """
+        装备一键精炼
+        :param id:装备唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Equipment_RefiningOneLevel = cs_pb2.C2S_Equipment_RefiningOneLevel()
+        C2S_Equipment_RefiningOneLevel.id = id
+        C2S_Equipment_RefiningOneLevel = C2S_Equipment_RefiningOneLevel.SerializeToString()
+        C2S_Equipment_RefiningOneLevel_attr = {'name': "C2S_Equipment_RefiningOneLevel", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 10608, 'recv_cmd': 10609, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Equipment_RefiningOneLevel, C2S_Equipment_RefiningOneLevel_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Equipment_RefiningOneLevel_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Equipment_Glyph(self,id, uid, sid):
+        """
+        装备雕纹
+        :param id:装备唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S_Equipment_Glyph = cs_pb2.C2S_Equipment_Glyph()
+        C2S_Equipment_Glyph.id = id
+        C2S_Equipment_Glyph = C2S_Equipment_Glyph.SerializeToString()
+        C2S_Equipment_Glyph_attr = {'name': "C2S_Equipment_Glyph", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 10604, 'recv_cmd': 10605, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S_Equipment_Glyph, C2S_Equipment_Glyph_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_Equipment_Glyph_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Pet_OneKey_LevelUp(self,id,level, uid, sid):
+        """
+        神兽一键升级
+        :param id:唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_Pet_OneKey_LevelUp()
+        C2S.id = id
+        C2S.level = level
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_Pet_OneKey_LevelUp", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 13502, 'recv_cmd': 13503, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_Pet_StarUp(self,id,cost_id, uid, sid):
+        """
+        神兽升星
+        :param id:唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_Pet_StarUp()
+        C2S.id = id
+        for cost in cost_id:
+            C2S.cost_id.append(cost)
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_Pet_StarUp", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 13504, 'recv_cmd': 13505, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data
+
+
+
+
+
+
+

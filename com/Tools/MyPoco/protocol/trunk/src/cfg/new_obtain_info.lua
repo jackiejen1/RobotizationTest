@@ -4,18 +4,20 @@ local record_new_obtain_info = {}
 
 record_new_obtain_info.id = 0--ID
 record_new_obtain_info.type = 0--类型
+record_new_obtain_info.subtype = 0--子类型
 record_new_obtain_info.open_level = 0--新获得机制开启等级
 record_new_obtain_info.close_level = 0--新获得机制关闭等级
 
 local new_obtain_info = {
    _data = {   
-    [1] = {1,4,1,20,},  
-    [2] = {2,5,1,30,},  
-    [3] = {3,7,1,40,},  
-    [4] = {4,8,1,50,},  
-    [5] = {5,11,1,60,},  
-    [6] = {6,14,1,70,},  
-    [7] = {7,13,1,100,},
+    [1] = {1,4,0,1,20,},  
+    [2] = {2,5,0,1,30,},  
+    [3] = {3,7,0,1,40,},  
+    [4] = {4,8,0,1,50,},  
+    [5] = {5,11,0,1,60,},  
+    [6] = {6,14,0,1,70,},  
+    [7] = {7,13,0,1,100,},  
+    [8] = {8,2,20,1,200,},
     }
 }
 
@@ -26,14 +28,16 @@ local __index_id = {
     [4] = 4,  
     [5] = 5,  
     [6] = 6,  
-    [7] = 7,
+    [7] = 7,  
+    [8] = 8,
 }
 
 local __key_map = { 
     id = 1,
     type = 2,
-    open_level = 3,
-    close_level = 4,
+    subtype = 3,
+    open_level = 4,
+    close_level = 5,
 }
 
 local m = { 

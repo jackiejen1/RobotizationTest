@@ -22,6 +22,7 @@ local SpecialAttrRule = load "core.rule.SpecialAttrRule"
 local SkillSpecialRule = load "core.rule.SkillSpecialRule"
 local BuffRule = load "core.rule.BuffRule"
 local FightResult = load "core.fight.FightResult"
+local SkillSpecialRule = load "core.rule.SkillSpecialRule"
 
 local UpdateComponent = {}
 
@@ -52,7 +53,7 @@ function UpdateComponent.update(attacker, battleData, battleField)
 	-- 被放逐不被动回怒，回合计值
 	if not exile then
 		-- 默认合击值回复
-		if not battleField.disableComboRecover then
+		if not battleField:isDisableComboRecover() then
 			local info = battleData:getComboInfo(identity)
 			local value = info.baseInfo.COMBO_RECOVER_ACTION
 			value = battleData:updateComboValue(value,identity,true)
@@ -86,7 +87,10 @@ function UpdateComponent.update(attacker, battleData, battleField)
 		local removeList = attacker:doSpBuffRound(BuffRule.ROUND.BEFORE,BuffRule.TYPE.EXILE)
 		commands.removeList = removeList
 	end
-
+	-- buff移除触发被动
+	if commands.removeList then
+		battleData:excuteSpRule(SkillSpecialRule.TYPE.BUFF_REMOVE, commands.removeList)
+	end
 
 	commands.attacker = attacker
 
@@ -99,7 +103,7 @@ end
 function UpdateComponent.updateAttacker(attacker, commands,battleField)
 	for i, buff in ipairs(commands.buff) do
 		local buffEffect = buff.buff_effect
-		FightResult.updateSkillEffect(commands,buff.attacker,attacker, buffEffect,battleField)
+		FightResult.updateSkillEffect(commands,buff.attacker,buff.victim, buffEffect,battleField)
 	end
 	for i, effect in ipairs(commands.effect) do
 		FightResult.updateSkillEffect(commands,attacker,attacker, effect,battleField)
@@ -135,9 +139,9 @@ function UpdateComponent.updateAfterAttack(attacker, battleData, battleField)
 			if buff.isDone then
 				table.insert(removeList, buff)
 				table.remove(buffList, i)
-				if buff.passive_skill_serial_id > 0 then
-					buff.victim:removePassiveSkill(buff.passive_skill_serial_id)
-				end
+				buff:doRemove()
+			else
+				buff:doClean()
 			end
 		end
 	end
@@ -161,7 +165,9 @@ function UpdateComponent.updateAfterAttack(attacker, battleData, battleField)
 			end
 		end
 	end
-
+	if #removeList > 0 then
+		battleData:excuteSpRule(SkillSpecialRule.TYPE.BUFF_REMOVE, removeList)
+	end
 	commands.removeList = removeList
 
 	return commands

@@ -13,14 +13,14 @@ import time
 import requests
 
 from gm.gm_method import GmMethod
-from proto_tool.proto_method import ProtocolFunction
+from sx_proto_tool.proto_method import ProtocolFunction
 
 if __name__ == '__main__':
     account = str(int(time.time()))[-6:]
     server_name="QA2"
     pr = ProtocolFunction(server_name,account)
     gm = pr.Login()
-    gm.add_resources({"元宝":1})
+    gm.add_resources({"天命丹":1})
     #神将
 
         # 升魂（除主角）

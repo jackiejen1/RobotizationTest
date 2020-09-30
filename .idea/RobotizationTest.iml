@@ -10,6 +10,8 @@
       <sourceFolder url="file://$MODULE_DIR$/com/Tools/MyPoco/protocol/trunk/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/shaoxi/proto" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/shaoxi" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/com/shaosan" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/com/shaosan/proto" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

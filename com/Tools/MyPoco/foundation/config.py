@@ -137,7 +137,7 @@ class Config:
         "QA2_server_ages": {"server_id": "2246440002", "host": "", "port": "", "gm_url": "qa.test.snxyj.youzu.com"},
         "QA3_server_ages": {"server_id": "", "host": "", "port": ""},
         "sever_poco": "cocos-lua",
-        "close_game_poco_name": None,
+        "close_game_poco_name": "MainCityScene",
     }
     sys_set = {
         "my_poco_path": None,

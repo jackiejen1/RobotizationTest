@@ -26,7 +26,8 @@ local KnightFactory = {}
 
 local createKnightBuff = nil
 createKnightBuff = function (buffId, buffSerialId, buffTime, victim, attacker,buffCheck, battleField)
-	local buffCfg = loadCfg("cfg.buff_info").get(buffId)
+	local buff_info = loadCfg("cfg.buff_info")
+	local buffCfg = buff_info.get(buffId)
 
 	local buff = {
 		-- buffCfg
@@ -64,9 +65,22 @@ createKnightBuff = function (buffId, buffSerialId, buffTime, victim, attacker,bu
 		buff.passive_skill_serial_id = passiveSkill.serialId
 	end
 	-- 绑定附属的buff效果
-	if buffCfg.sub_buff_id > 0 then
-		local subBuff = createKnightBuff(buffCfg.sub_buff_id, 0, buffTime, victim, attacker,buffCheck, battleField)
-		insert(buff.subBuffs, subBuff)
+	local index = 1
+	while buff_info.hasKey("sub_buff_id_"..index) do
+		local subBuffId = buffCfg["sub_buff_id_"..index]
+		if subBuffId > 0 then
+			local subBuff = createKnightBuff(subBuffId, 0, buffTime, victim, attacker,buffCheck, battleField)
+			insert(buff.subBuffs, subBuff)
+		end
+		index = index + 1
+	end
+
+	-- 添加buff回合计数
+	buff.addBuffTime = function (self, num)
+		self.buffTime = self.buffTime + num
+		for i, subBuff in ipairs(self.subBuffs) do
+			subBuff:addBuffTime(num)
+		end
 	end
 
 	-- 回合数减一
@@ -77,6 +91,9 @@ createKnightBuff = function (buffId, buffSerialId, buffTime, victim, attacker,bu
 				self.isDone = true
 			end
 		end
+		for i, subBuff in ipairs(self.subBuffs) do
+			subBuff:doRound(mode)
+		end
 	end
 
 	buff.doSpRound = function(self, mode,bfType)
@@ -84,6 +101,52 @@ createKnightBuff = function (buffId, buffSerialId, buffTime, victim, attacker,bu
 			self.buffTime = self.buffTime - 1
 			if self.buffTime == 0 then
 				self.isDone = true
+			end
+		end
+		for i, subBuff in ipairs(self.subBuffs) do
+			subBuff:doSpRound(mode, bfType)
+		end
+	end
+
+	-- buff移除时调用
+	-- @params isClear 是否是直接清除buff，清除时不触发buff相关被动
+	buff.doRemove = function (self, isClear)
+		-- 移除绑定的被动
+		for i, subBuff in ipairs(self.subBuffs) do
+			subBuff:doRemove(isClear)
+		end
+		-- 移除绑定的被动
+		if self.passive_skill_serial_id > 0 then
+			self.victim:removePassiveSkill(self.passive_skill_serial_id)
+		end
+		if not isClear then
+			self:excutePassiveSkill(BuffRule.SKILL_TRIGGER_TYPE.DISAPPEAR)
+		end
+	end
+	-- buff生效、移除时触发的技能
+	buff.excutePassiveSkill = function (self, tType)
+		local index = 1
+		while buff_info.hasKey("trigger_skill_type_"..index) do
+			local triggerType = buffCfg["trigger_skill_type_"..index]
+			if triggerType == tType then
+				local skillId = buffCfg["trigger_skill_id_"..index]
+				if skillId > 0 then
+					local info = skill_info.get(skillId)
+					battleField:getBattleData():addPassive({knight=self.attacker,identity=self.attacker.identity,info=info,isSkill=true})
+				end
+			end
+			index = index + 1
+		end
+	end
+
+	-- 清理已完成的附属buff
+	buff.doClean = function (self)
+		for i = #self.subBuffs, 1, -1 do
+			local subBuff = self.subBuffs[i]
+			if subBuff.isDone then
+				remove(self.subBuffs, i)
+			else
+				subBuff:doClean()
 			end
 		end
 	end
@@ -94,7 +157,6 @@ createKnightBuff = function (buffId, buffSerialId, buffTime, victim, attacker,bu
 	-- 执行buff效果
 	buff.excute = function ( self , mode , data )
 		local affect = false
-		local isMainAffect = false	-- 主效果是否生效
 		if type(self.rule) == "table" then
 			if self.rule[mode] then
 				if not self.buffCheckSkill or self.buffCheckSkill:check() then
@@ -112,32 +174,21 @@ createKnightBuff = function (buffId, buffSerialId, buffTime, victim, attacker,bu
 				end
 			end
 		end
-		isMainAffect = affect
+		if affect then
+			self:checkDisappear(BuffRule.DISAPPEAR.AFFECT, nil, true)
+			self:excutePassiveSkill(BuffRule.SKILL_TRIGGER_TYPE.AFFECT)
+		end
 		-- 附属buff效果
-		for i, subBuff in ipairs(buff.subBuffs) do
-			if type(subBuff.rule) == "table" then
-				if subBuff.rule[mode] then
-					if not subBuff.buffCheckSkill or subBuff.buffCheckSkill:check() then
-						local tempAffect, tempData = subBuff.rule[mode](data)
-						if tempAffect then
-							affect, data = true, tempData
-						end
-					end
-				end
-			elseif mode == subBuff.buffCfg.buff_type then
-				if not subBuff.buffCheckSkill or subBuff.buffCheckSkill:check() then
-					local tempAffect, tempData = subBuff.rule(data)
-					if tempAffect then
-						affect, data = true, tempData
-					end
-				end
-			end
+		for i, subBuff in ipairs(self.subBuffs) do
+			local isAffect = false
+			isAffect, data = subBuff:excute(mode, data)
+			affect = affect or isAffect
 		end
 
-		return affect, data, isMainAffect
+		return affect, data
 	end
 
-	buff.checkDisappear = function(self, mode, data)
+	buff.checkDisappear = function(self, mode, data, onlySelf)
 		if mode == self.buffCfg.buff_disappear then
 			if mode == BuffRule.DISAPPEAR.AFFECT then
 				-- 生效X次消失
@@ -163,6 +214,11 @@ createKnightBuff = function (buffId, buffSerialId, buffTime, victim, attacker,bu
 		elseif mode == BuffRule.DISAPPEAR.AFFECT and self.buffCfg.buff_disappear == BuffRule.DISAPPEAR.AFFECT_ROUND then
 			-- 生效后一回合消失，特殊做
 			self.buffTime = 1
+		end
+		if not onlySelf then
+			for i, subBuff in ipairs(self.subBuffs) do
+				subBuff:checkDisappear(mode, data, onlySelf)
+			end
 		end
 	end
 
@@ -214,11 +270,25 @@ local function createKnightMark(markId, attacker)
 			self.markCfg = skill_mark_info.get(id)
 		end
 		if self.level >= self.maxLevel then
-			self.level = self.maxLevel
 			if self.markCfg.skill_info_id > 0 then
-				local info = skill_info.get(self.markCfg.skill_info_id)
-				self.attacker.battleField:getBattleData():addFastPassive({knight=self.attacker,info=info,isSkill=true})
+				local triggerNum = self.attacker:getMarkSkillNum(self.markCfg.type)
+				if self.markCfg.skill_trigger_limit == 0 or triggerNum < self.markCfg.skill_trigger_limit then
+					local isTriggerSkill = false
+					local info = skill_info.get(self.markCfg.skill_info_id)
+					if self.markCfg.skill_trigger_merges == 1 then
+						self.attacker.battleField:getBattleData():addFastPassive({knight=self.attacker,info=info,isSkill=true})
+						isTriggerSkill = true
+					elseif self.markCfg.skill_trigger_merges == 0 then
+						self.attacker.battleField:getBattleData():addPassive({knight=self.attacker,info=info,isSkill=true})
+						isTriggerSkill = true
+					end
+					if isTriggerSkill then
+						self.attacker:addMarkSkillNum(self.markCfg.type)
+						self:delLevel(self.markCfg.mark_purging_num)
+					end
+				end
 			end
+			self.level = min(self.maxLevel, self.level)
 		end
 	end
 
@@ -243,6 +313,25 @@ local function createPassiveSkill(id, serialId, identity, battleField, knight)
 	}
 
 	return passiveSkill
+end
+
+-- 获取武将被动
+local function getKnightPassiveSkillIds(knightCfg, isMonster)
+	local skillIds = {}
+	if isMonster then
+		skillIds = {knightCfg.passive_skill}
+	else
+		local idx = 1
+		local knight_info = loadCfg("cfg.knight_info")
+		while knight_info.hasKey("passive_skill_"..idx) do
+			local passiveId = knightCfg["passive_skill_"..idx]
+			if passiveId > 0 then
+				insert(skillIds, passiveId)
+			end
+			idx = idx + 1
+		end
+	end
+	return skillIds
 end
 
 --[[
@@ -293,6 +382,8 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 		multiple = 1000,
 		--被动技能列表
 		skills = {},
+		-- 自己武将（化身）的被动ID
+		passiveSkillIds = {},
 		--额外的被动技能
 		extraSkills = {},
 		-- 技能使用次数
@@ -310,6 +401,7 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 		isGhost = false,	-- 是否是幽灵状态
 
 		marks = {}, -- 标记
+		markSkillNum = {}, -- 标记触发的技能次数
 		exile = false, -- 放逐
 		battleField = battleField,
 	}
@@ -466,7 +558,7 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 	local commonSkillId = knightCfg.common_id
 	local activeSkillId = knightCfg.active_skill_id
 	local energySkillId = knightCfg.energy_skill_id
-	local passiveSkillId = knightCfg.passive_skill
+	local passiveSkillIds = getKnightPassiveSkillIds(knightCfg, isMonster)
 	local initialEnergy = knightCfg.initial_energy
 	energyRuleList = getEnergyRuleList(knightCfg)
 	if not isMonster and knightCfg.type == 1 and user then
@@ -499,7 +591,7 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			local advanceId = transformCardCfg.advance_id
 			local knightCfg = KnightTable.getKnightByAdvIdStar(advanceId, star)
 			if knightCfg then
-				passiveSkillId = knightCfg.passive_skill
+				passiveSkillIds = getKnightPassiveSkillIds(knightCfg)
 				initialEnergy = knightCfg.initial_energy
 				energyRuleList = getEnergyRuleList(knightCfg)
 			end
@@ -525,9 +617,12 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 		assert(knight.energySkillCfg, "Could not find skill_info with id: "..tostring(energySkillId))
 	end
 
-	if passiveSkillId > 0 then
+	if next(passiveSkillIds) then
 		knight.skills = clone(knight.skills)
-		knight.skills[#knight.skills + 1] = passiveSkillId
+		for i, id in ipairs(passiveSkillIds) do
+			knight.skills[#knight.skills + 1] = id
+		end
+		knight.passiveSkillIds = passiveSkillIds
 	end
 	-- 初始必杀能量
 	knight.originInfo.INITIAL_ENERGY = initialEnergy
@@ -556,22 +651,24 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			for i , skill in ipairs(skills) do
 				local passive_skill_type = skill.info.passive_skill_type
 				-- spType存在就指定类型4的被动
-				if spType and passive_skill_type == 4 or (passive_skill_type ~= 4 and not spType) then
+				if spType then
+					-- 被动特殊效果
+					if passive_skill_type == 4 and skill.spEffectInfo.special_skill_type == spType then
+						if skill:check(data) and skill:excute() then
+							spData = skill.spEffectRule(spData)
+							insert(spList, skill.spEffectInfo.id)
+						end
+					end
+				else
 					if skill:check(data) and skill:excute() then
 						if passive_skill_type == 3 then
 							-- 属性类，目前以buff的形式来实现
 							-- 会有个问题，后上场的吃不到这个buff，这个目前不影响，以后再解决
-							battleField:getBattleData():addFastPassive({knight=knight,info=skill.info,check=skill})
+							battleField:getBattleData():addFastPassive({knight=knight,info=skill.info,check=skill,identity=knight.identity})
 						elseif passive_skill_type == 1 and skill.info.if_merge == 1 then
-							battleField:getBattleData():addFastPassive({knight=knight,info=skill.info})
+							battleField:getBattleData():addFastPassive({knight=knight,info=skill.info,identity=knight.identity})
 						elseif passive_skill_type == 1 or passive_skill_type == 2 then
-							battleField:getBattleData():addPassive({knight=knight,info=skill.info})
-						elseif passive_skill_type == 4 then
-							-- 被动特殊效果
-							if skill.spEffectInfo.special_skill_type == spType then
-								spData = skill.spEffectRule(spData)
-								insert(spList, skill.spEffectInfo.id)
-							end
+							battleField:getBattleData():addPassive({knight=knight,info=skill.info, identity=knight.identity})
 						end
 					end
 				end
@@ -584,6 +681,14 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			end
 		end
 		return spData, spList
+	end
+
+	knight.resetSpRule = function( self )
+		for k , skills in pairs(knight.spRules) do
+			for i , skill in ipairs(skills) do
+				skill:reset()
+			end
+		end
 	end
 
 	-- 额外的被动技能
@@ -711,10 +816,7 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			if v.buffCheck then
 				table.insert(pBuffs,#pBuffs+1,v)
 			else
-				-- 移除绑定的被动
-				if v.passive_skill_serial_id > 0 then
-					v.victim:removePassiveSkill(v.passive_skill_serial_id)
-				end
+				v:doRemove(true)
 			end
 		end
 		self.buffs = pBuffs
@@ -730,6 +832,7 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			if buff.serialId == serialId then
 				target = buff
 				remove(self.buffs, i)
+				buff:doRemove()
 				break
 			end
 		end
@@ -746,15 +849,10 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 		local affect = false
 		for i = 1, #self.buffs do
 			local buff = self.buffs[i]
-			affect, ret, isMainAffect = buff:excute(mode,data)
+			affect, ret = buff:excute(mode,data)
 			if affect then
 				data = ret
 			end
-			-- 主buff效果生效，才算消失规则次数
-			if isMainAffect then
-				buff:checkDisappear(BuffRule.DISAPPEAR.AFFECT)
-			end
-			
 		end
 		-- 插入标记的影响
 		if mode == BuffRule.TYPE.ATTR and #self.marks > 0 then
@@ -774,10 +872,9 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			if buff.isDone then
 				insert(list,buff)
 				insert(removeIndex,1,i)
-				-- 移除绑定的被动
-				if buff.passive_skill_serial_id > 0 then
-					buff.victim:removePassiveSkill(buff.passive_skill_serial_id)
-				end
+				buff:doRemove()
+			else
+				buff:doClean()
 			end
 		end
 		for i = 1 , #removeIndex do
@@ -797,10 +894,9 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			if buff.isDone then
 				insert(list,buff)
 				insert(removeIndex,1,i)
-				-- 移除绑定的被动
-				if buff.passive_skill_serial_id > 0 then
-					buff.victim:removePassiveSkill(buff.passive_skill_serial_id)
-				end
+				buff:doRemove()
+			else
+				buff:doClean()
 			end
 		end
 		for i = 1 , #removeIndex do
@@ -824,6 +920,7 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			local buff = self.buffs[i]
 			if buff.buffCfg.buff_type == buffType then
 				remove(self.buffs, i)
+				buff:doRemove()
 			end
 		end
 		-- 移除buff时，检查放逐状态
@@ -872,26 +969,65 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			self.energySkillCfg = skill_info.get(knightCfg.energy_skill_id).toObject()
 		end
 
+		local energyRuleList = {}
+		local getEnergyRuleList = function (knightCfg)
+			local list = {}
+			local idx = 1
+			while knight_info.hasKey("energy_type_" .. idx) do
+				local rtype, value = knightCfg["energy_type_"..idx], knightCfg["energy_value_"..idx]
+				if rtype > 0 then
+					insert(list, {
+						type = rtype,
+						value = value,
+					})
+				end
+				idx = idx + 1
+			end
+			return list
+		end
+		energyRuleList = getEnergyRuleList(knightCfg)
+		self.energyRules = EnergyRule.initRule(self, energyRuleList)
+
+		local prePassiveSkillIds = self.passiveSkillIds
+		local skillIds = getKnightPassiveSkillIds(knightCfg)
 		if info.image_type == 1 then
 			-- 变身
 			-- 需要先删掉之前的被动
-			if knightCfg.passive_skill > 0 then
-				self.skills[#self.skills] = knightCfg.passive_skill
-			else
-				self.skills[#self.skills] = nil
+			if next(prePassiveSkillIds) then
+				for i = 1, #prePassiveSkillIds do
+					self.skills[#self.skills] = nil
+				end
+			end
+			-- TODO 目前主角不变身，不考虑化身
+			for i, skillId in ipairs(skillIds) do
+				self.skills[#self.skills + 1] = skillId
 			end
 		else
 			-- 召唤
-			if knightCfg.passive_skill > 0 then
-				self.skills = {knightCfg.passive_skill}
+			if next(skillIds) then
+				self.skills = skillIds
 			else
 				self.skills = {}
 			end
 			self:clearBuff()
 			self:clearPassiveSkill()
 		end
-		self.spRules = SkillSpecialRule.initRule(self,battleField)
-
+		self.passiveSkillIds = skillIds
+		local oldSpRules = self.spRules
+		self.spRules = SkillSpecialRule.initRule(self.skills,self.identity,battleField,self)
+		-- 被动继承老的部分数据
+		for mode, list in pairs(self.spRules) do
+			local oldList = oldSpRules[mode] or {}
+			for i, v in ipairs(list) do
+				for j, w in ipairs(oldList) do
+					if v.info.id == w.info.id then
+						v.count = w.count
+						v.round = w.round
+						break
+					end
+				end
+			end
+		end
 		-- 属性改变
 		if info.hp_inherit_type == 1 then
 			local hp = math.floor(self.baseInfo.INITIAL_HP*info.hp_inherit_num/1000)
@@ -902,6 +1038,7 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 			self.originInfo.INITIAL_HP = hp
 			self.baseInfo.INITIAL_HP = hp
 		end
+		self.baseInfo.INITIAL_ENERGY = knightCfg.initial_energy
 
 		self.baseInfo.ATTACK = math.floor(self.baseInfo.ATTACK*info.attack_inherit_num/1000)
 		self.baseInfo.PHY_DEFENCE = math.floor(self.baseInfo.PHY_DEFENCE*info.defence_inherit_num/1000)
@@ -1009,6 +1146,12 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 		return 0
 	end
 
+	-- 清除所有标记
+	knight.clearMark = function ( self )
+		self.marks = {}
+		self.markSkillNum = {}
+	end
+
 	-- 更新血量，需要考虑护盾
 	knight.updateHp = function (self,value)
 		if self.isDead then
@@ -1044,6 +1187,17 @@ function KnightFactory.createKnight(knightData, identity,isMonster,user,battleFi
 		local key = skillId .. "_" .. affectIndex
 		self.skillAffectTimes[key] = self.skillAffectTimes[key] or 0
 		self.skillAffectTimes[key] = self.skillAffectTimes[key] + num
+	end
+
+	-- 添加标记的技能的触发次数
+	knight.addMarkSkillNum = function (self, markType)
+		self.markSkillNum[markType] = self.markSkillNum[markType] or 0
+		self.markSkillNum[markType] = self.markSkillNum[markType] + 1
+	end
+
+	-- 获取标记的技能已触发次数
+	knight.getMarkSkillNum = function (self, markType)
+		return self.markSkillNum[markType] or 0
 	end
 
 	return knight
