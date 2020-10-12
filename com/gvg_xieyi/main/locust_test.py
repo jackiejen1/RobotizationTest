@@ -17,10 +17,9 @@ import hashlib, json, base64
 from com.gvg_xieyi.tools.MyException import *
 from socket import create_connection
 from locust import HttpLocust, TaskSet, task, seq_task, TaskSequence, Locust,events
+
 import random
 import sqlite3
-
-
 
 class LoginGame:
     def __init__(self, server_name,):
@@ -39,12 +38,6 @@ class LoginGame:
         self.nearby_user_dic_list = {}  # 记录位置玩家列表 {位置：{uid:0/1 在/不在}}
         self.match_user_dic = {}  # 记录在场所有人员的UId和所有user信息
         self.gate_dic = {}  # 城门位置id  hp 用来记录城门能否攻击
-        self.all_go_gate_pos_id_list = [,,,,,,,,,] #所有可以攻击城门的位置
-        self.all_move_pos_id_list = [,,, , , , , , , ]  # 所有可以移动位置
-        self.go_gate_dic = {:[,,,,,],:[,,,,,],:[,,,,,,],:[,,,,,,],}  # 城门位置id：可攻击位置id[]
-        self.buff_dic = {}  # buff点位置[buff_id，消失时间]
-        self.tower_dic = {:,:,:,:,:,}  # 抢占区id ：占领区id  提前写死 记录抢占区绑定的占领区
-        self.zhanling_dic = {:0,:0,:0,:0,:0,:0,:0,}  # 占领区id :占领区uid 记录谁当前在占领区
         self.G_bisai_id = 0  # 军团战比赛ID
         self.achieve_id_list = []  # 成就id列表 看看能不能领取成就奖励
         self.NotifyMove_id = 0  # 移动推送ID，用来区别重复消息，减少更新信息频率
@@ -90,6 +83,7 @@ class LoginGame:
             exception=exc,
         )
 
+
     def send_receive(self, socketdata, api_attr, headsize, norecv=False, limitime=40):
         """
         发送并接收socket数据，并返回给调用函数
@@ -109,7 +103,7 @@ class LoginGame:
             self.success('socket', workname, time.time(), len(socketdata))
         except Exception:
             flag = False
-            self.failure('socket', workname,"数据发送失败")
+            self.failure('socket', workname, "数据发送失败")
         if not flag:
             return flag, b'error'
         else:
@@ -147,10 +141,12 @@ class LoginGame:
                     recvtime = time.time()
                     recvdata = b'error'
                     print("等了很久都没有等到想要的")
+                    self.failure('socket', api_attr['name'], "接收数据失败,超时")
                     return recvdata, recvtime
                 rev_data = self.socket.recv(buffersize)  # 第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
                 if len(rev_data) == 0:
                     print(str(api_attr['uid']) + ":error,消息头长度为0")
+                    self.failure('socket', api_attr['name'], "接收数据失败,消息头长度为0")
                     raise Exception("消息头长度为0")
                     # data = b'error'
                     # recv_time = time.time()
@@ -1015,25 +1011,25 @@ class LoginGame:
         print("设置关卡进度成功")
 
     def new_sql(self,):
-        conn = sqlite3.connect('GVG_account.db')
+        conn = sqlite3.connect('GVG_account_text.db')
         cursor = conn.cursor()
         cursor.execute(
-            'create table user(account varchar(20) primary key,is_login varchar(20),sever varchar(20))')  # 创建表
+            'create table user(account varchar(20) primary key,is_login varchar(20))')  # 创建表
         cursor.close()
         conn.commit()
         conn.close()
 
-    def set_account_sql(self,account_into,sever_name):
+    def set_account_sql(self,account_into, sever_name):
         """
         保存账号，用于创建账号使用
         :param account_into:
         :return:
         """
         sever_name = sever_name[-1:]
-        account_into = str(account_into)
-        conn = sqlite3.connect('GVG_account.db')
+        account_into = str(account_into) + sever_name
+        conn = sqlite3.connect('GVG_account_text.db')
         cursor = conn.cursor()
-        cursor.execute('insert into user (account, is_login) values (' + account_into + ',0,'+sever_name+')')
+        cursor.execute('insert into user (account, is_login) values (' + account_into + ',0)')
         cursor.close()
         conn.commit()
         conn.close()
@@ -1043,17 +1039,16 @@ class LoginGame:
         获取账号，然后设置账号登录状态
         :return:
         """
-        conn = sqlite3.connect('GVG_account.db')
+        conn = sqlite3.connect('GVG_account_text.db')
         cursor = conn.cursor()
         cursor.execute('select *from user where is_login=0')
         values = cursor.fetchall()
         account = values[0][0]
-        sever_name = values[0][2]
-        cursor.execute('UPDATE user SET is_login =1  WHERE account = '+account)#更新登录状态
+        cursor.execute('UPDATE user SET is_login =1  WHERE account = ' + account)  # 更新登录状态
         cursor.close()
         conn.commit()
         conn.close()
-        return account,sever_name
+        return account
 
     def Login(self, username_read=False):
         """
@@ -1070,7 +1065,7 @@ class LoginGame:
             self.set_account_sql(self.username,self.server_name)
         else:
             self.username = self.get_account_sql()
-
+            self.username = self.username[:-1]
         flag, data = self.MSG_C2G_Login()
         G2C_Login = cg_pb2.G2C_Login()
         G2C_Login.ParseFromString(data)
@@ -1103,192 +1098,39 @@ class LoginGame:
 class MyTaskSet(TaskSequence):
     def __init__(self, parent):
         super(MyTaskSet, self).__init__(parent)
-        self.account = self.locust.username
-        self.OpServerID = self.locust.OpServerID
+        # self.account = self.locust.username
+        # self.OpServerID = self.locust.OpServerID
         self.exceptTime = 30
         self.hands = 0
         self.battleUnits = {}
 
-    def new_rold(self,Guild_name):
+    @seq_task(1)
+    def new_rold(self,):
         """
         报名阶段使用，创建账号角色，创建军团，报名
         :return:
         """
-        self.lg = LoginGame("QA1")
-        self.lg.Login()
+        self.lg = LoginGame("QA4")
+        self.lg.Login(True)
+        game_account_f = time.time()
+        dateArray = datetime.datetime.fromtimestamp(game_account_f)
+        hms = dateArray.strftime("%Y%m%d")
+        game_account_int = int(game_account_f * 1000000)
+        Guild_name = str(game_account_int)[-5:]
         self.lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-        if not self.lg.is_guild_boss:  # 不是军团长才报名
-            self.lg.MSG_C2S_GVG_Join()  # 报名
-        self.lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+        # if not self.lg.is_guild_boss:  # 不是军团长才报名
+        #     self.lg.MSG_C2S_GVG_Join()  # 报名
+        # self.lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
 
-    @seq_task(1)
-    def Login_Second(self,):
-        """
-        压测的时候主要调用这个登录
-        :return:
-        """
-        self.lg = LoginGame("QA1")
-        self.lg.Login(username_read = True)#读取数据库里面的账号
-        self.lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
 
-    @task
-    def in_out_match(self):
-        if self.lg.is_in_match:  # 在场
-            self.lg.MSG_C2S_GVG_LeaveMatch()  # 离开比赛
-        else:  # 不在场
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-
-    @task
-    def always_in_out(self):
-        """
-        进进出出
-        :return: 
-        """
-        for i in range(5000):
-            if self.lg.is_in_match:#在场
-                self.lg.always_LeaveMatch()
-            else:#不在场
-                self.lg.always_EnterMatch()
-
-    @task
-    def always_move(self):
-        """
-        溜达溜达
-        :return:
-        """
-        #可移动ID的列表
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        all_move_pos_id_list = self.lg.all_move_pos_id_list
-        old_pos_id = 0
-        for i in range(5000):
-            angle = random.randint(0, len(all_move_pos_id_list) - 1)
-            #做一个随机数，随机选取列表中的坐标
-            target_pos_id = all_move_pos_id_list[angle]
-            if old_pos_id != target_pos_id:
-                self.lg.MSG_C2S_GVG_Move(target_pos_id)  # 玩家移动
-                old_pos_id = target_pos_id
-    @seq_task(100)
-    def get_Matchinfo(self):
-        """
-        战斗打完之后获取各种信息
-        :return:
-        """
-        if self.lg.is_over:
-            self.lg.MSG_C2S_GVG_GetAchieve()  # 获取赛季成就信息
-            if len(self.lg.achieve_id_list) > 0:
-                for achieve_id in self.achieve_id_list:
-                    self.lg.MSG_C2S_GVG_GetAchieveAward(achieve_id)  # 领取赛季成就奖励
-            self.lg.MSG_C2S_GVG_GetAdvanceMatches()  # 获取淘汰赛以后的比赛信息
-            self.lg.MSG_C2S_GVG_GetSeasonHistory()  # 军团战-获取历史赛季
-            self.lg.MSG_C2S_GVG_GetGuildRankList()  # 获取赛季军团排名
-        else:
-            print("军团战还没打完")
-    @task
-    def all_ui_info(self):
-        """
-        战斗中获取玩家数据，可以随时发
-        :return:
-        """
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for i in range(5000):
-            self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
-
-    @task
-    def tower_battle(self):
-        """
-        炮台的战斗
-        :return:
-        """
-        # 移动到炮台抢占区
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for qiangzhan_pos_id in self.lg.tower_dic.keys():
-            self.lg.MSG_C2S_GVG_Move(qiangzhan_pos_id)  # 移动到抢占区
-            zhanling_pos_id = self.lg.tower_dic[qiangzhan_pos_id]
-            zhanling_uid = self.lg.zhanling_dic[zhanling_pos_id]
-            if zhanling_uid!="":
-                self.lg.MSG_C2S_GVG_AttackUser(zhanling_uid)  # 攻击对应占领区玩家
-                break
-
-    @task
-    def first_go_tower(self):
-        """
-        炮台区空着就先去抢炮台区
-        :return:
-        """
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        # 移动到炮台占领区
-        for zhanling_pos_id in self.lg.zhanling_dic.keys():
-            if self.lg.zhanling_dic[zhanling_pos_id] == "":#判断占领区有没有人
-                self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
-                # 判断自己在不在占领区对应的抢占区,或者自己在不在占领区
-                if self_pos_id in self.lg.zhanling_dic.keys() or (self_pos_id in self.lg.tower_dic.keys() and self.lg.tower_dic[self_pos_id] == zhanling_pos_id):
-                    self.lg.MSG_C2S_GVG_Move(zhanling_pos_id)  # 玩家移动
-                    break
-
-    @task
-    def user_battle(self):
-        """
-        玩家间相互战斗
-        :return:
-        """
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        # 攻击任意玩家
-        #做一个可攻击玩家列表
-        user_id_list =[]
-        for uid in self.lg.match_user_dic.keys():
-            if self.lg.self_guild_id != self.lg.match_user_dic[uid]["军团ID"]:# 不是一个军团
-                is_not_guild=True
-            else:
-                is_not_guild = False
-            if time.time() >= self.lg.match_user_dic[uid]["无敌结束时间"]:
-                is_not_invincible = True
-            else:
-                is_not_invincible = False
-            if self.lg.match_user_dic[uid]["血量"] != 0:
-                is_not_dead = True
-            else:
-                is_not_dead = False
-            if time.time() >= self.lg.match_user_dic[uid]["移动结束时间"]:
-                is_not_moveing= True
-            else:
-                is_not_moveing = False
-            if is_not_guild and is_not_invincible and is_not_dead and is_not_moveing:
-                user_id_list.append(uid)
-        #做一个随机数，随机选取列表中的玩家
-        angle = random.randint(0,len(user_id_list)-1)
-        do_uid = user_id_list[angle]
-        #如果选定的玩家和自己不在一个位置，就先过去
-        if self.lg.match_user_dic[do_uid]["位置ID"] != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
-            self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
-        self.lg.MSG_C2S_GVG_AttackUser(do_uid)  # 攻击玩家
-
-    @task
-    def attack_gate(self):
-        # 攻击城门
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
-        if self_pos_id not in self.all_go_gate_pos_id_list:#判断是否需要移动
-            angle = random.randint(0, len(self.all_go_gate_pos_id_list) - 1)
-            go_gate_pos_id = self.all_go_gate_pos_id_list[angle]#随机选取一个攻击区域
-            self.lg.MSG_C2S_GVG_Move(go_gate_pos_id)  # 玩家移动
-        else:
-            go_gate_pos_id=self_pos_id
-        # 判断能不能攻击城门
-        for gate_id in self.lg.go_gate_dic.keys():
-            gate_id_list = self.lg.go_gate_dic[gate_id]#某个城门的可攻击位置列表
-            if go_gate_pos_id in gate_id_list:
-                hp = self.lg.gate_dic[gate_id]
-                if hp != 0:
-                    self.lg.MSG_C2S_GVG_AttackGate()  # 攻击城门 需要先移动到指定位置
-
-    # lg.MSG_C2S_GVG_Revive()  # 复活放到攻击推送里面，自动复活
-    # lg.MSG_C2S_GVG_AddBuff()  # 获取Buff，放到buff刷新推送里面，自动过去获取
+    # def Login_Second(self,):
+    #     """
+    #     压测的时候主要调用这个登录
+    #     :return:
+    #     """
+    #     self.lg = LoginGame("QA3")
+    #     self.lg.Login(username_read = True)#读取数据库里面的账号
+    #     self.lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
 
 class MyLocust(Locust):
     def __init__(self):
@@ -1301,4 +1143,20 @@ class MyLocust(Locust):
 if __name__ == '__main__':
     wl = MyLocust()
     wl.run()
+    # conn = sqlite3.connect('GVG_account_text.db')
+    # cursor = conn.cursor()
+    # cursor.execute(
+    #     'create table user1(account varchar(20) primary key,is_login varchar(20),sever varchar(20))')  # 创建表
+    # cursor.close()
+    # conn.commit()
+    #
+    # cursor = conn.cursor()
+    # cursor.execute('insert into user1 (account,is_login,sever) values (\'654215\',0,\'3\')')
+    # cursor.close()
+    # conn.commit()
 
+    # cursor = conn.cursor()
+    # cursor.execute('select *from user1')
+    # values = cursor.fetchall()
+    # print(type(values[0][1]))
+    # print(values)

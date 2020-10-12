@@ -127,6 +127,22 @@ class Config:
         "sever_poco": "cocos-lua",
         "close_game_poco_name": "HomeLayer"
     }
+    shaosan2yn = {
+        "app_name": "com.vng.thieunien3qvng",
+        "uid": None,
+        "sid": None,
+        "c2sname": "MSG_C2S",
+        "s2cname": "MSG_S2C",
+        "protocolfilepath": "\protocol_file\cs.txt",
+        "resource_excelpath": "\info_tab\少三2道具类型表.xlsx",
+        "checkpointl_excelpath": "\info_tab\少三2关卡类型表.xlsx",
+        "QA1_server_ages": {"server_id": "2770420001", "host": "qa-ynngame2.tn3q.vn", "port": 38422, "gm_url": "api-ynngame2.tn3q.vn"},
+        "QA2_server_ages": {"server_id": "2770420002", "host": "qa-ynngame2.tn3q.vn", "port": 38422, "gm_url": "api-ynngame2.tn3q.vn"},
+        "QA3_server_ages": {"server_id": "2771420001", "host": "qa-ynngame2.tn3q.vn", "port": 38422, "gm_url": "api-ynngame2.tn3q.vn"},
+        "xn_account": "lidong1234",
+        "sever_poco": "cocos-lua",
+        "close_game_poco_name": "HomeLayer"
+    }
     shaoxi = {
         "app_name": "com.youzu.wgame2",
         "c2sname": None,
@@ -169,6 +185,7 @@ class Config:
         "少三2韩国": shaosan2hg,
         "少三2新马": shaosan2xm,
         "少三2台湾": shaosan2tw,
+        "少三2越南": shaosan2yn,
         "性能": xn,
         "少西": shaoxi,
         "少三": shaosan,

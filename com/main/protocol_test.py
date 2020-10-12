@@ -92,21 +92,21 @@ if __name__ == '__main__':
     # new_account(sever_name)
     # login()
 
-    my_poco = MyPoco("少三2",__phone_id__)
-    sever_name = "QA1"
+    my_poco = MyPoco("少三2越南",__phone_id__)
+    sever_name = "QA2"
     account = my_poco.get_random_account()[2:]#随机账号
     # account = "716419"
     sever_time = my_poco.make_new_role(sever_name, account,)#创建或登录已有账号
     my_poco.set_account_information_gm(account, sever_name)#先这个，才能添加资源，海外暂不支持
     my_poco.add_resource({"角色经验": 4099909990,"测试属性": 1,"银币": 999999,})#添加资源，海外暂不支持
-    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-220-10"})#通关副本，海外暂不支持
-    my_poco.GM_yijian_chuanzhuangbei()
-    my_poco.shangzhenshenshou(1,"碧水麒麟")
-    my_poco.shangzhenshenshou(2, "神木青鸾")
-    my_poco.shangzhenshenshou(3, "九天应龙")
-    my_poco.shangzhenshenshou(4, "狱火穷奇")
-    my_poco.shangzhenshenshou(5, "苍鸣雷君")
-    my_poco.shangzhenshenshou(6, "撼地灵犀")
+    my_poco.set_checkpoint(account, sever_name, {"副本": "副本-120-10"})#通关副本，海外暂不支持
+    # my_poco.GM_yijian_chuanzhuangbei()
+    # my_poco.shangzhenshenshou(1,"碧水麒麟")
+    # my_poco.shangzhenshenshou(2, "神木青鸾")
+    # my_poco.shangzhenshenshou(3, "九天应龙")
+    # my_poco.shangzhenshenshou(4, "狱火穷奇")
+    # my_poco.shangzhenshenshou(5, "苍鸣雷君")
+    # my_poco.shangzhenshenshou(6, "撼地灵犀")
     # my_poco.xue_gong_lun_zhan()
 
 
@@ -117,7 +117,6 @@ if __name__ == '__main__':
     # my_poco.shangzhenwujiang(2, "陆逊")
     # my_poco.GM_new_join_guild("sdasa",5,True)
     # my_poco.GM_fengkuang_shenbingxilian("倚天剑",100000)
-    # my_poco.GM_yijian_chuanzhuangbei()
     # my_poco.GM_wangzhejingji()
     # my_poco.del_all_resource_pb()
     # my_poco.GM_yijian_fuben(4)#通关副本，海外用这个

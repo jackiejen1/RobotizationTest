@@ -40,8 +40,6 @@ class MyPoco:
         # self.newaccount = NewAccount(game_name, phone_id)
         self.phone_id = phone_id
         self.xt = None
-        self.Flush_body = None
-        self.pet_list = None
 
     def make_new_role(self, server_name, username="", protocol_name="", is_new_account_into=False):
         """
@@ -72,7 +70,7 @@ class MyPoco:
         if role_id != "":
             return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id, role=role)
         else:
-            if self.game_name_key == "少三2" or self.game_name_key == "少三2台湾" or self.game_name_key == "少三2日本" or self.game_name_key == "少三2韩国" or self.game_name_key == "少三2新马":
+            if self.game_name_key == "少三2" or self.game_name_key == "少三2越南"or self.game_name_key == "少三2台湾" or self.game_name_key == "少三2日本" or self.game_name_key == "少三2韩国" or self.game_name_key == "少三2新马":
                 role_id, sever_time = self.protocol.get_role_id()
                 return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,
                                                        role=role)
@@ -103,27 +101,25 @@ class MyPoco:
         :return:
         """
         wujiang_id = self.get_resource_id(name)
-        if (self.Flush_body == None) or (str(wujiang_id) not in self.Flush_body.keys()):
-            self.Flush_body = self.protocol.Flush("武将")
-        if str(wujiang_id) in self.Flush_body.keys():
-            only_id = self.Flush_body[str(wujiang_id)]
+        Flush_body = self.protocol.Flush("武将")
+        if str(wujiang_id) in Flush_body.keys():
+            only_id = Flush_body[str(wujiang_id)]
             self.protocol.shangzhenwujiang(pos, only_id)
             self.wujiangshengxing(name, only_id)
         else:
-            raise GmException("请先添加武将"+name)
+            raise GmException("请先添加武将" + name)
 
-    def wujiangshengxing(self, name,only_id):
+    def wujiangshengxing(self, name, only_id):
         """
         武将升星
         :param pos: 坑位，2-6
         :param id: 武将名
         :return:
         """
-        add_type, wujiang_id = self.protocol.mri.get_type_id_from_name(name+"碎片")
+        add_type, wujiang_id = self.protocol.mri.get_type_id_from_name(name + "碎片")
         self.protocol.add_resource_pb(add_type, wujiang_id, 10000)
         for i in range(7):
             self.protocol.Knight_StarIncrease(only_id)
-
 
     def shangzhenshenshou(self, pos, name):
         """
@@ -132,24 +128,25 @@ class MyPoco:
         :param name: 道具的名字
         :return:
         """
+
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("神兽仙石")
+        self.protocol.add_resource_pb(add_type, add_value, 648)
         add_type, add_value = self.protocol.mri.get_type_id_from_name(name)
         self.protocol.add_resource_pb(add_type, add_value, 12)
         daoju_id = str(add_value)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("极品灵兽丹")
-        self.protocol.add_resource_pb(add_type, add_value, 99999)
-        # if (self.pet_list == None) or (str(daoju_id) not in self.pet_list.keys()):
-        #     self.pet_list =self.protocol.Flush("神兽")
-        self.pet_list = self.protocol.Flush("神兽")
-        if str(daoju_id) in self.pet_list.keys():
-            only_id_list = self.pet_list[daoju_id]
+        self.protocol.add_resource_pb(add_type, add_value, 7478)
+        pet_list = self.protocol.Flush("神兽")
+        if str(daoju_id) in pet_list.keys():
+            only_id_list = pet_list[daoju_id]
             only_id = only_id_list[0]
-            self.protocol.shangzhenshenshou(pos,only_id)#上阵
+            self.protocol.shangzhenshenshou(pos, only_id)  # 上阵
             for i in range(47):
-                level = self.protocol.Pet_OneKey_LevelUp(only_id,5)#升级
+                level = self.protocol.Pet_OneKey_LevelUp(only_id, 5)  # 升级
                 if level > 234:
                     break
-            only_id_list.pop(0)#都操作完了之后把该装备从列表里删除
-            self.protocol.Pet_StarUp(only_id,only_id_list[0:1])
+            only_id_list.pop(0)  # 都操作完了之后把该神兽从列表里删除
+            self.protocol.Pet_StarUp(only_id, only_id_list[0:1])
             self.protocol.Pet_StarUp(only_id, only_id_list[1:2])
             self.protocol.Pet_StarUp(only_id, only_id_list[2:3])
             self.protocol.Pet_StarUp(only_id, only_id_list[3:4])
@@ -157,7 +154,24 @@ class MyPoco:
             self.protocol.Pet_StarUp(only_id, only_id_list[6:8])
             self.protocol.Pet_StarUp(only_id, only_id_list[-3:])
         else:
-            raise GmException("请先添加神兽"+name)
+            raise GmException("请先添加神兽" + name)
+        #穿戴神兽装备
+        pet_equipment_name = "幻紫仙爪"
+        add_type, add_zhua_value = self.protocol.mri.get_type_id_from_name(pet_equipment_name)
+        self.protocol.add_resource_pb(add_type, add_zhua_value, 1)
+        pet_equipment_name = "幻紫仙角"
+        add_type, add_jiao_value = self.protocol.mri.get_type_id_from_name(pet_equipment_name)
+        self.protocol.add_resource_pb(add_type, add_jiao_value, 1)
+        pet_equipment_name = "幻紫仙环"
+        add_type, add_huan_value = self.protocol.mri.get_type_id_from_name(pet_equipment_name)
+        self.protocol.add_resource_pb(add_type, add_huan_value, 1)
+        pet_zhuangbei_list = self.protocol.Flush("神兽装备")
+        print(pet_zhuangbei_list)
+        self.protocol.shangzhenshenshouzhuangbei(pos * 3 - 2, pet_zhuangbei_list[add_zhua_value][0])
+        self.protocol.shangzhenshenshouzhuangbei(pos * 3 - 1, pet_zhuangbei_list[add_jiao_value][0])
+        self.protocol.shangzhenshenshouzhuangbei(pos * 3, pet_zhuangbei_list[add_huan_value][0])
+        for i in range(24):
+            self.protocol.Pet_Equipment_FastUpgrade([pos * 3, pos * 3 - 1, pos * 3 - 2])#一键强化
 
     def chuandaizhuangbei(self, pos, name):
         """
@@ -173,22 +187,66 @@ class MyPoco:
         add_type, add_value = self.protocol.mri.get_type_id_from_name("普通装备纹晶")
         self.protocol.add_resource_pb(add_type, add_value, 999)
         daoju_id = self.get_resource_id(name)
-        if (self.Flush_body == None) or (str(daoju_id) not in self.Flush_body.keys()):
-            self.Flush_body = self.protocol.Flush("装备")
-        if str(daoju_id) in self.Flush_body.keys():
-            only_id_list = self.Flush_body[str(daoju_id)]
+        Flush_body = self.protocol.Flush("装备")
+        if str(daoju_id) in Flush_body.keys():
+            only_id_list = Flush_body[str(daoju_id)]
             self.protocol.chuandaizhuangbei(pos, only_id_list[0])
             for i in range(80):
-                self.protocol.Equipment_RefiningOneLevel(only_id_list[0])#装备精炼
+                self.protocol.Equipment_RefiningOneLevel(only_id_list[0])  # 装备精炼
             for i in range(3):
-                self.protocol.Equipment_Glyph(only_id_list[0])#装备雕纹
-            self.Flush_body[str(daoju_id)] = only_id_list
+                self.protocol.Equipment_Glyph(only_id_list[0])  # 装备雕纹
+            Flush_body[str(daoju_id)] = only_id_list
             num = random.randint(1, 30)
             for i in range(30):
-                level = self.protocol.Equipment_Upgrade(only_id_list[0], 5)#强化装备
+                level = self.protocol.Equipment_Upgrade(only_id_list[0], 5)  # 强化装备
                 if level > 240:
                     break
-            only_id_list.pop(0)#都操作完了之后把该装备从列表里删除
+            only_id_list.pop(0)  # 都操作完了之后把该装备从列表里删除
+        else:
+            raise GmException("请先添加装备" + name)
+
+    def chuandaibaowu(self, pos, name):
+        """
+        上阵宝物,左1，右2，依次递增
+        :param pos: 坑位，1-12
+        :param name: 道具的名字
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("经验虎符")
+        self.protocol.add_resource_pb(add_type, add_value, 700)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("普通宝物纹晶")
+        self.protocol.add_resource_pb(add_type, add_value, 200)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("高级宝物纹晶")
+        self.protocol.add_resource_pb(add_type, add_value, 400)
+        daoju_id = self.get_resource_id(name)
+        Flush_body = self.protocol.Flush("宝物")
+        if daoju_id in Flush_body.keys():
+            only_id_list = Flush_body[daoju_id]
+            self.protocol.chuandaibaowu(pos, only_id_list[0])
+            self.protocol.Treasure_Upgrade_OneLevel(only_id_list[0], 60)  # 强化宝物 todo 换成孟德新书
+            for i in range(6):
+                self.protocol.Treasure_Glyph(only_id_list[0])#雕纹
+        else:
+            raise GmException("请先添加装备" + name)
+
+    def chuandaishenbing(self, pos, name):
+        """
+        上阵神兵,
+        :param pos: 坑位，1-6
+        :param name: 道具的名字
+        :return:
+        """
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("神兵锻造石")
+        self.protocol.add_resource_pb(add_type, add_value, 999999)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name(name+"碎片")
+        self.protocol.add_resource_pb(add_type, add_value, 3000)
+        daoju_id = self.get_resource_id(name)
+        Flush_body = self.protocol.Flush("神兵")
+        if daoju_id in Flush_body.keys():
+            only_id = Flush_body[daoju_id]
+            self.protocol.chuandaishenbing(pos, only_id)
+            self.protocol.Artifact_LevelUp(only_id, 239)  # 强化
+            self.protocol.Artifact_Star(only_id, 50)#升星
         else:
             raise GmException("请先添加装备" + name)
 
@@ -739,25 +797,9 @@ class MyPoco:
     def GM_yijian_chuanzhuangbei(self):
         # 上阵武将
         wuqi = "测试战戟"
-        xiezi ="测试战靴"
+        xiezi = "测试战靴"
         zhanjia = "测试战甲"
-        toukui ="测试头盔"
-        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("陆逊")
-        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
-        self.shangzhenwujiang(2, "陆逊")
-        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("刘备")
-        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
-        self.shangzhenwujiang(3, "刘备")
-        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("郭嘉")
-        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
-        self.shangzhenwujiang(4, "郭嘉")
-        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("黄忠")
-        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
-        self.shangzhenwujiang(5, "黄忠")
-        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("诸葛亮")
-        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
-        self.shangzhenwujiang(6, "诸葛亮")
-        self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])  # 调整阵型
+        toukui = "测试头盔"
         add_type, add_value = self.protocol.mri.get_type_id_from_name(wuqi)
         self.protocol.add_resource_pb(add_type, add_value, 6)
         add_type, add_value = self.protocol.mri.get_type_id_from_name(xiezi)
@@ -766,30 +808,60 @@ class MyPoco:
         self.protocol.add_resource_pb(add_type, add_value, 6)
         add_type, add_value = self.protocol.mri.get_type_id_from_name(toukui)
         self.protocol.add_resource_pb(add_type, add_value, 6)
-        self.chuandaizhuangbei(1, wuqi)
-        self.chuandaizhuangbei(2, xiezi)
-        self.chuandaizhuangbei(3, zhanjia)
-        self.chuandaizhuangbei(4, toukui)
-        self.chuandaizhuangbei(5, wuqi)
-        self.chuandaizhuangbei(6, xiezi)
-        self.chuandaizhuangbei(7, zhanjia)
-        self.chuandaizhuangbei(8, toukui)
-        self.chuandaizhuangbei(9, wuqi)
-        self.chuandaizhuangbei(10, xiezi)
-        self.chuandaizhuangbei(11, zhanjia)
-        self.chuandaizhuangbei(12, toukui)
-        self.chuandaizhuangbei(13, wuqi)
-        self.chuandaizhuangbei(14, xiezi)
-        self.chuandaizhuangbei(15, zhanjia)
-        self.chuandaizhuangbei(16, toukui)
-        self.chuandaizhuangbei(17, wuqi)
-        self.chuandaizhuangbei(18, xiezi)
-        self.chuandaizhuangbei(19, zhanjia)
-        self.chuandaizhuangbei(20, toukui)
-        self.chuandaizhuangbei(21, wuqi)
-        self.chuandaizhuangbei(22, xiezi)
-        self.chuandaizhuangbei(23, zhanjia)
-        self.chuandaizhuangbei(24, toukui)
+        zuobaowu ="孟德新书"
+        youbaowu = "丞相印"
+        add_type, add_value = self.protocol.mri.get_type_id_from_name(zuobaowu)
+        self.protocol.add_resource_pb(add_type, add_value, 6)
+        add_type, add_value = self.protocol.mri.get_type_id_from_name(youbaowu)
+        self.protocol.add_resource_pb(add_type, add_value, 6)
+        shenbing1="太公护符"
+        shenbing2="倚天剑"
+        shenbing3="七星宝刀"
+        shenbing4="青釭剑"
+        shenbing5="闭月团扇"
+        shenbing6="丈八蛇矛"
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing1)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing2)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing3)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing4)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing5)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing6)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        self.chuandaishenbing(1, shenbing1)
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("陆逊")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(2, "陆逊")
+        self.chuandaishenbing(2, shenbing2)
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("刘备")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(3, "刘备")
+        self.chuandaishenbing(3, shenbing3)
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("郭嘉")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(4, "郭嘉")
+        self.chuandaishenbing(4, shenbing4)
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("黄忠")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(5, "黄忠")
+        self.chuandaishenbing(5, shenbing5)
+        add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("诸葛亮")
+        self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
+        self.shangzhenwujiang(6, "诸葛亮")
+        self.chuandaishenbing(5, shenbing6)
+        self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])  # 调整阵型
+        for i in range(1,7):
+            self.chuandaizhuangbei(i*4-3, wuqi)
+            self.chuandaizhuangbei(i*4-2, xiezi)
+            self.chuandaizhuangbei(i*4-1, zhanjia)
+            self.chuandaizhuangbei(i*4, toukui)
+        for i in range(1,7):
+            self.chuandaibaowu(i*2-1, zuobaowu)
+            self.chuandaibaowu(i*2, youbaowu)
 
     def GM_yijian_fuben(self, zhangjie_id):
         """
@@ -1091,7 +1163,7 @@ class MyPoco:
         self.protocol.add_resource_pb(add_type, add_value, 99999999)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("军旗")
         self.protocol.add_resource_pb(add_type, add_value, num)
-        if join!="":
+        if join != "":
             if not join:
                 # 如果是创建军团，就需要加一些道具
                 add_type, add_value = self.protocol.mri.get_type_id_from_name("贵族经验")
@@ -1307,7 +1379,7 @@ class MyPoco:
         print("账号" + account1 + "上有" + str(num) + "个好友")
         return account1
 
-    def GM_fengkuang_huashen(self, activity_id,cishu):
+    def GM_fengkuang_huashen(self, activity_id, cishu):
         """
         十连抽化身，检测是否抽到指定的东西,默认抽到一次后就停止
         :param activity_id: int 活动ID，GM后台配置
@@ -1323,15 +1395,15 @@ class MyPoco:
         resource_dic_list = []
         for i in range(cishu):
             award_list = self.protocol.huashen_shilian(activity_id)
-            resource_dic_list = resource_dic_list+award_list
+            resource_dic_list = resource_dic_list + award_list
         log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
         try:
             new_excel_tab("化身", log_str_z, tongji_str_z, shijiancishu)
-        except Exception :
+        except Exception:
             pass
         return log_str_z, tongji_str_z, shijiancishu
 
-    def make_ui_log_by_gm(self,resource_dic_list_input):
+    def make_ui_log_by_gm(self, resource_dic_list_input):
         """
         用来给抽奖类方法处理统一的日志
         :param resource_dic_list_input: 抽奖返回值奖励列表[{"type":,"value":,"size":,},]
@@ -1364,11 +1436,11 @@ class MyPoco:
                 resources_zongcishu = log_dic["抽到次数"]
                 if str(resources_name) in shuliangtongji_dic.keys():
                     shuliangtongji_dic[str(resources_name)] = shuliangtongji_dic[str(resources_name)] + int(
-                            resources_shuliang) * int(resources_zongcishu)
+                        resources_shuliang) * int(resources_zongcishu)
                 else:
                     shuliangtongji_dic[str(resources_name)] = int(resources_shuliang) * int(resources_zongcishu)
                 log_str = "道具：" + str(resources_name) + "，数量：" + str(resources_shuliang) + "，一共抽到：" + str(
-                        resources_zongcishu) + "次"
+                    resources_zongcishu) + "次"
                 log_str_z = log_str_z + "\r\n" + log_str
         if "事件" in resources_dic.keys():
             shijiancishu = "抽到事件" + str(resources_dic["事件"]) + "次"
@@ -1378,7 +1450,6 @@ class MyPoco:
         for tongji in shuliangtongji_dic.keys():
             tongji_str_z = tongji_str_z + "\r\n" + tongji + "：" + str(shuliangtongji_dic[tongji]) + "个"
         return log_str_z, tongji_str_z, shijiancishu
-
 
     def GM_fengkuang_hengsaoqianjun(self, activity_id, cishu):
         """
@@ -1394,11 +1465,10 @@ class MyPoco:
         resource_dic_list = []
         for i in range(cishu):
             award_list = self.protocol.hengsaoqianjun_shilian(activity_id)
-            resource_dic_list = resource_dic_list+award_list
+            resource_dic_list = resource_dic_list + award_list
         log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
         new_excel_tab("横扫千军", log_str_z, tongji_str_z, shijiancishu)
         return log_str_z, tongji_str_z, shijiancishu
-
 
     def GM_fengkuang_shikongzhaohuan(self, activity_id, cishu):
         """
@@ -1414,8 +1484,8 @@ class MyPoco:
         self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
         resource_dic_list = []
         for i in range(cishu):
-            award_list = self.protocol.shikongzhaohuan_shilian(activity_id,id)
-            resource_dic_list = resource_dic_list+award_list
+            award_list = self.protocol.shikongzhaohuan_shilian(activity_id, id)
+            resource_dic_list = resource_dic_list + award_list
         log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
         new_excel_tab("时空召唤", log_str_z, tongji_str_z, shijiancishu)
         return log_str_z, tongji_str_z, shijiancishu
@@ -1486,8 +1556,8 @@ class MyPoco:
         self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)
         resource_dic_list = []
         for i in range(cishu):
-            award_list = self.protocol.xianshishenjiang_shilian(activity_id, id_into,sub_type)
-            resource_dic_list = resource_dic_list+award_list
+            award_list = self.protocol.xianshishenjiang_shilian(activity_id, id_into, sub_type)
+            resource_dic_list = resource_dic_list + award_list
         log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
         new_excel_tab("限时金将", log_str_z, tongji_str_z, shijiancishu)
         return log_str_z, tongji_str_z, shijiancishu
@@ -1496,18 +1566,17 @@ class MyPoco:
         add_type, shenbing_add_value = self.protocol.mri.get_type_id_from_name(artifact_name)
         self.protocol.add_resource_pb(add_type, shenbing_add_value, 1)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("洗练晶石")
-        self.protocol.add_resource_pb(add_type, add_value, cishu*5)
-        shenbinglist = self.protocol.Flush("神兵")
-        for shenbing in shenbinglist:
-            if str(shenbing_add_value) in shenbing.keys():
-                artifact_id = shenbing[str(shenbing_add_value)]
+        self.protocol.add_resource_pb(add_type, add_value, cishu * 5)
+        shenbing_dic = self.protocol.Flush("神兵")
+        if shenbing_add_value in shenbing_dic.keys():
+            artifact_id = shenbing_dic[shenbing_add_value]
         pinzhi_dic = {"白": 0, "绿": 0, "蓝": 0, "紫": 0, "橙": 0, "红": 0, "金": 0, "紫金": 0, }
         try:
             if cishu > 1:
                 for i in range(cishu):
                     artifacts_dic_list = self.protocol.Artifact_Purify(artifact_id)
                     for artifacts_dic in artifacts_dic_list:
-                        #只取一个孔的概率
+                        # 只取一个孔的概率
                         pinzhi = artifacts_dic[str(1)]
                         if pinzhi == "1":
                             pinzhi_dic["白"] = pinzhi_dic["白"] + 1
@@ -1551,7 +1620,7 @@ class MyPoco:
             else:
                 print("次数太少了")
                 return ""
-        except Exception :
+        except Exception:
             pass
         print("一共洗练" + str(cishu) + "次")
         print("共洗练出白色属性" + str(pinzhi_dic["白"]) + "次")
@@ -1621,12 +1690,12 @@ class MyPoco:
         for tongji in shuliangtongji_dic.keys():
             tongji_str_z = tongji_str_z + "\r\n" + tongji + "：" + str(shuliangtongji_dic[tongji]) + "个"
         try:
-            new_excel_tab("富甲天下",log_str_z, tongji_str_z, shijiancishu)
+            new_excel_tab("富甲天下", log_str_z, tongji_str_z, shijiancishu)
         except Exception:
             pass
         return log_str_z, tongji_str_z, shijiancishu
 
-    def GM_World_Chat(self,instruction_str_into):
+    def GM_World_Chat(self, instruction_str_into):
         """
         向世界频道发送聊天内容，一般用作GM指令
         :param instruction_str_into:
@@ -1644,13 +1713,13 @@ class MyPoco:
         """
         # 先把消耗的道具加进去
 
-            # 如果是创建军团，就需要加一些道具
+        # 如果是创建军团，就需要加一些道具
         add_type, add_value = self.protocol.mri.get_type_id_from_name("贵族经验")
         self.protocol.add_resource_pb(add_type, add_value, 500000)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("元宝")
         self.protocol.add_resource_pb(add_type, add_value, 200)
         self.protocol.search_Guild(Guild_name)
-        self.GM_World_Chat("/set_guild_level "+str(num))
+        self.GM_World_Chat("/set_guild_level " + str(num))
 
     def taofamojiang(self):
         """
@@ -1660,6 +1729,7 @@ class MyPoco:
         self.protocol.DemonBoss_UserJoin()
         self.protocol.DemonBoss_ChoseTeam()
         self.protocol.DemonBoss_BeginChallenge()
+
     def xue_gong_lun_zhan(self):
         """
         学宫论战-进入玩法
@@ -1671,10 +1741,10 @@ class MyPoco:
         #     only_id = self.Flush_body[str(wujiang_id)]
         #     line_up.append(only_id)
         #     line_up.append(0)
-        self.protocol.Debate_EnterInfo()#进入
+        self.protocol.Debate_EnterInfo()  # 进入
         # self.protocol.Debate_LineUp(line_up)
-        self.protocol.Debate_LineUp()#布阵
-        self.protocol.Debate_RefreshMatch()#手动匹配
+        self.protocol.Debate_LineUp()  # 布阵
+        self.protocol.Debate_RefreshMatch()  # 手动匹配
         # print(match_user_index_list)
         is_win = self.protocol.Debate_BattleStart(2)
         if not is_win:

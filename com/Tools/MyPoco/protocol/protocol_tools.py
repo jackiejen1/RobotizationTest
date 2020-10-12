@@ -118,8 +118,9 @@ def _recv_data(s, api_attr, buffersize, limittime):
                         if head_data[1] == rec:  # 这里对返回数据进行校验，只返回要求协议ID的数据
                             recvtime = time.time()
                             recvdata = tmpdata
+                            if str(rec) not in recvdata_dic.keys():
+                                then_len = then_len + 1
                             recvdata_dic[str(rec)] = recvdata
-                            then_len = then_len + 1
                     if then_len == len(recvcmd):
                         return recvdata_dic,recvtime
             else:

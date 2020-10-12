@@ -2538,7 +2538,7 @@ message S2C_Formation_ChangePosition {
 }
 
 message C2S_Formation_ChangeFormation {
-    required uint32 tp = 1;//1武将 3装备 4宝物 6 神兽 7 神兽装备
+    required uint32 tp = 1;//1武将 3装备 4宝物 5神兵 6 神兽 7 神兽装备
     required uint32 pos = 2;
     required uint64 id = 3;//标识ID
 }

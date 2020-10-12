@@ -51,10 +51,10 @@ if __name__ == '__main__':
     # height= json.loads(height)
     # print(width)
     # print(height)
-    a = [0,1,2,3,4,5,6,7,8,9,10,11]
-    print(a[5:6])
-    print(a[7:9])
-    print(a[-3:])
+    a =  range(1,7)
+    for i in range(1,7):
+        print(i)
+
     # if resource_name in col:
     #     print(col.index(resource_name))
     #     row = table.row_values(col.index(resource_name))

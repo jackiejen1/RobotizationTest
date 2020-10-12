@@ -29,6 +29,8 @@ class EntryGameSs2:
             game_name_text = "少三2台湾"
         elif self.game_name == "com.yoozoogames.ss2game":
             game_name_text = "少三2新马"
+        elif self.game_name == "com.vng.thieunien3qvng":
+            game_name_text = "少三2越南"
         else:
             raise ValueException("没有该游戏名")
         self.my_poco_obj = MyPocoObject(game_name_text,phone_id)

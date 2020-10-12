@@ -44,6 +44,8 @@ class LoginGame:
             key = "Zj10zrXxlWC7xKuX66TjsNvepQKIFfzR"
         elif region == "台湾":
             key = "Wjiqv6sjw4NIFhKY7i598bO1AWjru2en"
+        elif region == "越南":
+            key = "5l6PeNKsO2jWKWRtJU7GRp8IIQQ53BsW"
         else:
             raise ProtocolException("版本信息输入错误，登录信息设置失败")
         string = "account_system_id=1_&channel_id=1&extend=1|1|1&osdk_game_id=196377847&osdk_user_id=1_" + self.username + "&time=123&user_id=" + self.username + key
@@ -134,7 +136,7 @@ class LoginGame:
         C2S_Flush = C2S_Flush.SerializeToString()  # 序列化
         # ID10101的协议可以不接收，不是实际需要的内容
         C2S_Flush_attr = {'name': "C2S_Flush", 'protocol': 'protobuf-ss', 'send_cmd': 10100,
-                          'recv_cmd': int(recv_cmd_id), 'uid': uid, 'sid': sid}
+                          'recv_cmd': recv_cmd_id, 'uid': uid, 'sid': sid}
         senddata = pack_data(C2S_Flush, C2S_Flush_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_Flush_attr, 32)  # 发送协议
         return flag, data
@@ -1183,9 +1185,94 @@ class LoginGame:
         flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
         return flag, data
 
+    def MSG_C2S_Pet_Equipment_FastUpgrade(self,positions, uid, sid):
+        """
+        神兽装备一键强化
+        :param id:唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_Pet_Equipment_FastUpgrade()
+        for position in positions:
+            C2S.positions.append(position)
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_Pet_Equipment_FastUpgrade", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 13512, 'recv_cmd': 13513, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data
 
+    def MSG_C2S_Treasure_Upgrade_OneLevel(self,id,level, uid, sid):
+        """
+        宝物一键强化
+        :param id:唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_Treasure_Upgrade_OneLevel()
+        C2S.id=id
+        C2S.cost_red = False
+        C2S.level =level
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_Treasure_Upgrade_OneLevel", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 10758, 'recv_cmd': 10759, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data
 
+    def MSG_C2S_Treasure_Glyph(self,id, uid, sid):
+        """
+        宝物雕纹
+        :param id:唯一ID
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_Treasure_Glyph()
+        C2S.id=id
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_Treasure_Glyph", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 10756, 'recv_cmd': 10757, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data
 
+    def MSG_C2S_Artifact_LevelUp(self,id, tg_lv,uid, sid):
+        """
+        神兵强化
+        :param id:唯一ID
+        :param tg_lv:强化等级
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_Artifact_LevelUp()
+        C2S.id=id
+        C2S.tg_lv=tg_lv
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_Artifact_LevelUp", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 12600, 'recv_cmd': 12601, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data
 
-
-
+    def MSG_C2S_Artifact_Star(self,id, tg_star,uid, sid):
+        """
+        神兵升星
+        :param id:唯一ID
+        :param tg_star:升星等级
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_Artifact_Star()
+        C2S.id=id
+        C2S.tg_star=tg_star
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_Artifact_Star", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 12602, 'recv_cmd': 12603, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data

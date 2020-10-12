@@ -41,6 +41,8 @@ class UnexpectedWin:
                 self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
             elif self.game_name == "com.yoozoogames.ss2game":
                 self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.vng.thieunien3qvng":
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
             else:
                 pass
         print("开始查找异常窗口")

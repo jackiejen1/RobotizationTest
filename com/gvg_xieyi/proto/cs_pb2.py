@@ -12,8 +12,8 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-import out_base_pb2 as out__base__pb2
-import bs_pb2 as bs__pb2
+import com.gvg_xieyi.proto.out_base_pb2 as out__base__pb2
+import com.gvg_xieyi.proto.bs_pb2 as bs__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
