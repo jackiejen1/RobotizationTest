@@ -75,6 +75,8 @@ class Config:
                               "gm_url": "api-jpngame2.gtarcade.com"},
         "QA3_server_ages": {"server_id": "2740440001", "host": "qa-jpngame2.gtarcade.com", "port": 38422,
                               "gm_url": "api-jpngame2.gtarcade.com"},
+        "QA4_server_ages": {"server_id": "2719420003", "host": "qa-jpngame2.gtarcade.com", "port": 38422,
+                            "gm_url": "api-jpngame2.gtarcade.com"},
         "xn_account": "lidong1234",
         "sever_poco": "cocos-lua",
         "close_game_poco_name": "HomeLayer"

@@ -51,9 +51,9 @@ if __name__ == '__main__':
     # height= json.loads(height)
     # print(width)
     # print(height)
-    a =  range(1,7)
-    for i in range(1,7):
-        print(i)
+    dic_i = {1:1,3:1}
+    a = dic_i.keys()
+    print(len(dic_i.keys()))
 
     # if resource_name in col:
     #     print(col.index(resource_name))

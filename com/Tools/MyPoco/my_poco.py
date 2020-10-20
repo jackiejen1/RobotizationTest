@@ -204,6 +204,37 @@ class MyPoco:
             only_id_list.pop(0)  # 都操作完了之后把该装备从列表里删除
         else:
             raise GmException("请先添加装备" + name)
+    def yijianshangzhenshenbing(self):
+        """
+        上阵神兵,
+        :param pos: 坑位，1-6
+        :param name: 道具的名字
+        :return:
+        """
+        shenbing1="太公护符"
+        shenbing2="倚天剑"
+        shenbing3="七星宝刀"
+        shenbing4="青釭剑"
+        shenbing5="闭月团扇"
+        shenbing6="丈八蛇矛"
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing1)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing2)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing3)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing4)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing5)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing6)
+        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
+        self.chuandaishenbing(1, shenbing1)
+        self.chuandaishenbing(2, shenbing2)
+        self.chuandaishenbing(3, shenbing3)
+        self.chuandaishenbing(4, shenbing4)
+        self.chuandaishenbing(5, shenbing5)
+        self.chuandaishenbing(6, shenbing6)
 
     def chuandaibaowu(self, pos, name):
         """
@@ -814,45 +845,21 @@ class MyPoco:
         self.protocol.add_resource_pb(add_type, add_value, 6)
         add_type, add_value = self.protocol.mri.get_type_id_from_name(youbaowu)
         self.protocol.add_resource_pb(add_type, add_value, 6)
-        shenbing1="太公护符"
-        shenbing2="倚天剑"
-        shenbing3="七星宝刀"
-        shenbing4="青釭剑"
-        shenbing5="闭月团扇"
-        shenbing6="丈八蛇矛"
-        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing1)
-        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
-        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing2)
-        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
-        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing3)
-        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
-        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing4)
-        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
-        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing5)
-        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
-        add_shenbing_type, add_shenbing_value = self.protocol.mri.get_type_id_from_name(shenbing6)
-        self.protocol.add_resource_pb(add_shenbing_type, add_shenbing_value, 1)
-        self.chuandaishenbing(1, shenbing1)
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("陆逊")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(2, "陆逊")
-        self.chuandaishenbing(2, shenbing2)
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("刘备")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(3, "刘备")
-        self.chuandaishenbing(3, shenbing3)
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("郭嘉")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(4, "郭嘉")
-        self.chuandaishenbing(4, shenbing4)
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("黄忠")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(5, "黄忠")
-        self.chuandaishenbing(5, shenbing5)
         add_wujiang_type, add_wujiang_value = self.protocol.mri.get_type_id_from_name("诸葛亮")
         self.protocol.add_resource_pb(add_wujiang_type, add_wujiang_value, 1)
         self.shangzhenwujiang(6, "诸葛亮")
-        self.chuandaishenbing(5, shenbing6)
         self.protocol.Formation_ChangePosition([6, 1, 2, 3, 4, 5])  # 调整阵型
         for i in range(1,7):
             self.chuandaizhuangbei(i*4-3, wuqi)
@@ -862,6 +869,7 @@ class MyPoco:
         for i in range(1,7):
             self.chuandaibaowu(i*2-1, zuobaowu)
             self.chuandaibaowu(i*2, youbaowu)
+        # self.yijianshangzhenshenbing()
 
     def GM_yijian_fuben(self, zhangjie_id):
         """

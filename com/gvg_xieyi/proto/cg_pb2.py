@@ -12,7 +12,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-import com.gvg_xieyi.proto.out_base_pb2 as out__base__pb2
+import proto.out_base_pb2 as out__base__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(

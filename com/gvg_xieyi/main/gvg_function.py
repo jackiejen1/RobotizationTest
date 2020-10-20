@@ -12,20 +12,19 @@ import datetime
 import struct
 import time
 import requests
-from com.gvg_xieyi.proto import cs_pb2, cg_pb2, bs_pb2, out_base_pb2
+from proto import cs_pb2, cg_pb2, bs_pb2, out_base_pb2
 import hashlib, json, base64
-from com.gvg_xieyi.tools.MyException import *
+from tools.MyException import *
 from socket import create_connection
-from locust import HttpLocust, TaskSet, task, seq_task, TaskSequence, Locust,events
+from locust import HttpLocust, TaskSet, task, seq_task, TaskSequence, Locust, events
 import random
 import sqlite3
 
 
-
 class LoginGame:
-    def __init__(self, server_name,):
-        server_id_dic = {"QA1": 1652440001, "QA2": 1652440002, "QA3": 1652440003, "QA4": 1652440004, "QA6": 1652440006,
-                         "QA7": 1652440007, }
+    def __init__(self, server_name, ):
+        server_id_dic = {"QA1": 1652440001, "QA2": 1652440002, "QA3": 1652440003, "QA4": 1652440004, "QA5": 1652440005,"QA6": 1652440006,
+                         "QA7": 1652440007, "新QA1": 1733440001, "新QA2": 1733440002, "新QA3": 1733440003, "新QA4": 1733440004, "新QA5": 1733440005,}
         self.server_name = server_name
         self.server_id = server_id_dic[server_name]
         self.host = "fqa.sk.youzu.com"
@@ -34,30 +33,40 @@ class LoginGame:
             self.socket = create_connection((self.host, self.port))
         except Exception:
             raise GmException("服务器可能在维护")
-        self.waiting_for_you_list = [14444, 14447, 14464, 14450, 14453, 14456, 14459, 14470]  # 监听推送协议列表
+        self.waiting_for_you_list = [14444,14473, 14447, 14464, 14450, 14453, 14456, 14459, 14470]  # 监听推送协议列表
         self.guild_index_dic = {}  # 军团id，比赛中的索引
         self.nearby_user_dic_list = {}  # 记录位置玩家列表 {位置：{uid:0/1 在/不在}}
         self.match_user_dic = {}  # 记录在场所有人员的UId和所有user信息
-        self.gate_dic = {}  # 城门位置id  hp 用来记录城门能否攻击
-        self.all_go_gate_pos_id_list = [,,,,,,,,,] #所有可以攻击城门的位置
-        self.all_move_pos_id_list = [,,, , , , , , , ]  # 所有可以移动位置
-        self.go_gate_dic = {:[,,,,,],:[,,,,,],:[,,,,,,],:[,,,,,,],}  # 城门位置id：可攻击位置id[]
+        self.fuhuo_pos = [813,41,57,29,749,841,831,865,771,178,221,224]
+        self.gate_dic = {900201:57600, 900202:57600}  # 城门位置id  hp 用来记录城门能否攻击
+        self.all_go_gate_pos_id_list = [412, 443, 474, 424, 455, 486, ]  # 所有可以攻击城门的位置
+        self.all_move_pos_id_list = [412, 443, 474, 424, 455, 486, 406, 407, 408, 439, 470, 469, 468, 437, 731, 730,
+                                     729, 728, 727, 191, 190, 189, 188, 187, ]  # 所有可以移动位置,buff区，城门区，炮台攻占区
+        self.go_gate_dic = {900201: [412, 443, 474, ], 900202: [424, 455, 486, ]}  # 城门位置id：可攻击位置id[]
         self.buff_dic = {}  # buff点位置[buff_id，消失时间]
-        self.tower_dic = {:,:,:,:,:,}  # 抢占区id ：占领区id  提前写死 记录抢占区绑定的占领区
-        self.zhanling_dic = {:0,:0,:0,:0,:0,:0,:0,}  # 占领区id :占领区uid 记录谁当前在占领区
+        self.tower_dic = [[731, 700, 730, 699, 729, 698, 728, 697, 727, 696, ],
+                          [191, 213, 190, 212, 189, 211, 188, 210, 187, 209, ]]  # 两个炮台战斗区id
+        self.zhanling_dic = {700: "", 699: "", 696: "", 698: "", 697: "", 213: "", 212: "", 211: "", 210: "",
+                             209: "", }  # 占领区id :占领区uid 记录谁当前在占领区
         self.G_bisai_id = 0  # 军团战比赛ID
         self.achieve_id_list = []  # 成就id列表 看看能不能领取成就奖励
         self.NotifyMove_id = 0  # 移动推送ID，用来区别重复消息，减少更新信息频率
         self.NotifyAttackUser_id = 0  # 攻击推送ID，用来区别重复消息，减少更新信息频率
         self.NotifyAttackGate_id = 0  # 攻击城门推送ID，用来区别重复消息，减少更新信息频率
         self.NotifyRevive_id = 0  # 复活推送ID，用来区别重复消息，减少更新信息频率
-        self.fuhuo_cd = 0  # 复活CD todo 需要改表
-        self.move_cd = 0  # 移动CD todo 需要改表
-        self.going_move_time = 0  # 移动耗时 todo 需要改表
-        self.is_over = False  #记录军团战进行时状态
-        self.is_in_match =False  #记录自己是否进入军团战战场
+        self.UserEnter_id = 0   # 进入战场推送ID
+        self.fuhuo_cd = 10  # 复活CD
+        self.move_cd = 3  # 移动CD
+        self.attack_cd = 5  # 攻击其他玩家CD
+        self.attack_time = 0 #记录攻击玩家CD结束时间
+        self.attack_gate_cd = 10 #攻击城门CD
+        self.attack_gate_time = 0 #记录攻击城门CD结束时间
+        self.going_move_time = 7  # 移动耗时
+        self.protect_end_time = 0# 炮台无敌时间
+        self.is_over = False  # 记录军团战进行时状态
+        self.is_in_match = False  # 记录自己是否进入军团战战场
 
-    def success(self,restype, workname, response_time, content_size):
+    def success(self, restype, workname, response_time, content_size):
         """
         记录成功数据
         :param restype:
@@ -73,7 +82,7 @@ class LoginGame:
             response_length=content_size,
         )
 
-    def failure(self,restype, workname, errormsg):
+    def failure(self, restype, workname, errormsg):
         """
         记录失败请求
         :param restype: 请求类型(socket,http)
@@ -104,12 +113,12 @@ class LoginGame:
         workname = api_attr['name']
         print("当前发送接口:--{}".format(workname))
         flag = True
+        send_time = time.time()
         try:
             self.socket.send(socketdata)  # 发送数据
-            self.success('socket', workname, time.time(), len(socketdata))
         except Exception:
             flag = False
-            self.failure('socket', workname,"数据发送失败")
+            self.failure('socket', workname, "数据发送失败")
         if not flag:
             return flag, b'error'
         else:
@@ -117,10 +126,16 @@ class LoginGame:
         if norecv:  # 是否需要接受数据，默认接收
             return flag, b'norecv'
         receive_data, recv_time = self.recv_data(api_attr, headsize, limitime)  # 开始接收数据
+        send_time = send_time * 1000
+        recv_time = recv_time * 1000
+        # 将毫秒规整，不然统计数据太多，不利于统计
+        usedtime = int(recv_time - send_time)  # + 20000
         if receive_data != b'error':
             flag = True
+            self.success("socket", workname, usedtime, len(receive_data))
         else:
             flag = False
+            self.failure("socket", workname, "接收数据失败")
         return flag, receive_data
 
     def recv_data(self, api_attr, buffersize, limittime):
@@ -146,15 +161,12 @@ class LoginGame:
                 if ct - rst > limittime:
                     recvtime = time.time()
                     recvdata = b'error'
-                    print("等了很久都没有等到想要的")
+                    print(str(api_attr['uid']) +"等了很久都没有等到想要的")
                     return recvdata, recvtime
                 rev_data = self.socket.recv(buffersize)  # 第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
                 if len(rev_data) == 0:
                     print(str(api_attr['uid']) + ":error,消息头长度为0")
                     raise Exception("消息头长度为0")
-                    # data = b'error'
-                    # recv_time = time.time()
-                    # return data, recv_time
                 if len(rev_data) < buffersize:  # 服务端拆包发送，第一条不是完整数据，包头长度会不够
                     rev_data = rev_data + self.socket.recv(buffersize - len(rev_data))
                 head_data = struct.unpack('>IIQQQ', rev_data)  # 把消息头解包
@@ -165,10 +177,12 @@ class LoginGame:
                     tmpdata += self.socket.recv(data_len - len(tmpdata))
                 # 收完完整的一条后进行校验
                 recvtime = time.time()
-                if len(self.waiting_for_you_list) >= 1:
-                    for recv_id in self.waiting_for_you_list:
-                        if head_data[1] == recv_id:
-                            self.waiting_for_you(recv_id, tmpdata)
+                if len(self.waiting_for_you_list)>0 and head_data[1] in self.waiting_for_you_list:
+                    try:
+                        self.waiting_for_you(head_data[1], tmpdata)
+                    except Exception:
+                        print(str(api_attr['uid']) +"更新数据失败，协议编号"+str(head_data[1])+",包体大小"+str(len(tmpdata)))
+                # 判断是不是自己想要的协议，如果不是指定的协议，就继续接收下一条协议内容
                 if isinstance(recvcmd, list):
                     # 需要多条返回协议的处理
                     for rec in recvcmd:
@@ -177,20 +191,15 @@ class LoginGame:
                             recvdata = tmpdata
                             recvdata_dic[str(rec)] = recvdata
                             then_len = then_len + 1
-                            self.success('socket', api_attr['name'], recvtime, len(recvdata))
                     if then_len == len(recvcmd):
                         return recvdata_dic, recvtime
                 else:
                     if head_data[1] == recvcmd:  # 这里对返回数据进行校验，只返回要求协议ID的数据
                         recvtime = time.time()
                         recvdata = tmpdata
-                        self.success('socket', api_attr['name'], recvtime, len(recvdata))
                         return recvdata, recvtime
-                # 如果不是指定的协议，就继续接收下一条协议内容
             except Exception as e:
-                print("socket接收数据时发生错误")
-                print("error,具体错误 {}".format(e))
-                print("战斗协议的话可能是无需战斗造成的")
+                print(str(api_attr['uid']) +"socket接收数据时发生错误"+"error,具体错误 {}".format(e))
                 recvtime = time.time()
                 recvdata = b'error'
                 self.failure('socket', api_attr['name'], "接收数据失败")
@@ -259,7 +268,7 @@ class LoginGame:
         flag, data = self.send_receive(senddata, C2G_Create_attr, 32)
         return flag, data
 
-    def MSG_C2S_Chat(self):
+    def MSG_C2S_Chat(self,gm_zhiling):
         """
         聊天协议
         :param content_str_into: str 聊天的内容，默认世界频道
@@ -269,7 +278,7 @@ class LoginGame:
         """
         C2S_Chat = cs_pb2.C2S_Chat()
         C2S_Chat.channel = 1  # 世界频道
-        C2S_Chat.content = "/set_guild_level 9"
+        C2S_Chat.content = gm_zhiling
         C2S_Chat = C2S_Chat.SerializeToString()
         C2S_Chat_attr = {'name': "C2S_Chat", 'protocol': 'protobuf-ss',
                          'send_cmd': 10142, 'recv_cmd': 10143, 'uid': self.uid, 'sid': self.sid}
@@ -278,7 +287,7 @@ class LoginGame:
         S2C_Chat = cs_pb2.S2C_Chat()  # 创建返回协议对象
         S2C_Chat.ParseFromString(data)  # 解析协议返回值
         if S2C_Chat.ret == 1:
-            print("聊天框发送信息成功")
+            print(str(self.uid) + "聊天框发送信息成功")
         else:
             raise ProtocolException(str(self.uid) + "聊天框发送信息失败" + str(S2C_Chat.ret))
 
@@ -303,7 +312,7 @@ class LoginGame:
         S2C_Guild_Search = cs_pb2.S2C_Guild_Search()  # 创建返回协议对象
         S2C_Guild_Search.ParseFromString(data)  # 解析协议返回值
         if S2C_Guild_Search.ret == 1:
-            print("查询成功")
+            print(str(self.uid) + "查询成功")
             for guild in S2C_Guild_Search.guilds:
                 self.self_guild_id = guild.id
                 member_num = guild.member_num
@@ -324,17 +333,10 @@ class LoginGame:
             S2C_Guild_Create = cs_pb2.S2C_Guild_Create()  # 创建返回协议对象
             S2C_Guild_Create.ParseFromString(data)  # 解析协议返回值
             if S2C_Guild_Create.ret == 1:
-                print("创建军团成功，军团名为：" + Guild_name)
+                print(str(self.uid) + "创建军团成功，军团名为：" + Guild_name)
                 self.is_guild_boss = True
-                C2S_Chat = cs_pb2.C2S_Chat()
-                C2S_Chat.channel = 1  # 世界频道
-                C2S_Chat.content = "/set_guild_level 10"
-                C2S_Chat = C2S_Chat.SerializeToString()
-                C2S_Chat_attr = {'name': "C2S_Chat", 'protocol': 'protobuf-ss',
-                                 'send_cmd': 10142, 'recv_cmd': 10143, 'uid': self.uid, 'sid': self.sid}
-                senddata = self.pack_data(C2S_Chat, C2S_Chat_attr)  # 装包，需要学习
-                self.send_receive(senddata, C2S_Chat_attr, 32, norecv=True)  # 发送协议
-                print("军团等级10级设置完毕")
+                self.MSG_C2S_Chat("/set_guild_level 10")
+                print(str(self.uid) + "军团等级10级设置完毕")
                 self.self_guild_id = S2C_Guild_Create.guild.id
                 return ""
             else:
@@ -351,7 +353,7 @@ class LoginGame:
         S2C_Guild_ReqJoin = cs_pb2.S2C_Guild_ReqJoin()  # 创建返回协议对象
         S2C_Guild_ReqJoin.ParseFromString(data)  # 解析协议返回值
         if S2C_Guild_ReqJoin.join:
-            print("加入成功，军团名为：" + Guild_name)
+            print(str(self.uid) + "加入成功，军团名为：" + Guild_name)
             self.is_guild_boss = False
         else:
             raise ProtocolException(str(self.uid) + "军团加入失败" + str(S2C_Guild_ReqJoin.ret))
@@ -387,43 +389,14 @@ class LoginGame:
         flag, data = self.send_receive(senddata, C2S_GVG_GetInfo_attr, 32)  # 发送协议
         S2C_GVG_GetInfo = cs_pb2.S2C_GVG_GetInfo()  # 创建返回协议对象
         S2C_GVG_GetInfo.ParseFromString(data)  # 解析协议返回值
-        if "is_guild_joined" in dir(S2C_GVG_GetInfo):
-            if "my_match" in dir(S2C_GVG_GetInfo) and S2C_GVG_GetInfo.is_guild_joined:
-                self.G_bisai_id = S2C_GVG_GetInfo.my_match.id
         if S2C_GVG_GetInfo.ret == 1:
-            print("军团战信息查询成功")
+            print(str(self.uid) + "军团战信息查询成功")
+            if "is_guild_joined" in dir(S2C_GVG_GetInfo):
+                if "my_match" in dir(S2C_GVG_GetInfo) and S2C_GVG_GetInfo.is_guild_joined:
+                    self.G_bisai_id = S2C_GVG_GetInfo.my_match.id
         else:
             print(str(self.uid) + "军团战信息查询失败" + str(S2C_GVG_GetInfo.ret))
             raise ProtocolException("军团没有军团战")
-
-    def MSG_C2S_GVG_GetMatchInfo(self):
-        """
-        获取军团战比赛信息
-        :param match_id: 比赛id
-        :param uid:
-        :param sid:
-        :return:
-        """
-        C2S_GVG_GetMatchInfo = cs_pb2.C2S_GVG_GetMatchInfo()
-        C2S_GVG_GetMatchInfo.id = self.G_bisai_id
-        C2S_GVG_GetMatchInfo = C2S_GVG_GetMatchInfo.SerializeToString()
-        C2S_GVG_GetMatchInfo_attr = {'name': "C2S_GVG_GetMatchInfo", 'protocol': 'protobuf-ss',
-                                     'send_cmd': 14432, 'recv_cmd': 14433, 'uid': self.uid, 'sid': self.sid}
-        senddata = self.pack_data(C2S_GVG_GetMatchInfo, C2S_GVG_GetMatchInfo_attr)  # 装包，需要学习
-        flag, data = self.send_receive(senddata, C2S_GVG_GetMatchInfo_attr, 32)  # 发送协议
-        S2C_GVG_GetMatchInfo = cs_pb2.S2C_GVG_GetMatchInfo()  # 创建返回协议对象
-        S2C_GVG_GetMatchInfo.ParseFromString(data)  # 解析协议返回值
-        if S2C_GVG_GetMatchInfo.ret == 1:
-            print("军团战比赛信息查询成功")
-            # MSG_C2S_GVG_EnterMatch 接口以及获取了参战军团信息了
-            # if "match_info" in dir(S2C_GVG_GetMatchInfo):
-            #     self.guild_id_list = []
-            #     for guild_list in S2C_GVG_GetMatchInfo.match_info.guilds:
-            #         for guild in guild_list:
-            #             self.guild_id_list.append(guild.id)
-        else:
-            print(str(self.uid) + "军团战比赛信息查询失败" + str(S2C_GVG_GetMatchInfo.ret))
-            raise ProtocolException("军团没有军团战比赛信息")
 
     def MSG_C2S_GVG_Join(self, ):
         """
@@ -440,8 +413,10 @@ class LoginGame:
         flag, data = self.send_receive(senddata, C2S_GVG_Join_attr, 32)  # 发送协议
         S2C_GVG_Join = cs_pb2.S2C_GVG_Join()  # 创建返回协议对象
         S2C_GVG_Join.ParseFromString(data)  # 解析协议返回值
-        if S2C_GVG_Join.ret == 1 and S2C_GVG_Join.is_guild_joined:
-            print("军团战报名成功")
+        if S2C_GVG_Join.ret == 1:
+            print(str(self.uid) + "军团战报名成功")
+        elif S2C_GVG_Join.ret == 941:
+            print(str(self.uid) + "军团战报名完毕")
         else:
             print(str(self.uid) + "军团战报名失败" + str(S2C_GVG_Join.ret))
             raise ProtocolException("军团战报名失败")
@@ -462,7 +437,7 @@ class LoginGame:
         S2C_GVG_GetAchieve = cs_pb2.S2C_GVG_GetAchieve()  # 创建返回协议对象
         S2C_GVG_GetAchieve.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetAchieve.ret == 1:
-            print("获取赛季成就信息成功")
+            print(str(self.uid) + "获取赛季成就信息成功")
             for achieve in S2C_GVG_GetAchieve.achieves:
                 if "state" in dir(achieve):
                     if achieve.state == 1:
@@ -487,7 +462,9 @@ class LoginGame:
         S2C_GVG_GetAchieveAward = cs_pb2.S2C_GVG_GetAchieveAward()  # 创建返回协议对象
         S2C_GVG_GetAchieveAward.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetAchieveAward.ret == 1:
-            print("领取赛季成就奖励成功")
+            print(str(self.uid) + "领取赛季成就奖励成功")
+        elif S2C_GVG_GetAchieveAward.ret == 976:
+            print(str(self.uid) + "GVG任务未完成")
         else:
             print(str(self.uid) + "领取赛季成就奖励失败" + str(S2C_GVG_GetAchieveAward.ret))
             raise ProtocolException("领取赛季成就奖励失败")
@@ -498,25 +475,27 @@ class LoginGame:
         :param user:
         :return:
         """
-        if "pos_id" in dir(user):
-            pos_id = user.pos_id
+
+        pos_id = user.pos_id
+        move_arrive_time = user.move_arrive_time
+        power = user.power  # 当前兵力
+        tower_protect_end_time = user.tower_protect_end_time  # 如果玩家在炮台占领位，则有炮台占领位保护结束时间
+        if user.user_id in self.match_user_dic.keys():
+            user_info_dic = self.match_user_dic[user.user_id]
+            user_info_dic["血量"] =power
+            user_info_dic["位置ID"] =pos_id
+            user_info_dic["移动结束时间"] =move_arrive_time
+            user_info_dic["无敌结束时间"] =tower_protect_end_time
+            self.match_user_dic[user.user_id] = user_info_dic
         else:
-            pos_id = 0
-        if "move_arrive_time" in dir(user):
-            move_arrive_time = user.move_arrive_time
-        else:
-            move_arrive_time = 0
-        if "power" in dir(user):
-            power = user.power  # 当前兵力
-        else:
-            power = 1
-        if "tower_protect_end_time" in dir(user):
-            tower_protect_end_time = user.tower_protect_end_time  # 如果玩家在炮台占领位，则有炮台占领位保护结束时间
-        else:
-            tower_protect_end_time = 0
-        self.match_user_dic[user.user_id] = {"军团ID": user.snapshot.guild_id, "血量": power, "位置ID": pos_id,
+            self.match_user_dic[user.user_id] = {"军团ID": 0, "血量": 100, "位置ID": pos_id,
                                              "移动结束时间": move_arrive_time, "无敌结束时间": tower_protect_end_time}
-        self.nearby_user_dic_list[pos_id][user.user_id] = 0
+        if pos_id in self.nearby_user_dic_list.keys():
+            user_id_dic = self.nearby_user_dic_list[pos_id]
+            user_id_dic[user.user_id] = 0
+            self.nearby_user_dic_list[pos_id] = user_id_dic
+        else:
+            self.nearby_user_dic_list[pos_id] = {user.user_id:0}
 
     def MSG_C2S_GVG_EnterMatch(self, ):
         """
@@ -534,36 +513,46 @@ class LoginGame:
         S2C_GVG_EnterMatch = cs_pb2.S2C_GVG_EnterMatch()  # 创建返回协议对象
         S2C_GVG_EnterMatch.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_EnterMatch.ret == 1:
-            print("军团战进入比赛成功")
+            print(str(self.uid) + "军团战进入比赛成功")
             self.is_in_match = True
+            for guild_list in S2C_GVG_EnterMatch.info.guilds:
+                guild_num_str = guild_list.guild.id # 军团战中的军团id
+                self.guild_index_dic[guild_num_str] = guild_list.revive_grid_id  # 军团ID当key
+            for user in S2C_GVG_EnterMatch.users:  # 比赛中的玩家列表
+                self.make_user_info(user)
+            for gate_list in S2C_GVG_EnterMatch.gates:  # 城门
+                self.gate_dic[gate_list.grid_id] = gate_list.hp
+            for buff_list in S2C_GVG_EnterMatch.buffs:  # BUFF点
+                grid_id = buff_list.grid_id
+                buff_id = buff_list.buff_id
+                end_time = buff_list.end_time
+                self.buff_dic[grid_id] = {buff_id:end_time}
+            if S2C_GVG_EnterMatch.revive_enable_time!=0:
+                self_uid_dic = self.match_user_dic[self.uid]
+                self_uid_dic["血量"] = 0
+                self_uid_dic["无敌结束时间"] = time.time()+self.fuhuo_cd
+                self.match_user_dic[self.uid] = self_uid_dic
+            else:
+                self_uid_dic = self.match_user_dic[self.uid]
+                self_uid_dic["血量"] = 100
+                self_uid_dic["无敌结束时间"] = 0
+                self.match_user_dic[self.uid] = self_uid_dic
+            self.MSG_C2S_GVG_GetUserSnapshots()  # 在这里拉取一下在场玩家的数据，更新一下军团ID
+            # for tower_list in S2C_GVG_EnterMatch.towers:  # 炮台
+            #     grid_id = tower_list.grid_id
+            #     if "guild_id" in dir(tower_list):
+            #         guild_id = tower_list.guild_id
+        elif S2C_GVG_EnterMatch.ret == 945 or S2C_GVG_EnterMatch.ret == 184:
+            raise ProtocolException(str(self.uid) + "比赛未开始")
         else:
             print(str(self.uid) + "军团战进入比赛失败" + str(S2C_GVG_EnterMatch.ret))
-            raise ProtocolException("军团战进入比赛失败")
-        if self.G_bisai_id != S2C_GVG_EnterMatch.info.id:
+            raise ProtocolException("军团战进入比赛失败"+str(self.is_in_match))
+        if self.G_bisai_id !=0 and self.G_bisai_id != S2C_GVG_EnterMatch.info.id:
             raise ProtocolException("军团战ID和报名的ID不一致")
-        for guild_list in S2C_GVG_EnterMatch.guilds:
-            guild_num_str = str(guild_list.guild.id)  # 军团战中的军团id
-            self.guild_index_dic[guild_num_str] = guild_list.index  # 军团ID当key
-        for user in S2C_GVG_EnterMatch.users:  # 比赛中的玩家列表
-            self.make_user_info(user)
-        for gate_list in S2C_GVG_EnterMatch.gates:  # 城门
-            self.gate_dic[gate_list.grid_id] = gate_list.hp
-        for buff_list in S2C_GVG_EnterMatch.buffs:  # BUFF点
-            grid_id = buff_list.grid_id
-            buff_id = buff_list.buff_id
-            end_time = buff_list.end_time
-            self.buff_dic[grid_id] = [buff_id, end_time]
-        if "revive_enable_time" in dir(S2C_GVG_EnterMatch):
-            self.match_user_dic[self.uid]["血量"] = 0
-            self.match_user_dic[self.uid]["无敌结束时间"] = S2C_GVG_EnterMatch.revive_enable_time
-        # for tower_list in S2C_GVG_EnterMatch.towers:  # 炮台
-        #     grid_id = tower_list.grid_id
-        #     if "guild_id" in dir(tower_list):
-        #         guild_id = tower_list.guild_id
 
     def always_EnterMatch(self, ):
         """
-        军团战进入比赛
+        军团战进入比赛,不更新数据
         :param uid:
         :param sid:
         :return:
@@ -573,139 +562,291 @@ class LoginGame:
         C2S_GVG_EnterMatch_attr = {'name': "C2S_GVG_EnterMatch", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14442, 'recv_cmd': 14443, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_EnterMatch, C2S_GVG_EnterMatch_attr)  # 装包，需要学习
-        self.send_receive(senddata, C2S_GVG_EnterMatch_attr, 32,True)  # 发送协议 只发不收
+        self.send_receive(senddata, C2S_GVG_EnterMatch_attr, 32, True)  # 发送协议 只发不收
 
-
-    def waiting_for_you(self, recvcmd_into, data):
+    def waiting_for_you(self, first_recvcmd_into, data_all):
         """
         :param recvcmd_into: 需要监听的协议号
         :param data: 协议包
         :return:
         """
-        if recvcmd_into == 14444:
-            # 玩家进入战场推送
-            S2C_GVG_NotifyUserEnter = cs_pb2.S2C_GVG_NotifyUserEnter()  # 创建返回协议对象
-            S2C_GVG_NotifyUserEnter.ParseFromString(data)
-            # 收到推送后自动更新场上玩家列表
-            if self.UserEnter_id != S2C_GVG_NotifyUserEnter.message_index:
-                self.UserEnter_id = S2C_GVG_NotifyUserEnter.message_index
-                self.make_user_info(S2C_GVG_NotifyUserEnter.user)
-        if recvcmd_into == 14447:
-            # 玩家离开比赛推送
-            # 收到推送后自动更新场上玩家列表
-            S2C_GVG_NotifyUserLeave = cs_pb2.S2C_GVG_NotifyUserLeave()  # 创建返回协议对象
-            S2C_GVG_NotifyUserLeave.ParseFromString(data)
-            old_pos_id = self.match_user_dic[S2C_GVG_NotifyUserLeave.user_id]["位置ID"]
-            self.nearby_user_dic_list[old_pos_id][S2C_GVG_NotifyUserLeave.user_id] = 1#从位置列表移出
-            self.match_user_dic.pop(S2C_GVG_NotifyUserLeave.user_id, 0)
+        if first_recvcmd_into == 14473:
+            # 军团战批量推送
+            S2C_GVG_BatchNotify = cs_pb2.S2C_GVG_BatchNotify()  # 创建返回协议对象
+            S2C_GVG_BatchNotify.ParseFromString(data_all)
+            for notify in S2C_GVG_BatchNotify.notify_list:
+                recvcmd_into = notify.message_id
+                data = notify.content
+                try:
+                    if recvcmd_into == 14444:
+                        # 玩家进入战场推送
+                        S2C_GVG_NotifyUserEnter = cs_pb2.S2C_GVG_NotifyUserEnter()  # 创建返回协议对象
+                        S2C_GVG_NotifyUserEnter.ParseFromString(data)
+                        # 收到推送后自动更新场上玩家列表
+                        if self.UserEnter_id != S2C_GVG_NotifyUserEnter.message_index:
+                            self.UserEnter_id = S2C_GVG_NotifyUserEnter.message_index
+                            self.make_user_info(S2C_GVG_NotifyUserEnter.user)
+                            self.MSG_C2S_GVG_GetUserSnapshots(S2C_GVG_NotifyUserEnter.user.user_id)
+                        return
+                    if recvcmd_into == 14447:
+                        # 玩家离开比赛推送
+                        # 收到推送后自动更新场上玩家列表
+                        S2C_GVG_NotifyUserLeave = cs_pb2.S2C_GVG_NotifyUserLeave()  # 创建返回协议对象
+                        S2C_GVG_NotifyUserLeave.ParseFromString(data)
+                        old_pos_id = self.match_user_dic[S2C_GVG_NotifyUserLeave.user_id]["位置ID"]
+                        self.nearby_user_dic_list[old_pos_id][S2C_GVG_NotifyUserLeave.user_id] = 1  # 从位置列表移出
+                        self.match_user_dic.pop(S2C_GVG_NotifyUserLeave.user_id, 0)
+                        return
+                    if recvcmd_into == 14464:
+                        # 刷新Buff推送
+                        S2C_GVG_NotifyNewBuff = cs_pb2.S2C_GVG_NotifyNewBuff()
+                        S2C_GVG_NotifyNewBuff.ParseFromString(data)
+                        # 出现buff了，就刷新buff
+                        self.buff_dic[S2C_GVG_NotifyNewBuff.grid_buff.grid_id] = {
+                            S2C_GVG_NotifyNewBuff.grid_buff.buff_id:
+                                S2C_GVG_NotifyNewBuff.grid_buff.end_time}
+                        move_time = self.match_user_dic[self.uid]["移动结束时间"]
+                        stop_time = move_time + self.move_cd - time.time()
+                        if stop_time > 0:  # 移动CD中，等会再去拿buff
+                            time.sleep(stop_time)
+                        self.MSG_C2S_GVG_Move(S2C_GVG_NotifyNewBuff.grid_buff.grid_id)
+                        self.MSG_C2S_GVG_AddBuff()  # 获取Buff  有时间限制
+                        return
+                    if recvcmd_into == 14450:
+                        # 玩家移动推送
+                        S2C_GVG_NotifyMove = cs_pb2.S2C_GVG_NotifyMove()  # 创建返回协议对象
+                        S2C_GVG_NotifyMove.ParseFromString(data)  # 解析协议返回值
+                        if self.NotifyMove_id != S2C_GVG_NotifyMove.message_index:
+                            self.NotifyMove_id = S2C_GVG_NotifyMove.message_index
+                            old_pos_id = self.match_user_dic[S2C_GVG_NotifyMove.user_id]["位置ID"]
+                            self.nearby_user_dic_list[old_pos_id][S2C_GVG_NotifyMove.user_id] = 1  # 离开原来位置
+                            self.match_user_dic[S2C_GVG_NotifyMove.user_id][
+                                "位置ID"] = S2C_GVG_NotifyMove.pos_id  # 更新位置数据
+                            if S2C_GVG_NotifyMove.pos_id in self.nearby_user_dic_list.keys():
+                                self.nearby_user_dic_list[S2C_GVG_NotifyMove.pos_id][S2C_GVG_NotifyMove.user_id] = 0
+                            else:
+                                self.nearby_user_dic_list[S2C_GVG_NotifyMove.pos_id] = {S2C_GVG_NotifyMove.user_id: 0}
+                            if S2C_GVG_NotifyMove.pos_id in self.zhanling_dic.keys():  # 判断玩家是否移动到炮台占领区
+                                self.zhanling_dic[S2C_GVG_NotifyMove.pos_id] = S2C_GVG_NotifyMove.user_id
+                            if old_pos_id in self.zhanling_dic.keys():  # 判断玩家是否从占领区离开
+                                self.zhanling_dic[old_pos_id] = ""  # 清空占领区uid
+                            arrive_time = S2C_GVG_NotifyMove.arrive_time  # 到达时间    无此值时表示立即到达
+                            self.match_user_dic[S2C_GVG_NotifyMove.user_id][
+                                "移动结束时间"] = time.time() + self.going_move_time
+                            owner_guild_id = S2C_GVG_NotifyMove.owner_guild_id  # 炮塔拥有者是发生变更时，返回当前炮台占领的军团
+                            protect_end_time = S2C_GVG_NotifyMove.protect_end_time  # 如果是站上炮台占领位，则返回保护到期时间
+                            self.match_user_dic[S2C_GVG_NotifyMove.user_id][
+                                "无敌结束时间"] = time.time() + self.protect_end_time
+                        return
+                    # 攻击玩家推送
+                    if recvcmd_into == 14453:
+                        S2C_GVG_NotifyAttackUser = cs_pb2.S2C_GVG_NotifyAttackUser()  # 创建返回协议对象
+                        S2C_GVG_NotifyAttackUser.ParseFromString(data)  # 解析协议返回值
+                        if self.NotifyAttackUser_id != S2C_GVG_NotifyAttackUser.message_index:
+                            self.NotifyAttackUser_id = S2C_GVG_NotifyAttackUser.message_index
+                            attacker_user_id = S2C_GVG_NotifyAttackUser.attacker_user_id  # 攻击方玩家ID
+                            attacker_score = S2C_GVG_NotifyAttackUser.attacker_score  # 攻击方当前积分
+                            attacker_power = S2C_GVG_NotifyAttackUser.attacker_power  # 攻击方当前兵力
+                            self.match_user_dic[attacker_user_id]["血量"] = attacker_power
+                            if attacker_power == 0:
+                                self.match_user_dic[attacker_user_id]["无敌结束时间"] = time.time() + self.fuhuo_cd
+                            attacker_cont_kill_num = S2C_GVG_NotifyAttackUser.attacker_cont_kill_num  # 连续杀人数
+                            defender_user_id = S2C_GVG_NotifyAttackUser.defender_user_id  # 被攻击方玩家ID
+                            defender_score = S2C_GVG_NotifyAttackUser.defender_score  # 被攻击方当前积分
+                            defender_power = S2C_GVG_NotifyAttackUser.defender_power  # 被攻击方当前兵力
+                            self.match_user_dic[defender_user_id]["血量"] = defender_power
+                            if defender_power == 0:
+                                self.match_user_dic[defender_user_id]["无敌结束时间"] = time.time() + self.fuhuo_cd
+                            defender_cont_kill_num = S2C_GVG_NotifyAttackUser.defender_cont_kill_num  # 被攻击方连续杀人数
+                            if "attacker_protect_end_time" in dir(S2C_GVG_NotifyAttackUser):
+                                attacker_protect_end_time = S2C_GVG_NotifyAttackUser.attacker_protect_end_time  # 如果是攻占炮台占领位，则返回保护到期时间
+                                # if defender_power > 0:
+                                #     self.match_user_dic[defender_user_id]["无敌结束时间"] = attacker_protect_end_time
+                                #     old_zhanling_id = self.match_user_dic[attacker_user_id]["位置ID"]
+                                #     if old_zhanling_id in self.zhanling_dic.keys():
+                                #         self.zhanling_dic[old_zhanling_id] = 0
+                                if attacker_power > 0:
+                                    self.match_user_dic[attacker_user_id][
+                                        "无敌结束时间"] = time.time() + self.protect_end_time
+                                    old_zhanling_id = self.match_user_dic[defender_user_id]["位置ID"]
+                                    if old_zhanling_id in self.zhanling_dic.keys():
+                                        self.zhanling_dic[old_zhanling_id] = attacker_user_id
+                            if "owner_guild_id" in dir(S2C_GVG_NotifyAttackUser):
+                                owner_guild_id = S2C_GVG_NotifyAttackUser.owner_guild_id  # 如果是炮台占领区占领军团，则返回当前占领者
+                            # 判断自己是不是死了
+                            if self.match_user_dic[self.uid]["血量"] == 0:
+                                time.sleep(self.fuhuo_cd)
+                                # 死了就复活
+                                self.MSG_C2S_GVG_Revive()
+                        return
+                    if recvcmd_into == 14456:
+                        # 攻击城门推送
+                        S2C_GVG_NotifyAttackGate = cs_pb2.S2C_GVG_NotifyAttackGate()  # 创建返回协议对象
+                        S2C_GVG_NotifyAttackGate.ParseFromString(data)  # 解析协议返回值
+                        if self.NotifyAttackGate_id != S2C_GVG_NotifyAttackGate.message_index:
+                            self.NotifyAttackGate_id = S2C_GVG_NotifyAttackGate.message_index
+                            score = S2C_GVG_NotifyAttackGate.score  # 当前积分
+                            gate_grid_id = S2C_GVG_NotifyAttackGate.gate_grid_id  # 城门格子ID
+                            if "gate_hp" in dir(S2C_GVG_NotifyAttackGate):
+                                gate_hp = S2C_GVG_NotifyAttackGate.gate_hp  # 城门当前耐久
+                                self.gate_dic[gate_grid_id] = gate_hp
+                        return
+                    if recvcmd_into == 14459:
+                        # 玩家复活
+                        S2C_GVG_NotifyRevive = cs_pb2.S2C_GVG_NotifyRevive()  # 创建返回协议对象
+                        S2C_GVG_NotifyRevive.ParseFromString(data)  # 解析协议返回值
+                        if self.NotifyRevive_id != S2C_GVG_NotifyRevive.message_index:
+                            self.NotifyRevive_id = S2C_GVG_NotifyRevive.message_index
+                            self.match_user_dic[S2C_GVG_NotifyRevive.user_id][
+                                "位置ID"] = S2C_GVG_NotifyRevive.pos_id  # 复活玩家id
+                            self.match_user_dic[S2C_GVG_NotifyRevive.user_id]["血量"] = 1
+                        return
+                    if recvcmd_into == 14470:
+                        # 比赛结束通知
+                        S2C_GVG_NotifyMatchEnd = cs_pb2.S2C_GVG_NotifyMatchEnd()  # 创建返回协议对象
+                        S2C_GVG_NotifyMatchEnd.ParseFromString(data)  # 解析协议返回值
+                        print("军团战结束了")
+                        self.is_over = True
+                        if "mvp" in dir(S2C_GVG_NotifyMatchEnd.match_info):
+                            mvp_uid = S2C_GVG_NotifyMatchEnd.match_info.mvp.user_id  # mvp玩家
+                            print("mvp是玩家：" + str(mvp_uid))
+                        if "mars" in dir(S2C_GVG_NotifyMatchEnd.match_info):
+                            mars_uid = S2C_GVG_NotifyMatchEnd.match_info.mars.user_id  # 战神玩家
+                            print("战神是玩家：" + str(mars_uid))
+                        return
+                except Exception:
+                    print("军团战批量推送,更新数据失败，协议编号" + str(recvcmd_into))
 
-        if recvcmd_into == 14464:
-            # 刷新Buff推送
-            S2C_GVG_NotifyNewBuff = cs_pb2.S2C_GVG_NotifyNewBuff()
-            S2C_GVG_NotifyNewBuff.ParseFromString(data)
-            # 出现buff了，就刷新buff
-            self.buff_dic[S2C_GVG_NotifyNewBuff.grid_buff.grid_id] = [S2C_GVG_NotifyNewBuff.grid_buff.buff_id,
-                                                                      S2C_GVG_NotifyNewBuff.grid_buff.end_time]
-            stop_time =  self.match_user_dic[self.uid]["移动结束时间"]+self.move_cd - time.time()
-            if stop_time>0:#移动CD中，等会再去拿buff
-                time.sleep(stop_time)
-            self.MSG_C2S_GVG_Move(S2C_GVG_NotifyNewBuff.grid_buff.grid_id)
-            self.MSG_C2S_GVG_AddBuff()  # 获取Buff  有时间限制
-        if recvcmd_into == 14450:
-            # 玩家移动推送
-            S2C_GVG_NotifyMove = cs_pb2.S2C_GVG_NotifyMove()  # 创建返回协议对象
-            S2C_GVG_NotifyMove.ParseFromString(data)  # 解析协议返回值
-            if self.NotifyMove_id != S2C_GVG_NotifyMove.message_index:
-                self.NotifyMove_id = S2C_GVG_NotifyMove.message_index
-                old_pos_id = self.match_user_dic[S2C_GVG_NotifyMove.user_id]["位置ID"]
-                self.nearby_user_dic_list[old_pos_id][S2C_GVG_NotifyMove.user_id] = 1  # 离开原来位置
-                self.match_user_dic[S2C_GVG_NotifyMove.user_id]["位置ID"] = S2C_GVG_NotifyMove.pos_id  # 更新位置数据
-                self.nearby_user_dic_list[S2C_GVG_NotifyMove.pos_id][S2C_GVG_NotifyMove.user_id] = 0  # 到达新位置
-                if S2C_GVG_NotifyMove.pos_id in self.zhanling_dic.keys():  # 判断玩家是否移动到炮台占领区
-                    for qiangzhan_id in self.tower_dic.keys():
-                        if self.tower_dic[qiangzhan_id] == S2C_GVG_NotifyMove.pos_id:
-                            self.zhanling_dic[S2C_GVG_NotifyMove.pos_id:] = S2C_GVG_NotifyMove.user_id
-                if old_pos_id in self.zhanling_dic.keys():  # 判断玩家是否从占领区离开
-                    self.zhanling_dic[old_pos_id] = ""  # 清空占领区uid
-                if "arrive_time" in dir(S2C_GVG_NotifyMove):
-                    arrive_time = S2C_GVG_NotifyMove.arrive_time  # 到达时间    无此值时表示立即到达
-                    self.match_user_dic[S2C_GVG_NotifyMove.user_id]["移动结束时间"] = arrive_time
-                if "owner_guild_id" in dir(S2C_GVG_NotifyMove):
-                    owner_guild_id = S2C_GVG_NotifyMove.owner_guild_id  # 炮塔拥有者是发生变更时，返回当前炮台占领的军团
-                if "protect_end_time" in dir(S2C_GVG_NotifyMove):
-                    protect_end_time = S2C_GVG_NotifyMove.protect_end_time  # 如果是站上炮台占领位，则返回保护到期时间
-                    self.match_user_dic[S2C_GVG_NotifyMove.user_id]["无敌结束时间"] = protect_end_time
-                    # if "arrive_time" in dir(S2C_GVG_NotifyMove) and S2C_GVG_NotifyMove.arrive_time > protect_end_time:
-                    #     self.match_user_dic[S2C_GVG_NotifyMove.user_id]["无敌结束时间"] = S2C_GVG_NotifyMove.arrive_time
-                    # else:
-                    #     self.match_user_dic[S2C_GVG_NotifyMove.user_id]["无敌结束时间"] = protect_end_time
-        # 攻击玩家推送
-        if recvcmd_into == 14453:
-            S2C_GVG_NotifyAttackUser = cs_pb2.S2C_GVG_NotifyAttackUser()  # 创建返回协议对象
-            S2C_GVG_NotifyAttackUser.ParseFromString(data)  # 解析协议返回值
-            if self.NotifyAttackUser_id != S2C_GVG_NotifyAttackUser.message_index:
-                self.NotifyAttackUser_id = S2C_GVG_NotifyAttackUser.message_index
-                attacker_user_id = S2C_GVG_NotifyAttackUser.attacker_user_id  # 攻击方玩家ID
-                attacker_score = S2C_GVG_NotifyAttackUser.attacker_score  # 攻击方当前积分
-                attacker_power = S2C_GVG_NotifyAttackUser.attacker_power  # 攻击方当前兵力
-                self.match_user_dic[attacker_user_id]["血量"] = attacker_power
-                if attacker_power == 0:
-                    self.match_user_dic[attacker_user_id]["无敌结束时间"] = time.time() + self.fuhuo_cd
-                attacker_cont_kill_num = S2C_GVG_NotifyAttackUser.attacker_cont_kill_num  # 连续杀人数
-                defender_user_id = S2C_GVG_NotifyAttackUser.defender_user_id  # 被攻击方玩家ID
-                defender_score = S2C_GVG_NotifyAttackUser.defender_score  # 被攻击方当前积分
-                defender_power = S2C_GVG_NotifyAttackUser.defender_power  # 被攻击方当前兵力
-                self.match_user_dic[defender_user_id]["血量"] = defender_power
-                if defender_power == 0:
-                    self.match_user_dic[defender_user_id]["无敌结束时间"] = time.time() + self.fuhuo_cd
-                defender_cont_kill_num = S2C_GVG_NotifyAttackUser.defender_cont_kill_num  # 被攻击方连续杀人数
-                if "attacker_protect_end_time" in dir(S2C_GVG_NotifyAttackUser):
-                    attacker_protect_end_time = S2C_GVG_NotifyAttackUser.attacker_protect_end_time  # 如果是攻占炮台占领位，则返回保护到期时间
-                    if defender_power > 0:
-                        self.match_user_dic[defender_user_id]["无敌结束时间"] = attacker_protect_end_time
-                    if attacker_power > 0:
-                        self.match_user_dic[attacker_user_id]["无敌结束时间"] = attacker_protect_end_time
-                if "owner_guild_id" in dir(S2C_GVG_NotifyAttackUser):
-                    owner_guild_id = S2C_GVG_NotifyAttackUser.owner_guild_id  # 如果是炮台占领区占领军团，则返回当前占领者
-                    pos_id = self.match_user_dic[defender_user_id]["位置ID"]
-                    self.tower_dic[pos_id] = owner_guild_id
-                # 判断自己是不是死了
-                if self.match_user_dic[self.uid]["血量"] == 0:
-                    time.sleep(self.fuhuo_cd)
-                    # 死了就复活
-                    self.MSG_C2S_GVG_Revive()
-
-        if recvcmd_into == 14456:
-            # 攻击城门推送
-            S2C_GVG_NotifyAttackGate = cs_pb2.S2C_GVG_NotifyAttackGate()  # 创建返回协议对象
-            S2C_GVG_NotifyAttackGate.ParseFromString(data)  # 解析协议返回值
-            if self.NotifyAttackGate_id != S2C_GVG_NotifyAttackGate.message_index:
-                self.NotifyAttackGate_id = S2C_GVG_NotifyAttackGate.message_index
-                score = S2C_GVG_NotifyAttackGate.score  # 当前积分
-                gate_grid_id = S2C_GVG_NotifyAttackGate.gate_grid_id  # 城门格子ID
-                if "gate_hp" in dir(S2C_GVG_NotifyAttackGate):
-                    gate_hp = S2C_GVG_NotifyAttackGate.gate_hp  # 城门当前耐久
-                    self.gate_dic[gate_grid_id] = gate_hp
-        if recvcmd_into == 14459:
-            # 玩家复活
-            S2C_GVG_NotifyRevive = cs_pb2.S2C_GVG_NotifyRevive()  # 创建返回协议对象
-            S2C_GVG_NotifyRevive.ParseFromString(data)  # 解析协议返回值
-            if self.NotifyRevive_id != S2C_GVG_NotifyRevive.message_index:
-                self.NotifyRevive_id = S2C_GVG_NotifyRevive.message_index
-                self.match_user_dic[S2C_GVG_NotifyRevive.user_id]["位置ID"] = S2C_GVG_NotifyRevive.pos_id  # 复活玩家id
-                self.match_user_dic[S2C_GVG_NotifyRevive.user_id]["血量"] = 1
-        if recvcmd_into == 14470:
-            # 比赛结束通知
-            S2C_GVG_NotifyMatchEnd = cs_pb2.S2C_GVG_NotifyMatchEnd()  # 创建返回协议对象
-            S2C_GVG_NotifyMatchEnd.ParseFromString(data)  # 解析协议返回值
-            print("军团战结束了")
-            self.is_over = True
-            if "mvp" in dir(S2C_GVG_NotifyMatchEnd.match_info):
-                mvp_uid = S2C_GVG_NotifyMatchEnd.match_info.mvp.user_id  # mvp玩家
-                print("mvp是玩家：" + str(mvp_uid))
-            if "mars" in dir(S2C_GVG_NotifyMatchEnd.match_info):
-                mars_uid = S2C_GVG_NotifyMatchEnd.match_info.mars.user_id  # 战神玩家
-                print("战神是玩家：" + str(mars_uid))
+        # if recvcmd_into == 14444:
+        #     # 玩家进入战场推送
+        #     S2C_GVG_NotifyUserEnter = cs_pb2.S2C_GVG_NotifyUserEnter()  # 创建返回协议对象
+        #     S2C_GVG_NotifyUserEnter.ParseFromString(data)
+        #     # 收到推送后自动更新场上玩家列表
+        #     if self.UserEnter_id != S2C_GVG_NotifyUserEnter.message_index:
+        #         self.UserEnter_id = S2C_GVG_NotifyUserEnter.message_index
+        #         self.make_user_info(S2C_GVG_NotifyUserEnter.user)
+        #         self.MSG_C2S_GVG_GetUserSnapshots(S2C_GVG_NotifyUserEnter.user.user_id)
+        #     return
+        # if recvcmd_into == 14447:
+        #     # 玩家离开比赛推送
+        #     # 收到推送后自动更新场上玩家列表
+        #     S2C_GVG_NotifyUserLeave = cs_pb2.S2C_GVG_NotifyUserLeave()  # 创建返回协议对象
+        #     S2C_GVG_NotifyUserLeave.ParseFromString(data)
+        #     old_pos_id = self.match_user_dic[S2C_GVG_NotifyUserLeave.user_id]["位置ID"]
+        #     self.nearby_user_dic_list[old_pos_id][S2C_GVG_NotifyUserLeave.user_id] = 1  # 从位置列表移出
+        #     self.match_user_dic.pop(S2C_GVG_NotifyUserLeave.user_id, 0)
+        #     return
+        # if recvcmd_into == 14464:
+        #     # 刷新Buff推送
+        #     S2C_GVG_NotifyNewBuff = cs_pb2.S2C_GVG_NotifyNewBuff()
+        #     S2C_GVG_NotifyNewBuff.ParseFromString(data)
+        #     # 出现buff了，就刷新buff
+        #     self.buff_dic[S2C_GVG_NotifyNewBuff.grid_buff.grid_id] = {S2C_GVG_NotifyNewBuff.grid_buff.buff_id:
+        #                                                               S2C_GVG_NotifyNewBuff.grid_buff.end_time}
+        #     move_time = self.match_user_dic[self.uid]["移动结束时间"]
+        #     stop_time = move_time + self.move_cd - time.time()
+        #     if stop_time > 0:  # 移动CD中，等会再去拿buff
+        #         time.sleep(stop_time)
+        #     self.MSG_C2S_GVG_Move(S2C_GVG_NotifyNewBuff.grid_buff.grid_id)
+        #     self.MSG_C2S_GVG_AddBuff()  # 获取Buff  有时间限制
+        #     return
+        # if recvcmd_into == 14450:
+        #     # 玩家移动推送
+        #     S2C_GVG_NotifyMove = cs_pb2.S2C_GVG_NotifyMove()  # 创建返回协议对象
+        #     S2C_GVG_NotifyMove.ParseFromString(data)  # 解析协议返回值
+        #     if self.NotifyMove_id != S2C_GVG_NotifyMove.message_index:
+        #         self.NotifyMove_id = S2C_GVG_NotifyMove.message_index
+        #         old_pos_id = self.match_user_dic[S2C_GVG_NotifyMove.user_id]["位置ID"]
+        #         self.nearby_user_dic_list[old_pos_id][S2C_GVG_NotifyMove.user_id] = 1  # 离开原来位置
+        #         self.match_user_dic[S2C_GVG_NotifyMove.user_id]["位置ID"] = S2C_GVG_NotifyMove.pos_id  # 更新位置数据
+        #         if S2C_GVG_NotifyMove.pos_id in self.nearby_user_dic_list.keys():
+        #             self.nearby_user_dic_list[S2C_GVG_NotifyMove.pos_id][S2C_GVG_NotifyMove.user_id] = 0
+        #         else:
+        #             self.nearby_user_dic_list[S2C_GVG_NotifyMove.pos_id] = {S2C_GVG_NotifyMove.user_id: 0}
+        #         if S2C_GVG_NotifyMove.pos_id in self.zhanling_dic.keys():  # 判断玩家是否移动到炮台占领区
+        #             self.zhanling_dic[S2C_GVG_NotifyMove.pos_id] = S2C_GVG_NotifyMove.user_id
+        #         if old_pos_id in self.zhanling_dic.keys():  # 判断玩家是否从占领区离开
+        #             self.zhanling_dic[old_pos_id] = ""  # 清空占领区uid
+        #         arrive_time = S2C_GVG_NotifyMove.arrive_time  # 到达时间    无此值时表示立即到达
+        #         self.match_user_dic[S2C_GVG_NotifyMove.user_id]["移动结束时间"] = time.time()+self.going_move_time
+        #         owner_guild_id = S2C_GVG_NotifyMove.owner_guild_id  # 炮塔拥有者是发生变更时，返回当前炮台占领的军团
+        #         protect_end_time = S2C_GVG_NotifyMove.protect_end_time  # 如果是站上炮台占领位，则返回保护到期时间
+        #         self.match_user_dic[S2C_GVG_NotifyMove.user_id]["无敌结束时间"] = time.time()+self.protect_end_time
+        #     return
+        # # 攻击玩家推送
+        # if recvcmd_into == 14453:
+        #     S2C_GVG_NotifyAttackUser = cs_pb2.S2C_GVG_NotifyAttackUser()  # 创建返回协议对象
+        #     S2C_GVG_NotifyAttackUser.ParseFromString(data)  # 解析协议返回值
+        #     if self.NotifyAttackUser_id != S2C_GVG_NotifyAttackUser.message_index:
+        #         self.NotifyAttackUser_id = S2C_GVG_NotifyAttackUser.message_index
+        #         attacker_user_id = S2C_GVG_NotifyAttackUser.attacker_user_id  # 攻击方玩家ID
+        #         attacker_score = S2C_GVG_NotifyAttackUser.attacker_score  # 攻击方当前积分
+        #         attacker_power = S2C_GVG_NotifyAttackUser.attacker_power  # 攻击方当前兵力
+        #         self.match_user_dic[attacker_user_id]["血量"] = attacker_power
+        #         if attacker_power == 0:
+        #             self.match_user_dic[attacker_user_id]["无敌结束时间"] = time.time() + self.fuhuo_cd
+        #         attacker_cont_kill_num = S2C_GVG_NotifyAttackUser.attacker_cont_kill_num  # 连续杀人数
+        #         defender_user_id = S2C_GVG_NotifyAttackUser.defender_user_id  # 被攻击方玩家ID
+        #         defender_score = S2C_GVG_NotifyAttackUser.defender_score  # 被攻击方当前积分
+        #         defender_power = S2C_GVG_NotifyAttackUser.defender_power  # 被攻击方当前兵力
+        #         self.match_user_dic[defender_user_id]["血量"] = defender_power
+        #         if defender_power == 0:
+        #             self.match_user_dic[defender_user_id]["无敌结束时间"] = time.time() + self.fuhuo_cd
+        #         defender_cont_kill_num = S2C_GVG_NotifyAttackUser.defender_cont_kill_num  # 被攻击方连续杀人数
+        #         if "attacker_protect_end_time" in dir(S2C_GVG_NotifyAttackUser):
+        #             attacker_protect_end_time = S2C_GVG_NotifyAttackUser.attacker_protect_end_time  # 如果是攻占炮台占领位，则返回保护到期时间
+        #             # if defender_power > 0:
+        #             #     self.match_user_dic[defender_user_id]["无敌结束时间"] = attacker_protect_end_time
+        #             #     old_zhanling_id = self.match_user_dic[attacker_user_id]["位置ID"]
+        #             #     if old_zhanling_id in self.zhanling_dic.keys():
+        #             #         self.zhanling_dic[old_zhanling_id] = 0
+        #             if attacker_power > 0:
+        #                 self.match_user_dic[attacker_user_id]["无敌结束时间"] = time.time()+self.protect_end_time
+        #                 old_zhanling_id = self.match_user_dic[defender_user_id]["位置ID"]
+        #                 if old_zhanling_id in self.zhanling_dic.keys():
+        #                     self.zhanling_dic[old_zhanling_id] = attacker_user_id
+        #         if "owner_guild_id" in dir(S2C_GVG_NotifyAttackUser):
+        #             owner_guild_id = S2C_GVG_NotifyAttackUser.owner_guild_id  # 如果是炮台占领区占领军团，则返回当前占领者
+        #         # 判断自己是不是死了
+        #         if self.match_user_dic[self.uid]["血量"] == 0:
+        #             time.sleep(self.fuhuo_cd)
+        #             # 死了就复活
+        #             self.MSG_C2S_GVG_Revive()
+        #     return
+        # if recvcmd_into == 14456:
+        #     # 攻击城门推送
+        #     S2C_GVG_NotifyAttackGate = cs_pb2.S2C_GVG_NotifyAttackGate()  # 创建返回协议对象
+        #     S2C_GVG_NotifyAttackGate.ParseFromString(data)  # 解析协议返回值
+        #     if self.NotifyAttackGate_id != S2C_GVG_NotifyAttackGate.message_index:
+        #         self.NotifyAttackGate_id = S2C_GVG_NotifyAttackGate.message_index
+        #         score = S2C_GVG_NotifyAttackGate.score  # 当前积分
+        #         gate_grid_id = S2C_GVG_NotifyAttackGate.gate_grid_id  # 城门格子ID
+        #         if "gate_hp" in dir(S2C_GVG_NotifyAttackGate):
+        #             gate_hp = S2C_GVG_NotifyAttackGate.gate_hp  # 城门当前耐久
+        #             self.gate_dic[gate_grid_id] = gate_hp
+        #     return
+        # if recvcmd_into == 14459:
+        #     # 玩家复活
+        #     S2C_GVG_NotifyRevive = cs_pb2.S2C_GVG_NotifyRevive()  # 创建返回协议对象
+        #     S2C_GVG_NotifyRevive.ParseFromString(data)  # 解析协议返回值
+        #     if self.NotifyRevive_id != S2C_GVG_NotifyRevive.message_index:
+        #         self.NotifyRevive_id = S2C_GVG_NotifyRevive.message_index
+        #         self.match_user_dic[S2C_GVG_NotifyRevive.user_id]["位置ID"] = S2C_GVG_NotifyRevive.pos_id  # 复活玩家id
+        #         self.match_user_dic[S2C_GVG_NotifyRevive.user_id]["血量"] = 1
+        #     return
+        # if recvcmd_into == 14470:
+        #     # 比赛结束通知
+        #     S2C_GVG_NotifyMatchEnd = cs_pb2.S2C_GVG_NotifyMatchEnd()  # 创建返回协议对象
+        #     S2C_GVG_NotifyMatchEnd.ParseFromString(data)  # 解析协议返回值
+        #     print("军团战结束了")
+        #     self.is_over = True
+        #     if "mvp" in dir(S2C_GVG_NotifyMatchEnd.match_info):
+        #         mvp_uid = S2C_GVG_NotifyMatchEnd.match_info.mvp.user_id  # mvp玩家
+        #         print("mvp是玩家：" + str(mvp_uid))
+        #     if "mars" in dir(S2C_GVG_NotifyMatchEnd.match_info):
+        #         mars_uid = S2C_GVG_NotifyMatchEnd.match_info.mars.user_id  # 战神玩家
+        #         print("战神是玩家：" + str(mars_uid))
+        #     return
 
     def MSG_C2S_GVG_Revive(self, ):
         """
@@ -725,7 +866,7 @@ class LoginGame:
         S2C_GVG_Revive = cs_pb2.S2C_GVG_Revive()  # 创建返回协议对象
         S2C_GVG_Revive.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_Revive.ret == 1:
-            print("军团战-玩家复活成功")
+            print(str(self.uid) + "军团战-玩家复活成功")
         else:
             print(str(self.uid) + "军团战-玩家复活失败" + str(S2C_GVG_Revive.ret))
             raise ProtocolException("军团战-玩家复活失败")
@@ -737,6 +878,9 @@ class LoginGame:
         :param sid:
         :return:
         """
+        this_time = time.time()
+        if this_time < self.attack_time:
+            time.sleep(self.attack_time - this_time)
         C2S_GVG_AttackUser = cs_pb2.C2S_GVG_AttackUser()
         C2S_GVG_AttackUser.user_id = user_id
         C2S_GVG_AttackUser = C2S_GVG_AttackUser.SerializeToString()
@@ -744,12 +888,23 @@ class LoginGame:
                                    'send_cmd': 14451, 'recv_cmd': 14452, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_AttackUser, C2S_GVG_AttackUser_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_AttackUser_attr, 32)  # 发送协议
-        S2C_GVG_Revive = cs_pb2.S2C_GVG_Revive()  # 创建返回协议对象
-        S2C_GVG_Revive.ParseFromString(data)  # 解析协议返回值
-        if S2C_GVG_Revive.ret == 1:
-            print("军团战-攻击玩家成功")
+        S2C_GVG_AttackUser = cs_pb2.S2C_GVG_AttackUser()  # 创建返回协议对象
+        S2C_GVG_AttackUser.ParseFromString(data)  # 解析协议返回值
+        if S2C_GVG_AttackUser.ret == 1:
+            print(str(self.uid) + "军团战-攻击玩家成功")
+            self.attack_time = time.time() + self.attack_cd
+        elif S2C_GVG_AttackUser.ret == 945:
+            print(str(self.uid) + "不在活动时间内")
+        elif S2C_GVG_AttackUser.ret == 954:
+            print(str(self.uid) + "目标玩家不在同一个功能区，不能攻击")
+        elif S2C_GVG_AttackUser.ret == 955:
+            print(str(self.uid) + "玩家不可攻击")
         else:
-            print(str(self.uid) + "军团战-攻击玩家失败" + str(S2C_GVG_Revive.ret))
+            print(str(self.uid) + "军团战-攻击玩家失败" + str(S2C_GVG_AttackUser.ret))
+            print("----------------------------------")
+            print(str(self.match_user_dic[self.uid]))
+            print(str(self.match_user_dic[user_id]))
+            print("----------------------------------")
             raise ProtocolException("军团战-攻击玩家失败")
 
     def MSG_C2S_GVG_AttackGate(self):
@@ -768,7 +923,11 @@ class LoginGame:
         S2C_GVG_AttackGate = cs_pb2.S2C_GVG_AttackGate()  # 创建返回协议对象
         S2C_GVG_AttackGate.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_AttackGate.ret == 1:
-            print("军团战-攻击城门成功")
+            print(str(self.uid) + "军团战-攻击城门成功")
+        elif S2C_GVG_AttackGate.ret == 945:
+            print(str(self.uid) + "军团战-攻击城门失败,比赛未开始或者已经结束")
+        elif S2C_GVG_AttackGate.ret == 946:
+            print(str(self.uid) + "进攻CD中")
         else:
             print(str(self.uid) + "军团战-攻击城门失败" + str(S2C_GVG_AttackGate.ret))
             raise ProtocolException("军团战-攻击城门失败")
@@ -795,7 +954,7 @@ class LoginGame:
         S2C_GVG_Move = cs_pb2.S2C_GVG_Move()  # 创建返回协议对象
         S2C_GVG_Move.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_Move.ret == 1:
-            print("军团战-玩家移动成功")
+            print(str(self.uid) + "军团战-玩家移动成功")
             old_pos_id = self.match_user_dic[self.uid]["位置ID"]
             if old_pos_id in self.zhanling_dic.keys():  # 清空占领区uid
                 self.zhanling_dic[old_pos_id] = ""
@@ -803,8 +962,17 @@ class LoginGame:
                 self.zhanling_dic[target_pos_id] = self.uid
             self.match_user_dic[self.uid]["位置ID"] = target_pos_id
             if "arrive_time" in dir(S2C_GVG_Move):
-                self.match_user_dic[self.uid]["移动结束时间"] = S2C_GVG_Move.arrive_time
-                time.sleep(S2C_GVG_Move.arrive_time - time.time())  # 移动中不能干别的事
+                self.match_user_dic[self.uid]["移动结束时间"] = time.time()+self.going_move_time#服务器时间和本地时间不一致
+            time.sleep(self.going_move_time)  # 移动中不能干别的事
+        elif S2C_GVG_Move.ret == 958:
+            print(str(self.uid) + "移动速度非法")
+            raise ProtocolException("军团战-玩家移动失败")
+        elif S2C_GVG_Move.ret == 947:
+            print(str(self.uid) + "移动目标非法")
+            raise ProtocolException("军团战-玩家移动失败")
+        elif S2C_GVG_Move.ret == 945:
+            print(str(self.uid) + "不在活动时间内")
+            raise ProtocolException("军团战-玩家移动失败")
         else:
             print(str(self.uid) + "军团战-玩家移动失败" + str(S2C_GVG_Move.ret))
             raise ProtocolException("军团战-玩家移动失败")
@@ -826,15 +994,16 @@ class LoginGame:
         S2C_GVG_LeaveMatch = cs_pb2.S2C_GVG_LeaveMatch()  # 创建返回协议对象
         S2C_GVG_LeaveMatch.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_LeaveMatch.ret == 1:
-            print("军团战-离开比赛成功")
+            print(str(self.uid) + "军团战-离开比赛成功")
+            self.match_user_dic.pop(self.uid,0)
             self.is_in_match = False
         else:
-            print(str(self.uid) + "军团战-离开比赛失败" + str(S2C_GVG_LeaveMatch.ret))
+            print(str(self.uid) + "军团战-离开比赛失败" + str(S2C_GVG_LeaveMatch.ret)+str(self.is_in_match))
             raise ProtocolException("军团战-离开比赛失败")
 
     def always_LeaveMatch(self, ):
         """
-        离开比赛
+        离开比赛，不更新数据
         :param Guild_name: string 军团名字
         :param uid:
         :param sid:
@@ -845,15 +1014,28 @@ class LoginGame:
         C2S_GVG_LeaveMatch_attr = {'name': "C2S_GVG_LeaveMatch", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14445, 'recv_cmd': 14446, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_LeaveMatch, C2S_GVG_LeaveMatch_attr)  # 装包，需要学习
-        flag, data = self.send_receive(senddata, C2S_GVG_LeaveMatch_attr, 32,True)  # 发送协议
+        flag, data = self.send_receive(senddata, C2S_GVG_LeaveMatch_attr, 32, True)  # 发送协议
 
-    def MSG_C2S_GVG_GetUserSnapshots(self):
+    def MSG_C2S_GVG_GetUserSnapshots(self,uid = None):
         """
         获取比赛中的指定玩家的快照
         :return:
         """
+        uid_num = 1
         C2S_GVG_GetUserSnapshots = cs_pb2.C2S_GVG_GetUserSnapshots()
-        for uid in self.match_user_dic.keys():
+        if uid == None:
+            if len(self.match_user_dic.keys())==0:
+                print("玩家数据获取失败，没有记录玩家UID")
+                return
+            print_uid_list = []
+            for uid in self.match_user_dic.keys():
+                if uid_num>98:
+                    break
+                if self.match_user_dic[uid]["军团ID"] == 0:
+                    C2S_GVG_GetUserSnapshots.user_ids.append(uid)
+                    print_uid_list.append(uid)
+                    uid_num = uid_num+1
+        else:
             C2S_GVG_GetUserSnapshots.user_ids.append(uid)
         C2S_GVG_GetUserSnapshots = C2S_GVG_GetUserSnapshots.SerializeToString()
         C2S_GVG_GetUserSnapshots_attr = {'name': "C2S_GVG_GetUserSnapshots", 'protocol': 'protobuf-ss',
@@ -863,9 +1045,14 @@ class LoginGame:
         S2C_GVG_GetUserSnapshots = cs_pb2.S2C_GVG_GetUserSnapshots()  # 创建返回协议对象
         S2C_GVG_GetUserSnapshots.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetUserSnapshots.ret == 1:
-            print("军团战-获取玩家快照成功")
+            print(str(self.uid) + "军团战-获取玩家快照成功")
+            for snapshot in S2C_GVG_GetUserSnapshots.snapshots:
+                self.match_user_dic[snapshot.id]["军团ID"]  = snapshot.guild_id
+        elif S2C_GVG_GetUserSnapshots.ret == 945:
+            print(str(self.uid) + "比赛未开始")
         else:
             print(str(self.uid) + "军团战-获取玩家快照失败" + str(S2C_GVG_GetUserSnapshots.ret))
+            print(print_uid_list)
             raise ProtocolException("军团战-获取玩家快照失败")
 
     def MSG_C2S_GVG_GetGuildRankList(self):
@@ -883,7 +1070,7 @@ class LoginGame:
         S2C_GVG_GetGuildRankList = cs_pb2.S2C_GVG_GetGuildRankList()  # 创建返回协议对象
         S2C_GVG_GetGuildRankList.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetGuildRankList.ret == 1:
-            print("军团战-获取获取赛季军团排名信息成功")
+            print(str(self.uid) + "军团战-获取获取赛季军团排名信息成功")
         else:
             print(str(self.uid) + "军团战-获取获取赛季军团排名失败" + str(S2C_GVG_GetGuildRankList.ret))
             raise ProtocolException("军团战-获取获取赛季军团排名失败")
@@ -902,7 +1089,7 @@ class LoginGame:
         S2C_GVG_GetSeasonHistory = cs_pb2.S2C_GVG_GetSeasonHistory()  # 创建返回协议对象
         S2C_GVG_GetSeasonHistory.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetSeasonHistory.ret == 1:
-            print("军团战-获取历史赛季信息成功")
+            print(str(self.uid) + "军团战-获取历史赛季信息成功")
         else:
             print(str(self.uid) + "军团战-获取历史赛季信息失败" + str(S2C_GVG_GetSeasonHistory.ret))
             raise ProtocolException("军团战-获取历史赛季信息失败")
@@ -921,29 +1108,10 @@ class LoginGame:
         S2C_GVG_GetAdvanceMatches = cs_pb2.S2C_GVG_GetAdvanceMatches()  # 创建返回协议对象
         S2C_GVG_GetAdvanceMatches.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetAdvanceMatches.ret == 1:
-            print("军团战-获取淘汰赛以后的比赛信息成功")
+            print(str(self.uid) + "军团战-获取淘汰赛以后的比赛信息成功")
         else:
             print(str(self.uid) + "军团战-获取淘汰赛以后的比赛信息失败" + str(S2C_GVG_GetAdvanceMatches.ret))
             raise ProtocolException("军团战-获取淘汰赛以后的比赛信息失败")
-
-    def MSG_C2S_GVG_GetSeasonHistory(self):
-        """
-        获取历史赛季
-        :return:
-        """
-        C2S_GVG_GetSeasonHistory = cs_pb2.C2S_GVG_GetSeasonHistory()
-        C2S_GVG_GetSeasonHistory = C2S_GVG_GetSeasonHistory.SerializeToString()
-        C2S_GVG_GetSeasonHistory_attr = {'name': "C2S_GVG_GetSeasonHistory", 'protocol': 'protobuf-ss',
-                                         'send_cmd': 14440, 'recv_cmd': 14441, 'uid': self.uid, 'sid': self.sid}
-        senddata = self.pack_data(C2S_GVG_GetSeasonHistory, C2S_GVG_GetSeasonHistory_attr)  # 装包，需要学习
-        flag, data = self.send_receive(senddata, C2S_GVG_GetSeasonHistory_attr, 32)  # 发送协议
-        S2C_GVG_GetSeasonHistory = cs_pb2.S2C_GVG_GetSeasonHistory()  # 创建返回协议对象
-        S2C_GVG_GetSeasonHistory.ParseFromString(data)  # 解析协议返回值
-        if S2C_GVG_GetSeasonHistory.ret == 1:
-            print("军团战-获取历史赛季成功")
-        else:
-            print(str(self.uid) + "军团战-获取历史赛季失败" + str(S2C_GVG_GetSeasonHistory.ret))
-            raise ProtocolException("军团战-获取历史赛季失败")
 
     def MSG_C2S_GVG_AddBuff(self, ):
         """
@@ -961,7 +1129,7 @@ class LoginGame:
         S2C_GVG_AddBuff = cs_pb2.S2C_GVG_AddBuff()  # 创建返回协议对象
         S2C_GVG_AddBuff.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_AddBuff.ret == 1:
-            print("军团战-获取Buff成功")
+            print(str(self.uid) + "军团战-获取Buff成功")
         else:
             print(str(self.uid) + "军团战-获取Buff失败" + str(S2C_GVG_AddBuff.ret))
             raise ProtocolException("军团战-获取Buff失败")
@@ -1003,7 +1171,7 @@ class LoginGame:
         S2C_Test = cs_pb2.S2C_Test()  # 创建返回协议对象
         S2C_Test.ParseFromString(data)  # 解析协议返回值
         if S2C_Test.ret == 1:
-            print("添加道具成功")
+            print(str(self.uid) + "添加道具成功")
         else:
             raise ProtocolException(str(self.uid) + "添加道具失败" + str(S2C_Test.ret))
 
@@ -1012,18 +1180,19 @@ class LoginGame:
         data = {"account": self.username, "role_id": self.uid, "server": self.server_id, "function": "1",
                 "checkpoint": 53640}
         requests.request("POST", url, data=data)
-        print("设置关卡进度成功")
+        print(str(self.uid) + "设置关卡进度成功")
 
-    def new_sql(self,):
+    def new_sql(self, ):
         conn = sqlite3.connect('GVG_account.db')
         cursor = conn.cursor()
+        cursor.execute('DROP TABLE user')
         cursor.execute(
-            'create table user(account varchar(20) primary key,is_login varchar(20),sever varchar(20))')  # 创建表
+            'create table user(account varchar(20) primary key,is_login varchar(20),sever_name text)')  # 创建表
         cursor.close()
         conn.commit()
         conn.close()
 
-    def set_account_sql(self,account_into,sever_name):
+    def set_account_sql(self, account_into, sever_name):
         """
         保存账号，用于创建账号使用
         :param account_into:
@@ -1033,12 +1202,12 @@ class LoginGame:
         account_into = str(account_into)
         conn = sqlite3.connect('GVG_account.db')
         cursor = conn.cursor()
-        cursor.execute('insert into user (account, is_login) values (' + account_into + ',0,'+sever_name+')')
+        cursor.execute('insert into user (account, is_login, sever_name) values (' + account_into + ',0,' + sever_name + ')')
         cursor.close()
         conn.commit()
         conn.close()
 
-    def get_account_sql(self,):
+    def get_account_sql(self, ):
         """
         获取账号，然后设置账号登录状态
         :return:
@@ -1047,13 +1216,16 @@ class LoginGame:
         cursor = conn.cursor()
         cursor.execute('select *from user where is_login=0')
         values = cursor.fetchall()
+        if len(values) == 0:
+            print("err，没有账号了，休息吧")
+            raise ProtocolException("没有账号了,都登陆完了")
         account = values[0][0]
         sever_name = values[0][2]
-        cursor.execute('UPDATE user SET is_login =1  WHERE account = '+account)#更新登录状态
+        cursor.execute('UPDATE user SET is_login =1  WHERE account = ' + account)  # 更新登录状态
         cursor.close()
         conn.commit()
         conn.close()
-        return account,sever_name
+        return account, sever_name
 
     def Login(self, username_read=False):
         """
@@ -1066,10 +1238,10 @@ class LoginGame:
         hms = dateArray.strftime("%Y%m%d")
         game_account_int = int(game_account_f * 1000000)
         if username_read:
-            self.username = hms[-1:] + str(game_account_int)[-7:]
-            self.set_account_sql(self.username,self.server_name)
+            self.username = "2"+hms[-1:] + str(game_account_int)[-6:]
+            self.set_account_sql(self.username, self.server_name)
         else:
-            self.username = self.get_account_sql()
+            self.username, self.server_name = self.get_account_sql()
 
         flag, data = self.MSG_C2G_Login()
         G2C_Login = cg_pb2.G2C_Login()
@@ -1093,156 +1265,184 @@ class LoginGame:
                 self.add_resource_pb(1, 1, 9999999)  # 角色经验
                 self.add_resource_pb(1, 2, 99999)  # 贵族经验
                 self.add_resource_pb(999, 0, 99999)  # 元宝
+                self.set_checkpoint()
             else:
                 raise GmException("创建角色失败" + str(G2C_Create.uid))
         elif G2C_Login.ret == 2:
             raise GameServerStopException("服务器维护中,创建账号失败")
-        self.set_checkpoint()
+
 
 
 class MyTaskSet(TaskSequence):
     def __init__(self, parent):
         super(MyTaskSet, self).__init__(parent)
-        self.account = self.locust.username
-        self.OpServerID = self.locust.OpServerID
+        # self.account = self.locust.username
+        # self.OpServerID = self.locust.OpServerID
         self.exceptTime = 30
         self.hands = 0
         self.battleUnits = {}
 
-    def new_rold(self,Guild_name):
-        """
-        报名阶段使用，创建账号角色，创建军团，报名
-        :return:
-        """
-        self.lg = LoginGame("QA1")
-        self.lg.Login()
-        self.lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-        if not self.lg.is_guild_boss:  # 不是军团长才报名
-            self.lg.MSG_C2S_GVG_Join()  # 报名
-        self.lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-
-    @seq_task(1)
-    def Login_Second(self,):
+    def on_start(self, ):
         """
         压测的时候主要调用这个登录
         :return:
         """
-        self.lg = LoginGame("QA1")
-        self.lg.Login(username_read = True)#读取数据库里面的账号
+        self.lg = LoginGame("新QA1")
+        self.lg.Login(username_read=False)  # 读取数据库里面的账号
         self.lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
 
-    @task
+    @task()
     def in_out_match(self):
+        print(str(self.lg.uid) + "进入或退出战斗")
         if self.lg.is_in_match:  # 在场
             self.lg.MSG_C2S_GVG_LeaveMatch()  # 离开比赛
         else:  # 不在场
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
 
-    @task
+
     def always_in_out(self):
         """
         进进出出
         :return: 
         """
-        for i in range(5000):
-            if self.lg.is_in_match:#在场
-                self.lg.always_LeaveMatch()
-            else:#不在场
-                self.lg.always_EnterMatch()
+        print(str(self.lg.uid) + "进进出出")
+        for i in range(50):
+            self.in_out_match()
 
-    @task
+    @task()
     def always_move(self):
         """
         溜达溜达
         :return:
         """
-        #可移动ID的列表
+        # 可移动ID的列表
+        print(str(self.lg.uid) +"溜达溜达")
         if not self.lg.is_in_match:
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
         all_move_pos_id_list = self.lg.all_move_pos_id_list
         old_pos_id = 0
-        for i in range(5000):
+        for i in range(50):
             angle = random.randint(0, len(all_move_pos_id_list) - 1)
-            #做一个随机数，随机选取列表中的坐标
+            # 做一个随机数，随机选取列表中的坐标
             target_pos_id = all_move_pos_id_list[angle]
             if old_pos_id != target_pos_id:
-                self.lg.MSG_C2S_GVG_Move(target_pos_id)  # 玩家移动
+                try:
+                    self.lg.MSG_C2S_GVG_Move(target_pos_id)  # 玩家移动
+                except Exception:
+                    return
                 old_pos_id = target_pos_id
-    @seq_task(100)
-    def get_Matchinfo(self):
+
+    def on_stop(self):
         """
         战斗打完之后获取各种信息
         :return:
         """
+        print(str(self.lg.uid) +"战斗打完之后获取各种信息")
         if self.lg.is_over:
             self.lg.MSG_C2S_GVG_GetAchieve()  # 获取赛季成就信息
             if len(self.lg.achieve_id_list) > 0:
-                for achieve_id in self.achieve_id_list:
+                for achieve_id in self.lg.achieve_id_list:
                     self.lg.MSG_C2S_GVG_GetAchieveAward(achieve_id)  # 领取赛季成就奖励
             self.lg.MSG_C2S_GVG_GetAdvanceMatches()  # 获取淘汰赛以后的比赛信息
             self.lg.MSG_C2S_GVG_GetSeasonHistory()  # 军团战-获取历史赛季
             self.lg.MSG_C2S_GVG_GetGuildRankList()  # 获取赛季军团排名
         else:
-            print("军团战还没打完")
-    @task
+            print(str(self.lg.uid) +"军团战还没打完")
+
+    @task()
     def all_ui_info(self):
         """
         战斗中获取玩家数据，可以随时发
         :return:
         """
+        print(str(self.lg.uid) +"战斗中疯狂获取玩家数据")
         if not self.lg.is_in_match:
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for i in range(5000):
+        for i in range(50):
             self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
 
-    @task
+    @task()
     def tower_battle(self):
         """
         炮台的战斗
         :return:
         """
+        print(str(self.lg.uid) +"炮台的战斗")
         # 移动到炮台抢占区
         if not self.lg.is_in_match:
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for qiangzhan_pos_id in self.lg.tower_dic.keys():
-            self.lg.MSG_C2S_GVG_Move(qiangzhan_pos_id)  # 移动到抢占区
-            zhanling_pos_id = self.lg.tower_dic[qiangzhan_pos_id]
-            zhanling_uid = self.lg.zhanling_dic[zhanling_pos_id]
-            if zhanling_uid!="":
-                self.lg.MSG_C2S_GVG_AttackUser(zhanling_uid)  # 攻击对应占领区玩家
-                break
-
-    @task
-    def first_go_tower(self):
-        """
-        炮台区空着就先去抢炮台区
-        :return:
-        """
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        # 移动到炮台占领区
+        # 炮台区空着就先去抢炮台区
         for zhanling_pos_id in self.lg.zhanling_dic.keys():
-            if self.lg.zhanling_dic[zhanling_pos_id] == "":#判断占领区有没有人
+            if self.lg.zhanling_dic[zhanling_pos_id] == "":  # 判断占领区有没有人
                 self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
                 # 判断自己在不在占领区对应的抢占区,或者自己在不在占领区
-                if self_pos_id in self.lg.zhanling_dic.keys() or (self_pos_id in self.lg.tower_dic.keys() and self.lg.tower_dic[self_pos_id] == zhanling_pos_id):
+                # if self_pos_id not in self.lg.zhanling_dic.keys():#不在占领区就不移动了
+                try:
                     self.lg.MSG_C2S_GVG_Move(zhanling_pos_id)  # 玩家移动
-                    break
+                except Exception:
+                    return
+                break
+        self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]  # 找到自己位置
+        if self_pos_id not in self.lg.tower_dic[0] and self_pos_id not in self.lg.tower_dic[1]:  # 判断自己不在炮台区域
+            pos_list = self.lg.tower_dic[0] + self.lg.tower_dic[1]
+            pos_angle = random.randint(0, len(pos_list) - 1)
+            go_pos_id = pos_list[pos_angle]
+            try:
+                self.lg.MSG_C2S_GVG_Move(go_pos_id)  # 移动到抢占区
+            except Exception:
+                return
+            self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
+        zhanling_uid = 0
+        # 判断自己在哪个炮台区域
+        if self_pos_id in self.lg.tower_dic[0]:
+            pos_agl = random.randint(0, len(self.lg.tower_dic[0]))  # 随机一个角标
+            pos = self.lg.tower_dic[0][pos_agl]  # 随机一个位置
+            if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
+                uid = self.lg.zhanling_dic[pos]
+                if uid != 0 and uid != self.lg.uid:
+                    zhanling_uid = uid
+            else:
+                user_dic = self.lg.nearby_user_dic_list[pos]  # 从位置玩家表里找人
+                for uid in user_dic.keys():
+                    if user_dic[uid] == 0:  # 谁在就打谁
+                        zhanling_uid = uid
+                        break
+        elif self_pos_id in self.lg.tower_dic[1]:
+            pos_agl = random.randint(0, len(self.lg.tower_dic[1]))  # 随机一个角标
+            pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+            if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
+                uid = self.lg.zhanling_dic[pos]
+                if uid != 0 and uid != self.lg.uid:
+                    zhanling_uid = uid
+            else:
+                user_dic = self.lg.nearby_user_dic_list[pos]
+                for uid in user_dic.keys():
+                    if user_dic[uid] == 0:
+                        zhanling_uid = uid
+                        break
+        else:
+            print(str(self.lg.uid) +"err：没有移动到炮台区域，无法进行炮台战斗")
+            return
+        if zhanling_uid != 0:
+            self.lg.MSG_C2S_GVG_AttackUser(zhanling_uid)  # 攻击对应占领区玩家
+        else:
+            print("err：没有找到合适的人选，无法进行炮台战斗")
 
-    @task
+    @task()
     def user_battle(self):
         """
         玩家间相互战斗
         :return:
         """
+        print(str(self.lg.uid) +"玩家间相互战斗")
         if not self.lg.is_in_match:
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
         # 攻击任意玩家
-        #做一个可攻击玩家列表
-        user_id_list =[]
+        # 做一个可攻击玩家列表
+        user_id_list = []
         for uid in self.lg.match_user_dic.keys():
-            if self.lg.self_guild_id != self.lg.match_user_dic[uid]["军团ID"]:# 不是一个军团
-                is_not_guild=True
+            if self.lg.match_user_dic[self.lg.uid]["军团ID"]!= self.lg.match_user_dic[uid]["军团ID"]:  # 不是一个军团
+                is_not_guild = True
             else:
                 is_not_guild = False
             if time.time() >= self.lg.match_user_dic[uid]["无敌结束时间"]:
@@ -1254,39 +1454,89 @@ class MyTaskSet(TaskSequence):
             else:
                 is_not_dead = False
             if time.time() >= self.lg.match_user_dic[uid]["移动结束时间"]:
-                is_not_moveing= True
+                is_not_moveing = True
             else:
                 is_not_moveing = False
             if is_not_guild and is_not_invincible and is_not_dead and is_not_moveing:
                 user_id_list.append(uid)
-        #做一个随机数，随机选取列表中的玩家
-        angle = random.randint(0,len(user_id_list)-1)
-        do_uid = user_id_list[angle]
-        #如果选定的玩家和自己不在一个位置，就先过去
-        if self.lg.match_user_dic[do_uid]["位置ID"] != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
-            self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
+        # 做一个随机数，随机选取列表中的玩家
+        go_pos = 0
+        for i in range(len(user_id_list)):
+            angle = random.randint(0, len(user_id_list) - 1)
+            do_uid = user_id_list[angle]
+            go_pos = self.lg.match_user_dic[do_uid]["位置ID"]
+            if go_pos not in self.lg.fuhuo_pos:
+                break
+        # 如果选定的玩家和自己不在一个位置，就先过去
+        if go_pos!=0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+            try:
+                self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
+            except Exception:
+                return
+        else:
+            print(str(self.lg.uid) +"没有找到合适的攻击人选")
+            return
+        new_time = time.time()
+        if new_time < self.lg.attack_time:
+            time.sleep(self.lg.attack_time - new_time)
         self.lg.MSG_C2S_GVG_AttackUser(do_uid)  # 攻击玩家
+        self.lg.attack_time = time.time() + self.lg.attack_cd
 
-    @task
+    @task()
     def attack_gate(self):
         # 攻击城门
+        print(str(self.lg.uid) +"攻击城门")
         if not self.lg.is_in_match:
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
         self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
-        if self_pos_id not in self.all_go_gate_pos_id_list:#判断是否需要移动
-            angle = random.randint(0, len(self.all_go_gate_pos_id_list) - 1)
-            go_gate_pos_id = self.all_go_gate_pos_id_list[angle]#随机选取一个攻击区域
-            self.lg.MSG_C2S_GVG_Move(go_gate_pos_id)  # 玩家移动
+        if self_pos_id not in self.lg.all_go_gate_pos_id_list:  # 判断是否需要移动
+            angle = random.randint(0, len(self.lg.all_go_gate_pos_id_list) - 1)
+            go_gate_pos_id = self.lg.all_go_gate_pos_id_list[angle]  # 随机选取一个攻击区域
+            try:
+                self.lg.MSG_C2S_GVG_Move(go_gate_pos_id)  # 玩家移动
+            except Exception:
+                return
         else:
-            go_gate_pos_id=self_pos_id
+            go_gate_pos_id = self_pos_id
         # 判断能不能攻击城门
         for gate_id in self.lg.go_gate_dic.keys():
-            gate_id_list = self.lg.go_gate_dic[gate_id]#某个城门的可攻击位置列表
+            gate_id_list = self.lg.go_gate_dic[gate_id]  # 某个城门的可攻击位置列表
             if go_gate_pos_id in gate_id_list:
                 hp = self.lg.gate_dic[gate_id]
                 if hp != 0:
-                    self.lg.MSG_C2S_GVG_AttackGate()  # 攻击城门 需要先移动到指定位置
+                    new_time = time.time()
+                    if new_time<self.lg.attack_gate_time:
+                        time.sleep(self.lg.attack_gate_time-new_time)
+                    self.lg.MSG_C2S_GVG_AttackGate()  # 攻击城门
+                    self.lg.attack_gate_time = time.time()+self.lg.attack_gate_cd
+                    break
 
+    @task()
+    def always_attack_gate(self):
+        # 攻击城门
+        print(str(self.lg.uid) +"一直攻击城门")
+        if not self.lg.is_in_match:
+            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
+        self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
+        if self_pos_id not in self.lg.all_go_gate_pos_id_list:  # 判断是否需要移动
+            angle = random.randint(0, len(self.lg.all_go_gate_pos_id_list) - 1)
+            go_gate_pos_id = self.lg.all_go_gate_pos_id_list[angle]  # 随机选取一个攻击区域
+            try:
+                self.lg.MSG_C2S_GVG_Move(go_gate_pos_id)  # 玩家移动
+            except Exception:
+                return
+        else:
+            go_gate_pos_id = self_pos_id
+        # 判断能不能攻击城门
+        for gate_id in self.lg.go_gate_dic.keys():
+            gate_id_list = self.lg.go_gate_dic[gate_id]  # 某个城门的可攻击位置列表
+            if go_gate_pos_id in gate_id_list:
+                for i in range(100):
+                    hp = self.lg.gate_dic[gate_id]
+                    if hp != 0:
+                        self.lg.MSG_C2S_GVG_AttackGate()  # 攻击城门
+                    else:
+                        break
     # lg.MSG_C2S_GVG_Revive()  # 复活放到攻击推送里面，自动复活
     # lg.MSG_C2S_GVG_AddBuff()  # 获取Buff，放到buff刷新推送里面，自动过去获取
 
@@ -1298,7 +1548,103 @@ class MyLocust(Locust):
     min_wait = 200
     max_wait = 200
 
+
 if __name__ == '__main__':
     wl = MyLocust()
     wl.run()
-
+# todo 城门打得少，玩家打得少，去不到炮台占领位
+    # Guild_name_id = 53
+    # for i in range(10):
+    #     lg = LoginGame("新QA1")
+    #     if i ==0:
+    #         lg.new_sql()
+    #         lg.Login(username_read=True)
+    #     else:
+    #         lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+1)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+2)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+3)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+4)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+5)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+6)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+7)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+8)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+9)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+10)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+11)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    #     lg = LoginGame("新QA1")
+    #     lg.Login(username_read=True)
+    #     Guild_name ="gvg"+str(Guild_name_id+12)
+    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #     if not lg.is_guild_boss:  # 不是军团长才报名
+    #         lg.MSG_C2S_GVG_Join()  # 报名
+    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+    # conn = sqlite3.connect('GVG_account.db')
+    # cursor = conn.cursor()
+    # cursor.execute('select *from user')
+    # values = cursor.fetchall()
+    # print(values)

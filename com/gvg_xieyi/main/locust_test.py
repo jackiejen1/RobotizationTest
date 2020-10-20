@@ -12,9 +12,9 @@ import datetime
 import struct
 import time
 import requests
-from com.gvg_xieyi.proto import cs_pb2, cg_pb2, bs_pb2, out_base_pb2
+from proto import cs_pb2, cg_pb2, bs_pb2, out_base_pb2
 import hashlib, json, base64
-from com.gvg_xieyi.tools.MyException import *
+from tools.MyException import *
 from socket import create_connection
 from locust import HttpLocust, TaskSet, task, seq_task, TaskSequence, Locust,events
 
@@ -98,23 +98,29 @@ class LoginGame:
         workname = api_attr['name']
         print("当前发送接口:--{}".format(workname))
         flag = True
+        send_time =  time.time()
         try:
             self.socket.send(socketdata)  # 发送数据
-            self.success('socket', workname, time.time(), len(socketdata))
         except Exception:
             flag = False
-            self.failure('socket', workname, "数据发送失败")
         if not flag:
+            self.failure('socket', workname, "数据发送失败")
             return flag, b'error'
         else:
             print("send data success")
         if norecv:  # 是否需要接受数据，默认接收
             return flag, b'norecv'
         receive_data, recv_time = self.recv_data(api_attr, headsize, limitime)  # 开始接收数据
+        send_time = send_time * 1000
+        recv_time = recv_time * 1000
+        # 将毫秒规整，不然统计数据太多，不利于统计
+        usedtime = int(recv_time - send_time)  # + 20000
         if receive_data != b'error':
             flag = True
+            self.success("socket",workname,usedtime,len(receive_data))
         else:
             flag = False
+            self.failure("socket",workname,"接收数据失败")
         return flag, receive_data
 
     def recv_data(self, api_attr, buffersize, limittime):
@@ -141,16 +147,13 @@ class LoginGame:
                     recvtime = time.time()
                     recvdata = b'error'
                     print("等了很久都没有等到想要的")
-                    self.failure('socket', api_attr['name'], "接收数据失败,超时")
                     return recvdata, recvtime
                 rev_data = self.socket.recv(buffersize)  # 第一次接收数据，只获取消息头，消息头包含数据体的长度和协议编号
                 if len(rev_data) == 0:
                     print(str(api_attr['uid']) + ":error,消息头长度为0")
-                    self.failure('socket', api_attr['name'], "接收数据失败,消息头长度为0")
-                    raise Exception("消息头长度为0")
-                    # data = b'error'
-                    # recv_time = time.time()
-                    # return data, recv_time
+                    recvdata = b'error'
+                    recv_time = time.time()
+                    return recvdata, recv_time
                 if len(rev_data) < buffersize:  # 服务端拆包发送，第一条不是完整数据，包头长度会不够
                     rev_data = rev_data + self.socket.recv(buffersize - len(rev_data))
                 head_data = struct.unpack('>IIQQQ', rev_data)  # 把消息头解包
@@ -160,7 +163,7 @@ class LoginGame:
                 while (len(tmpdata) < data_len):  # 一次没收完，就继续收
                     tmpdata += self.socket.recv(data_len - len(tmpdata))
                 # 收完完整的一条后进行校验
-                recvtime = time.time()
+
                 if len(self.waiting_for_you_list) >= 1:
                     for recv_id in self.waiting_for_you_list:
                         if head_data[1] == recv_id:
@@ -169,18 +172,17 @@ class LoginGame:
                     # 需要多条返回协议的处理
                     for rec in recvcmd:
                         if head_data[1] == rec:  # 这里对返回数据进行校验，只返回要求协议ID的数据
-                            recvtime = time.time()
+
                             recvdata = tmpdata
                             recvdata_dic[str(rec)] = recvdata
                             then_len = then_len + 1
-                            self.success('socket', api_attr['name'], recvtime, len(recvdata))
                     if then_len == len(recvcmd):
+                        recvtime = time.time()
                         return recvdata_dic, recvtime
                 else:
                     if head_data[1] == recvcmd:  # 这里对返回数据进行校验，只返回要求协议ID的数据
                         recvtime = time.time()
                         recvdata = tmpdata
-                        self.success('socket', api_attr['name'], recvtime, len(recvdata))
                         return recvdata, recvtime
                 # 如果不是指定的协议，就继续接收下一条协议内容
             except Exception as e:
@@ -189,7 +191,6 @@ class LoginGame:
                 print("战斗协议的话可能是无需战斗造成的")
                 recvtime = time.time()
                 recvdata = b'error'
-                self.failure('socket', api_attr['name'], "接收数据失败")
                 return recvdata, recvtime
 
     def pack_data(self, data, api_attr):
@@ -1062,10 +1063,10 @@ class LoginGame:
         game_account_int = int(game_account_f * 1000000)
         if username_read:
             self.username = hms[-1:] + str(game_account_int)[-7:]
-            self.set_account_sql(self.username,self.server_name)
-        else:
-            self.username = self.get_account_sql()
-            self.username = self.username[:-1]
+            # self.set_account_sql(self.username,self.server_name)
+        # else:
+            # self.username = self.get_account_sql()
+            # self.username = self.username[:-1]
         flag, data = self.MSG_C2G_Login()
         G2C_Login = cg_pb2.G2C_Login()
         G2C_Login.ParseFromString(data)

@@ -143,6 +143,8 @@ enum ID {
   MSG_S2C_Knight_Adjutant_Op = 10277;
   MSG_C2S_Knight_Awake_Quick = 10278; //武将觉醒 快速
   MSG_S2C_Knight_Awake_Quick = 10279;
+  MSG_C2S_Knight_OneKey_StarTrain = 10280;	// 快捷养成-将星一键培养
+  MSG_S2C_Knight_OneKey_StarTrain = 10281;
 
   MSG_C2S_Fragment_Compose = 10300;	// 合成碎片
   MSG_S2C_Fragment_Compose = 10301;
@@ -335,6 +337,10 @@ enum ID {
   MSG_S2C_Treasure_Upgrade_OneLevel = 10759;
 	MSG_C2S_Treasure_Golden = 10762; //宝物升灵
 	MSG_S2C_Treasure_Golden = 10763;
+    MSG_C2S_Treasure_PurplizeNode = 10764; //宝物幻紫小节点
+    MSG_S2C_Treasure_PurplizeNode = 10765;
+    MSG_C2S_Treasure_PurplizeStage = 10766; //宝物幻紫大节点升阶
+    MSG_S2C_Treasure_PurplizeStage = 10767;
 
 	// 夺宝
   MSG_C2S_ContendTreasure_GetList = 10800;	// 获取抢夺列表
@@ -1666,6 +1672,9 @@ enum ID {
   MSG_C2S_GVG_GetGuildRankList = 14468; //获取军团排行榜
   MSG_S2C_GVG_GetGuildRankList = 14469;
   MSG_S2C_GVG_NotifyMatchEnd = 14470; //比赛结束通知
+  MSG_C2S_GVG_GetMatchAchieveAward = 14471;//领取单场比赛成就奖励
+  MSG_S2C_GVG_GetMatchAchieveAward = 14472;
+  MSG_S2C_GVG_BatchNotify = 14473; //军团战批量推送
 
   // 18加信息
   MSG_C2S_EighteenPlus_Info = 14500;  // 18加信息
@@ -1705,6 +1714,16 @@ enum ID {
   MSG_C2S_PreDraw_ReceiveFinalAward = 14664;//领取最终奖励
   MSG_S2C_PreDraw_ReceiveFinalAward = 14665;
   MSG_S2C_PreDraw_ChangeNotify = 14666;
+
+  // 周末狂欢
+  MSG_C2S_GuideWind_GetInfo = 14700; // 获取信息 
+  MSG_S2C_GuideWind_GetInfo = 14701;
+  MSG_C2S_GuideWind_ProAward = 14702; // 领取进度奖励
+  MSG_S2C_GuideWind_ProAward = 14703;
+  MSG_C2S_GuideWind_Start = 14704; // 启阵(生成奖池)
+  MSG_S2C_GuideWind_Start = 14705;
+  MSG_C2S_GuideWind_Draw = 14706; // 抽奖
+  MSG_S2C_GuideWind_Draw = 14707;
 }
 
 //跨服玩法聊天+弹幕
@@ -2679,12 +2698,14 @@ message S2C_Dungeon_FinishAchievement {
 
 // 主线副本-星数/章节宝箱一键领奖
 message C2S_Dungeon_OneKey_GetChapterChestAward {
+    repeated uint32 ids = 1; // 可领奖的章节id
 }
 
 message S2C_Dungeon_OneKey_GetChapterChestAward {
     required uint32 ret = 1;
     repeated out_base.Award awards = 2;
     repeated out_base.Chapter chapters = 3;
+    repeated uint32 ids = 4;
 }
 
 message C2S_Item_Use {
@@ -3660,6 +3681,30 @@ message S2C_Treasure_Golden {
     optional uint32 base_id = 3;
 }
 
+//宝物幻紫小节点注灵
+message C2S_Treasure_PurplizeNode {
+    required uint64 id = 1;//宝物唯一id
+    required uint32 node_id = 2;//宝物小节点id
+    repeated uint64 consume_list = 3;//被消耗的材料宝物List
+}
+
+message S2C_Treasure_PurplizeNode {
+    required uint32 ret = 1;
+    required uint64 id = 2;
+    required uint32 node_id = 3;
+    repeated uint64 consume_list = 4;//被消耗的材料宝物Id
+}
+
+//宝物幻紫大节点升阶
+message C2S_Treasure_PurplizeStage {
+    required uint64 id = 1;
+}
+
+message S2C_Treasure_PurplizeStage {
+    required uint32 ret = 1;
+    required uint64 id = 2;
+}
+
 // --------- 夺宝 ---------
 //获取抢夺列表
 message C2S_ContendTreasure_GetList {
@@ -3750,6 +3795,7 @@ message S2C_ContendTreasure_AvengeFinish {
 message C2S_ContendTreasure_OneKeyFast {
     required uint32 id = 1; // 要合成的宝物id
     optional uint32 is_use_item = 2; // 是否使用夺宝令 0:不使用; 1:使用
+	optional uint32 quick_num = 3;	// 2.7.0：快捷夺宝增加字段:快捷夺宝次数
 }
 
 message S2C_ContendTreasure_OneKeyFast {
@@ -3758,6 +3804,7 @@ message S2C_ContendTreasure_OneKeyFast {
     optional uint32 is_use_item = 3; // 是否使用夺宝令 0:不使用; 1:使用
     repeated out_base.ContendTreasureAward awards = 4;
     repeated uint32 rob_result = 5;  //抢夺到的碎片id，0为抢夺失败
+	optional uint32 quick_num = 6;	// 2.7.0：快捷夺宝增加字段:快捷夺宝次数
 }
 
 message C2S_City_GetInfo {
@@ -4407,8 +4454,9 @@ message S2C_Rebel_Info {
 
 message C2S_Rebel_AttackBegin { // 攻击叛军
     required uint64 uid = 1;	// 叛军所属的玩家id
-                                required uint32 id = 2;	// 叛军id
-                                required uint32 attack_type = 3;	// 1:普通攻击 2:全力一击
+    required uint32 id = 2;	// 叛军id
+    required uint32 attack_type = 3;	// 1:普通攻击 2:全力一击
+	optional bool use_item = 4;	// 是否自动使用讨伐令
 }
 message S2C_Rebel_AttackBegin {
     required uint32 ret = 1;
@@ -4416,6 +4464,7 @@ message S2C_Rebel_AttackBegin {
     required uint32 id = 3;	// 叛军id
     required uint32 attack_type = 4;	// 1:普通攻击 2:全力一击
     optional uint64 battle_id = 5;	// 战斗id
+	optional bool use_item = 6;	// 是否自动使用讨伐令
 }
 
 message C2S_Rebel_OneKeyAttackBegin {
@@ -5714,6 +5763,7 @@ message C2S_New_GiftCode {
 message S2C_New_GiftCode {
     required uint32 ret = 1;
     repeated out_base.Award awards = 2;
+    optional uint32 code_type = 3;
 }
 
 //领取首充阶段奖励
@@ -8275,6 +8325,19 @@ message S2C_Knight_Adjutant_Op {
     required uint32 pos = 4;
 }
 
+// 快捷养成-将星一键培养
+message C2S_Knight_OneKey_StarTrain {
+    required uint64 id = 1;	//武将id
+    required uint32 num = 2;	//次数
+}
+
+message S2C_Knight_OneKey_StarTrain {
+    required uint32 ret = 1; 
+    required uint64 id = 2;	//武将id
+    required uint32 num = 3;	//次数
+    optional uint32 old_star_level = 4; //培养前将星等级
+    optional uint32 star_level = 5; //当前将星等级
+}
 
 //获取屏蔽的活动列表
 message C2S_BlockedActivity_GetList{
@@ -9664,6 +9727,8 @@ message S2C_GVG_GetInfo {
   optional out_base.GVGMatchInfo my_match = 6; //己方军团比赛信息
   optional uint32 mvp_num = 7; //mvp次数
   optional uint32 kill_num = 8; //杀人次数
+  repeated out_base.GVGUserAchieve achieves = 9; //赛季成就
+  repeated out_base.GVGMatchAchieve match_achieves = 10; //单场比赛成就
 }
 
 // 军团战-获取赛季成就
@@ -9681,6 +9746,17 @@ message C2S_GVG_GetAchieveAward {
 }
 
 message S2C_GVG_GetAchieveAward {
+  required uint32 ret = 1;
+  required uint32 id = 2;
+  repeated out_base.Award awards = 3;
+}
+
+// 军团战-领取比赛成就奖励
+message C2S_GVG_GetMatchAchieveAward {
+  required uint32 id = 1; //成就ID
+}
+
+message S2C_GVG_GetMatchAchieveAward {
   required uint32 ret = 1;
   required uint32 id = 2;
   repeated out_base.Award awards = 3;
@@ -9874,6 +9950,11 @@ message S2C_GVG_GetUserSnapshots {
   repeated out_base.UserSnapshot snapshots = 3; //比赛中的玩家列表
 }
 
+//军团战批量通知
+message S2C_GVG_BatchNotify {
+  repeated out_base.GVGNotify notify_list = 1; //通知列表
+}
+
 //获取赛季军团排名
 message C2S_GVG_GetGuildRankList {
   required uint32 size = 1; //排行长度
@@ -9927,6 +10008,7 @@ message S2C_Debate_EnterInfo {
   repeated uint32 doctor_awarded = 6;   // 已领取五经博士奖励
   optional bool is_match = 7;           // 是否自动刷新匹配
   repeated out_base.DebateUser match_users = 8;  // 匹配玩家
+  optional uint32 turn = 9;             // 轮次
 }
 
 //学宫论战-布阵保存
@@ -10070,3 +10152,46 @@ message S2C_PreDraw_ChangeNotify {
   optional uint32 delete = 2;
 }
 
+// 周末狂欢-获取信息
+message C2S_GuideWind_GetInfo {
+}
+
+message S2C_GuideWind_GetInfo {
+  required uint32 ret = 1;
+  optional uint32 pro_level = 2; // 进度奖励等级
+  repeated uint32 award_pro_id = 3; // 已领奖的进度id
+  repeated out_base.GuideWindAward award_pool = 4; // 奖池
+  optional uint32 jackpot_id = 5; // 奖池id
+}
+
+// 周末狂欢-领取进度奖励
+message C2S_GuideWind_ProAward {
+  repeated uint32 ids = 1; // 领取的进度奖励id
+}
+
+message S2C_GuideWind_ProAward {
+  required uint32 ret = 1;
+  repeated uint32 ids = 2;
+  repeated out_base.Award award = 3; // 奖励
+  repeated uint32 award_pro_id = 4; // 已领奖的进度id
+}
+
+// 周末狂欢-启阵
+message C2S_GuideWind_Start {
+}
+
+message S2C_GuideWind_Start {
+  required uint32 ret = 1;
+  repeated out_base.GuideWindAward award_pool = 2; // 奖池
+  optional uint32 jackpot_id = 3; // 奖池id
+}
+
+// 周末狂欢-抽奖
+message C2S_GuideWind_Draw {
+}
+
+message S2C_GuideWind_Draw {
+  required uint32 ret = 1;
+  repeated out_base.Award award = 2; // 抽中的奖励
+  repeated out_base.GuideWindAward award_pool = 3; // 奖池
+}
