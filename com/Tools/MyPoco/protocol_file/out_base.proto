@@ -240,6 +240,8 @@ message Treasure {
   optional uint32 refining_level = 6;//精炼等级
   optional uint32 glyph_level = 7; //雕纹等级
   optional uint32 golden_level = 8;//升金等级
+  optional uint32 purplize_stage = 9;//幻紫大节点等级
+  repeated uint32 purplize_nodes = 10;//幻紫小节点
 }
 
 //红点规则
@@ -292,6 +294,15 @@ message RedPoint {
   optional GVGHint gvg_hint = 39; // 军团战红点
   optional FundHint fund_hint = 40; //基金红点
   optional DebateHint debate_hint = 41; //学宫红点
+  optional GuideWindHint guide_wind_hint = 42; // 周末狂欢红点
+}
+
+// 周末狂欢红点
+message GuideWindHint { 
+  optional uint32 pro_level = 1; // 进度奖励等级
+  repeated uint32 award_pro_id = 2; // 已领奖的进度id
+  optional uint32 jackpot_id = 3; // 奖池id
+  repeated out_base.GuideWindAward award_pool = 4; // 奖池
 }
 
 // 学宫论战红点
@@ -307,6 +318,9 @@ message GVGHint {
   optional uint32 end_time = 3; //活动结束时间
   optional bool is_joined = 4; //当前玩家是否已参战
   optional bool is_guild_joined = 5; //军团是否已报名
+  optional bool avail_achieve_award = 6; //有待领取的成就奖励
+  optional bool avail_match_achieve_award = 7; //有待领取的单场比赛成就奖励
+  optional bool server_ever_gvg = 8; //本服务器是否开启过军团战
 }
 
 // 烽火连城红点
@@ -2719,6 +2733,13 @@ message GVGMatchUser {
   optional bool is_in_match = 12; //是否在比赛中
 }
 
+//军团战-比赛成就
+message GVGMatchAchieve {
+  required uint32 id = 1; //成就ID
+  required uint64 value = 2; //成就进度
+  required uint32 state = 3; //成就状态
+}
+
 //军团战-比赛中的军团
 message GVGMatchGuild {
   required GuildSnapshot guild = 1; //军团快照
@@ -2750,8 +2771,14 @@ message GVGMatchGridGate {
 //比赛对阵概况
 message GVGMatchSummary {
   required uint32 index = 1; //序号
-  repeated out_base.GuildSnapshot guilds = 2; //军团列表
+  repeated GVGMatchGuild guilds = 2; //军团列表
   optional uint64 winner_guild_id = 3; //胜利者军团
+}
+
+//军团战推送
+message GVGNotify {
+  required uint32 message_id = 1; //消息ID
+  optional bytes content = 2; //消息内容
 }
 
 //学宫论战匹配玩家
@@ -2792,5 +2819,9 @@ message UserPreDraw {
   required uint32 need_login_day = 5; //需要累登多少天可以领取大奖
 }
 
-
-
+// 周末狂欢奖励
+message GuideWindAward {
+  repeated Award awards = 1; // 奖励
+  optional bool is_draw = 2; // 是否被抽中
+  optional uint32 pos = 3; // 位置
+}

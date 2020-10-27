@@ -8,16 +8,16 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from airtest.core.helper import G
+# from airtest.core.helper import G
 
 
-def add_msg_in_log(msg, is_pass=True):
-    name = "添加日志"
-    if is_pass:  # 默认添加的日志是通过状态
-        rizhi = {"name": name, "call_args": {"text": str(msg)}}
-    else:
-        rizhi = {"name": name, "call_args": {"text": ""}, "traceback": str(msg)}
-    G.LOGGER.log("function", rizhi, 1)
+# def add_msg_in_log(msg, is_pass=True):
+#     name = "添加日志"
+#     if is_pass:  # 默认添加的日志是通过状态
+#         rizhi = {"name": name, "call_args": {"text": str(msg)}}
+#     else:
+#         rizhi = {"name": name, "call_args": {"text": ""}, "traceback": str(msg)}
+#     G.LOGGER.log("function", rizhi, 1)
 
 
 class NoneException(Exception):

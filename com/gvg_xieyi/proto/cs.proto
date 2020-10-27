@@ -9861,7 +9861,10 @@ message S2C_GVG_NotifyAttackUser {
   required uint64 attacker_guild_score = 12;//攻击方军团积分
   required uint64 defender_guild_id = 13; //攻击方军团ID
   required uint64 defender_guild_score = 14;//防守方方军团积分
-  required uint64 message_index = 15; //消息序号
+  required uint32 attacker_lose_power = 15; //进攻方损失兵力
+  required uint32 defender_lose_poser = 16; //防守方损失兵力
+  required bool is_attacker_win = 17; //是否进攻方胜利
+  required uint64 message_index = 18; //消息序号
 }
 
 //军团战-攻击城门
@@ -9952,7 +9955,22 @@ message S2C_GVG_GetUserSnapshots {
 
 //军团战批量通知
 message S2C_GVG_BatchNotify {
-  repeated out_base.GVGNotify notify_list = 1; //通知列表
+  repeated S2C_GVG_Notify notify_list = 1; //通知列表
+}
+
+//军团战推送
+message S2C_GVG_Notify {
+  optional S2C_GVG_NotifyMove move = 1; //移动推送
+  optional S2C_GVG_NotifyAttackUser attack_user = 2; //攻击玩家推送
+  optional S2C_GVG_NotifyAttackGate attack_gate = 3; //攻击城门推送
+  optional S2C_GVG_NotifyNewBuff new_buff = 4; //新buff推送
+  optional S2C_GVG_NotifyTowerAttack tower_attack = 5; //攻击城门推送
+  optional S2C_GVG_NotifyUserEnter user_enter = 6; //玩家进入推送
+  optional S2C_GVG_NotifyUserLeave user_leave = 7; //玩家离开推送
+  optional S2C_GVG_NotifyRevive revive = 8; //复活推送
+  optional S2C_GVG_NotifyAddBuff add_buff = 9; //添加buff推送
+  optional S2C_GVG_NotifyRemoveBuff remove_buff = 10; //移除buff推送
+  optional S2C_GVG_NotifyMatchEnd match_end = 11; //比赛结束推送
 }
 
 //获取赛季军团排名

@@ -352,3 +352,9 @@ enum ELITE_DUNGEON_RECORD_TYPE {
   EDRT_BEST = 2;   //极限通关（战力最低的）
   EDRT_NEAR = 3;   //最近通关（时间最近的）
 }
+
+//礼包码对应的活动类型
+enum CODE_ACT_TYPE {
+  ACT_TYPE_NONE = 0; //无活动类型
+  ACT_TYPE_PRE_DRAW = 1; //预抽卡
+}

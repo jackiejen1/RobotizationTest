@@ -1541,7 +1541,7 @@ class ProtocolFunction:
         if S2C_Equipment_RefiningOneLevel.ret == 1:
             print("装备一键精炼成功")
         else:
-            raise ProtocolException(str(self.uid) + "装备一键精炼失败" + str(S2C_Equipment_RefiningOneLevel.ret))
+            print(str(self.uid) + "装备一键精炼失败" + str(S2C_Equipment_RefiningOneLevel.ret))
 
     def Equipment_Glyph(self, id):
         """
@@ -1666,5 +1666,50 @@ class ProtocolFunction:
         else:
             raise ProtocolException(str(self.uid) + function_name + "失败" + str(S2C.ret))
 
+    def GuideWind_Start(self,):
+        """
+        周末狂欢-启阵
+        :param id:
+        :return:
+        """
+        function_name = "周末狂欢-启阵"
+        flag, data_pak = self.protocol.MSG_C2S_GuideWind_Start(self.uid, self.sid)
+        S2C = cs_pb2.S2C_GuideWind_Start()
+        S2C.ParseFromString(data_pak)
+        if S2C.ret == 1:
+            # print(function_name + "成功")
+            award_list = []
+            for award_pool in S2C.award_pool:
+                for award in award_pool.awards:
+                    award_dic = {}
+                    award_dic["type"] = award.type
+                    award_dic["value"] = award.value
+                    award_dic["size"] = award.size
+                    award_list.append(award_dic)
+            return award_list
 
+        else:
+            raise ProtocolException(str(self.uid) + function_name + "失败" + str(S2C.ret))
 
+    def GuideWind_Draw(self,):
+        """
+        周末狂欢-抽奖
+        :param id:
+        :return:
+        """
+        function_name = "周末狂欢-抽奖"
+        flag, data_pak = self.protocol.MSG_C2S_GuideWind_Draw(self.uid, self.sid)
+        S2C = cs_pb2.S2C_GuideWind_Draw()
+        S2C.ParseFromString(data_pak)
+        if S2C.ret == 1:
+            # print(function_name + "成功")
+            award_list = []
+            for award in S2C.award:
+                award_dic = {}
+                award_dic["type"] = award.type
+                award_dic["value"] = award.value
+                award_dic["size"] = award.size
+                award_list.append(award_dic)
+            return award_list
+        else:
+            raise ProtocolException(str(self.uid) + function_name + "失败" + str(S2C.ret))

@@ -1276,3 +1276,38 @@ class LoginGame:
         senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
         flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
         return flag, data
+
+
+    def MSG_C2S_GuideWind_Start(self,uid, sid):
+        """
+        周末狂欢-启阵
+        :param id:唯一ID
+        :param tg_star:升星等级
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_GuideWind_Start()
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_GuideWind_Start", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 14704, 'recv_cmd': 14705, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data
+
+    def MSG_C2S_GuideWind_Draw(self,uid, sid):
+        """
+        周末狂欢-抽奖
+        :param id:唯一ID
+        :param tg_star:升星等级
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2S = cs_pb2.C2S_GuideWind_Draw()
+        C2S = C2S.SerializeToString()
+        C2S_attr = {'name': "C2S_GuideWind_Draw", 'protocol': 'protobuf-ss',
+                                              'send_cmd': 14706, 'recv_cmd': 14707, 'uid': uid, 'sid': sid}
+        senddata = pack_data(C2S, C2S_attr)  # 装包，需要学习
+        flag, data = send_receive(self.socket, senddata, C2S_attr, 32)  # 发送协议
+        return flag, data

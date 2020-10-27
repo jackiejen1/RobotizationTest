@@ -372,6 +372,7 @@ enum RET {
   RET_GC_CODE_EXPIRED = 503; //礼包码已过期
   RET_GC_CODE_IS_USED = 504; //礼包码已被使用
   RET_GC_CODE_ERR = 505; //兑换失败，使用受限
+  RET_GC_CODE_NOT_IN_VALIDATE_TIME = 506;
 
   // 王者荣耀
   RET_GROUP_BATTLE_IS_JOIN_ROOM = 600; // 玩家已经加入房间
@@ -404,6 +405,7 @@ enum RET {
   // 宝物
   RET_TREASURE_CONTEND_UNABLE = 650; // 宝物不可抢夺
   RET_TREASURE_CONTEND_TYPE_ERROR = 651; // 宝物抢夺类型错误
+  RET_TREASURE_QUIK_CONTEND_MAX_ERROR = 652; // 快捷夺宝最大夺宝次数错误
 
   // 噩梦副本
   RET_SPACETIME_DUNGEON_UNLOCK_CHAPTER = 660; // 关卡未解锁
@@ -578,6 +580,7 @@ enum RET {
   RET_PRE_DRAW_FINAL_AWARD_UNAVAILABLE = 925; //最终奖励不可领取
   RET_PRE_DRAW_LOGIN_AWARD_NIL = 926; //登录奖励为空
   RET_PRE_DRAW_FINAL_AWARD_NIL = 927; //最终奖励为空
+  RET_PRE_DRAW_OVER_EXCHANGE = 928; //一个活动里只能兑换一次奖励
 
   // 军团图腾
   RET_GUILD_TOTEM_NOT_FOUND = 930; // 图腾不存在
@@ -631,7 +634,8 @@ enum RET {
   RET_DEBATE_BOX_NOT_FINISH = 994;    // 宝箱进度未完成
   RET_DEBATE_BATTLE_TIMES_NOT = 995;  // 挑战次数不足
   RET_DEBATE_REFRESH_TIMES_NOT = 996; // 刷新次数不足
-  RET_DEBATE_ENEMY_TEAM_NOT = 997;    // 获取地方阵容失败
+  RET_DEBATE_ENEMY_TEAM_NOT = 997;    // 获取敌方阵容失败
+  RET_DEBATE_SEASON_SETTLEMENT = 998; // 赛季结算中请稍后再试
 
 
   ///////////////// 1000-1100是客户端战斗代码返回错误 /////////////////

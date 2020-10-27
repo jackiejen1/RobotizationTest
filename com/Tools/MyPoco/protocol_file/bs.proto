@@ -35,6 +35,7 @@ message BattleUnit {
     optional uint32 wingId = 19;//穿戴翅膀
 		optional uint32 energy_skill_id = 20;//必杀技能
 	optional uint32 magic_id = 21;	// 战法baseId
+    optional uint32 dress_level = 22;//时装等级
 }
 
 message BattleTeam {

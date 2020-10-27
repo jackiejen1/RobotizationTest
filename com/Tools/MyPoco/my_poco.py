@@ -21,7 +21,7 @@ from MyPoco.protocol.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject, time
 from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
 from airtest.core.api import stop_app
-from MyPoco.foundation.tools import new_excel_tab
+from MyPoco.foundation.tools import *
 
 
 class MyPoco:
@@ -1459,6 +1459,48 @@ class MyPoco:
             tongji_str_z = tongji_str_z + "\r\n" + tongji + "：" + str(shuliangtongji_dic[tongji]) + "个"
         return log_str_z, tongji_str_z, shijiancishu
 
+    def make_ui_log_by_gm_dongfeng(self, resource_dic_list_input):
+        """
+        用来给抽奖类方法处理统一的日志
+        :param resource_dic_list_input: 抽奖返回值奖励列表[{"type":,"value":,"size":,},]
+        :return:
+        """
+        resources_dic = {}
+        for resource_dic in resource_dic_list_input:
+            # 获得道具名
+            query_dic = {}
+            query_dic['type'] = resource_dic['type']
+            query_dic['id'] = resource_dic['value']
+            resources_name = self.protocol.mri.get_name_from_type_id(query_dic)
+            name = resources_name + str(resource_dic['size'])
+            # 把名字和次数一一对应
+            if name not in resources_dic.keys():  # 第一次添加，初始化
+                resources_name_dic = {}
+                resources_name_dic["抽到次数"] = 1
+                resources_name_dic["道具名字"] = resources_name
+                resources_name_dic["道具数量"] = resource_dic['size']
+                resources_dic[name] = resources_name_dic
+            else:
+                resources_dic[name]["抽到次数"] = resources_dic[name]["抽到次数"] + 1
+        shuliangtongji_dic = {}
+        log_str_z = "抽奖结果，"
+        for name in resources_dic.keys():
+            if name != "事件":
+                log_dic = resources_dic[name]
+                resources_name = log_dic["道具名字"]
+                resources_shuliang = log_dic["道具数量"]
+                resources_zongcishu = log_dic["抽到次数"]
+                if str(resources_name) in shuliangtongji_dic.keys():
+                    shuliangtongji_dic[str(resources_name)] = shuliangtongji_dic[str(resources_name)] + int(
+                        resources_shuliang) * int(resources_zongcishu)
+                else:
+                    shuliangtongji_dic[str(resources_name)] = int(resources_shuliang) * int(resources_zongcishu)
+                log_str = "道具：" + str(resources_name) + "，数量：" + str(resources_shuliang) + "，一共抽到：" + str(
+                    resources_zongcishu) + "次"
+                log_str_z = log_str_z +log_str
+        return log_str_z
+
+
     def GM_fengkuang_hengsaoqianjun(self, activity_id, cishu):
         """
         横扫千军10连抽，
@@ -1498,7 +1540,7 @@ class MyPoco:
         new_excel_tab("时空召唤", log_str_z, tongji_str_z, shijiancishu)
         return log_str_z, tongji_str_z, shijiancishu
 
-    def GM_fengkuang_xianshijinjiang(self, activity_id, id_name_into, camps_name, cishu):
+    def GM_fengkuang_xianshijinjiang(self, activity_id, id_name_into, camps_name, cishu,resource_name=None):
         """
         限时神将10连抽，检测是否抽到指定的东西,默认抽到一次后就停止
         :param activity_id: int 活动ID，GM后台配置
@@ -1522,7 +1564,8 @@ class MyPoco:
                        "金2(2.2.0)": "100008",
                        "金3(2.2.0)": "100009",
                        "第六期金1-金5": "100010",
-                       "紫金1双卡池": "100011"}
+                       "紫金1双卡池": "100011",
+                       "紫金2双卡池": "100015",}
         # "配置对应的期数ID": "实际协议传输的ID",
         id_into_dic = {"100000": 1,
                        "100001": 5,
@@ -1536,6 +1579,7 @@ class MyPoco:
                        "100009": 37,
                        "100010": 41,
                        "100011": 45,
+                       "100015": 59,
                        }
         id_into_key = id_name_dic[id_name_into]
         if camps_name == "魏":
@@ -1553,7 +1597,10 @@ class MyPoco:
         elif camps_name == "金":
             id_into = id_into_dic[id_into_key]
             sub_type = 1
-        elif camps_name == "紫金":
+        elif camps_name == "紫金1":
+            id_into = id_into_dic[id_into_key] + 1
+            sub_type = 2
+        elif camps_name == "紫金1-2":
             id_into = id_into_dic[id_into_key] + 1
             sub_type = 2
         else:
@@ -1563,11 +1610,22 @@ class MyPoco:
         add_type, add_value = self.protocol.mri.get_type_id_from_name("紫金神将令")
         self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)
         resource_dic_list = []
+        find_num_list = []
+        if resource_name!=None:
+            find_type, find_value = self.protocol.mri.get_type_id_from_name(resource_name)
         for i in range(cishu):
             award_list = self.protocol.xianshishenjiang_shilian(activity_id, id_into, sub_type)
+            if resource_name != None:
+                for award in award_list:
+                    if award["type"] ==find_type and award["value"] ==find_value:
+                        find_num_list.append(i+1)
             resource_dic_list = resource_dic_list + award_list
         log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
         new_excel_tab("限时金将", log_str_z, tongji_str_z, shijiancishu)
+        print("-------------------------")
+        print("指定的奖励出现的次数")
+        print(find_num_list)
+        print("-------------------------")
         return log_str_z, tongji_str_z, shijiancishu
 
     def GM_fengkuang_shenbingxilian(self, artifact_name, cishu):
@@ -1757,3 +1815,29 @@ class MyPoco:
         is_win = self.protocol.Debate_BattleStart(2)
         if not is_win:
             self.protocol.Debate_BattleStart(0)
+
+
+    def dongfengxunbao(self,dengji):
+        """
+        东风寻宝
+        :return:
+        """
+        exp_dic = {20:6230,59:1662490,60:1828280,80:8230080,81:8723680,120:48011290,}
+        exp_num = exp_dic[dengji]
+        self.protocol.add_resource_pb(1, 1, exp_num)
+        open_award_list = self.protocol.GuideWind_Start()#开启奖池
+        self.protocol.add_resource_pb(3, 262, 5)
+        log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(open_award_list)
+        log_str_z = log_str_z.replace("抽奖结果：","启阵结果，")
+        log_str_z = log_str_z.replace("道具", "启阵道具")
+        choujiang_log = log_str_z+"\r\n"
+        for i in range(5):
+            get_award_list = self.protocol.GuideWind_Draw()#开始抽奖
+            log_str_z= self.make_ui_log_by_gm_dongfeng(get_award_list)
+            if i == 0:
+                choujiang_log = choujiang_log + "第" + str(i + 1) + "次" + log_str_z
+            else:
+                choujiang_log = choujiang_log+"\r\n"+"第"+str(i+1)+"次"+log_str_z
+        return choujiang_log
+
+

@@ -2,24 +2,30 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2cb626f3-9a2f-46a9-8452-99af37d546a7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/foundation/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/foundation/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/foundation/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/foundation/tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/info_tab/少三2道具类型表.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/info_tab/少三2道具类型表.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/my_poco.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/my_poco.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/gvg_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/gvg_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/locust_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/locust_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/bs.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/bs.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/bs_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/proto/bs_pb2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/cg_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/proto/cg_pb2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol/login_game.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol/login_game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol/protocol_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol/protocol_function.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/bs.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/bs.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/bs_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/bs_pb2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/cg_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/cg_pb2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/cs.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/cs.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/cs_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/cs_pb2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/enums.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/enums.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/enums_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/enums_pb2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/out_base.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/out_base.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/out_base_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/out_base_pb2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/ret.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/ret.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/ret_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Tools/MyPoco/protocol_file/ret_pb2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/GVG_account.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/gvg_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/gvg_function.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proto/cs.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/cs.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proto/cs_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/proto/cs_pb2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/enums.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/enums.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/enums_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/proto/enums_pb2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/out_base.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/out_base.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/out_base_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/proto/out_base_pb2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/ret.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/ret.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/ret_pb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/proto/ret_pb2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../main/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/../main/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/MyException.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/MyException.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/protocol_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/../main/protocol_test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,24 +34,24 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/main/gvg_function.py">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gvg_function.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="572" column="39" lean-forward="true" selection-start-line="572" selection-start-column="39" selection-end-line="572" selection-end-column="39" />
+            <state relative-caret-position="95">
+              <caret line="1880" column="16" selection-start-line="1880" selection-start-column="16" selection-end-line="1880" selection-end-column="16" />
               <folding>
-                <element signature="e#238#253#0" expanded="true" />
+                <element signature="e#240#255#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/proto/cs.proto">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="283">
-              <caret line="9954" column="29" selection-start-line="9954" selection-start-column="20" selection-end-line="9954" selection-end-column="29" />
+            <state relative-caret-position="468">
+              <caret line="9796" selection-start-line="9796" selection-end-line="9796" />
             </state>
           </provider>
         </entry>
@@ -53,29 +59,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/proto/out_base.proto">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="318">
-              <caret line="2780" column="24" selection-start-line="2780" selection-start-column="17" selection-end-line="2780" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/proto/ret.proto">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="186" column="37" selection-start-line="186" selection-start-column="37" selection-end-line="186" selection-end-column="37" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main/run.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="118">
-              <caret line="10" column="31" selection-start-line="10" selection-start-column="31" selection-end-line="10" selection-end-column="31" />
-              <folding>
-                <element signature="e#59#68#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="261">
+              <caret line="2724" column="50" selection-start-line="2724" selection-start-column="50" selection-end-line="2724" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -84,39 +69,40 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>14446</find>
-      <find>is_in_match</find>
-      <find>attack_gate_cd</find>
-      <find>攻击城门</find>
-      <find>成功</find>
-      <find>set_checkpoint</find>
-      <find>MSG_C2S_GVG_GetUserSnapshots</find>
-      <find>82</find>
-      <find>S2C_GVG_NotifyUserEnter</find>
-      <find>MSG_S2C_GVG_NotifyMatchEnd</find>
-      <find>S2C_GVG_NotifyMatchEnd</find>
-      <find>寻宝</find>
-      <find>启</find>
-      <find>周末活动</find>
-      <find>攻击玩家成功</find>
-      <find>14444</find>
-      <find>waiting_for_you</find>
-      <find>14473</find>
-      <find>MSG_C2S_GVG_LeaveMatch</find>
-      <find>print(C2S_GVG_GetUserSnapshots.user_ids)</find>
-      <find>报名</find>
-      <find>战报名</find>
-      <find>127</find>
-      <find>军团名为：gvg</find>
+      <find>GVG_Join</find>
+      <find>G2C_Login</find>
+      <find>C2G_Login</find>
+      <find>1099511931408</find>
+      <find>1099511931407</find>
+      <find>军团战报名</find>
+      <find>军团战报名成功</find>
+      <find>sever_name</find>
+      <find>Guild_name_id</find>
+      <find>209</find>
+      <find>on_s</find>
+      <find>get_a</find>
+      <find>查询成功</find>
+      <find>军团</find>
+      <find>on_</find>
+      <find>军团名为</find>
+      <find>C2S_GVG_Move</find>
+      <find>on_st</find>
+      <find>UserSnapshot</find>
+      <find>UserSnapshot</find>
       <find>C2S_GVG_GetUserSnapshots</find>
-      <find>GVGMatchGridTower</find>
-      <find>notify</find>
-      <find>S2C_GVG_BatchNotify</find>
-      <find>GVGNotify</find>
-      <find>更新数据失败，协议编号</find>
+      <find>UserSnapshot {</find>
+      <find>失败</find>
+      <find>进入</find>
+      <find>self_pos_id = self.lg.match_user_dic[self.lg.uid][&quot;位置ID&quot;]</find>
+      <find>1099511932414</find>
+      <find>离开</find>
+      <find>if self.match_user_dic[user_id][&quot;位置ID&quot;] in self.fuhuo_pos:</find>
+      <find>GVGMatchUser {</find>
+      <find>C2S_GVG_EnterMatch</find>
     </findStrings>
     <replaceStrings>
       <replace>&quot;&quot;</replace>
+      <replace>sever_name</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -128,11 +114,14 @@
         <option value="$PROJECT_DIR$/main/locust_test.py" />
         <option value="$PROJECT_DIR$/proto/out_base.proto" />
         <option value="$PROJECT_DIR$/proto/ret.proto" />
-        <option value="$PROJECT_DIR$/proto/bs_pb2.py" />
         <option value="$PROJECT_DIR$/proto/cg_pb2.py" />
         <option value="$PROJECT_DIR$/proto/cs_pb2.py" />
+        <option value="$PROJECT_DIR$/proto/bs_pb2.py" />
         <option value="$PROJECT_DIR$/main/run.py" />
         <option value="$PROJECT_DIR$/main/gvg_function.py" />
+        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/tools/MyException.py" />
+        <option value="$PROJECT_DIR$/gvg_function.py" />
       </list>
     </option>
   </component>
@@ -148,10 +137,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1942" />
-    <option name="y" value="5" />
+    <option name="x" value="1945" />
+    <option name="y" value="34" />
     <option name="width" value="1896" />
-    <option name="height" value="1030" />
+    <option name="height" value="1006" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -177,6 +166,11 @@
               <item name="gvg_xieyi" type="462c0819:PsiDirectoryNode" />
               <item name="proto" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="gvg_xieyi" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gvg_xieyi" type="462c0819:PsiDirectoryNode" />
+              <item name="tools" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -184,7 +178,14 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../.." />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\RobotizationTest\com\gvg_xieyi" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -198,7 +199,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.run">
+  <component name="RunManager" selected="Python.run (1)">
     <configuration name="GM_UI_v2" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gvg_xieyi" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -220,6 +221,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="gvg_function (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="gvg_xieyi" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gvg_function.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="gvg_function" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gvg_xieyi" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -232,7 +254,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main/gvg_function.py" />
+      <option name="SCRIPT_NAME" value="D:\RobotizationTest\com\gvg_xieyi\gvg_function.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -241,7 +263,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="locust_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="run (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gvg_xieyi" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -249,11 +271,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/main" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main/locust_test.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -274,7 +296,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main/run.py" />
+      <option name="SCRIPT_NAME" value="D:\RobotizationTest\com\gvg_xieyi\run.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -285,10 +307,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.run (1)" />
+        <item itemvalue="Python.gvg_function (1)" />
         <item itemvalue="Python.run" />
         <item itemvalue="Python.gvg_function" />
         <item itemvalue="Python.GM_UI_v2" />
-        <item itemvalue="Python.locust_test" />
       </list>
     </recent_temporary>
   </component>
@@ -306,15 +329,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1942" y="5" width="1896" height="1030" extended-state="0" />
-    <editor active="true" />
+    <frame x="1945" y="34" width="1896" height="1006" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14550409" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11111111" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32924107" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49946353" visible="true" weight="0.10491072" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49946353" visible="true" weight="0.1559633" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.28348213" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -324,11 +346,11 @@
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.12611607" />
       <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="bottom" id="Messages" order="11" />
-      <window_info anchor="right" id="make" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="aiXcoder" order="3" />
+      <window_info anchor="right" id="make" order="4" />
     </layout>
     <layout-to-restore>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14550409" />
@@ -354,13 +376,6 @@
     </layout-to-restore>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/proto/cg.proto">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="9" column="26" lean-forward="true" selection-start-line="9" selection-start-column="26" selection-end-line="9" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/D/file/Programming/PDK/Lib/random.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="252">
@@ -427,34 +442,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../books/协议/protocol_help.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="12" column="12" selection-start-line="12" selection-start-column="12" selection-end-line="12" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/proto/bs_pb2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/proto/cg_pb2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/proto/cs_pb2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/proto/enums_pb2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -483,51 +470,170 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/proto/ret.proto">
+    <entry file="file://$PROJECT_DIR$/main/log.txt" />
+    <entry file="file://$PROJECT_DIR$/proto/bs_pb2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="186" column="37" selection-start-line="186" selection-start-column="37" selection-end-line="186" selection-end-column="37" />
+        <state relative-caret-position="248">
+          <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main/run.py">
+    <entry file="file://$PROJECT_DIR$/proto/cs_pb2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="118">
-          <caret line="10" column="31" selection-start-line="10" selection-start-column="31" selection-end-line="10" selection-end-column="31" />
+        <state relative-caret-position="315">
+          <caret line="15" column="19" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../books/协议/protocol_help.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="12" column="37" selection-start-line="12" selection-start-column="2" selection-end-line="12" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/qstools_shanhai.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="5" column="8" selection-start-line="5" selection-end-line="5" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/rclient.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="18" column="34" lean-forward="true" selection-start-line="18" selection-start-column="34" selection-end-line="18" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/sendrecvpub.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3360" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/Python/Python37/site-packages/locust/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
           <folding>
-            <element signature="e#59#68#0" expanded="true" />
+            <element signature="e#0#75#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/proto/cg_pb2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="822" selection-start-line="822" selection-end-line="822" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/proto/cg.proto">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="86">
+          <caret line="54" column="22" selection-start-line="54" selection-start-column="18" selection-end-line="54" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/proto/ret.proto">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="67">
+          <caret line="187" column="34" selection-start-line="187" selection-start-column="34" selection-end-line="187" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/Python/Python37/site-packages/locust/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="82">
+          <caret line="385" selection-start-line="385" selection-end-line="385" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/MyException.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="123">
+          <caret line="6" column="9" selection-start-line="6" selection-start-column="9" selection-end-line="6" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust0.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="411" column="32" selection-start-line="418" selection-start-column="27" selection-end-line="418" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust1.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="5161" column="41" selection-start-line="5161" selection-start-column="41" selection-end-line="5161" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust2.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="9" column="49" selection-start-line="9" selection-start-column="49" selection-end-line="9" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust3.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="8" column="27" selection-start-line="8" selection-start-column="27" selection-end-line="8" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust4.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-31" />
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust5.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-31" />
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust6.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-31" />
+      </provider>
+    </entry>
+    <entry file="file://D:/百度网盘/15697_10.22.184.13log/locust7.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="348">
+          <caret line="418" column="62" lean-forward="true" selection-start-line="418" selection-start-column="4" selection-end-line="418" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/proto/out_base.proto">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="261">
+          <caret line="2724" column="50" selection-start-line="2724" selection-start-column="50" selection-end-line="2724" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gvg_function.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="1880" column="16" selection-start-line="1880" selection-start-column="16" selection-end-line="1880" selection-end-column="16" />
+          <folding>
+            <element signature="e#240#255#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/proto/cs.proto">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="9954" column="29" selection-start-line="9954" selection-start-column="20" selection-end-line="9954" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/proto/out_base.proto">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="2780" column="24" selection-start-line="2780" selection-start-column="17" selection-end-line="2780" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main/log.txt">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="99">
-          <caret line="1556" column="64" lean-forward="true" selection-start-line="1556" selection-start-column="64" selection-end-line="1556" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main/gvg_function.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="572" column="39" lean-forward="true" selection-start-line="572" selection-start-column="39" selection-end-line="572" selection-end-column="39" />
-          <folding>
-            <element signature="e#238#253#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="468">
+          <caret line="9796" selection-start-line="9796" selection-end-line="9796" />
         </state>
       </provider>
     </entry>
