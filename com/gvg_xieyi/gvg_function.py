@@ -18,7 +18,7 @@ from proto import cs_pb2, cg_pb2
 import hashlib, json, base64
 from tools.MyException import *
 from socket import create_connection
-from locust import task, TaskSequence, Locust, events
+from locust import task, TaskSequence, Locust, events,seq_task
 import random
 from redis import Redis
 
@@ -29,7 +29,7 @@ class LoginGame:
             dateArray = datetime.datetime.fromtimestamp(game_account_f)
             hms = dateArray.strftime("%Y%m%d")
             game_account_int = int(game_account_f * 1000000)
-            self.username = "4"+hms[-1:] + str(game_account_int)[-6:]
+            self.username = "6"+hms[-1:] + str(game_account_int)[-6:]
             self.set_account_sql(self.username, server_name_into)
             server_name = server_name_into
         else:
@@ -41,10 +41,12 @@ class LoginGame:
         server_id_dic = {"QA1": 1652440001, "QA2": 1652440002, "QA3": 1652440003, "QA4": 1652440004, "QA5": 1652440005,"QA6": 1652440006,
                          "QA7": 1652440007, "新QA1": 1733440001, "新QA2": 1733440002, "新QA3": 1733440003, "新QA4": 1733440004, "新QA5": 1733440005,}
         self.server_id = server_id_dic[server_name]
-        # self.host = "fqa.sk.youzu.com"
-        # self.port = 19007
-        self.host="t0.pvpngame2.uuzuonline.net"
-        self.port=14028
+        if "新" in server_name_into:
+            self.host = "fqa.sk.youzu.com"
+            self.port = 19007
+        else:
+            self.host="t0.pvpngame2.uuzuonline.net"
+            self.port=14028
         try:
             self.socket = create_connection((self.host, self.port))
         except Exception:
@@ -60,8 +62,8 @@ class LoginGame:
         self.all_move_pos_id_list = [ 585, 621, 657,580,616,373,337,377,341,303,265,238,239,240,241,242,269,268,266,652,653,654,877,913,951,1096,1095,597,633,669,600,636,672,673,674,638,602,601,1094,1132,1168,133,132,131,158,185,186,187,160,1167,1166,1130,917,881,989,988,986,985,1025,1024,1023,1022,1021,618,582,581, 597, 633, 669,]  # 所有可以移动位置,buff区，城门区，炮台攻占区
         self.go_gate_dic = {1000102: [585,549,693, 621, 657, ], 1000101: [597,561,705, 633, 669, ]}  # 城门位置id：可攻击位置id[]
         self.buff_dic = {}  # buff点位置[buff_id，消失时间]
-        self.tower_dic = [[881,917,877,913,951,989,988,986,985,1025,1024,1022,1021],
-                          [337,341,377,373,303,265,266,268,269,242,241,240,239,238]]  # 两个炮台战斗区id
+        self.tower_dic = [[1025,881,917,877,913,951,989,988,986,985,1024,1022,1021],
+                          [242,337,341,377,373,303,265,266,268,269,241,240,239,238]]  # 两个炮台战斗区id
         self.zhanling_dic = {881: "", 877: "", 913: "", 951: "", 917: "",  303: "", 337: "", 373: "",
                              341: "",377: "", }  # 占领区id :占领区uid 记录谁当前在占领区
         self.G_bisai_id = 0  # 军团战比赛ID
@@ -91,6 +93,8 @@ class LoginGame:
         :param content_size:
         :return: None
         """
+        if workname == "":
+            return
         events.request_success.fire(
             request_type=restype,
             name=workname,
@@ -106,6 +110,8 @@ class LoginGame:
         :param errormsg: 错误日志
         :return: None
         """
+        if workname == "":
+            return
         exc = ProtocolException(errormsg)
         events.request_failure.fire(
             request_type=restype,
@@ -167,7 +173,7 @@ class LoginGame:
         else:
             flag = False
             self.failure("socket", workname, "接收数据失败")
-            print(workname+"接收数据失败")
+            print(str(self.uid)+workname+"接收数据失败")
         return flag, receive_data
 
     def recv_data(self, api_attr, buffersize, limittime):
@@ -373,7 +379,7 @@ class LoginGame:
         if S2C_Chat.ret == 1:
             print(str(self.uid) + "聊天框发送信息成功")
         else:
-            raise ProtocolException(str(self.uid) + "聊天框发送信息失败" + str(S2C_Chat.ret))
+            print(str(self.uid) + "聊天框发送信息失败" + str(S2C_Chat.ret))
 
     def MSG_C2S_Guild_Search(self, Guild_name):
         """
@@ -402,6 +408,10 @@ class LoginGame:
                 member_num = guild.member_num
                 if member_num >= 48:
                     raise ProtocolException("军团人数已满")
+        elif S2C_Guild_Search.ret == 82:
+            self.is_guild_boss = True
+            print("已经加入军团，应该是账号重复了")
+            return ""
         elif S2C_Guild_Search.ret == 87 or S2C_Guild_Search.ret == 104:
             C2S_Guild_Create = cs_pb2.C2S_Guild_Create()
             C2S_Guild_Create.name = Guild_name
@@ -455,6 +465,22 @@ class LoginGame:
                                'send_cmd': 11014, 'recv_cmd': 11015, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_Guild_Quit, C2S_Guild_Quit_attr)  # 装包，需要学习
         self.send_receive(senddata, C2S_Guild_Quit_attr, 32, norecv=True)  # 发送协议
+
+    def MSG_C2G_KeepAlive(self):
+        """
+        退出军团协议
+        :param Guild_name: string 军团名字
+        :param uid:
+        :param sid:
+        :return:
+        """
+        C2G_KeepAlive = cg_pb2.C2G_KeepAlive()
+        C2G_KeepAlive = C2G_KeepAlive.SerializeToString()
+        C2G_KeepAlive_attr = {'name': "C2G_KeepAlive", 'protocol': 'protobuf-ss',
+                               'send_cmd': 10006, 'recv_cmd': 10007, 'uid': self.uid, 'sid': self.sid}
+        senddata = self.pack_data(C2G_KeepAlive, C2G_KeepAlive_attr)  # 装包，需要学习
+        self.send_receive(senddata, C2G_KeepAlive_attr, 32, norecv=True)  # 发送协议
+
 
     def MSG_C2S_GVG_GetInfo(self, ):
         """
@@ -603,7 +629,7 @@ class LoginGame:
                 self.guild_index_dic[guild_num_str] = guild_list.revive_grid_id  # 军团ID当key
             for user in S2C_GVG_EnterMatch.users:  # 比赛中的玩家列表
                 self.make_user_info(user)
-                self.match_user_dic[self.uid]={"军团ID": 0, "血量": 100, "位置ID": self.fuhuo_pos[0],
+            self.match_user_dic[self.uid]={"军团ID": 0, "血量": 100, "位置ID": self.fuhuo_pos[0],
                                              "移动结束时间": 0, "无敌结束时间": 0}
             for gate_list in S2C_GVG_EnterMatch.gates:  # 城门
                 self.gate_dic[gate_list.grid_id] = gate_list.hp
@@ -622,7 +648,7 @@ class LoginGame:
             #     self_uid_dic["血量"] = 100
             #     self_uid_dic["无敌结束时间"] = 0
             #     self.match_user_dic[self.uid] = self_uid_dic
-            self.MSG_C2S_GVG_GetUserSnapshots()  # 在这里拉取一下在场玩家的数据，更新一下军团ID
+            # self.MSG_C2S_GVG_GetUserSnapshots()  # 在这里拉取一下在场玩家的数据，更新一下军团ID
             # for tower_list in S2C_GVG_EnterMatch.towers:  # 炮台
             #     grid_id = tower_list.grid_id
             #     if "guild_id" in dir(tower_list):
@@ -696,7 +722,7 @@ class LoginGame:
                         if self.UserEnter_id != data.message_index:
                             self.UserEnter_id = data.message_index
                             self.make_user_info(data.user)
-                            self.MSG_C2S_GVG_GetUserSnapshots(data.user.user_id)
+                            # self.MSG_C2S_GVG_GetUserSnapshots(data.user.user_id)
                         return
                     if recvcmd_into == 14447:
                         # 玩家离开比赛推送
@@ -1267,6 +1293,8 @@ class LoginGame:
                     C2S_GVG_GetUserSnapshots.user_ids.append(uid)
                     print_uid_list.append(uid)
                     uid_num = uid_num+1
+            if len(print_uid_list)==0:
+                return
         else:
             print_uid_list = uid
             C2S_GVG_GetUserSnapshots.user_ids.append(uid)
@@ -1466,6 +1494,8 @@ class LoginGame:
         userid = r.lpop('ss2')
         print("获取账号")
         r.close()
+        if userid == None:
+            raise ProtocolException("没有账号了")
         return userid,None
 
 
@@ -1511,7 +1541,6 @@ class LoginGame:
             G2C_Create = cg_pb2.G2C_Create()
             G2C_Create.ParseFromString(data_Create)
             if G2C_Create.ret == 1:
-
                 C2S_SyncTime = cs_pb2.C2S_SyncTime()  # 创建发送协议对象
                 C2S_SyncTime.client_time = int(time.time())  # 参数赋值
                 C2S_SyncTime = C2S_SyncTime.SerializeToString()  # 序列化
@@ -1555,7 +1584,19 @@ class MyTaskSet(TaskSequence):
         sever_name = "QA5"
         self.lg = LoginGame(False,sever_name) # 读取数据库里面的账号
         self.lg.Login()
+        while True:
+            r = Redis(host='10.23.139.54', password='username_redis', decode_responses=True)
+            account_num = r.llen('ss2')
+            r.close()
+            self.lg.MSG_C2G_KeepAlive()
+            if account_num<1:
+                break
+            time.sleep(10)
         self.lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
+        self.lg.MSG_C2S_GVG_EnterMatch()
+        for i in range(6):
+            self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
+        self.always_move()
 
     def in_out_match(self):
         print(str(self.lg.uid) + "进入或退出战斗")
@@ -1563,7 +1604,6 @@ class MyTaskSet(TaskSequence):
             self.lg.MSG_C2S_GVG_LeaveMatch()  # 离开比赛
         else:  # 不在场
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-
 
     def always_in_out(self):
         """
@@ -1577,7 +1617,7 @@ class MyTaskSet(TaskSequence):
         if not self.lg.is_in_match:  # 在场
             self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
 
-
+    @seq_task(20)
     def always_move(self):
         """
         溜达溜达
@@ -1585,82 +1625,73 @@ class MyTaskSet(TaskSequence):
         """
         # 可移动ID的列表
         print(str(self.lg.uid) +"溜达溜达")
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
+        # if not self.lg.is_in_match:
+        #     self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
         all_move_pos_id_list = self.lg.all_move_pos_id_list
         old_pos_id = 0
-        for i in range(50):
+        for i in range(2):
             angle = random.randint(0, len(all_move_pos_id_list) - 1)
-            # 做一个随机数，随机选取列表中的坐标
+                # 做一个随机数，随机选取列表中的坐标
             target_pos_id = all_move_pos_id_list[angle]
-            if old_pos_id != target_pos_id:
-                try:
-                    self.lg.MSG_C2S_GVG_Move(target_pos_id)  # 玩家移动
-                except Exception:
-                    return
+            if old_pos_id != target_pos_id and target_pos_id not in self.lg.fuhuo_pos:
+                self.lg.MSG_C2S_GVG_Move(target_pos_id)  # 玩家移动
                 old_pos_id = target_pos_id
 
-    @task()
+    @seq_task(5)
     def tower_battle(self):
         """
         炮台的战斗
         :return:
         """
         print(str(self.lg.uid) +"炮台的战斗")
-        # 移动到炮台抢占区
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for i in range(10):
-            self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
-        # 炮台区空着就先去抢炮台区
         for zhanling_pos_id in self.lg.zhanling_dic.keys():
             if self.lg.zhanling_dic[zhanling_pos_id] == "":  # 判断占领区有没有人
-                # self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
-                # 判断自己在不在占领区对应的抢占区,或者自己在不在占领区
-                # if self_pos_id not in self.lg.zhanling_dic.keys():#不在占领区就不移动了
-                try:
-                    pos_list_id = random.randint(0, 1)
-                    first_pos_list = self.lg.tower_dic[pos_list_id]
-                    self.lg.MSG_C2S_GVG_Move(first_pos_list[0])
-                    print(str(self.lg.uid)+"移动到抢占区"+str(first_pos_list[0]))
-                    self.lg.MSG_C2S_GVG_Move(zhanling_pos_id)  # 玩家移动
-                    print(str(self.lg.uid) + "移动到炮台占领区" + str(zhanling_pos_id))
-                except Exception:
-                    print(str(self.lg.uid)+"移动到空的抢占位失败")
-                    return
+                pos_list_id = random.randint(0, 1)
+                first_pos_list = self.lg.tower_dic[pos_list_id]
+                self.lg.MSG_C2S_GVG_Move(first_pos_list[0])
+                print(str(self.lg.uid)+"移动到抢占区"+str(first_pos_list[0]))
+                self.lg.MSG_C2S_GVG_Move(zhanling_pos_id)  # 玩家移动
+                print(str(self.lg.uid) + "移动到炮台占领区" + str(zhanling_pos_id))
                 break
         self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]  # 找到自己位置
         if self_pos_id not in self.lg.tower_dic[0] and self_pos_id not in self.lg.tower_dic[1]:  # 判断自己不在炮台区域
             pos_list = self.lg.tower_dic[0] + self.lg.tower_dic[1]
             pos_angle = random.randint(0, len(pos_list) - 1)
             go_pos_id = pos_list[pos_angle]
-            try:
-                self.lg.MSG_C2S_GVG_Move(go_pos_id)  # 移动到抢占区
-            except Exception:
-                print("移动到抢占区失败")
-                return
+            self.lg.MSG_C2S_GVG_Move(go_pos_id)  # 移动到抢占区
             self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
         zhanling_uid = 0
         # 判断自己在哪个炮台区域
         if self_pos_id in self.lg.tower_dic[0]:
-            pos_agl = random.randint(0, len(self.lg.tower_dic[0]))  # 随机一个角标
-            pos = self.lg.tower_dic[0][pos_agl]  # 随机一个位置
+            for i in range(100):
+                pos_agl = random.randint(0, len(self.lg.tower_dic[1])-1)  # 随机一个角标
+                pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+                if pos in self.lg.nearby_user_dic_list.keys():
+                    break
             if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
                 uid = self.lg.zhanling_dic[pos]
-                if uid != 0 and uid != self.lg.uid:
+                if uid != "" and uid != self.lg.uid:
                     zhanling_uid = uid
             else:
+                for i in range(100):
+                    pos_agl = random.randint(0, len(self.lg.tower_dic[1]) - 1)  # 随机一个角标
+                    pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+                    if pos in self.lg.nearby_user_dic_list.keys():
+                        break
                 user_dic = self.lg.nearby_user_dic_list[pos]  # 从位置玩家表里找人
                 for uid in user_dic.keys():
                     if user_dic[uid] == 0:  # 谁在就打谁
                         zhanling_uid = uid
                         break
         elif self_pos_id in self.lg.tower_dic[1]:
-            pos_agl = random.randint(0, len(self.lg.tower_dic[1]))  # 随机一个角标
-            pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+            for i in range(100):
+                pos_agl = random.randint(0, len(self.lg.tower_dic[1])-1)  # 随机一个角标
+                pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+                if pos in self.lg.nearby_user_dic_list.keys():
+                    break
             if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
                 uid = self.lg.zhanling_dic[pos]
-                if uid != 0 and uid != self.lg.uid:
+                if uid != "" and uid != self.lg.uid:
                     zhanling_uid = uid
             else:
                 user_dic = self.lg.nearby_user_dic_list[pos]
@@ -1670,26 +1701,19 @@ class MyTaskSet(TaskSequence):
                         break
         else:
             print(str(self.lg.uid) +"err：没有移动到炮台区域，无法进行炮台战斗")
-            return
         if zhanling_uid != 0:
             self.lg.MSG_C2S_GVG_AttackUser(zhanling_uid)  # 攻击对应占领区玩家
         else:
             print("err：没有找到合适的人选，无法进行炮台战斗")
 
-    @task()
+    @seq_task(2)
     def user_battle(self):
         """
         玩家间相互战斗
         :return:
         """
         print(str(self.lg.uid) +"玩家间相互战斗")
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for i in range(10):
-            self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
-        # 攻击任意玩家
-        # 做一个可攻击玩家列表
-        for i in range(50):
+        for i in range(25):
             user_id_list = []
             for uid in self.lg.match_user_dic.keys():
                 if self.lg.match_user_dic[self.lg.uid]["军团ID"]!= self.lg.match_user_dic[uid]["军团ID"]:  # 不是一个军团
@@ -1720,37 +1744,31 @@ class MyTaskSet(TaskSequence):
                 if go_pos not in self.lg.fuhuo_pos:
                     break
             # 如果选定的玩家和自己不在一个位置，就先过去
-            if go_pos!=0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
-                try:
-                    self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
-                except Exception:
-                    print(str(self.lg.uid) +"攻打玩家移动报错了，没有走过去")
-                    break
+            if go_pos != 0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+                self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
+            elif go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+                new_time = time.time()
+                if new_time < self.lg.attack_time:
+                    time.sleep(self.lg.attack_time - new_time)
+                if do_uid == 0:
+                    continue
+                self.lg.MSG_C2S_GVG_AttackUser(do_uid)  # 攻击玩家
+                self.lg.attack_time = time.time() + self.lg.attack_cd
             else:
-                print(str(self.lg.uid) +"没有找到合适的攻击人选")
-                return
-            new_time = time.time()
-            if new_time < self.lg.attack_time:
-                time.sleep(self.lg.attack_time - new_time)
-            if do_uid == 0:
-                return
-            self.lg.MSG_C2S_GVG_AttackUser(do_uid)  # 攻击玩家
-            self.lg.attack_time = time.time() + self.lg.attack_cd
+                angle = random.randint(0, len(user_id_list) - 1)
+                do_uid = user_id_list[angle]
+                self.lg.MSG_C2S_GVG_AttackUser(do_uid)
+                time.sleep(2)
+                print(str(self.lg.uid) + "没有找到合适的攻击人选，随便打打")
 
-    @task()
+    @seq_task(10)
     def user_battle_tow(self):
         """
         玩家间相互战斗
         :return:
         """
         print(str(self.lg.uid) + "玩家间相互战斗")
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for i in range(10):
-            self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
-        # 攻击任意玩家
-        # 做一个可攻击玩家列表
-        for i in range(50):
+        for i in range(25):
             user_id_list = []
             for uid in self.lg.match_user_dic.keys():
                 if self.lg.match_user_dic[self.lg.uid]["军团ID"] != self.lg.match_user_dic[uid]["军团ID"]:  # 不是一个军团
@@ -1782,61 +1800,26 @@ class MyTaskSet(TaskSequence):
                     break
             # 如果选定的玩家和自己不在一个位置，就先过去
             if go_pos != 0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
-                try:
-                    self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
-                except Exception:
-                    print(str(self.lg.uid) + "攻打玩家移动报错了，没有走过去")
-                    break
+                self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
+            elif go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+                new_time = time.time()
+                if new_time < self.lg.attack_time:
+                    time.sleep(self.lg.attack_time - new_time)
+                if do_uid == 0:
+                    continue
+                self.lg.MSG_C2S_GVG_AttackUser(do_uid)  # 攻击玩家
+                self.lg.attack_time = time.time() + self.lg.attack_cd
             else:
-                print(str(self.lg.uid) + "没有找到合适的攻击人选")
-                return
-            new_time = time.time()
-            if new_time < self.lg.attack_time:
-                time.sleep(self.lg.attack_time - new_time)
-            if do_uid == 0:
-                return
-            self.lg.MSG_C2S_GVG_AttackUser(do_uid)  # 攻击玩家
-            self.lg.attack_time = time.time() + self.lg.attack_cd
+                angle = random.randint(0, len(user_id_list) - 1)
+                do_uid = user_id_list[angle]
+                self.lg.MSG_C2S_GVG_AttackUser(do_uid)
+                time.sleep(2)
+                print(str(self.lg.uid) + "没有找到合适的攻击人选，随便打打")
 
-
-    def attack_gate(self):
-        # 攻击城门
-        print(str(self.lg.uid) +"攻击城门")
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for i in range(10):
-            self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
-        self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
-        if self_pos_id not in self.lg.all_go_gate_pos_id_list:  # 判断是否需要移动
-            angle = random.randint(0, len(self.lg.all_go_gate_pos_id_list) - 1)
-            go_gate_pos_id = self.lg.all_go_gate_pos_id_list[angle]  # 随机选取一个攻击区域
-            try:
-                self.lg.MSG_C2S_GVG_Move(go_gate_pos_id)  # 玩家移动
-            except Exception:
-                return
-        else:
-            go_gate_pos_id = self_pos_id
-        # 判断能不能攻击城门
-        for gate_id in self.lg.go_gate_dic.keys():
-            gate_id_list = self.lg.go_gate_dic[gate_id]  # 某个城门的可攻击位置列表
-            if go_gate_pos_id in gate_id_list:
-                hp = self.lg.gate_dic[gate_id]
-                if hp != 0:
-                    new_time = time.time()
-                    if new_time<self.lg.attack_gate_time:
-                        time.sleep(self.lg.attack_gate_time-new_time)
-                    self.lg.MSG_C2S_GVG_AttackGate()  # 攻击城门
-                    self.lg.attack_gate_time = time.time()+self.lg.attack_gate_cd
-                    break
-
-    @task()
+    @seq_task(3)
     def always_attack_gate(self):
         # 攻击城门
         print(str(self.lg.uid) +"一直攻击城门")
-        if not self.lg.is_in_match:
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
-        for i in range(10):
-            self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
         self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
         if self_pos_id not in self.lg.all_go_gate_pos_id_list:  # 判断是否需要移动
             angle = random.randint(0, len(self.lg.all_go_gate_pos_id_list) - 1)
@@ -1851,7 +1834,7 @@ class MyTaskSet(TaskSequence):
         for gate_id in self.lg.go_gate_dic.keys():
             gate_id_list = self.lg.go_gate_dic[gate_id]  # 某个城门的可攻击位置列表
             if go_gate_pos_id in gate_id_list:
-                for i in range(100):
+                for i in range(50):
                     hp = self.lg.gate_dic[gate_id]
                     if hp != 0:
                         new_time = time.time()
@@ -1861,8 +1844,6 @@ class MyTaskSet(TaskSequence):
                         self.lg.attack_gate_time = time.time() + self.lg.attack_gate_cd
                     else:
                         break
-    # lg.MSG_C2S_GVG_Revive()  # 复活放到攻击推送里面，自动复活
-    # lg.MSG_C2S_GVG_AddBuff()  # 获取Buff，放到buff刷新推送里面，自动过去获取
 
 class MyLocust(Locust):
     def __init__(self):
@@ -1872,109 +1853,31 @@ class MyLocust(Locust):
     min_wait = 200
     max_wait = 200
 
-
 if __name__ == '__main__':
     # 这里是执行的时候放开的，不要注释，就这两行就行，执行旁边那个run.py的脚本
     # wl = MyLocust()
     # wl.run()
+
+    # r = Redis(host='10.23.139.54', password='username_redis', decode_responses=True)
+    # r.delete('ss2')
+    # print("清空数据")
+
+    # # for i in range(100):
+    # userid = r.lpop('ss2')
+    # print(userid)
+    # a = r.llen('ss2')
+    # print(a)
+    # r.close()
+
     sever_name = "QA5"
-    pop_num = 48
-    Guild_name_id = 53
-    for i in range(pop_num):
-        lg = LoginGame(True,"新QA1")
-        if i ==0:
-            lg.new_sql()
+    pop_num = 46
+    Guild_name_id = 202
+    juntuan= 50
+    for guid in range(juntuan):
+        for i in range(pop_num):
+            lg = LoginGame(True,sever_name)
             lg.Login()
-        else:
-            lg.Login()
-        Guild_name ="gvg"+str(Guild_name_id+1)
-        lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-        if not lg.is_guild_boss:  # 不是军团长才报名
-            lg.MSG_C2S_GVG_Join()  # 报名
-        lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-
-
-
-
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+2)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+3)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+4)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+5)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+6)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+7)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+8)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+9)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+10)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+11)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    #     lg = LoginGame("新QA1")
-    #     lg.Login(username_read=True)
-    #     Guild_name ="gvg"+str(Guild_name_id+12)
-    #     lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-    #     if not lg.is_guild_boss:  # 不是军团长才报名
-    #         lg.MSG_C2S_GVG_Join()  # 报名
-    #     lg.MSG_C2S_GVG_GetInfo()  # 获取军团战信息
-    # conn = sqlite3.connect('GVG_account.db')
-    # cursor = conn.cursor()
-    # cursor.execute('select *from user')
-    # values = cursor.fetchall()
-    # print(values)
+            Guild_name ="gg"+str(Guild_name_id+guid)
+            lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+            if not lg.is_guild_boss:  # 不是军团长才报名
+                lg.MSG_C2S_GVG_Join()  # 报名

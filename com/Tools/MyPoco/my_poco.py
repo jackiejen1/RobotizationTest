@@ -211,7 +211,7 @@ class MyPoco:
         :param name: 道具的名字
         :return:
         """
-        shenbing1="太公护符"
+        shenbing1="曲燕"
         shenbing2="倚天剑"
         shenbing3="七星宝刀"
         shenbing4="青釭剑"
