@@ -93,7 +93,7 @@ class LoginGame:
         :param content_size:
         :return: None
         """
-        if workname == "":
+        if workname == "C2G_Login":
             return
         events.request_success.fire(
             request_type=restype,
@@ -110,7 +110,7 @@ class LoginGame:
         :param errormsg: 错误日志
         :return: None
         """
-        if workname == "":
+        if workname == "C2G_Login":
             return
         exc = ProtocolException(errormsg)
         events.request_failure.fire(
@@ -1598,24 +1598,24 @@ class MyTaskSet(TaskSequence):
             self.lg.MSG_C2S_GVG_GetUserSnapshots()  # 获取比赛中的指定玩家的快照  所有
         self.always_move()
 
-    def in_out_match(self):
-        print(str(self.lg.uid) + "进入或退出战斗")
-        if self.lg.is_in_match:  # 在场
-            self.lg.MSG_C2S_GVG_LeaveMatch()  # 离开比赛
-        else:  # 不在场
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
+    # def in_out_match(self):
+    #     print(str(self.lg.uid) + "进入或退出战斗")
+    #     if self.lg.is_in_match:  # 在场
+    #         self.lg.MSG_C2S_GVG_LeaveMatch()  # 离开比赛
+    #     else:  # 不在场
+    #         self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
 
-    def always_in_out(self):
-        """
-        进进出出
-        :return: 
-        """
-        print(str(self.lg.uid) + "进进出出")
-        for i in range(2):
-            self.in_out_match()
-            time.sleep(1)
-        if not self.lg.is_in_match:  # 在场
-            self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
+    # def always_in_out(self):
+    #     """
+    #     进进出出
+    #     :return:
+    #     """
+    #     print(str(self.lg.uid) + "进进出出")
+    #     for i in range(2):
+    #         self.in_out_match()
+    #         time.sleep(1)
+    #     if not self.lg.is_in_match:  # 在场
+    #         self.lg.MSG_C2S_GVG_EnterMatch()  # 进入比赛
 
     @seq_task(20)
     def always_move(self):
@@ -1637,74 +1637,74 @@ class MyTaskSet(TaskSequence):
                 self.lg.MSG_C2S_GVG_Move(target_pos_id)  # 玩家移动
                 old_pos_id = target_pos_id
 
-    @seq_task(5)
-    def tower_battle(self):
-        """
-        炮台的战斗
-        :return:
-        """
-        print(str(self.lg.uid) +"炮台的战斗")
-        for zhanling_pos_id in self.lg.zhanling_dic.keys():
-            if self.lg.zhanling_dic[zhanling_pos_id] == "":  # 判断占领区有没有人
-                pos_list_id = random.randint(0, 1)
-                first_pos_list = self.lg.tower_dic[pos_list_id]
-                self.lg.MSG_C2S_GVG_Move(first_pos_list[0])
-                print(str(self.lg.uid)+"移动到抢占区"+str(first_pos_list[0]))
-                self.lg.MSG_C2S_GVG_Move(zhanling_pos_id)  # 玩家移动
-                print(str(self.lg.uid) + "移动到炮台占领区" + str(zhanling_pos_id))
-                break
-        self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]  # 找到自己位置
-        if self_pos_id not in self.lg.tower_dic[0] and self_pos_id not in self.lg.tower_dic[1]:  # 判断自己不在炮台区域
-            pos_list = self.lg.tower_dic[0] + self.lg.tower_dic[1]
-            pos_angle = random.randint(0, len(pos_list) - 1)
-            go_pos_id = pos_list[pos_angle]
-            self.lg.MSG_C2S_GVG_Move(go_pos_id)  # 移动到抢占区
-            self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
-        zhanling_uid = 0
-        # 判断自己在哪个炮台区域
-        if self_pos_id in self.lg.tower_dic[0]:
-            for i in range(100):
-                pos_agl = random.randint(0, len(self.lg.tower_dic[1])-1)  # 随机一个角标
-                pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
-                if pos in self.lg.nearby_user_dic_list.keys():
-                    break
-            if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
-                uid = self.lg.zhanling_dic[pos]
-                if uid != "" and uid != self.lg.uid:
-                    zhanling_uid = uid
-            else:
-                for i in range(100):
-                    pos_agl = random.randint(0, len(self.lg.tower_dic[1]) - 1)  # 随机一个角标
-                    pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
-                    if pos in self.lg.nearby_user_dic_list.keys():
-                        break
-                user_dic = self.lg.nearby_user_dic_list[pos]  # 从位置玩家表里找人
-                for uid in user_dic.keys():
-                    if user_dic[uid] == 0:  # 谁在就打谁
-                        zhanling_uid = uid
-                        break
-        elif self_pos_id in self.lg.tower_dic[1]:
-            for i in range(100):
-                pos_agl = random.randint(0, len(self.lg.tower_dic[1])-1)  # 随机一个角标
-                pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
-                if pos in self.lg.nearby_user_dic_list.keys():
-                    break
-            if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
-                uid = self.lg.zhanling_dic[pos]
-                if uid != "" and uid != self.lg.uid:
-                    zhanling_uid = uid
-            else:
-                user_dic = self.lg.nearby_user_dic_list[pos]
-                for uid in user_dic.keys():
-                    if user_dic[uid] == 0:
-                        zhanling_uid = uid
-                        break
-        else:
-            print(str(self.lg.uid) +"err：没有移动到炮台区域，无法进行炮台战斗")
-        if zhanling_uid != 0:
-            self.lg.MSG_C2S_GVG_AttackUser(zhanling_uid)  # 攻击对应占领区玩家
-        else:
-            print("err：没有找到合适的人选，无法进行炮台战斗")
+    # @seq_task(5)
+    # def tower_battle(self):
+    #     """
+    #     炮台的战斗
+    #     :return:
+    #     """
+    #     print(str(self.lg.uid) +"炮台的战斗")
+    #     for zhanling_pos_id in self.lg.zhanling_dic.keys():
+    #         if self.lg.zhanling_dic[zhanling_pos_id] == "":  # 判断占领区有没有人
+    #             pos_list_id = random.randint(0, 1)
+    #             first_pos_list = self.lg.tower_dic[pos_list_id]
+    #             self.lg.MSG_C2S_GVG_Move(first_pos_list[0])
+    #             print(str(self.lg.uid)+"移动到抢占区"+str(first_pos_list[0]))
+    #             self.lg.MSG_C2S_GVG_Move(zhanling_pos_id)  # 玩家移动
+    #             print(str(self.lg.uid) + "移动到炮台占领区" + str(zhanling_pos_id))
+    #             break
+    #     self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]  # 找到自己位置
+    #     if self_pos_id not in self.lg.tower_dic[0] and self_pos_id not in self.lg.tower_dic[1]:  # 判断自己不在炮台区域
+    #         pos_list = self.lg.tower_dic[0] + self.lg.tower_dic[1]
+    #         pos_angle = random.randint(0, len(pos_list) - 1)
+    #         go_pos_id = pos_list[pos_angle]
+    #         self.lg.MSG_C2S_GVG_Move(go_pos_id)  # 移动到抢占区
+    #         self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
+    #     zhanling_uid = 0
+    #     # 判断自己在哪个炮台区域
+    #     if self_pos_id in self.lg.tower_dic[0]:
+    #         for i in range(100):
+    #             pos_agl = random.randint(0, len(self.lg.tower_dic[1])-1)  # 随机一个角标
+    #             pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+    #             if pos in self.lg.nearby_user_dic_list.keys():
+    #                 break
+    #         if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
+    #             uid = self.lg.zhanling_dic[pos]
+    #             if uid != "" and uid != self.lg.uid:
+    #                 zhanling_uid = uid
+    #         else:
+    #             for i in range(100):
+    #                 pos_agl = random.randint(0, len(self.lg.tower_dic[1]) - 1)  # 随机一个角标
+    #                 pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+    #                 if pos in self.lg.nearby_user_dic_list.keys():
+    #                     break
+    #             user_dic = self.lg.nearby_user_dic_list[pos]  # 从位置玩家表里找人
+    #             for uid in user_dic.keys():
+    #                 if user_dic[uid] == 0:  # 谁在就打谁
+    #                     zhanling_uid = uid
+    #                     break
+    #     elif self_pos_id in self.lg.tower_dic[1]:
+    #         for i in range(100):
+    #             pos_agl = random.randint(0, len(self.lg.tower_dic[1])-1)  # 随机一个角标
+    #             pos = self.lg.tower_dic[1][pos_agl]  # 随机一个位置
+    #             if pos in self.lg.nearby_user_dic_list.keys():
+    #                 break
+    #         if pos in self.lg.zhanling_dic.keys():  # 判断是不是占领区
+    #             uid = self.lg.zhanling_dic[pos]
+    #             if uid != "" and uid != self.lg.uid:
+    #                 zhanling_uid = uid
+    #         else:
+    #             user_dic = self.lg.nearby_user_dic_list[pos]
+    #             for uid in user_dic.keys():
+    #                 if user_dic[uid] == 0:
+    #                     zhanling_uid = uid
+    #                     break
+    #     else:
+    #         print(str(self.lg.uid) +"err：没有移动到炮台区域，无法进行炮台战斗")
+    #     if zhanling_uid != 0:
+    #         self.lg.MSG_C2S_GVG_AttackUser(zhanling_uid)  # 攻击对应占领区玩家
+    #     else:
+    #         print("err：没有找到合适的人选，无法进行炮台战斗")
 
     @seq_task(2)
     def user_battle(self):
@@ -1744,9 +1744,10 @@ class MyTaskSet(TaskSequence):
                 if go_pos not in self.lg.fuhuo_pos:
                     break
             # 如果选定的玩家和自己不在一个位置，就先过去
-            if go_pos != 0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
-                self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
-            elif go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+            # if go_pos != 0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+            #     self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
+            # elif go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+            if go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
                 new_time = time.time()
                 if new_time < self.lg.attack_time:
                     time.sleep(self.lg.attack_time - new_time)
@@ -1799,9 +1800,10 @@ class MyTaskSet(TaskSequence):
                 if go_pos not in self.lg.fuhuo_pos:
                     break
             # 如果选定的玩家和自己不在一个位置，就先过去
-            if go_pos != 0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
-                self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
-            elif go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+            # if go_pos != 0 and go_pos != self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+            #     self.lg.MSG_C2S_GVG_Move(self.lg.match_user_dic[do_uid]["位置ID"])  # 玩家移动
+            # elif go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
+            if go_pos == self.lg.match_user_dic[self.lg.uid]["位置ID"]:
                 new_time = time.time()
                 if new_time < self.lg.attack_time:
                     time.sleep(self.lg.attack_time - new_time)
@@ -1816,34 +1818,34 @@ class MyTaskSet(TaskSequence):
                 time.sleep(2)
                 print(str(self.lg.uid) + "没有找到合适的攻击人选，随便打打")
 
-    @seq_task(3)
-    def always_attack_gate(self):
-        # 攻击城门
-        print(str(self.lg.uid) +"一直攻击城门")
-        self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
-        if self_pos_id not in self.lg.all_go_gate_pos_id_list:  # 判断是否需要移动
-            angle = random.randint(0, len(self.lg.all_go_gate_pos_id_list) - 1)
-            go_gate_pos_id = self.lg.all_go_gate_pos_id_list[angle]  # 随机选取一个攻击区域
-            try:
-                self.lg.MSG_C2S_GVG_Move(go_gate_pos_id)  # 玩家移动
-            except Exception:
-                return
-        else:
-            go_gate_pos_id = self_pos_id
-        # 判断能不能攻击城门
-        for gate_id in self.lg.go_gate_dic.keys():
-            gate_id_list = self.lg.go_gate_dic[gate_id]  # 某个城门的可攻击位置列表
-            if go_gate_pos_id in gate_id_list:
-                for i in range(50):
-                    hp = self.lg.gate_dic[gate_id]
-                    if hp != 0:
-                        new_time = time.time()
-                        if new_time < self.lg.attack_gate_time:
-                            time.sleep(self.lg.attack_gate_time - new_time)
-                        self.lg.MSG_C2S_GVG_AttackGate()  # 攻击城门
-                        self.lg.attack_gate_time = time.time() + self.lg.attack_gate_cd
-                    else:
-                        break
+    # @seq_task(3)
+    # def always_attack_gate(self):
+    #     # 攻击城门
+    #     print(str(self.lg.uid) +"一直攻击城门")
+    #     self_pos_id = self.lg.match_user_dic[self.lg.uid]["位置ID"]
+    #     if self_pos_id not in self.lg.all_go_gate_pos_id_list:  # 判断是否需要移动
+    #         angle = random.randint(0, len(self.lg.all_go_gate_pos_id_list) - 1)
+    #         go_gate_pos_id = self.lg.all_go_gate_pos_id_list[angle]  # 随机选取一个攻击区域
+    #         try:
+    #             self.lg.MSG_C2S_GVG_Move(go_gate_pos_id)  # 玩家移动
+    #         except Exception:
+    #             return
+    #     else:
+    #         go_gate_pos_id = self_pos_id
+    #     # 判断能不能攻击城门
+    #     for gate_id in self.lg.go_gate_dic.keys():
+    #         gate_id_list = self.lg.go_gate_dic[gate_id]  # 某个城门的可攻击位置列表
+    #         if go_gate_pos_id in gate_id_list:
+    #             for i in range(50):
+    #                 hp = self.lg.gate_dic[gate_id]
+    #                 if hp != 0:
+    #                     new_time = time.time()
+    #                     if new_time < self.lg.attack_gate_time:
+    #                         time.sleep(self.lg.attack_gate_time - new_time)
+    #                     self.lg.MSG_C2S_GVG_AttackGate()  # 攻击城门
+    #                     self.lg.attack_gate_time = time.time() + self.lg.attack_gate_cd
+    #                 else:
+    #                     break
 
 class MyLocust(Locust):
     def __init__(self):
@@ -1855,8 +1857,8 @@ class MyLocust(Locust):
 
 if __name__ == '__main__':
     # 这里是执行的时候放开的，不要注释，就这两行就行，执行旁边那个run.py的脚本
-    # wl = MyLocust()
-    # wl.run()
+    wl = MyLocust()
+    wl.run()
 
     # r = Redis(host='10.23.139.54', password='username_redis', decode_responses=True)
     # r.delete('ss2')
@@ -1869,15 +1871,15 @@ if __name__ == '__main__':
     # print(a)
     # r.close()
 
-    sever_name = "QA5"
-    pop_num = 46
-    Guild_name_id = 202
-    juntuan= 50
-    for guid in range(juntuan):
-        for i in range(pop_num):
-            lg = LoginGame(True,sever_name)
-            lg.Login()
-            Guild_name ="gg"+str(Guild_name_id+guid)
-            lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
-            if not lg.is_guild_boss:  # 不是军团长才报名
-                lg.MSG_C2S_GVG_Join()  # 报名
+    # sever_name = "QA5"
+    # pop_num = 46
+    # Guild_name_id = 363
+    # juntuan= 50
+    # for guid in range(juntuan):
+    #     for i in range(pop_num):
+    #         lg = LoginGame(True,sever_name)
+    #         lg.Login()
+    #         Guild_name ="gg"+str(Guild_name_id+guid)
+    #         lg.MSG_C2S_Guild_Search(Guild_name)  # 创建或加入军团
+    #         if not lg.is_guild_boss:  # 不是军团长才报名
+    #             lg.MSG_C2S_GVG_Join()  # 报名

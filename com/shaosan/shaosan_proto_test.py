@@ -14,7 +14,7 @@ from ss_proto_tool.proto_method import ProtocolFunction
 
 if __name__ == '__main__':
     account = str(int(time.time()))[-6:]
-    server_name = "QA2"
+    server_name = "QA5"
     pr = ProtocolFunction(server_name, account)
     gm = pr.Login()
     # gm.add_resources({"战将令": 1})

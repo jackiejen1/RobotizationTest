@@ -16,9 +16,6 @@ from MyPoco.foundation.make_poco_dic import MakePocoDic
 class UnexpectedWinSx:
     def __init__(self,game_name,phone_id):
         self.make_poco_dic = MakePocoDic(game_name,phone_id)
-        # self.poco = StdPoco()
-        # self.make_poco_dic.set_poco(self.poco)
-        # self.make_poco_dic.get_poco_dic()
 
     def unexpected_win(self):
         self.make_poco_dic.get_poco_dic()

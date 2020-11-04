@@ -34,12 +34,6 @@ class MyPocoObject():
         self.uw = UnexpectedWin(game_name, phone_id)
         self.poco = None
         self.is_pass =0
-    # def renovate_and_get_poco_dic(self):
-    #     """
-    #     刷新UI信息并保存本地
-    #     :return: ui dic
-    #     """
-    #     return self.make_poco_dic.renovate_and_get_poco_dic()
 
     def get_poco_dic(self):
         """
@@ -48,18 +42,6 @@ class MyPocoObject():
         """
         return self.make_poco_dic.get_poco_dic()
 
-    # def new_poco_obj(self):
-    #     """
-    #     游戏启动之后启动该方法
-    #     根据游戏不同创建不同的poco对象，用来刷新poco_dic数据
-    #     先运行此方法，然后才能使用其他方法
-    #     """
-    #     if self.game_name == "com.youzu.test.qa" or self.game_name == "com.youzu.wgame2":
-    #         self.poco = StdPoco()
-    #     elif self.game_name == "com.youzu.yztest_nosdk":
-    #         self.poco = AndroidUiautomationPoco(use_airtest_input=True, screenshot_each_action=False)
-    #     self.make_poco_dic.set_poco(self.poco)
-    #     return self.poco
     def query_game_is_run(self, game_name):
         """
         查询游戏线程是否存在，主要用于开始测试前排除其他poco干扰
@@ -167,26 +149,6 @@ class MyPocoObject():
             start_app(self.game_name)
             time.sleep(4)
             snapshot(msg="10053异常")
-
-
-    # def touch_poco_obj(self, poco_path, click_list):
-    #     """
-    #     :param find_poco:查找的poco对象的name(路径)
-    #     :param click_list:控件点击偏移点[0,0]-[1,1]范围
-    #     :return:
-    #     raise：PocoNoSuchNodeException、RpcTimeoutError
-    #     """
-    #     self.uw.unexpected_win()
-    #     try:
-    #         self.make_poco_dic.touch_poco_obj(poco_path, click_list)
-    #     except RpcTimeoutError:
-    #         snapshot(msg="poco超时异常")
-    #         self.make_poco_dic.touch_poco_obj(poco_path, click_list)
-    #     except ConnectionAbortedError:
-    #         start_app(self.game_name)
-    #         time.sleep(4)
-    #         snapshot(msg="10053异常")
-    #     time.sleep(1)
 
     def is_exist_poco_log(self, poco_path, is_exist_str):
         """

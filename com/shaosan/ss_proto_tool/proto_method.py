@@ -18,7 +18,7 @@ from proto import cs_pb2
 import hashlib, json, base64
 # from google.protobuf.json_format import MessageToJson
 from gm.gm_method import GmMethod
-from sx_proto_tool.protocol_tools import pack_data, send_receive
+from ss_proto_tool.protocol_tools import pack_data, send_receive
 import requests
 
 
@@ -78,7 +78,7 @@ class ProtocolFunction:
         v["extend"] = "1|1|1"
         v["channel_id"] = "1"
         key = "I71m5iENcyMG2KnUrX6Uzu0zL7GzH8MY"
-        string = "account_system_id=1&channel_id=1&extend=1|1|1&osdk_game_id=94&osdk_user_id=1" + self.username + "&time=123&user_id=" + self.username + key
+        string = "account_system_id=1&channel_id=1&extend=1|1|1&osdk_game_id=94&osdk_user_id=1" + self.username + "&time=123&user_id=" + self.username+key
         m1 = hashlib.md5()
         m1.update(string.encode())
         sign = m1.hexdigest()
@@ -95,9 +95,10 @@ class ProtocolFunction:
         C2G_Login_attr = {'name': "C2S_Login", 'protocol': 'protobuf-ss', 'send_cmd': 10002, 'recv_cmd': 10003,
                           'uid': 0, 'sid': 0}
         senddata = pack_data(C2G_Login, C2G_Login_attr)
-        Login_flag, Login_data = send_receive(self.socket, senddata, C2G_Login_attr, 20)
+        Login_flag, Login_data = send_receive(self.socket, senddata, C2G_Login_attr, 16)
         S2C_Login = cs_pb2.S2C_Login()
         S2C_Login.ParseFromString(Login_data)
+        print(S2C_Login)
         if S2C_Login.ret==1:
             print("账号登录成功,账号为" + str(self.username), S2C_Login)
         self.uid = S2C_Login.uid
@@ -115,7 +116,7 @@ class ProtocolFunction:
             C2G_Create_attr = {'name': "C2G_Create", 'protocol': 'protobuf-ss', 'send_cmd': 10004, 'recv_cmd': 10005,
                                'uid': self.uid, 'sid': self.sid}
             senddata = pack_data(C2G_Create, C2G_Create_attr)
-            flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 20)
+            flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 16)
             G2C_Create = cs_pb2.S2C_Create()
             G2C_Create.ParseFromString(data)
             if G2C_Create.ret == 1:

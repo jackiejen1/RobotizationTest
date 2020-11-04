@@ -37,7 +37,6 @@ class MyPoco:
         self.my_poco_obj = MyPocoObject(game_name, phone_id)
         self.gm = GmMethod(game_name, self.ui_path)
         self.rg = ResourceGm(game_name, phone_id)
-        # self.newaccount = NewAccount(game_name, phone_id)
         self.phone_id = phone_id
         self.xt = None
 
@@ -365,7 +364,6 @@ class MyPoco:
         """
         self.xt = XnTest()
 
-    # @err_close_game
     def open_game(self, sever_name_input, game_account_input, password=None):
         """
         功能向,启动游戏并到游戏主界面
@@ -375,12 +373,6 @@ class MyPoco:
         :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """
-        # game_text = self.my_poco_obj.get_game_run_text()
-        # game_name_list = ["少三2", "少西", "少三", "少三2台湾", "少三2日本", "少三2韩国", ]
-        # for game_name in game_name_list:
-        #     game_name_activities = self.info.get_config(game_name, "app_name")
-        #     if game_name_activities in game_text:
-        #         stop_app(game_name_activities)
         self.my_poco_obj.close_all_app()
         print("关闭app")
         entry = EntryGame(self.game_name_key, self.phone_id)
@@ -405,7 +397,6 @@ class MyPoco:
         """
         self.my_poco_obj.swipe(pos1, pos2, duration=duration)
 
-    # @err_close_game
     def my_swipe(self, start_path, end_path, timein=3):
         """
         两个对象中心点之间的滑动
@@ -424,7 +415,6 @@ class MyPoco:
         """
         self.my_poco_obj.swipe_pos(start_pos_list, end_pos_list, timein)
 
-    # @err_close_game
     def my_touch(self, poco_path, click_list=None):
         """
         :param poco_path:控件路径
@@ -587,7 +577,7 @@ class MyPoco:
         获取当前手机的分辨率
         :return:list_int[宽，高]
         """
-        return self.info.get_phone_size()
+        return self.my_poco_obj.make_poco_dic.get_phone_size()
 
     def contrast_first_second(self, first, second, msg):
         """
@@ -734,15 +724,6 @@ class MyPoco:
         """
         return self.gm.get_resource_id(resource_name)
 
-    # def get_sever_time(self):
-    #     """
-    #     查询服务器时间
-    #     :param server_name:str 服务器名
-    #     :return:[int(ymd),int(hms),int(week)]
-    #     """
-    #     # return self.gm.select_server_time(server_name)
-    #     return self.rg.get_sever_time()
-
     def set_sever_time(self, dic_input):
         """
         修改服务器时间
@@ -751,7 +732,6 @@ class MyPoco:
         """
         self.gm.set_server_time(dic_input)
 
-    # def set_checkpoint(self, checkpoint):
     def set_checkpoint(self, account, sever_name_input, checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
@@ -788,15 +768,6 @@ class MyPoco:
         :return: str 8位数字
         """
         return self.my_poco_obj.make_random_account()
-
-    # def start_protocol(self, server_name, protocol_name):#暂时不接入协议
-    #     """
-    #     传入服务器名和协议名
-    #     :param server_name: 服务器名
-    #     :param protocol_name:
-    #     :return:
-    #     """
-    #     self.pf = ProtocolFunction(self.game_name, server_name, protocol_name)
 
     def GM_fengkuang_fuben(self, checkpoint_name, num):
         """
@@ -1365,16 +1336,6 @@ class MyPoco:
             self.make_new_role(sever_name, account1)
             self.protocol.add_resource_pb(add_type, add_value, 4899990)
             self.protocol.socket_close()
-        # Thread_list = []
-        # for i in range(num):
-        #     thread = myThread(sever_name, account1)
-        #     print("创建新线程"+str(i))
-        #     # 开启新线程
-        #     thread.start()
-        #     Thread_list.append(thread)
-        # for thread in Thread_list:
-        #     print("开始线程")
-        #     thread.join()
         for i in range(num):
             time.sleep(0.1)
             self.make_new_role(sever_name, self.get_random_account())
@@ -1499,7 +1460,6 @@ class MyPoco:
                     resources_zongcishu) + "次"
                 log_str_z = log_str_z +log_str
         return log_str_z
-
 
     def GM_fengkuang_hengsaoqianjun(self, activity_id, cishu):
         """
@@ -1662,27 +1622,6 @@ class MyPoco:
                             pinzhi_dic["紫金"] = pinzhi_dic["紫金"] + 1
                         else:
                             print("没有对应品质" + pinzhi)
-                    # for artifacts_dic in artifacts_dic_list:
-                    #     for ii in range(6):
-                    #         pinzhi = artifacts_dic[str(1)]
-                    #         if pinzhi == "1":
-                    #             pinzhi_dic["白"] = pinzhi_dic["白"] + 1
-                    #         elif pinzhi == "2":
-                    #             pinzhi_dic["绿"] = pinzhi_dic["绿"] + 1
-                    #         elif pinzhi == "3":
-                    #             pinzhi_dic["蓝"] = pinzhi_dic["蓝"] + 1
-                    #         elif pinzhi == "4":
-                    #             pinzhi_dic["紫"] = pinzhi_dic["紫"] + 1
-                    #         elif pinzhi == "5":
-                    #             pinzhi_dic["橙"] = pinzhi_dic["橙"] + 1
-                    #         elif pinzhi == "6":
-                    #             pinzhi_dic["红"] = pinzhi_dic["红"] + 1
-                    #         elif pinzhi == "7":
-                    #             pinzhi_dic["金"] = pinzhi_dic["金"] + 1
-                    #         elif pinzhi == "8":
-                    #             pinzhi_dic["紫金"] = pinzhi_dic["紫金"] + 1
-                    #         else:
-                    #             print("没有对应品质" + pinzhi)
             else:
                 print("次数太少了")
                 return ""

@@ -16,18 +16,6 @@ from MyPoco.foundation.make_poco_dic import MakePocoDic
 class UnexpectedWinSs2:
     def __init__(self, game_name,phone_id):
         self.make_poco_dic = MakePocoDic(game_name,phone_id)
-        # self.poco = StdPoco()
-        # self.make_poco_dic.set_poco(self.poco)
-
-    # def get_poco_dic(self):
-    #     now_poco_dic = self.make_poco_dic.get_poco_dic()
-    #     self.now_poco_path_list = now_poco_dic.keys()
-    # 
-    # def is_in_dic(self, poco_path):
-    #     if poco_path in self.now_poco_path_list:
-    #         return True
-    #     else:
-    #         return False
 
     def unexpected_win(self):
         """

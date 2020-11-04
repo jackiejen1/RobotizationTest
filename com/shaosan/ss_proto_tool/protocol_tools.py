@@ -8,6 +8,8 @@
 # @Function:
 # @Method:
 # Reference:********************************
+import gzip
+
 from MyPoco.airtestide_lack_packages import xlrd
 from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
 import re
@@ -23,11 +25,11 @@ def protobuf_protocol(data, api_attr):
     :return:
     """
     msg_data_str = data
-    pack_length = len(msg_data_str) + 20#是包头长度
+    pack_length = len(msg_data_str) + 16#是包头长度
     cmd = api_attr['send_cmd']#发包协议ID号
     uid = api_attr['uid']
     sid = api_attr['sid']
-    head_data = struct.pack(">IIQI", pack_length, cmd, uid, sid)#把包头需要的信息转成bytes
+    head_data = struct.pack(">IIII", pack_length, cmd, uid, sid)#把包头需要的信息转成bytes
     #IIQQQ表示根据什么规则去把python的类型转换成c的类型
     #>大端小端，内存对其？设备位数？
     msg_data_str = head_data + msg_data_str#把包头和包体拼接
@@ -99,7 +101,7 @@ def _recv_data(s, api_attr, buffersize, limittime):
                 raise Exception("消息头长度为0")
             if len(rev_data) < buffersize:#服务端拆包发送，第一条不是完整数据，包头长度会不够
                 rev_data =rev_data + s.recv(buffersize-len(rev_data))
-            head_data = struct.unpack('>IIQI', rev_data)#把消息头解包
+            head_data = struct.unpack('>IIII', rev_data)#把消息头解包
             #通过消息头数据，计算出消息体的长度
             data_len = head_data[0] - buffersize
             tmpdata = s.recv(data_len)#接收后续的消息体
