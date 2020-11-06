@@ -10,7 +10,8 @@
 # Reference:********************************
 import time
 
-from MyPoco.protocol_file import cs_pb2, cg_pb2, bs_pb2, out_base_pb2
+from MyPoco.protocol.protocol_file_ss2 import cs_pb2, out_base_pb2
+from MyPoco.protocol.protocol_file_ss2 import bs_pb2, cg_pb2
 from MyPoco.protocol.protocol_tools import pack_data, send_receive
 import hashlib, json, base64
 # from locust.exception import StopLocust

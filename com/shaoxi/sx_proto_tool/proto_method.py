@@ -14,7 +14,7 @@ import socket
 import time
 from MyPoco.foundation.MyException import *
 from MyPoco.protocol.make_resource_body import MakeResourceBody
-from proto import cs_pb2
+from sx_proto import cs_pb2_sx
 
 # from google.protobuf.json_format import MessageToJson
 from gm.gm_method import GmMethod
@@ -63,7 +63,7 @@ class ProtocolFunction:
         get_acctoun_url = "http://gm.snxyj.youzu.com/tools/token.php?op_id=1&uid=" + self.username
         r = requests.get(url=get_acctoun_url)
         tocken_dic = r.json()
-        C2S_Login = cs_pb2.C2S_Login()
+        C2S_Login = cs_pb2_sx.C2S_Login()
         C2S_Login.token = tocken_dic["osdk_ticket"]
         C2S_Login.sid = self.server_id
         C2S_Login.channel_id = ""
@@ -74,7 +74,7 @@ class ProtocolFunction:
                           'uid': 0, 'sid': 0}
         senddata = pack_data(C2G_Login, C2G_Login_attr)
         Login_flag, Login_data = send_receive(self.socket, senddata, C2G_Login_attr, 20)
-        S2C_Login = cs_pb2.S2C_Login()
+        S2C_Login = cs_pb2_sx.S2C_Login()
         S2C_Login.ParseFromString(Login_data)
         print("账号登录成功,账号为" + str(self.username), S2C_Login)
         self.uid = S2C_Login.uid
@@ -85,7 +85,7 @@ class ProtocolFunction:
             raise GmException("重复登录,创建角色失败" + str(self.username))
         elif S2C_Login.ret == 3:
             print("新账号，开始创建角色")
-            C2G_Create = cs_pb2.C2S_Create()
+            C2G_Create = cs_pb2_sx.C2S_Create()
             C2G_Create.name = str(self.username)[1:]
             C2G_Create.type = 1
             C2G_Create = C2G_Create.SerializeToString()
@@ -93,7 +93,7 @@ class ProtocolFunction:
                                'uid': self.uid, 'sid': self.sid}
             senddata = pack_data(C2G_Create, C2G_Create_attr)
             flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 20)
-            G2C_Create = cs_pb2.S2C_Create()
+            G2C_Create = cs_pb2_sx.S2C_Create()
             G2C_Create.ParseFromString(data)
             if G2C_Create.ret == 1:
                 msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(
@@ -113,7 +113,7 @@ class ProtocolFunction:
         刷新协议
         :return:
         """
-        C2S_Flush = cs_pb2.C2S_Flush()
+        C2S_Flush = cs_pb2_sx.C2S_Flush()
         C2S_Flush.user = True  # 玩家基本信息
         C2S_Flush.equipment = True  # 装备
         C2S_Flush.knight = True  # 神将
@@ -154,7 +154,7 @@ class ProtocolFunction:
                           'uid': self.uid, 'sid': self.sid}
         senddata = pack_data(C2S_Flush, C2S_Flush_attr)
         flag, data = send_receive(self.socket, senddata, C2S_Flush_attr, 20)
-        S2C_Flush = cs_pb2.S2C_Flush()
+        S2C_Flush = cs_pb2_sx.S2C_Flush()
         S2C_Flush.ParseFromString(data[10007])
         if S2C_Flush.ret == 1:
             print("信息拉取成功")
@@ -183,7 +183,7 @@ class ProtocolFunction:
         :param materials: 升级材料
         :return:
         """
-        C2S_KnightLevelUp = cs_pb2.C2S_KnightLevelUp()
+        C2S_KnightLevelUp = cs_pb2_sx.C2S_KnightLevelUp()
         C2S_KnightLevelUp.id = id
         C2S_KnightLevelUp.materials = materials
         C2S_KnightLevelUp.SerializeToString()
@@ -192,7 +192,7 @@ class ProtocolFunction:
                                   'uid': self.uid, 'sid': self.sid}
         senddata = pack_data(C2S_KnightLevelUp, C2S_KnightLevelUp_attr)
         flag, data = send_receive(self.socket, senddata, C2S_KnightLevelUp_attr, 20)
-        S2C_KnightLevelUp = cs_pb2.S2C_KnightLevelUp()
+        S2C_KnightLevelUp = cs_pb2_sx.S2C_KnightLevelUp()
         S2C_KnightLevelUp.ParseFromString(data)
         if S2C_KnightLevelUp.ret == 1:
             print("武将升级成功")
@@ -206,7 +206,7 @@ class ProtocolFunction:
         :param materials: 消耗同名卡
         :return:
         """
-        C2S_KnightQualityUp = cs_pb2.C2S_KnightQualityUp()
+        C2S_KnightQualityUp = cs_pb2_sx.C2S_KnightQualityUp()
         C2S_KnightQualityUp.id = id
         C2S_KnightQualityUp.knight_id = knight_id
         C2S_KnightQualityUp.SerializeToString()
@@ -215,7 +215,7 @@ class ProtocolFunction:
                                     'uid': self.uid, 'sid': self.sid}
         senddata = pack_data(C2S_KnightQualityUp, C2S_KnightQualityUp_attr)
         flag, data = send_receive(self.socket, senddata, C2S_KnightQualityUp_attr, 20)
-        S2C_KnightQualityUp = cs_pb2.S2C_KnightQualityUp()
+        S2C_KnightQualityUp = cs_pb2_sx.S2C_KnightQualityUp()
         S2C_KnightQualityUp.ParseFromString(data)
         if S2C_KnightQualityUp.ret == 1:
             print("武将突破成功")
@@ -228,7 +228,7 @@ class ProtocolFunction:
         :param id: 武将唯一id
         :return:
         """
-        C2S_KnightDestinyUp10 = cs_pb2.C2S_KnightDestinyUp10()
+        C2S_KnightDestinyUp10 = cs_pb2_sx.C2S_KnightDestinyUp10()
         C2S_KnightDestinyUp10.id = id
         C2S_KnightDestinyUp10.auto = True
         C2S_KnightDestinyUp10.SerializeToString()
@@ -237,7 +237,7 @@ class ProtocolFunction:
                                       'uid': self.uid, 'sid': self.sid}
         senddata = pack_data(C2S_KnightDestinyUp10, C2S_KnightDestinyUp10_attr)
         flag, data = send_receive(self.socket, senddata, C2S_KnightDestinyUp10_attr, 20)
-        S2C_KnightDestinyUp10 = cs_pb2.S2C_KnightDestinyUp10()
+        S2C_KnightDestinyUp10 = cs_pb2_sx.S2C_KnightDestinyUp10()
         S2C_KnightDestinyUp10.ParseFromString(data)
         if S2C_KnightDestinyUp10.ret == 1:
             print("武将天命10次成功")
@@ -250,7 +250,7 @@ class ProtocolFunction:
         :param id: 武将唯一id
         :return:
         """
-        C2S_UpgradeTreasure = cs_pb2.C2S_UpgradeTreasure()
+        C2S_UpgradeTreasure = cs_pb2_sx.C2S_UpgradeTreasure()
         C2S_UpgradeTreasure.id = id
         C2S_UpgradeTreasure.materials = material  # 升级材料
         C2S_UpgradeTreasure.SerializeToString()
@@ -261,7 +261,7 @@ class ProtocolFunction:
                                       'uid': self.uid, 'sid': self.sid}
         senddata = pack_data(C2S_UpgradeTreasure, C2S_UpgradeTreasure_attr)
         flag, data = send_receive(self.socket, senddata, C2S_UpgradeTreasure_attr, 20)
-        S2C_UpgradeTreasure = cs_pb2.S2C_UpgradeTreasure()
+        S2C_UpgradeTreasure = cs_pb2_sx.S2C_UpgradeTreasure()
         S2C_UpgradeTreasure.ParseFromString(data)
         if S2C_UpgradeTreasure.ret == 1:
             print("强化宝物成功")

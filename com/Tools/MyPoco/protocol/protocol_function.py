@@ -15,7 +15,8 @@ from socket import create_connection
 from MyPoco.foundation.MyException import *
 from MyPoco.protocol import battle_tools
 from MyPoco.protocol.make_resource_body import MakeResourceBody
-from MyPoco.protocol_file import cs_pb2, cg_pb2, bs_pb2, out_base_pb2
+from MyPoco.protocol.protocol_file_ss2 import cs_pb2
+from MyPoco.protocol.protocol_file_ss2 import bs_pb2, cg_pb2
 from MyPoco.protocol.login_game import LoginGame
 from MyPoco.protocol.protocol_tools import ProtocolTools
 from MyPoco.foundation.information import Information

@@ -57,7 +57,7 @@ class ProtoBuilderTest(unittest.TestCase):
     self._fields = dict(self.ordered_fields)
 
   def testMakeSimpleProtoClass(self):
-    """Test that we can create a proto class."""
+    """Test that we can create a ss_proto class."""
     proto_cls = proto_builder.MakeSimpleProtoClass(
         self._fields,
         full_name='net.proto2.python.public.proto_builder_test.Test')

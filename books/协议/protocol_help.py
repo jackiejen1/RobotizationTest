@@ -10,4 +10,4 @@
 #Reference:********************************
 #下载的转换工具的版本要和pip下载的包的版本一致
 # 转译protoc文件。在cmd中转到proto文件所在文件夹,--（路径）可省略--
-# protoc .（路径）/*.proto --python_out=.
+# protoc .（路径）/*.ss_proto --python_out=.

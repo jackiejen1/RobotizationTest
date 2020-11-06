@@ -10,11 +10,15 @@
 # Reference:********************************
 import json
 import os
+import random
 import socket
 import time
+
+import math
+
 from MyPoco.foundation.MyException import *
 from MyPoco.protocol.make_resource_body import MakeResourceBody
-from proto import cs_pb2
+from ss_proto import cs_pb2_ss
 import hashlib, json, base64
 # from google.protobuf.json_format import MessageToJson
 from gm.gm_method import GmMethod
@@ -68,17 +72,19 @@ class ProtocolFunction:
         :param version: 版本号
         :return:
         """
-        C2S_Login = cs_pb2.C2S_Login()
+        C2S_Login = cs_pb2_ss.C2S_Login()
         v = {}
         v["account_system_id"] = "1"
-        v["osdk_game_id"] = "94"
+        v["extend"] = "2|94|2013"
+        v["osdk_game_id"] = "196377207"
+        v["osdk_user_id"] = "1_" + self.username
+        new_time = time.time()
+        v["time"] = new_time
         v["user_id"] = self.username
-        v["time"] = time.time()
-        v["osdk_user_id"] = "1" + self.username
-        v["extend"] = "1|1|1"
-        v["channel_id"] = "1"
-        key = "I71m5iENcyMG2KnUrX6Uzu0zL7GzH8MY"
-        string = "account_system_id=1&channel_id=1&extend=1|1|1&osdk_game_id=94&osdk_user_id=1" + self.username + "&time=123&user_id=" + self.username+key
+        # v["channel_id"] = "1"
+        # key = "I71m5iENcyMG2KnUrX6Uzu0zL7GzH8MY"
+        key="ngamesuifengsb123"
+        string = "account_system_id=1&extend=2|94|2013&osdk_game_id=196377207&osdk_user_id=1_" + self.username + "&time="+str(int(new_time))+"&user_id=" + self.username + key
         m1 = hashlib.md5()
         m1.update(string.encode())
         sign = m1.hexdigest()
@@ -89,14 +95,14 @@ class ProtocolFunction:
         C2S_Login.token =token
         C2S_Login.sid = self.server_id
         C2S_Login.channel_id ="1"
-        C2S_Login.device_id ='''{"moblie":"","device":"","ad":"{\"device_name\":\"iPhone 6s\",\"bundle_id\":\"com.uuzu.nznh\",\"idfv\":\"7A64A21C-C624-4FB4-A36D-A850FFE206A4\",\"os_version\":\"iOS10.0.2\",\"operator\":\"chinaMobile\",\"language\":\"zh-Hans-CN\",\"device_type\":\"iPhone 6s\",\"network\":\"WiFi\",\"idfa\":\"0951FD47-788E-4042-B491-7E73C2711EDA\"}"}'''
-        # C2S_Login.version = version
+        C2S_Login.device_id ='''{\"SdkParam\":\"{\\\"bundle_id\\\":\\\"com.youzu.android.snsgz\\\",\\\"device_name\\\":\\\"Netease\\\",\\\"device_type\\\":\\\"MuMu\\\",\\\"idfa\\\":\\\"990000000056368\\\",\\\"idfv\\\":\\\"0\\\",\\\"language\\\":\\\"zh\\\",\\\"network\\\":\\\"WIFI\\\",\\\"operator\\\":\\\"other\\\",\\\"os_version\\\":\\\"6.0.1\\\"}\",\"PackageVersion\":60500,\"DeviceId\":\"990000000056368_19bb0b987f9b3fe0_0\"}'''
+        # C2S_Login.version = 60677
         C2G_Login = C2S_Login.SerializeToString()
         C2G_Login_attr = {'name': "C2S_Login", 'protocol': 'protobuf-ss', 'send_cmd': 10002, 'recv_cmd': 10003,
                           'uid': 0, 'sid': 0}
         senddata = pack_data(C2G_Login, C2G_Login_attr)
         Login_flag, Login_data = send_receive(self.socket, senddata, C2G_Login_attr, 16)
-        S2C_Login = cs_pb2.S2C_Login()
+        S2C_Login = cs_pb2_ss.S2C_Login()
         S2C_Login.ParseFromString(Login_data)
         print(S2C_Login)
         if S2C_Login.ret==1:
@@ -109,24 +115,31 @@ class ProtocolFunction:
             raise GmException("重复登录,创建角色失败" + str(self.username))
         elif S2C_Login.ret == 3:
             print("新账号，开始创建角色")
-            C2G_Create = cs_pb2.C2S_Create()
-            C2G_Create.name = str(self.username)[1:]
-            C2G_Create.type = 1
-            C2G_Create = C2G_Create.SerializeToString()
-            C2G_Create_attr = {'name': "C2G_Create", 'protocol': 'protobuf-ss', 'send_cmd': 10004, 'recv_cmd': 10005,
+            rold_name = str(self.username[1:])
+            C2S_Create = cs_pb2_ss.C2S_Create()
+            m1 = hashlib.md5()
+            createId = math.floor(random.random()*20000)+1
+            createReason = createId
+            m1.update((S2C_Login.login_reason+str(createReason)+rold_name+"ss").encode())
+            si = m1.hexdigest()
+            name = str(createReason)+"|"+si+"|"+rold_name
+            C2S_Create.name = name
+            C2S_Create.type = 1
+            C2S_Create = C2S_Create.SerializeToString()
+            C2S_Create_attr = {'name': "C2S_Create", 'protocol': 'protobuf-ss', 'send_cmd': 10004, 'recv_cmd': 10005,
                                'uid': self.uid, 'sid': self.sid}
-            senddata = pack_data(C2G_Create, C2G_Create_attr)
-            flag, data = send_receive(self.socket, senddata, C2G_Create_attr, 16)
-            G2C_Create = cs_pb2.S2C_Create()
-            G2C_Create.ParseFromString(data)
-            if G2C_Create.ret == 1:
+            senddata = pack_data(C2S_Create, C2S_Create_attr)
+            flag, data = send_receive(self.socket, senddata, C2S_Create_attr, 16)
+            S2C_Create = cs_pb2_ss.S2C_Create()
+            S2C_Create.ParseFromString(data)
+            if S2C_Create.ret == 1:
                 msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(
-                    self.server_id) + "，角色名：" + self.username[1:] + "，UID：" + str(G2C_Create.uid)
+                    self.server_id) + "，角色名：" + self.username[1:] + "，UID：" + str(S2C_Create.uid)
                 print(msg)
                 add_msg_in_log(msg)
-                self.uid = G2C_Create.uid
+                self.uid = S2C_Create.uid
             else:
-                raise GmException(str(G2C_Create.uid) + "创建角色失败" + str(G2C_Create.ret))
+                raise GmException(str(S2C_Create.uid) + "创建角色失败" + str(S2C_Create.ret))
         elif S2C_Login.ret == 2:
             raise GameServerStopException("服务器维护中,创建账号失败")
         self.gm.set_account_information(self.username, self.server_name, self.username[1:])

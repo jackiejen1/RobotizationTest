@@ -412,7 +412,7 @@ class UnknownEnumValuesTest(unittest.TestCase):
     just_string.dummy = 'blah'
 
     missing = missing_enum_values_pb2.TestEnumValues()
-    # The parse is invalid, storing the string proto into the set of
+    # The parse is invalid, storing the string ss_proto into the set of
     # unknown fields.
     missing.ParseFromString(just_string.SerializeToString())
 

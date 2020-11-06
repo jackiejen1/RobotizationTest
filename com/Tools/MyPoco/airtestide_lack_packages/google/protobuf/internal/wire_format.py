@@ -37,7 +37,7 @@ from MyPoco.airtestide_lack_packages.google.protobuf import descriptor
 from MyPoco.airtestide_lack_packages.google.protobuf import message
 
 
-TAG_TYPE_BITS = 3  # Number of bits used to hold type info in a proto tag.
+TAG_TYPE_BITS = 3  # Number of bits used to hold type info in a ss_proto tag.
 TAG_TYPE_MASK = (1 << TAG_TYPE_BITS) - 1  # 0x7
 
 # These numbers identify the wire type of a protocol buffer value.

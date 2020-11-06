@@ -1050,7 +1050,7 @@ class JsonFormatTest(JsonFormatBase):
     self.assertEqual('{\n  "repeated_value": []\n}',
                      json_format.MessageToJson(message, True, True))
 
-    # Parsers accept both original proto field names and lowerCamelCase names.
+    # Parsers accept both original ss_proto field names and lowerCamelCase names.
     message = json_format_proto3_pb2.TestMessage()
     json_format.Parse('{"int32Value": 54321}', message)
     self.assertEqual(54321, message.int32_value)

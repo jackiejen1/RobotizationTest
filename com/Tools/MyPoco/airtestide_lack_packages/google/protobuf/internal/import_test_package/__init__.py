@@ -28,6 +28,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Sample module importing a nested proto from itself."""
+"""Sample module importing a nested ss_proto from itself."""
 
 from google.protobuf.internal.import_test_package import outer_pb2 as myproto

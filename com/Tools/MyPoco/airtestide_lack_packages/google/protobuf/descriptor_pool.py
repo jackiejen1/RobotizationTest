@@ -50,7 +50,7 @@ The message descriptor can be used in conjunction with the message_factory
 module in order to create a protocol buffer class that can be encoded and
 decoded.
 
-If you want to get a Python class for the specified proto, use the
+If you want to get a Python class for the specified ss_proto, use the
 helper functions inside google.protobuf.message_factory
 directly instead of this class.
 """
@@ -125,10 +125,10 @@ class DescriptorPool(object):
       return descriptor._message.DescriptorPool(descriptor_db)
 
   def __init__(self, descriptor_db=None):
-    """Initializes a Pool of proto buffs.
+    """Initializes a Pool of ss_proto buffs.
 
     The descriptor_db argument to the constructor is provided to allow
-    specialized file descriptor proto lookup code to be triggered on demand. An
+    specialized file descriptor ss_proto lookup code to be triggered on demand. An
     example would be an implementation which will read and compile a file
     specified in a call to FindFileByName() and not require the call to Add()
     at all. Results from this database will be cached internally here as well.
@@ -181,7 +181,7 @@ class DescriptorPool(object):
                        '": ' + desc_name +
                        ' is already defined in file "' +
                        old_file + '". Please fix the conflict by adding '
-                       'package name on the proto file, or use different '
+                       'package name on the ss_proto file, or use different '
                        'name for the duplication.')
           if isinstance(desc, descriptor.EnumValueDescriptor):
             error_msg += ('\nNote: enum values appear as '
@@ -575,7 +575,7 @@ class DescriptorPool(object):
     """
     full_name = _NormalizeFullyQualifiedName(full_name)
     try:
-      # The proto compiler does not give any link between the FileDescriptor
+      # The ss_proto compiler does not give any link between the FileDescriptor
       # and top-level extensions unless the FileDescriptorProto is added to
       # the DescriptorDatabase, but this can impact memory usage.
       # So we registered these extensions by name explicitly.
@@ -673,7 +673,7 @@ class DescriptorPool(object):
           self._extensions_by_name[extension.containing_type][
               extension.full_name] = extension
     except:
-      warn_msg = ('Unable to load proto file %s for extension number %d.' %
+      warn_msg = ('Unable to load ss_proto file %s for extension number %d.' %
                   (file_proto.name, number))
       warnings.warn(warn_msg, RuntimeWarning)
 
@@ -735,16 +735,16 @@ class DescriptorPool(object):
     return self._ConvertFileProtoToFileDescriptor(file_proto)
 
   def _ConvertFileProtoToFileDescriptor(self, file_proto):
-    """Creates a FileDescriptor from a proto or returns a cached copy.
+    """Creates a FileDescriptor from a ss_proto or returns a cached copy.
 
     This method also has the side effect of loading all the symbols found in
     the file into the appropriate dictionaries in the pool.
 
     Args:
-      file_proto: The proto to convert.
+      file_proto: The ss_proto to convert.
 
     Returns:
-      A FileDescriptor matching the passed in proto.
+      A FileDescriptor matching the passed in ss_proto.
     """
     if file_proto.name not in self._file_descriptors:
       built_deps = list(self._GetDeps(file_proto.dependency))
@@ -765,7 +765,7 @@ class DescriptorPool(object):
       # This loop extracts all the message and enum types from all the
       # dependencies of the file_proto. This is necessary to create the
       # scope of available message types when defining the passed in
-      # file proto.
+      # file ss_proto.
       for dependency in built_deps:
         scope.update(self._ExtractSymbols(
             dependency.message_types_by_name.values()))
@@ -822,11 +822,11 @@ class DescriptorPool(object):
 
   def _ConvertMessageDescriptor(self, desc_proto, package=None, file_desc=None,
                                 scope=None, syntax=None):
-    """Adds the proto to the pool in the specified package.
+    """Adds the ss_proto to the pool in the specified package.
 
     Args:
       desc_proto: The descriptor_pb2.DescriptorProto protobuf message.
-      package: The package the proto should be located in.
+      package: The package the ss_proto should be located in.
       file_desc: The file containing this message.
       scope: Dict mapping short and full symbols to message and enum types.
       syntax: string indicating syntax of the file ("proto2" or "proto3")
@@ -964,7 +964,7 @@ class DescriptorPool(object):
     fail.
 
     Args:
-      field_proto: The proto describing the field.
+      field_proto: The ss_proto describing the field.
       message_name: The name of the containing message.
       index: Index of the field
       file_desc: The file containing the field descriptor.
@@ -1033,7 +1033,7 @@ class DescriptorPool(object):
     """Sets the field's type, cpp_type, message_type and enum_type.
 
     Args:
-      field_proto: Data about the field in proto format.
+      field_proto: Data about the field in ss_proto format.
       field_desc: The descriptor to modiy.
       package: The package the field's container is in.
       scope: Enclosing scope of available types.
@@ -1104,10 +1104,10 @@ class DescriptorPool(object):
     field_desc.type = field_proto.type
 
   def _MakeEnumValueDescriptor(self, value_proto, index):
-    """Creates a enum value descriptor object from a enum value proto.
+    """Creates a enum value descriptor object from a enum value ss_proto.
 
     Args:
-      value_proto: The proto describing the enum value.
+      value_proto: The ss_proto describing the enum value.
       index: The index of the enum value.
 
     Returns:
@@ -1159,7 +1159,7 @@ class DescriptorPool(object):
     """Creates a method descriptor from a MethodDescriptorProto.
 
     Args:
-      method_proto: The proto describing the method.
+      method_proto: The ss_proto describing the method.
       service_name: The name of the containing service.
       package: Optional package name to look up for types.
       scope: Scope containing available types.
@@ -1217,7 +1217,7 @@ class DescriptorPool(object):
     """Finds a given type name in the current scope.
 
     Args:
-      package: The package the proto should be located in.
+      package: The package the ss_proto should be located in.
       type_name: The name of the type to be found in the scope.
       scope: Dict mapping short and full symbols to message and enum types.
 

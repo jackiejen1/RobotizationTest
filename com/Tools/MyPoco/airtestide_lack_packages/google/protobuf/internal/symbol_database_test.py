@@ -70,7 +70,7 @@ class SymbolDatabaseTest(unittest.TestCase):
 
   def testGetMessages(self):
     messages = self._Database().GetMessages(
-        ['google/protobuf/unittest.proto'])
+        ['google/protobuf/unittest.ss_proto'])
     self.assertTrue(
         unittest_pb2.TestAllTypes is
         messages['protobuf_unittest.TestAllTypes'])
@@ -119,19 +119,19 @@ class SymbolDatabaseTest(unittest.TestCase):
   def testFindFileContainingSymbol(self):
     # Lookup based on either enum or message.
     self.assertEqual(
-        'google/protobuf/unittest.proto',
+        'google/protobuf/unittest.ss_proto',
         self._Database().pool.FindFileContainingSymbol(
             'protobuf_unittest.TestAllTypes.NestedEnum').name)
     self.assertEqual(
-        'google/protobuf/unittest.proto',
+        'google/protobuf/unittest.ss_proto',
         self._Database().pool.FindFileContainingSymbol(
             'protobuf_unittest.TestAllTypes').name)
 
   def testFindFileByName(self):
     self.assertEqual(
-        'google/protobuf/unittest.proto',
+        'google/protobuf/unittest.ss_proto',
         self._Database().pool.FindFileByName(
-            'google/protobuf/unittest.proto').name)
+            'google/protobuf/unittest.ss_proto').name)
 
 
 if __name__ == '__main__':

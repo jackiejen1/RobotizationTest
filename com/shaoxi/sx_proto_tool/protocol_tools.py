@@ -8,10 +8,6 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from MyPoco.airtestide_lack_packages import xlrd
-from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
-import re
-from MyPoco.foundation.information import Information
 import struct
 import time
 from socket import error

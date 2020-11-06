@@ -61,7 +61,7 @@ class DescriptorDatabaseTest(unittest.TestCase):
     db.Add(file_desc_proto2)
 
     self.assertEqual(file_desc_proto, db.FindFileByName(
-        'google/protobuf/internal/factory_test2.proto'))
+        'google/protobuf/internal/factory_test2.ss_proto'))
     # Can find message type.
     self.assertEqual(file_desc_proto, db.FindFileContainingSymbol(
         'google.protobuf.python.internal.Factory2Message'))
@@ -125,7 +125,7 @@ class DescriptorDatabaseTest(unittest.TestCase):
       self.assertIn('Conflict register for file "other_file2": ',
                     str(w[0].message))
       self.assertIn('already defined in file '
-                    '"google/protobuf/unittest.proto"',
+                    '"google/protobuf/unittest.ss_proto"',
                     str(w[0].message))
 
 if __name__ == '__main__':

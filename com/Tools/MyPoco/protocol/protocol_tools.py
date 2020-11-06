@@ -9,7 +9,7 @@
 # @Method:
 # Reference:********************************
 from MyPoco.airtestide_lack_packages import xlrd
-from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
+from MyPoco.protocol.protocol_file_ss2 import cs_pb2, out_base_pb2
 import re
 from MyPoco.foundation.information import Information
 import struct

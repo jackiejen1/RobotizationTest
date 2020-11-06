@@ -50,7 +50,7 @@ if _api_version == 1:
   raise ValueError('api_version=1 is no longer supported.')
 if _api_version < 0:  # Still unspecified?
   try:
-    # The presence of this module in a build allows the proto implementation to
+    # The presence of this module in a build allows the ss_proto implementation to
     # be upgraded merely via build deps rather than a compiler flag or the
     # runtime environment variable.
     # pylint: disable=g-import-not-at-top
@@ -110,10 +110,10 @@ _implementation_version = int(_implementation_version_str)
 
 # Detect if serialization should be deterministic by default
 try:
-  # The presence of this module in a build allows the proto implementation to
+  # The presence of this module in a build allows the ss_proto implementation to
   # be upgraded merely via build deps.
   #
-  # NOTE: Merely importing this automatically enables deterministic proto
+  # NOTE: Merely importing this automatically enables deterministic ss_proto
   # serialization for C++ code, but we still need to export it as a boolean so
   # that we can do the same for `_implementation_type == 'python'`.
   #

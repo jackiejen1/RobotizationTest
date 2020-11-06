@@ -9,7 +9,6 @@
 # @Method:作为编写脚本时使用的类，所有方法集中在这里供脚本调用
 #         辅助脚本使用MyPocoObject类编写
 # Reference:********************************
-import os
 import random
 
 from MyPoco.foundation.MyException import *
@@ -19,8 +18,8 @@ from MyPoco.game_support.resource_gm import ResourceGm
 from MyPoco.poco.xn_test_tools import XnTest
 from MyPoco.protocol.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject, time
-from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
-from airtest.core.api import stop_app
+# from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
+from MyPoco.protocol.protocol_interface import ProtocolInterface
 from MyPoco.foundation.tools import *
 
 
@@ -54,8 +53,11 @@ class MyPoco:
         self.GM_server_name = server_name
         if username == "":
             username = self.get_random_account()
-        self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username,
-                                         is_new_account=is_new_account_into, ui_path=self.ui_path)
+        # self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username,
+        #                                  is_new_account=is_new_account_into, ui_path=self.ui_path)
+        protocol_obj = ProtocolInterface(self.game_name_key, server_name, protocol_name, username,
+                                          is_new_account=is_new_account_into, ui_path=self.ui_path)
+        self.protocol = protocol_obj.get_pro()
         return self.protocol.sever_time
 
     def set_account_information_gm(self, account, server_name, role_id="", role=""):

@@ -220,7 +220,7 @@ class GeneratorTest(unittest.TestCase):
 
   def testFileDescriptor(self):
     self.assertEqual(unittest_pb2.DESCRIPTOR.name,
-                     'google/protobuf/unittest.proto')
+                     'google/protobuf/unittest.ss_proto')
     self.assertEqual(unittest_pb2.DESCRIPTOR.package, 'protobuf_unittest')
     self.assertFalse(unittest_pb2.DESCRIPTOR.serialized_pb is None)
     self.assertEqual(unittest_pb2.DESCRIPTOR.dependencies,
@@ -351,9 +351,9 @@ class SymbolDatabaseRegistrationTest(unittest.TestCase):
 
   def testFindFileByName(self):
     self.assertEqual(
-        'google/protobuf/unittest.proto',
+        'google/protobuf/unittest.ss_proto',
         symbol_database.Default().pool.FindFileByName(
-            'google/protobuf/unittest.proto').name)
+            'google/protobuf/unittest.ss_proto').name)
 
 if __name__ == '__main__':
   unittest.main()

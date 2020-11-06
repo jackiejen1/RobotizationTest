@@ -40,7 +40,7 @@ class Error(Exception):
 
 
 class DescriptorDatabaseConflictingDefinitionError(Error):
-  """Raised when a proto is added with the same name & different descriptor."""
+  """Raised when a ss_proto is added with the same name & different descriptor."""
 
 
 class DescriptorDatabase(object):
@@ -57,8 +57,8 @@ class DescriptorDatabase(object):
       file_desc_proto: The FileDescriptorProto to add.
     Raises:
       DescriptorDatabaseConflictingDefinitionError: if an attempt is made to
-        add a proto with the same name but different definition than an
-        exisiting proto in the database.
+        add a ss_proto with the same name but different definition than an
+        exisiting ss_proto in the database.
     """
     proto_name = file_desc_proto.name
     if proto_name not in self._file_desc_protos_by_file:
@@ -85,17 +85,17 @@ class DescriptorDatabase(object):
       self._AddSymbol(('.'.join((package, service.name))), file_desc_proto)
 
   def FindFileByName(self, name):
-    """Finds the file descriptor proto by file name.
+    """Finds the file descriptor ss_proto by file name.
 
-    Typically the file name is a relative path ending to a .proto file. The
-    proto with the given name will have to have been added to this database
+    Typically the file name is a relative path ending to a .ss_proto file. The
+    ss_proto with the given name will have to have been added to this database
     using the Add method or else an error will be raised.
 
     Args:
       name: The file name to find.
 
     Returns:
-      The file descriptor proto matching the name.
+      The file descriptor ss_proto matching the name.
 
     Raises:
       KeyError if no file by the given name was added.
@@ -104,7 +104,7 @@ class DescriptorDatabase(object):
     return self._file_desc_protos_by_file[name]
 
   def FindFileContainingSymbol(self, symbol):
-    """Finds the file descriptor proto containing the specified symbol.
+    """Finds the file descriptor ss_proto containing the specified symbol.
 
     The symbol should be a fully qualified name including the file descriptor's
     package and any containing messages. Some examples:
@@ -113,14 +113,14 @@ class DescriptorDatabase(object):
     'some.package.name.Message.NestedEnum'
     'some.package.name.Message.some_field'
 
-    The file descriptor proto containing the specified symbol must be added to
+    The file descriptor ss_proto containing the specified symbol must be added to
     this database using the Add method or else an error will be raised.
 
     Args:
       symbol: The fully qualified symbol name.
 
     Returns:
-      The file descriptor proto containing the symbol.
+      The file descriptor ss_proto containing the symbol.
 
     Raises:
       KeyError if no file contains the specified symbol.
@@ -159,10 +159,10 @@ class DescriptorDatabase(object):
 
 
 def _ExtractSymbols(desc_proto, package):
-  """Pulls out all the symbols from a descriptor proto.
+  """Pulls out all the symbols from a descriptor ss_proto.
 
   Args:
-    desc_proto: The proto to extract symbols from.
+    desc_proto: The ss_proto to extract symbols from.
     package: The package containing the descriptor type.
 
   Yields:

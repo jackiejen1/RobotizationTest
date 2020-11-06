@@ -12,8 +12,8 @@ from MyPoco.airtestide_lack_packages.google.protobuf import symbol_database as _
 _sym_db = _symbol_database.Default()
 
 
-import MyPoco.protocol_file.out_base_pb2 as out__base__pb2
-import MyPoco.protocol_file.bs_pb2 as bs__pb2
+import MyPoco.protocol.protocol_file_ss2.out_base_pb2 as out__base__pb2
+import MyPoco.protocol.protocol_file_ss2.bs_pb2 as bs__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(

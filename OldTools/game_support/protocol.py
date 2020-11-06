@@ -15,7 +15,7 @@ using("Tools")
 from get_info.information import Information
 from game_support.protocol_ss2 import ProtocolSs2
 # from Tools.get_info.information import Information
-# from Tools.game_support.protocol_ss2 import ProtocolSs2
+# from Tools.game_support.protocol import ProtocolSs2
 
 
 class Protocol:

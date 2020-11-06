@@ -163,7 +163,7 @@ class MessageFactoryTest(unittest.TestCase):
 
     # Add Container message.
     f = descriptor_pb2.FileDescriptorProto()
-    f.name = 'google/protobuf/internal/container.proto'
+    f.name = 'google/protobuf/internal/container.ss_proto'
     f.package = 'google.protobuf.python.internal'
     msg = f.message_type.add()
     msg.name = 'Container'
@@ -176,9 +176,9 @@ class MessageFactoryTest(unittest.TestCase):
 
     # Extend container.
     f = descriptor_pb2.FileDescriptorProto()
-    f.name = 'google/protobuf/internal/extension.proto'
+    f.name = 'google/protobuf/internal/extension.ss_proto'
     f.package = 'google.protobuf.python.internal'
-    f.dependency.append('google/protobuf/internal/container.proto')
+    f.dependency.append('google/protobuf/internal/container.ss_proto')
     msg = f.message_type.add()
     msg.name = 'Extension'
     ext = msg.extension.add()
@@ -193,9 +193,9 @@ class MessageFactoryTest(unittest.TestCase):
 
     # Add Duplicate extending the same field number.
     f = descriptor_pb2.FileDescriptorProto()
-    f.name = 'google/protobuf/internal/duplicate.proto'
+    f.name = 'google/protobuf/internal/duplicate.ss_proto'
     f.package = 'google.protobuf.python.internal'
-    f.dependency.append('google/protobuf/internal/container.proto')
+    f.dependency.append('google/protobuf/internal/container.ss_proto')
     msg = f.message_type.add()
     msg.name = 'Duplicate'
     ext = msg.extension.add()

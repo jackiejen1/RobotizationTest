@@ -31,7 +31,7 @@
 """A simple wrapper around enum types to expose utility functions.
 
 Instances are created as properties with the same name as the enum they wrap
-on proto classes.  For usage, see:
+on ss_proto classes.  For usage, see:
   reflection_test.py
 """
 
@@ -73,7 +73,7 @@ class EnumTypeWrapper(object):
   def keys(self):
     """Return a list of the string names in the enum.
 
-    These are returned in the order they were defined in the .proto file.
+    These are returned in the order they were defined in the .ss_proto file.
     """
 
     return [value_descriptor.name
@@ -82,7 +82,7 @@ class EnumTypeWrapper(object):
   def values(self):
     """Return a list of the integer values in the enum.
 
-    These are returned in the order they were defined in the .proto file.
+    These are returned in the order they were defined in the .ss_proto file.
     """
 
     return [value_descriptor.number
@@ -91,7 +91,7 @@ class EnumTypeWrapper(object):
   def items(self):
     """Return a list of the (name, value) pairs of the enum.
 
-    These are returned in the order they were defined in the .proto file.
+    These are returned in the order they were defined in the .ss_proto file.
     """
     return [(value_descriptor.name, value_descriptor.number)
             for value_descriptor in self._enum_type.values]

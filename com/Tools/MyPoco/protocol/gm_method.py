@@ -54,7 +54,6 @@ class GmMethod:
         # 获取角色ID
         if role_id == "":
             pull_dic = self.gah.get_role_id({"account": self.account, "server": self.server_id, "role": self.role_name})
-            # role_id_dic = pull_dic['data']['data']
             role_id_dic = pull_dic['data']
             if 'role_id' in role_id_dic.keys():
                 self.role_id = role_id_dic['role_id']
@@ -65,6 +64,7 @@ class GmMethod:
             self.role_id = role_id
         # add_msg_in_log("角色ID为：" + str(role_id))
         return self.role_id
+
     def add_resources(self, resource_name_dic):
         """
         根据传入的道具列表添加道具

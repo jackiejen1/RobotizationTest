@@ -62,7 +62,7 @@ def _VerifyExtensionHandle(message, extension_handle):
 # extensions with the "has" bits turned on?
 class _ExtensionDict(object):
 
-  """Dict-like container for Extension fields on proto instances.
+  """Dict-like container for Extension fields on ss_proto instances.
 
   Note that in all cases we expect extension handles to be
   FieldDescriptors.

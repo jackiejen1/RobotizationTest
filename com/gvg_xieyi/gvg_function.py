@@ -14,7 +14,7 @@ import datetime
 import struct
 import time
 import requests
-from proto import cs_pb2, cg_pb2
+from sx_proto import cs_pb2_sx, cg_pb2
 import hashlib, json, base64
 from tools.MyException import *
 from socket import create_connection
@@ -366,7 +366,7 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_Chat = cs_pb2.C2S_Chat()
+        C2S_Chat = cs_pb2_sx.C2S_Chat()
         C2S_Chat.channel = 1  # 世界频道
         C2S_Chat.content = gm_zhiling
         C2S_Chat = C2S_Chat.SerializeToString()
@@ -374,7 +374,7 @@ class LoginGame:
                          'send_cmd': 10142, 'recv_cmd': 10143, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_Chat, C2S_Chat_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_Chat_attr, 32)  # 发送协议
-        S2C_Chat = cs_pb2.S2C_Chat()  # 创建返回协议对象
+        S2C_Chat = cs_pb2_sx.S2C_Chat()  # 创建返回协议对象
         S2C_Chat.ParseFromString(data)  # 解析协议返回值
         if S2C_Chat.ret == 1:
             print(str(self.uid) + "聊天框发送信息成功")
@@ -392,14 +392,14 @@ class LoginGame:
         if len(Guild_name) > 8:
             print("军团名字过长")
             return ""
-        C2S_Guild_Search = cs_pb2.C2S_Guild_Search()
+        C2S_Guild_Search = cs_pb2_sx.C2S_Guild_Search()
         C2S_Guild_Search.key = Guild_name
         C2S_Guild_Search = C2S_Guild_Search.SerializeToString()
         C2S_Guild_Search_attr = {'name': "C2S_Guild_Search", 'protocol': 'protobuf-ss',
                                  'send_cmd': 11002, 'recv_cmd': 11003, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_Guild_Search, C2S_Guild_Search_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_Guild_Search_attr, 32)  # 发送协议
-        S2C_Guild_Search = cs_pb2.S2C_Guild_Search()  # 创建返回协议对象
+        S2C_Guild_Search = cs_pb2_sx.S2C_Guild_Search()  # 创建返回协议对象
         S2C_Guild_Search.ParseFromString(data)  # 解析协议返回值
         if S2C_Guild_Search.ret == 1:
             print(str(self.uid) + "查询成功")
@@ -413,7 +413,7 @@ class LoginGame:
             print("已经加入军团，应该是账号重复了")
             return ""
         elif S2C_Guild_Search.ret == 87 or S2C_Guild_Search.ret == 104:
-            C2S_Guild_Create = cs_pb2.C2S_Guild_Create()
+            C2S_Guild_Create = cs_pb2_sx.C2S_Guild_Create()
             C2S_Guild_Create.name = Guild_name
             C2S_Guild_Create.icon = 1
             C2S_Guild_Create.confirm = False
@@ -423,7 +423,7 @@ class LoginGame:
                                      'send_cmd': 11006, 'recv_cmd': 11007, 'uid': self.uid, 'sid': self.sid}
             senddata = self.pack_data(C2S_Guild_Create, C2S_Guild_Create_attr)  # 装包，需要学习
             flag, data = self.send_receive(senddata, C2S_Guild_Create_attr, 32)  # 发送协议
-            S2C_Guild_Create = cs_pb2.S2C_Guild_Create()  # 创建返回协议对象
+            S2C_Guild_Create = cs_pb2_sx.S2C_Guild_Create()  # 创建返回协议对象
             S2C_Guild_Create.ParseFromString(data)  # 解析协议返回值
             if S2C_Guild_Create.ret == 1:
                 print(str(self.uid) + "创建军团成功，军团名为：" + Guild_name)
@@ -436,14 +436,14 @@ class LoginGame:
                 raise ProtocolException(str(self.uid) + "创建军团失败" + str(S2C_Guild_Create.ret))
         else:
             raise ProtocolException(str(self.uid) + "创建军团失败" + str(S2C_Guild_Search.ret))
-        C2S_Guild_ReqJoin = cs_pb2.C2S_Guild_ReqJoin()
+        C2S_Guild_ReqJoin = cs_pb2_sx.C2S_Guild_ReqJoin()
         C2S_Guild_ReqJoin.guild_id = self.self_guild_id
         C2S_Guild_Search = C2S_Guild_ReqJoin.SerializeToString()
         C2S_Guild_Search_attr = {'name': "C2S_Guild_ReqJoin", 'protocol': 'protobuf-ss',
                                  'send_cmd': 11008, 'recv_cmd': 11009, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_Guild_Search, C2S_Guild_Search_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_Guild_Search_attr, 32)  # 发送协议
-        S2C_Guild_ReqJoin = cs_pb2.S2C_Guild_ReqJoin()  # 创建返回协议对象
+        S2C_Guild_ReqJoin = cs_pb2_sx.S2C_Guild_ReqJoin()  # 创建返回协议对象
         S2C_Guild_ReqJoin.ParseFromString(data)  # 解析协议返回值
         if S2C_Guild_ReqJoin.join:
             print(str(self.uid) + "加入成功，军团名为：" + Guild_name)
@@ -459,7 +459,7 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_Guild_Quit = cs_pb2.C2S_Guild_Quit()
+        C2S_Guild_Quit = cs_pb2_sx.C2S_Guild_Quit()
         C2S_Guild_Quit = C2S_Guild_Quit.SerializeToString()
         C2S_Guild_Quit_attr = {'name': "C2S_Guild_Quit", 'protocol': 'protobuf-ss',
                                'send_cmd': 11014, 'recv_cmd': 11015, 'uid': self.uid, 'sid': self.sid}
@@ -490,13 +490,13 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_GetInfo = cs_pb2.C2S_GVG_GetInfo()
+        C2S_GVG_GetInfo = cs_pb2_sx.C2S_GVG_GetInfo()
         C2S_GVG_GetInfo = C2S_GVG_GetInfo.SerializeToString()
         C2S_GVG_GetInfo_attr = {'name': "C2S_GVG_GetInfo", 'protocol': 'protobuf-ss',
                                 'send_cmd': 14430, 'recv_cmd': 14431, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_GetInfo, C2S_GVG_GetInfo_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_GetInfo_attr, 32)  # 发送协议
-        S2C_GVG_GetInfo = cs_pb2.S2C_GVG_GetInfo()  # 创建返回协议对象
+        S2C_GVG_GetInfo = cs_pb2_sx.S2C_GVG_GetInfo()  # 创建返回协议对象
         S2C_GVG_GetInfo.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetInfo.ret == 1:
             print(str(self.uid) + "军团战信息查询成功")
@@ -514,13 +514,13 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_Join = cs_pb2.C2S_GVG_Join()
+        C2S_GVG_Join = cs_pb2_sx.C2S_GVG_Join()
         C2S_GVG_Join = C2S_GVG_Join.SerializeToString()
         C2S_GVG_Join_attr = {'name': "C2S_GVG_Join", 'protocol': 'protobuf-ss',
                              'send_cmd': 14434, 'recv_cmd': 14435, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_Join, C2S_GVG_Join_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_Join_attr, 32)  # 发送协议
-        S2C_GVG_Join = cs_pb2.S2C_GVG_Join()  # 创建返回协议对象
+        S2C_GVG_Join = cs_pb2_sx.S2C_GVG_Join()  # 创建返回协议对象
         S2C_GVG_Join.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_Join.ret == 1:
             print(str(self.uid) + "军团战报名成功")
@@ -537,13 +537,13 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_GetAchieve = cs_pb2.C2S_GVG_GetAchieve()
+        C2S_GVG_GetAchieve = cs_pb2_sx.C2S_GVG_GetAchieve()
         C2S_GVG_GetAchieve = C2S_GVG_GetAchieve.SerializeToString()
         C2S_GVG_GetAchieve_attr = {'name': "C2S_GVG_GetAchieve", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14436, 'recv_cmd': 14437, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_GetAchieve, C2S_GVG_GetAchieve_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_GetAchieve_attr, 32)  # 发送协议
-        S2C_GVG_GetAchieve = cs_pb2.S2C_GVG_GetAchieve()  # 创建返回协议对象
+        S2C_GVG_GetAchieve = cs_pb2_sx.S2C_GVG_GetAchieve()  # 创建返回协议对象
         S2C_GVG_GetAchieve.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetAchieve.ret == 1:
             print(str(self.uid) + "获取赛季成就信息成功")
@@ -561,14 +561,14 @@ class LoginGame:
         :param id:成就ID
         :return:
         """
-        C2S_GVG_GetAchieveAward = cs_pb2.C2S_GVG_GetAchieveAward()
+        C2S_GVG_GetAchieveAward = cs_pb2_sx.C2S_GVG_GetAchieveAward()
         C2S_GVG_GetAchieveAward.id = achieve_id
         C2S_GVG_GetAchieveAward = C2S_GVG_GetAchieveAward.SerializeToString()
         C2S_GVG_GetAchieveAward_attr = {'name': "C2S_GVG_GetAchieveAward", 'protocol': 'protobuf-ss',
                                         'send_cmd': 14438, 'recv_cmd': 14439, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_GetAchieveAward, C2S_GVG_GetAchieveAward_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_GetAchieveAward_attr, 32)  # 发送协议
-        S2C_GVG_GetAchieveAward = cs_pb2.S2C_GVG_GetAchieveAward()  # 创建返回协议对象
+        S2C_GVG_GetAchieveAward = cs_pb2_sx.S2C_GVG_GetAchieveAward()  # 创建返回协议对象
         S2C_GVG_GetAchieveAward.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetAchieveAward.ret == 1:
             print(str(self.uid) + "领取赛季成就奖励成功")
@@ -613,13 +613,13 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_EnterMatch = cs_pb2.C2S_GVG_EnterMatch()
+        C2S_GVG_EnterMatch = cs_pb2_sx.C2S_GVG_EnterMatch()
         C2S_GVG_EnterMatch = C2S_GVG_EnterMatch.SerializeToString()
         C2S_GVG_EnterMatch_attr = {'name': "C2S_GVG_EnterMatch", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14442, 'recv_cmd': 14443, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_EnterMatch, C2S_GVG_EnterMatch_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_EnterMatch_attr, 32)  # 发送协议
-        S2C_GVG_EnterMatch = cs_pb2.S2C_GVG_EnterMatch()  # 创建返回协议对象
+        S2C_GVG_EnterMatch = cs_pb2_sx.S2C_GVG_EnterMatch()  # 创建返回协议对象
         S2C_GVG_EnterMatch.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_EnterMatch.ret == 1:
             print(str(self.uid) + "军团战进入比赛成功")
@@ -668,7 +668,7 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_EnterMatch = cs_pb2.C2S_GVG_EnterMatch()
+        C2S_GVG_EnterMatch = cs_pb2_sx.C2S_GVG_EnterMatch()
         C2S_GVG_EnterMatch = C2S_GVG_EnterMatch.SerializeToString()
         C2S_GVG_EnterMatch_attr = {'name': "C2S_GVG_EnterMatch", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14442, 'recv_cmd': 14443, 'uid': self.uid, 'sid': self.sid}
@@ -683,7 +683,7 @@ class LoginGame:
         """
         if first_recvcmd_into == 14473:
             # 军团战批量推送
-            S2C_GVG_BatchNotify = cs_pb2.S2C_GVG_BatchNotify()  # 创建返回协议对象
+            S2C_GVG_BatchNotify = cs_pb2_sx.S2C_GVG_BatchNotify()  # 创建返回协议对象
             S2C_GVG_BatchNotify.ParseFromString(data_all)
             for notify in S2C_GVG_BatchNotify.notify_list:
                 if notify.user_enter != 0:
@@ -1096,13 +1096,13 @@ class LoginGame:
         """
         # recv_cmd_list = [14458,14459]
         recv_cmd_list = 14458
-        C2S_GVG_Revive = cs_pb2.C2S_GVG_Revive()
+        C2S_GVG_Revive = cs_pb2_sx.C2S_GVG_Revive()
         C2S_GVG_Revive = C2S_GVG_Revive.SerializeToString()
         C2S_GVG_Revive_attr = {'name': "C2S_GVG_Revive", 'protocol': 'protobuf-ss',
                                'send_cmd': 14457, 'recv_cmd': recv_cmd_list, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_Revive, C2S_GVG_Revive_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_Revive_attr, 32)  # 发送协议
-        S2C_GVG_Revive = cs_pb2.S2C_GVG_Revive()  # 创建返回协议对象
+        S2C_GVG_Revive = cs_pb2_sx.S2C_GVG_Revive()  # 创建返回协议对象
         S2C_GVG_Revive.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_Revive.ret == 1:
             print(str(self.uid) + "军团战-玩家复活成功")
@@ -1129,14 +1129,14 @@ class LoginGame:
         this_time = time.time()
         if this_time < self.attack_time:
             time.sleep(self.attack_time - this_time)
-        C2S_GVG_AttackUser = cs_pb2.C2S_GVG_AttackUser()
+        C2S_GVG_AttackUser = cs_pb2_sx.C2S_GVG_AttackUser()
         C2S_GVG_AttackUser.user_id = user_id
         C2S_GVG_AttackUser = C2S_GVG_AttackUser.SerializeToString()
         C2S_GVG_AttackUser_attr = {'name': "C2S_GVG_AttackUser", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14451, 'recv_cmd': 14452, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_AttackUser, C2S_GVG_AttackUser_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_AttackUser_attr, 32)  # 发送协议
-        S2C_GVG_AttackUser = cs_pb2.S2C_GVG_AttackUser()  # 创建返回协议对象
+        S2C_GVG_AttackUser = cs_pb2_sx.S2C_GVG_AttackUser()  # 创建返回协议对象
         S2C_GVG_AttackUser.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_AttackUser.ret == 1:
             print(str(self.uid) + "军团战-攻击玩家成功")
@@ -1164,13 +1164,13 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_AttackGate = cs_pb2.C2S_GVG_AttackGate()
+        C2S_GVG_AttackGate = cs_pb2_sx.C2S_GVG_AttackGate()
         C2S_GVG_AttackGate = C2S_GVG_AttackGate.SerializeToString()
         C2S_GVG_AttackGate_attr = {'name': "C2S_GVG_AttackGate", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14454, 'recv_cmd': 14455, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_AttackGate, C2S_GVG_AttackGate_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_AttackGate_attr, 32)  # 发送协议
-        S2C_GVG_AttackGate = cs_pb2.S2C_GVG_AttackGate()  # 创建返回协议对象
+        S2C_GVG_AttackGate = cs_pb2_sx.S2C_GVG_AttackGate()  # 创建返回协议对象
         S2C_GVG_AttackGate.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_AttackGate.ret == 1:
             print(str(self.uid) + "军团战-攻击城门成功")
@@ -1200,7 +1200,7 @@ class LoginGame:
         go_ing_time = self.match_user_dic[self.uid]["移动结束时间"] + self.move_cd
         if go_ing_time > time.time():
             time.sleep(go_ing_time - time.time())
-        C2S_GVG_Move = cs_pb2.C2S_GVG_Move()
+        C2S_GVG_Move = cs_pb2_sx.C2S_GVG_Move()
         C2S_GVG_Move.target_pos_id = target_pos_id
         C2S_GVG_Move.cost_time = self.going_move_time
         C2S_GVG_Move = C2S_GVG_Move.SerializeToString()
@@ -1208,7 +1208,7 @@ class LoginGame:
                              'send_cmd': 14448, 'recv_cmd': 14449, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_Move, C2S_GVG_Move_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_Move_attr, 32)  # 发送协议
-        S2C_GVG_Move = cs_pb2.S2C_GVG_Move()  # 创建返回协议对象
+        S2C_GVG_Move = cs_pb2_sx.S2C_GVG_Move()  # 创建返回协议对象
         S2C_GVG_Move.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_Move.ret == 1:
             print(str(self.uid) + "军团战-玩家移动成功")
@@ -1239,13 +1239,13 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_LeaveMatch = cs_pb2.C2S_GVG_LeaveMatch()
+        C2S_GVG_LeaveMatch = cs_pb2_sx.C2S_GVG_LeaveMatch()
         C2S_GVG_LeaveMatch = C2S_GVG_LeaveMatch.SerializeToString()
         C2S_GVG_LeaveMatch_attr = {'name': "C2S_GVG_LeaveMatch", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14445, 'recv_cmd': 14446, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_LeaveMatch, C2S_GVG_LeaveMatch_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_LeaveMatch_attr, 32)  # 发送协议
-        S2C_GVG_LeaveMatch = cs_pb2.S2C_GVG_LeaveMatch()  # 创建返回协议对象
+        S2C_GVG_LeaveMatch = cs_pb2_sx.S2C_GVG_LeaveMatch()  # 创建返回协议对象
         S2C_GVG_LeaveMatch.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_LeaveMatch.ret == 1:
             print(str(self.uid) + "军团战-离开比赛成功")
@@ -1267,7 +1267,7 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_LeaveMatch = cs_pb2.C2S_GVG_LeaveMatch()
+        C2S_GVG_LeaveMatch = cs_pb2_sx.C2S_GVG_LeaveMatch()
         C2S_GVG_LeaveMatch = C2S_GVG_LeaveMatch.SerializeToString()
         C2S_GVG_LeaveMatch_attr = {'name': "C2S_GVG_LeaveMatch", 'protocol': 'protobuf-ss',
                                    'send_cmd': 14445, 'recv_cmd': 14446, 'uid': self.uid, 'sid': self.sid}
@@ -1280,7 +1280,7 @@ class LoginGame:
         :return:
         """
         uid_num = 1
-        C2S_GVG_GetUserSnapshots = cs_pb2.C2S_GVG_GetUserSnapshots()
+        C2S_GVG_GetUserSnapshots = cs_pb2_sx.C2S_GVG_GetUserSnapshots()
         if uid == None:
             if len(self.match_user_dic.keys())==0:
                 print("玩家数据获取失败，没有记录玩家UID")
@@ -1303,7 +1303,7 @@ class LoginGame:
                                          'send_cmd': 14466, 'recv_cmd': 14467, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_GetUserSnapshots, C2S_GVG_GetUserSnapshots_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_GetUserSnapshots_attr, 32)  # 发送协议
-        S2C_GVG_GetUserSnapshots = cs_pb2.S2C_GVG_GetUserSnapshots()  # 创建返回协议对象
+        S2C_GVG_GetUserSnapshots = cs_pb2_sx.S2C_GVG_GetUserSnapshots()  # 创建返回协议对象
         S2C_GVG_GetUserSnapshots.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetUserSnapshots.ret == 1:
             print(str(self.uid) + "军团战-获取玩家快照成功")
@@ -1324,14 +1324,14 @@ class LoginGame:
         获取赛季军团排名
         :return:
         """
-        C2S_GVG_GetGuildRankList = cs_pb2.C2S_GVG_GetGuildRankList()
+        C2S_GVG_GetGuildRankList = cs_pb2_sx.C2S_GVG_GetGuildRankList()
         C2S_GVG_GetGuildRankList.size = 10
         C2S_GVG_GetGuildRankList = C2S_GVG_GetGuildRankList.SerializeToString()
         C2S_GVG_GetGuildRankList_attr = {'name': "C2S_GVG_GetGuildRankList", 'protocol': 'protobuf-ss',
                                          'send_cmd': 14468, 'recv_cmd': 14469, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_GetGuildRankList, C2S_GVG_GetGuildRankList_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_GetGuildRankList_attr, 32)  # 发送协议
-        S2C_GVG_GetGuildRankList = cs_pb2.S2C_GVG_GetGuildRankList()  # 创建返回协议对象
+        S2C_GVG_GetGuildRankList = cs_pb2_sx.S2C_GVG_GetGuildRankList()  # 创建返回协议对象
         S2C_GVG_GetGuildRankList.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetGuildRankList.ret == 1:
             print(str(self.uid) + "军团战-获取获取赛季军团排名信息成功")
@@ -1344,13 +1344,13 @@ class LoginGame:
         军团战-获取历史赛季
         :return:
         """
-        C2S_GVG_GetSeasonHistory = cs_pb2.C2S_GVG_GetSeasonHistory()
+        C2S_GVG_GetSeasonHistory = cs_pb2_sx.C2S_GVG_GetSeasonHistory()
         C2S_GVG_GetSeasonHistory = C2S_GVG_GetSeasonHistory.SerializeToString()
         C2S_GVG_GetSeasonHistory_attr = {'name': "C2S_GVG_GetSeasonHistory", 'protocol': 'protobuf-ss',
                                          'send_cmd': 14440, 'recv_cmd': 14441, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_GetSeasonHistory, C2S_GVG_GetSeasonHistory_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_GetSeasonHistory_attr, 32)  # 发送协议
-        S2C_GVG_GetSeasonHistory = cs_pb2.S2C_GVG_GetSeasonHistory()  # 创建返回协议对象
+        S2C_GVG_GetSeasonHistory = cs_pb2_sx.S2C_GVG_GetSeasonHistory()  # 创建返回协议对象
         S2C_GVG_GetSeasonHistory.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetSeasonHistory.ret == 1:
             print(str(self.uid) + "军团战-获取历史赛季信息成功")
@@ -1363,13 +1363,13 @@ class LoginGame:
         获取淘汰赛以后的比赛信息
         :return:
         """
-        C2S_GVG_GetAdvanceMatches = cs_pb2.C2S_GVG_GetAdvanceMatches()
+        C2S_GVG_GetAdvanceMatches = cs_pb2_sx.C2S_GVG_GetAdvanceMatches()
         C2S_GVG_GetAdvanceMatches = C2S_GVG_GetAdvanceMatches.SerializeToString()
         C2S_GVG_GetAdvanceMatches_attr = {'name': "C2S_GVG_GetAdvanceMatches", 'protocol': 'protobuf-ss',
                                           'send_cmd': 14432, 'recv_cmd': 14433, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_GetAdvanceMatches, C2S_GVG_GetAdvanceMatches_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_GetAdvanceMatches_attr, 32)  # 发送协议
-        S2C_GVG_GetAdvanceMatches = cs_pb2.S2C_GVG_GetAdvanceMatches()  # 创建返回协议对象
+        S2C_GVG_GetAdvanceMatches = cs_pb2_sx.S2C_GVG_GetAdvanceMatches()  # 创建返回协议对象
         S2C_GVG_GetAdvanceMatches.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_GetAdvanceMatches.ret == 1:
             print(str(self.uid) + "军团战-获取淘汰赛以后的比赛信息成功")
@@ -1384,13 +1384,13 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_GVG_AddBuff = cs_pb2.C2S_GVG_AddBuff()
+        C2S_GVG_AddBuff = cs_pb2_sx.C2S_GVG_AddBuff()
         C2S_GVG_AddBuff = C2S_GVG_AddBuff.SerializeToString()
         C2S_GVG_AddBuff_attr = {'name': "C2S_GVG_AddBuff", 'protocol': 'protobuf-ss',
                                 'send_cmd': 14460, 'recv_cmd': 14461, 'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_GVG_AddBuff, C2S_GVG_AddBuff_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_GVG_AddBuff_attr, 32)  # 发送协议
-        S2C_GVG_AddBuff = cs_pb2.S2C_GVG_AddBuff()  # 创建返回协议对象
+        S2C_GVG_AddBuff = cs_pb2_sx.S2C_GVG_AddBuff()  # 创建返回协议对象
         S2C_GVG_AddBuff.ParseFromString(data)  # 解析协议返回值
         if S2C_GVG_AddBuff.ret == 1:
             print(str(self.uid) + "军团战-获取Buff成功")
@@ -1426,7 +1426,7 @@ class LoginGame:
         :param sid:
         :return:
         """
-        C2S_Test = cs_pb2.C2S_Test()
+        C2S_Test = cs_pb2_sx.C2S_Test()
         award = C2S_Test.awards.add()
         award.type = type_into
         award.value = value_into
@@ -1436,7 +1436,7 @@ class LoginGame:
                          'uid': self.uid, 'sid': self.sid}
         senddata = self.pack_data(C2S_Test, C2S_Test_attr)  # 装包，需要学习
         flag, data = self.send_receive(senddata, C2S_Test_attr, 32)  # 发送协议
-        S2C_Test = cs_pb2.S2C_Test()  # 创建返回协议对象
+        S2C_Test = cs_pb2_sx.S2C_Test()  # 创建返回协议对象
         S2C_Test.ParseFromString(data)  # 解析协议返回值
         if S2C_Test.ret == 1:
             print(str(self.uid) + "添加道具成功")
@@ -1541,7 +1541,7 @@ class LoginGame:
             G2C_Create = cg_pb2.G2C_Create()
             G2C_Create.ParseFromString(data_Create)
             if G2C_Create.ret == 1:
-                C2S_SyncTime = cs_pb2.C2S_SyncTime()  # 创建发送协议对象
+                C2S_SyncTime = cs_pb2_sx.C2S_SyncTime()  # 创建发送协议对象
                 C2S_SyncTime.client_time = int(time.time())  # 参数赋值
                 C2S_SyncTime = C2S_SyncTime.SerializeToString()  # 序列化
                 C2S_SyncTime_attr = {'name': "C2S_SyncTime", 'protocol': 'protobuf-ss', 'send_cmd': 10145,
@@ -1549,7 +1549,7 @@ class LoginGame:
                                      'uid': self.uid, 'sid': self.sid}
                 senddata = self.pack_data(C2S_SyncTime, C2S_SyncTime_attr)  # 装包，需要学习
                 flag, data = self.send_receive(senddata, C2S_SyncTime_attr, 32)  # 发送协议
-                S2C_SyncTime = cs_pb2.S2C_SyncTime()  # 创建返回协议对象
+                S2C_SyncTime = cs_pb2_sx.S2C_SyncTime()  # 创建返回协议对象
                 S2C_SyncTime.ParseFromString(data)  # 解析协议返回值
                 self.sever_time = S2C_SyncTime.server_time  # 拿取返回值参数
                 msg = "角色创建成功，账号：" + self.username + "，区服id：" + str(

@@ -251,7 +251,7 @@ class FloatValueChecker(object):
                  (proposed_value, type(proposed_value)))
       raise TypeError(message)
     converted_value = float(proposed_value)
-    # This inf rounding matches the C++ proto SafeDoubleToFloat logic.
+    # This inf rounding matches the C++ ss_proto SafeDoubleToFloat logic.
     if converted_value > _FLOAT_MAX:
       return _INF
     if converted_value < _FLOAT_MIN:

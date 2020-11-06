@@ -4,7 +4,8 @@
 # datetime:2018/11/21 11:26
 # software: PyCharm
 
-from MyPoco.protocol_file import cs_pb2, cg_pb2, out_base_pb2
+from MyPoco.protocol_file_ss2 import cs_pb2, out_base_pb2
+from MyPoco.protocol.protocol_file_ss2 import cg_pb2
 from MyPoco.protocol.packdata import pack_data
 from MyPoco.protocol.sendrecvpub import send_receive, recv_data
 import hashlib, json, base64

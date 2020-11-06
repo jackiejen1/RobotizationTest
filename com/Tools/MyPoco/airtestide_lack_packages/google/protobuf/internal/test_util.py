@@ -721,7 +721,7 @@ def SetAllUnpackedFields(message):
 class NonStandardInteger(numbers.Integral):
   """An integer object that does not subclass int.
 
-  This is used to verify that both C++ and regular proto systems can handle
+  This is used to verify that both C++ and regular ss_proto systems can handle
   integer others than int and long and that they handle them in predictable
   ways.
 

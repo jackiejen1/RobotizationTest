@@ -62,7 +62,7 @@ class DescriptorTest(unittest.TestCase):
 
   def setUp(self):
     file_proto = descriptor_pb2.FileDescriptorProto(
-        name='some/filename/some.proto',
+        name='some/filename/some.ss_proto',
         package='protobuf_unittest')
     message_proto = file_proto.message_type.add(
         name='NestedMessage')
@@ -418,7 +418,7 @@ class DescriptorTest(unittest.TestCase):
     self.assertEqual(self.my_message.file, self.my_file)
 
   def testFileDescriptor(self):
-    self.assertEqual(self.my_file.name, 'some/filename/some.proto')
+    self.assertEqual(self.my_file.name, 'some/filename/some.ss_proto')
     self.assertEqual(self.my_file.package, 'protobuf_unittest')
     self.assertEqual(self.my_file.pool, self.pool)
     self.assertFalse(self.my_file.has_options)
@@ -827,9 +827,9 @@ class DescriptorCopyToProtoTest(unittest.TestCase):
 
   def testCopyToProto_FileDescriptor(self):
     UNITTEST_IMPORT_FILE_DESCRIPTOR_ASCII = ("""
-      name: 'google/protobuf/unittest_import.proto'
+      name: 'google/protobuf/unittest_import.ss_proto'
       package: 'protobuf_unittest_import'
-      dependency: 'google/protobuf/unittest_import_public.proto'
+      dependency: 'google/protobuf/unittest_import_public.ss_proto'
       message_type: <
         name: 'ImportMessage'
         field: <
@@ -923,7 +923,7 @@ class DescriptorCopyToProtoTest(unittest.TestCase):
   @unittest.skipIf(
       api_implementation.Type() == 'python',
       'Pure python does not raise error.')
-  # TODO(jieluo): Fix pure python to check with the proto type.
+  # TODO(jieluo): Fix pure python to check with the ss_proto type.
   def testCopyToProto_TypeError(self):
     file_proto = descriptor_pb2.FileDescriptorProto()
     self.assertRaises(TypeError,

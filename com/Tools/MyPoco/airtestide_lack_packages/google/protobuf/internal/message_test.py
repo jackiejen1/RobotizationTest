@@ -1452,7 +1452,7 @@ class Proto2Test(unittest.TestCase):
     unpickled_message = pickle.loads(pickled_message)
     self.assertEqual(unpickled_message, golden_message)
     self.assertEqual(unpickled_message.a, 1)
-    # This is still an incomplete proto - so serializing should fail
+    # This is still an incomplete ss_proto - so serializing should fail
     self.assertRaises(message.EncodeError, unpickled_message.SerializeToString)
 
 
@@ -1682,9 +1682,9 @@ class Proto3Test(unittest.TestCase):
     self.assertEqual(7654321, m2.repeated_nested_enum[0])
 
   # Map isn't really a proto3-only feature. But there is no proto2 equivalent
-  # of google/protobuf/map_unittest.proto right now, so it's not easy to
+  # of google/protobuf/map_unittest.ss_proto right now, so it's not easy to
   # test both with the same test like we do for the other proto2/proto3 tests.
-  # (google/protobuf/map_proto2_unittest.proto is very different in the set
+  # (google/protobuf/map_proto2_unittest.ss_proto is very different in the set
   # of messages and fields it contains).
   def testScalarMapDefaults(self):
     msg = map_unittest_pb2.TestMap()

@@ -10,7 +10,7 @@ from locust.exception import StopLocust
 import gevent
 from locust import events
 from packdata import pack_data
-from proto.errorMsgInfo_pb2 import CErrorMsgInfo
+from sx_proto.errorMsgInfo_pb2 import CErrorMsgInfo
 from Proto_new.worldBossOperate_pb2 import CWorldBossOperate
 from Proto_new.worldBossSystem_pb2 import CWorldBossBattleRevive
 

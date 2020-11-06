@@ -370,7 +370,7 @@ class ReflectionTest(unittest.TestCase):
     # Assignment to an attribute of a repeated field.
     self.assertRaises(AttributeError, setattr, proto.repeated_float,
                       'some_attribute', 34)
-    # proto.nonexistent_field = 23 should fail as well.
+    # ss_proto.nonexistent_field = 23 should fail as well.
     self.assertRaises(AttributeError, setattr, proto, 'nonexistent_field', 23)
 
   def testSingleScalarTypeSafety(self, message_module):
@@ -497,7 +497,7 @@ class ReflectionTest(unittest.TestCase):
     self.assertRaises(TypeError, proto.repeated_string.__setitem__, 0, 10)
 
     # Repeated enums tests.
-    #proto.repeated_nested_enum.append(0)
+    #ss_proto.repeated_nested_enum.append(0)
 
   def testSingleScalarGettersAndSetters(self, message_module):
     proto = message_module.TestAllTypes()
@@ -970,45 +970,45 @@ class Proto2ReflectionTest(unittest.TestCase):
     # I never thought I'd miss C++ macros and templates so much. :(
     # This helper is semantically just:
     #
-    #   assert proto.composite_field.scalar_field == 0
-    #   assert not proto.composite_field.HasField('scalar_field')
-    #   assert not proto.HasField('composite_field')
+    #   assert ss_proto.composite_field.scalar_field == 0
+    #   assert not ss_proto.composite_field.HasField('scalar_field')
+    #   assert not ss_proto.HasField('composite_field')
     #
-    #   proto.composite_field.scalar_field = 10
-    #   old_composite_field = proto.composite_field
+    #   ss_proto.composite_field.scalar_field = 10
+    #   old_composite_field = ss_proto.composite_field
     #
-    #   assert proto.composite_field.scalar_field == 10
-    #   assert proto.composite_field.HasField('scalar_field')
-    #   assert proto.HasField('composite_field')
+    #   assert ss_proto.composite_field.scalar_field == 10
+    #   assert ss_proto.composite_field.HasField('scalar_field')
+    #   assert ss_proto.HasField('composite_field')
     #
-    #   proto.ClearField('composite_field')
+    #   ss_proto.ClearField('composite_field')
     #
-    #   assert not proto.composite_field.HasField('scalar_field')
-    #   assert not proto.HasField('composite_field')
-    #   assert proto.composite_field.scalar_field == 0
+    #   assert not ss_proto.composite_field.HasField('scalar_field')
+    #   assert not ss_proto.HasField('composite_field')
+    #   assert ss_proto.composite_field.scalar_field == 0
     #
     #   # Now ensure that ClearField('composite_field') disconnected
     #   # the old field object from the object tree...
-    #   assert old_composite_field is not proto.composite_field
+    #   assert old_composite_field is not ss_proto.composite_field
     #   old_composite_field.scalar_field = 20
-    #   assert not proto.composite_field.HasField('scalar_field')
-    #   assert not proto.HasField('composite_field')
+    #   assert not ss_proto.composite_field.HasField('scalar_field')
+    #   assert not ss_proto.HasField('composite_field')
     def TestCompositeHasBits(composite_field_name, scalar_field_name):
       proto = unittest_pb2.TestAllTypes()
       # First, check that we can get the scalar value, and see that it's the
-      # default (0), but that proto.HasField('omposite') and
-      # proto.composite.HasField('scalar') will still return False.
+      # default (0), but that ss_proto.HasField('omposite') and
+      # ss_proto.composite.HasField('scalar') will still return False.
       composite_field = getattr(proto, composite_field_name)
       original_scalar_value = getattr(composite_field, scalar_field_name)
       self.assertEqual(0, original_scalar_value)
       # Assert that the composite object does not "have" the scalar.
       self.assertFalse(composite_field.HasField(scalar_field_name))
-      # Assert that proto does not "have" the composite field.
+      # Assert that ss_proto does not "have" the composite field.
       self.assertFalse(proto.HasField(composite_field_name))
 
       # Now set the scalar within the composite field.  Ensure that the setting
-      # is reflected, and that proto.HasField('composite') and
-      # proto.composite.HasField('scalar') now both return True.
+      # is reflected, and that ss_proto.HasField('composite') and
+      # ss_proto.composite.HasField('scalar') now both return True.
       new_val = 20
       setattr(composite_field, scalar_field_name, new_val)
       self.assertEqual(new_val, getattr(composite_field, scalar_field_name))
@@ -1962,20 +1962,20 @@ class Proto2ReflectionTest(unittest.TestCase):
       api_implementation.Type() != 'cpp' or api_implementation.Version() != 2,
       'Errors are only available from the most recent C++ implementation.')
   def testFileDescriptorErrors(self):
-    file_name = 'test_file_descriptor_errors.proto'
-    package_name = 'test_file_descriptor_errors.proto'
+    file_name = 'test_file_descriptor_errors.ss_proto'
+    package_name = 'test_file_descriptor_errors.ss_proto'
     file_descriptor_proto = descriptor_pb2.FileDescriptorProto()
     file_descriptor_proto.name = file_name
     file_descriptor_proto.package = package_name
     m1 = file_descriptor_proto.message_type.add()
     m1.name = 'msg1'
-    # Compiles the proto into the C++ descriptor pool
+    # Compiles the ss_proto into the C++ descriptor pool
     descriptor.FileDescriptor(
         file_name,
         package_name,
         serialized_pb=file_descriptor_proto.SerializeToString())
     # Add a FileDescriptorProto that has duplicate symbols
-    another_file_name = 'another_test_file_descriptor_errors.proto'
+    another_file_name = 'another_test_file_descriptor_errors.ss_proto'
     file_descriptor_proto.name = another_file_name
     m2 = file_descriptor_proto.message_type.add()
     m2.name = 'msg2'
@@ -1986,7 +1986,7 @@ class Proto2ReflectionTest(unittest.TestCase):
           serialized_pb=file_descriptor_proto.SerializeToString())
       self.assertTrue(hasattr(cm, 'exception'), '%s not raised' %
                       getattr(cm.expected, '__name__', cm.expected))
-      self.assertIn('test_file_descriptor_errors.proto', str(cm.exception))
+      self.assertIn('test_file_descriptor_errors.ss_proto', str(cm.exception))
       # Error message will say something about this definition being a
       # duplicate, though we don't check the message exactly to avoid a
       # dependency on the C++ logging code.
@@ -2004,7 +2004,7 @@ class Proto2ReflectionTest(unittest.TestCase):
     proto.Extensions[extension].str = test_utf8
 
     # Serialize using the MessageSet wire format (this is specified in the
-    # .proto file).
+    # .ss_proto file).
     serialized = proto.SerializeToString()
 
     # Check byte size.
@@ -2017,7 +2017,7 @@ class Proto2ReflectionTest(unittest.TestCase):
     message2 = message_set_extensions_pb2.TestMessageSetExtension2()
 
     self.assertEqual(1, len(raw.item))
-    # Check that the type_id is the same as the tag ID in the .proto file.
+    # Check that the type_id is the same as the tag ID in the .ss_proto file.
     self.assertEqual(raw.item[0].type_id, 98418634)
 
     # Check the actual bytes on the wire.
@@ -2630,7 +2630,7 @@ class SerializationTest(unittest.TestCase):
   def testCanonicalSerializationOrder(self):
     proto = more_messages_pb2.OutOfOrderFields()
     # These are also their tag numbers.  Even though we're setting these in
-    # reverse-tag order AND they're listed in reverse tag-order in the .proto
+    # reverse-tag order AND they're listed in reverse tag-order in the .ss_proto
     # file, they should nonetheless be serialized in tag order.
     proto.optional_sint32 = 5
     proto.Extensions[more_messages_pb2.optional_uint64] = 4
@@ -2694,7 +2694,7 @@ class SerializationTest(unittest.TestCase):
     proto.Extensions[extension3].text = 'bar'
 
     # Serialize using the MessageSet wire format (this is specified in the
-    # .proto file).
+    # .ss_proto file).
     serialized = proto.SerializeToString()
 
     raw = unittest_mset_pb2.RawMessageSet()
