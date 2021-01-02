@@ -34,7 +34,6 @@
 
 import unittest
 
-
 from google.protobuf.internal import more_messages_pb2
 from google.protobuf import descriptor_pool
 

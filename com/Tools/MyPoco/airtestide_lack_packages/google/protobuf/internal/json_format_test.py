@@ -43,19 +43,9 @@ try:
 except ImportError:
   import unittest
 
-from google.protobuf import any_pb2
-from google.protobuf import duration_pb2
-from google.protobuf import field_mask_pb2
-from google.protobuf import struct_pb2
-from google.protobuf import timestamp_pb2
-from google.protobuf import wrappers_pb2
-from google.protobuf import any_test_pb2
-from google.protobuf import unittest_mset_pb2
-from google.protobuf import unittest_pb2
-from google.protobuf import descriptor_pool
-from google.protobuf import json_format
-from google.protobuf.util import json_format_pb2
-from google.protobuf.util import json_format_proto3_pb2
+from google.protobuf import field_mask_pb2, any_test_pb2, wrappers_pb2, duration_pb2, any_pb2, timestamp_pb2, \
+    json_format, unittest_mset_pb2, struct_pb2, unittest_pb2, descriptor_pool
+from google.protobuf.util import json_format_proto3_pb2, json_format_pb2
 
 
 class JsonFormatBase(unittest.TestCase):
@@ -1050,7 +1040,7 @@ class JsonFormatTest(JsonFormatBase):
     self.assertEqual('{\n  "repeated_value": []\n}',
                      json_format.MessageToJson(message, True, True))
 
-    # Parsers accept both original ss_proto field names and lowerCamelCase names.
+    # Parsers accept both original proto field names and lowerCamelCase names.
     message = json_format_proto3_pb2.TestMessage()
     json_format.Parse('{"int32Value": 54321}', message)
     self.assertEqual(54321, message.int32_value)

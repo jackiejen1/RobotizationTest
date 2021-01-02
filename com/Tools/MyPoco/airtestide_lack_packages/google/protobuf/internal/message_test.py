@@ -52,7 +52,6 @@ import pickle
 import pydoc
 import six
 import sys
-import warnings
 
 try:
   # Since python 3
@@ -70,22 +69,10 @@ try:
 except NameError:
   cmp = lambda x, y: (x > y) - (x < y)  # Python 3
 
-from google.protobuf import map_proto2_unittest_pb2
-from google.protobuf import map_unittest_pb2
-from google.protobuf import unittest_pb2
-from google.protobuf import unittest_proto3_arena_pb2
-from google.protobuf import descriptor_pb2
-from google.protobuf import descriptor_pool
-from google.protobuf import message_factory
-from google.protobuf import text_format
-from google.protobuf.internal import api_implementation
-from google.protobuf.internal import encoder
-from google.protobuf.internal import more_extensions_pb2
-from google.protobuf.internal import packed_field_test_pb2
-from google.protobuf.internal import test_util
-from google.protobuf.internal import testing_refleaks
-from google.protobuf import message
-from google.protobuf.internal import _parameterized
+from google.protobuf import descriptor_pb2, map_unittest_pb2, message_factory, unittest_proto3_arena_pb2, text_format, \
+    message, map_proto2_unittest_pb2, unittest_pb2, descriptor_pool
+from google.protobuf.internal import api_implementation, testing_refleaks, encoder, packed_field_test_pb2, \
+    more_extensions_pb2, test_util, _parameterized
 
 UCS2_MAXUNICODE = 65535
 if six.PY3:
@@ -1452,7 +1439,7 @@ class Proto2Test(unittest.TestCase):
     unpickled_message = pickle.loads(pickled_message)
     self.assertEqual(unpickled_message, golden_message)
     self.assertEqual(unpickled_message.a, 1)
-    # This is still an incomplete ss_proto - so serializing should fail
+    # This is still an incomplete proto - so serializing should fail
     self.assertRaises(message.EncodeError, unpickled_message.SerializeToString)
 
 
@@ -1682,9 +1669,9 @@ class Proto3Test(unittest.TestCase):
     self.assertEqual(7654321, m2.repeated_nested_enum[0])
 
   # Map isn't really a proto3-only feature. But there is no proto2 equivalent
-  # of google/protobuf/map_unittest.ss_proto right now, so it's not easy to
+  # of google/protobuf/map_unittest.proto right now, so it's not easy to
   # test both with the same test like we do for the other proto2/proto3 tests.
-  # (google/protobuf/map_proto2_unittest.ss_proto is very different in the set
+  # (google/protobuf/map_proto2_unittest.proto is very different in the set
   # of messages and fields it contains).
   def testScalarMapDefaults(self):
     msg = map_unittest_pb2.TestMap()
@@ -2608,7 +2595,7 @@ class OversizeProtosTest(unittest.TestCase):
     self.p_serialized = self.p.SerializeToString()
 
   def testAssertOversizeProto(self):
-    from google.protobuf.pyext._message import SetAllowOversizeProtos
+    from google import SetAllowOversizeProtos
     SetAllowOversizeProtos(False)
     q = self.proto_cls()
     try:
@@ -2617,7 +2604,7 @@ class OversizeProtosTest(unittest.TestCase):
       self.assertEqual(str(e), 'Error parsing message')
 
   def testSucceedOversizeProto(self):
-    from google.protobuf.pyext._message import SetAllowOversizeProtos
+    from google import SetAllowOversizeProtos
     SetAllowOversizeProtos(True)
     q = self.proto_cls()
     q.ParseFromString(self.p_serialized)

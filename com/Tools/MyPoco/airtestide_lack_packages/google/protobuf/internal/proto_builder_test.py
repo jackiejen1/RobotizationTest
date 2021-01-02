@@ -41,10 +41,7 @@ try:
 except ImportError:
   import unittest
 
-from google.protobuf import descriptor_pb2
-from google.protobuf import descriptor_pool
-from google.protobuf import proto_builder
-from google.protobuf import text_format
+from google.protobuf import descriptor_pb2, proto_builder, text_format, descriptor_pool
 
 
 class ProtoBuilderTest(unittest.TestCase):
@@ -57,7 +54,7 @@ class ProtoBuilderTest(unittest.TestCase):
     self._fields = dict(self.ordered_fields)
 
   def testMakeSimpleProtoClass(self):
-    """Test that we can create a ss_proto class."""
+    """Test that we can create a proto class."""
     proto_cls = proto_builder.MakeSimpleProtoClass(
         self._fields,
         full_name='net.proto2.python.public.proto_builder_test.Test')

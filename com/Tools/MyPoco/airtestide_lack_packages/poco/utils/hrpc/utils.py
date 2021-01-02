@@ -5,7 +5,7 @@ from functools import wraps
 
 from hrpc.exceptions import RpcRemoteException
 from hrpc.object_proxy import safe_repr
-from poco.exceptions import PocoTargetRemovedException
+from MyPoco.airtestide_lack_packages.poco.exceptions import PocoTargetRemovedException
 
 
 def transform_node_has_been_removed_exception(func):

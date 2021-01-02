@@ -114,22 +114,26 @@ if __name__ == '__main__':
     #         else:
     #             zong_choujiang_log =zong_choujiang_log +"\r\n"+choujiang_log
     #     new_excel_tab_dongfeng(excel_tab_name, zong_choujiang_log)
-    for i in range(7):
-        my_poco = MyPoco("少三2日本", __phone_id__)
-        sever_name = "QA2"
-        account = my_poco.get_random_account()  # 随机账号
-        account = "1" + account
-        sever_time = my_poco.make_new_role(sever_name, account, )
-        my_poco.set_account_information_gm(account, sever_name)
-        my_poco.add_resource({"角色经验": 4099909990, "测试属性": 1, "银币": 999999, })
-        my_poco.set_checkpoint(account, sever_name, {"副本": "副本-120-10"})
-        my_poco.GM_yijian_chuanzhuangbei()
-        my_poco.shangzhenshenshou(1,"碧水麒麟")
-        my_poco.shangzhenshenshou(2, "神木青鸾")
-        my_poco.shangzhenshenshou(3, "九天应龙")
-        my_poco.shangzhenshenshou(4, "狱火穷奇")
-        my_poco.shangzhenshenshou(5, "巨猿")
-        my_poco.shangzhenshenshou(6, "撼地灵犀")
+    # for i in range(70):
+    #     my_poco = MyPoco("少三2", __phone_id__)
+    #     sever_name = "新QA2"
+    #     # account = my_poco.get_random_account()  # 随机账号
+    #     # account = "1" + account
+    #     print('当前第{}个'.format(i+1))
+    #     account = 'sxm11261{}'.format(i)
+    #     with open('username.txt','a') as f:
+    #         f.write('{}\n'.format(account))
+    #     sever_time = my_poco.make_new_role(sever_name, account, )
+    #     my_poco.set_account_information_gm(account, sever_name)
+    #     my_poco.add_resource({"角色经验": 4099909990, "测试属性": 1, "银币": 999999, })
+    #     my_poco.set_checkpoint(account, sever_name, {"副本": "副本-120-10"})
+    #     # my_poco.GM_yijian_chuanzhuangbei()
+    #     # my_poco.shangzhenshenshou(1,"碧水麒麟")
+    #     # my_poco.shangzhenshenshou(2, "神木青鸾")
+    #     # my_poco.shangzhenshenshou(3, "九天应龙")
+    #     # my_poco.shangzhenshenshou(4, "狱火穷奇")
+    #     # my_poco.shangzhenshenshou(5, "巨猿")
+    #     # my_poco.shangzhenshenshou(6, "撼地灵犀")
     # my_poco.xue_gong_lun_zhan()
 
 
@@ -148,11 +152,23 @@ if __name__ == '__main__':
     # my_poco.GM_fengkuang_fuben("副本-195-9",5)
     # my_poco.quit_Guild()
     # my_poco.GM_fengkuang_haoling("sfasf",99999999,"")
-    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_fujia(580,2,10000)
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_fujia(652,2,10000)
     # my_poco.GM_fengkuang_shikongzhaohuan(582, 10000)
-    my_poco.GM_fengkuang_xianshijinjiang(602,"紫金2双卡池","紫金1-2",10000,"紫金将8选1箱")
-    log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_huashen(555,10000)
-    log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_hengsaoqianjun(553,10000)
+    my_poco = MyPoco("少三2欧美", __phone_id__)
+    sever_name = "QA2"
+    # account = my_poco.get_random_account()  # 随机账号
+    # account = "1" + account
+    account = 'We01'
+    sever_time = my_poco.make_new_role(sever_name, account)
+    my_poco.GM_fengkuang_haoyou(30,'We01',sever_name)
+    # my_poco.set_account_information_gm(account, sever_name)
+    # my_poco.add_resource({"角色经验": 4099909990, "测试属性": 1, "银币": 999999, })
+    # my_poco.set_checkpoint(account, sever_name, {"副本": "副本-120-10"})
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_fujia(652,1,10000)
+    # print(my_poco.GM_fengkuang_shikongzhaohuan(662,10000))
+    # print(my_poco.GM_fengkuang_xianshijinjiang(633,"紫金3双卡池","金",10000))
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_huashen(555,10000)
+    # log_str_z, tongji_str_z, shijiancishu = my_poco.GM_fengkuang_hengsaoqianjun(553,10000)
     # my_poco.GM_fengkuang_haoyou(50,sever_name_into=sever_name,)
     # my_poco.GM_yijian_account_v1(account)
     # my_poco.GM_yijian_account_v2(account)

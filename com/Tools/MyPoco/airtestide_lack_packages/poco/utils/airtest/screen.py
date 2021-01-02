@@ -2,7 +2,7 @@
 
 import base64
 from airtest.core.api import snapshot, device as current_device
-from poco.sdk.interfaces.screen import ScreenInterface
+from MyPoco.airtestide_lack_packages.poco.sdk.interfaces.screen import ScreenInterface
 
 
 class AirtestScreen(ScreenInterface):

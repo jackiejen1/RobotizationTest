@@ -42,7 +42,7 @@ from google.protobuf.internal import api_implementation
 
 if api_implementation.Type() == 'cpp':
   # pylint: disable=g-import-not-at-top
-  from google.protobuf.pyext import _message
+  from google import _message
 
 
 class GeneratedServiceType(type):

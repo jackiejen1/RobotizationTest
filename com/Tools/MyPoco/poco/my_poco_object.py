@@ -142,11 +142,26 @@ class MyPocoObject():
         self.uw.unexpected_win()
         try:
             self.make_poco_dic.my_touch(poco_path, click_list=click_list)
+# <<<<<<< .mine
+#         except RpcTimeoutError:
+# ||||||| .r21670
         except RpcTimeoutError:
-            snapshot(msg="poco超时异常")
-            self.make_poco_dic.my_touch(poco_path, click_list=click_list)
-        except ConnectionAbortedError:
+            sys.exit(1)
+# =======
+#         except RpcTimeoutError as e:
+# # >>>>>>> .r21826
+#             snapshot(msg="poco超时异常")
+# <<<<<<< .mine
+#             self.make_poco_dic.my_touch(poco_path, click_list=click_list)
+# ||||||| .r21670
+#             self.make_poco_dic.my_touch(poco_path, click_list=click_list,func_text = func_text)
+# =======
+#             log(e, snapshot=True)
+#             self.make_poco_dic.my_touch(poco_path, click_list=click_list,func_text = func_text)
+# >>>>>>> .r21826
+        except ConnectionAbortedError as e:
             start_app(self.game_name)
+            log(e, snapshot=True)
             time.sleep(4)
             snapshot(msg="10053异常")
 
@@ -298,7 +313,7 @@ class MyPocoObject():
         try:
             number_int = int(number_str)
         except:
-            snapshot("数据类型转换异常")
+            log("数据类型转换异常", snapshot=True)
             raise NoneException("数据类型转换异常")
         return number_int
 

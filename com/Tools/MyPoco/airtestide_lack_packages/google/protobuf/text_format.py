@@ -32,19 +32,17 @@
 
 Simple usage example:
 
-  # Create a ss_proto object and serialize it to a text ss_proto string.
+  # Create a proto object and serialize it to a text proto string.
   message = my_proto_pb2.MyMessage(foo='bar')
   text_proto = text_format.MessageToString(message)
 
-  # Parse a text ss_proto string.
+  # Parse a text proto string.
   message = text_format.Parse(text_proto, my_proto_pb2.MyMessage())
 """
 
 __author__ = 'kenton@google.com (Kenton Varda)'
 
 # TODO(b/129989314) Import thread contention leads to test failures.
-import encodings.raw_unicode_escape  # pylint: disable=unused-import
-import encodings.unicode_escape  # pylint: disable=unused-import
 import io
 import re
 
@@ -139,7 +137,7 @@ def MessageToString(message,
   Double values can be formatted compactly with 15 digits of
   precision (which is the most that IEEE 754 "double" can guarantee)
   using double_format='.15g'. To ensure that converting to text and back to a
-  ss_proto will result in an identical value, double_format='.17g' should be used.
+  proto will result in an identical value, double_format='.17g' should be used.
 
   Args:
     message: The protocol buffers message.
@@ -150,7 +148,7 @@ def MessageToString(message,
     use_short_repeated_primitives: Use short repeated format for primitives.
     pointy_brackets: If True, use angle brackets instead of curly braces for
       nesting.
-    use_index_order: If True, fields of a ss_proto message will be printed using
+    use_index_order: If True, fields of a proto message will be printed using
       the order defined in source code instead of the field number, extensions
       will be printed at the end of the message and their relative order is
       determined by the extension number. By default, use the field number
@@ -328,7 +326,7 @@ class _Printer(object):
 
     Double values can be formatted compactly with 15 digits of precision
     (which is the most that IEEE 754 "double" can guarantee) using
-    double_format='.15g'. To ensure that converting to text and back to a ss_proto
+    double_format='.15g'. To ensure that converting to text and back to a proto
     will result in an identical value, double_format='.17g' should be used.
 
     Args:
@@ -341,7 +339,7 @@ class _Printer(object):
       use_short_repeated_primitives: Use short repeated format for primitives.
       pointy_brackets: If True, use angle brackets instead of curly braces for
         nesting.
-      use_index_order: If True, print fields of a ss_proto message using the order
+      use_index_order: If True, print fields of a proto message using the order
         defined in source code instead of the field number. By default, use the
         field number order.
       float_format: If set, use this to specify float field formatting
@@ -892,7 +890,7 @@ class _Parser(object):
         field = message_descriptor.fields_by_name.get(name, None)
 
         # Group names are expected to be capitalized as they appear in the
-        # .ss_proto file, which actually matches their type names, not their field
+        # .proto file, which actually matches their type names, not their field
         # names.
         if not field:
           field = message_descriptor.fields_by_name.get(name.lower(), None)

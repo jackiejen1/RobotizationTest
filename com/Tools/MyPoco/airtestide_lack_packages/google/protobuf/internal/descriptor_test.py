@@ -41,17 +41,9 @@ try:
 except ImportError:
   import unittest
 
-from google.protobuf import unittest_custom_options_pb2
-from google.protobuf import unittest_import_pb2
-from google.protobuf import unittest_pb2
-from google.protobuf import descriptor_pb2
+from google.protobuf import descriptor_pb2, symbol_database, unittest_import_pb2, text_format, unittest_pb2, \
+    descriptor_pool, descriptor, unittest_custom_options_pb2
 from google.protobuf.internal import api_implementation
-from google.protobuf.internal import test_util
-from google.protobuf import descriptor
-from google.protobuf import descriptor_pool
-from google.protobuf import symbol_database
-from google.protobuf import text_format
-
 
 TEST_EMPTY_MESSAGE_DESCRIPTOR_ASCII = """
 name: 'TestEmptyMessage'
@@ -62,7 +54,7 @@ class DescriptorTest(unittest.TestCase):
 
   def setUp(self):
     file_proto = descriptor_pb2.FileDescriptorProto(
-        name='some/filename/some.ss_proto',
+        name='some/filename/some.proto',
         package='protobuf_unittest')
     message_proto = file_proto.message_type.add(
         name='NestedMessage')
@@ -418,7 +410,7 @@ class DescriptorTest(unittest.TestCase):
     self.assertEqual(self.my_message.file, self.my_file)
 
   def testFileDescriptor(self):
-    self.assertEqual(self.my_file.name, 'some/filename/some.ss_proto')
+    self.assertEqual(self.my_file.name, 'some/filename/some.proto')
     self.assertEqual(self.my_file.package, 'protobuf_unittest')
     self.assertEqual(self.my_file.pool, self.pool)
     self.assertFalse(self.my_file.has_options)
@@ -827,9 +819,9 @@ class DescriptorCopyToProtoTest(unittest.TestCase):
 
   def testCopyToProto_FileDescriptor(self):
     UNITTEST_IMPORT_FILE_DESCRIPTOR_ASCII = ("""
-      name: 'google/protobuf/unittest_import.ss_proto'
+      name: 'google/protobuf/unittest_import.proto'
       package: 'protobuf_unittest_import'
-      dependency: 'google/protobuf/unittest_import_public.ss_proto'
+      dependency: 'google/protobuf/unittest_import_public.proto'
       message_type: <
         name: 'ImportMessage'
         field: <
@@ -923,7 +915,7 @@ class DescriptorCopyToProtoTest(unittest.TestCase):
   @unittest.skipIf(
       api_implementation.Type() == 'python',
       'Pure python does not raise error.')
-  # TODO(jieluo): Fix pure python to check with the ss_proto type.
+  # TODO(jieluo): Fix pure python to check with the proto type.
   def testCopyToProto_TypeError(self):
     file_proto = descriptor_pb2.FileDescriptorProto()
     self.assertRaises(TypeError,
@@ -1025,7 +1017,7 @@ class MakeDescriptorTest(unittest.TestCase):
 
     options = reformed_descriptor.GetOptions()
     self.assertEqual(101,
-                      options.Extensions[unittest_custom_options_pb2.msgopt].i)
+                     options.Extensions[unittest_custom_options_pb2.msgopt].i)
 
   def testCamelcaseName(self):
     descriptor_proto = descriptor_pb2.DescriptorProto()

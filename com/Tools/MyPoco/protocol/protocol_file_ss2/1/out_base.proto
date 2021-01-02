@@ -1,0 +1,2827 @@
+syntax = "proto2";
+package out_base;
+
+message EmptyMessage {
+}
+
+message KV {
+	required uint64 id = 1;//逻辑id
+	required uint64 num = 2;//逻辑num
+}
+
+message Status {
+	required uint32 id = 1;//逻辑状态Id
+	required uint64 status = 2;//逻辑状态 起始跟上面区别就是uint32跟uint64 看情况使用 服务器内部package相关
+}
+
+message Task {
+  required uint32 type = 1;
+  required uint64 value = 2;
+}
+
+//跨服弹幕信息
+message BulletScreenMessage{
+    optional UserSnapshot user = 1;
+    optional string content = 2;
+    optional uint32 time =3;
+    optional uint64 talk = 4;//聊天气泡框
+    repeated uint64 args = 5; // 参数
+}
+
+//傲视天下相关
+//仇人
+message MineEnemyUser{
+    optional UserSnapshot user = 1;
+    optional uint32 num = 2;//仇恨值
+    optional uint32 nowCityId = 3;//当前所在城池id
+}
+
+//敌对军团
+message MineEnemyGuild{
+    optional GuildSnapshot guild = 1;
+    optional uint32 num = 2;//敌对值
+}
+
+//赛季任务
+message MineAction{
+    optional uint32 id = 1;
+    optional uint32 value = 2;
+    optional uint32 state = 3;
+}
+
+message MineAchieve{
+    optional uint32 id = 1;
+    optional uint32 state = 2;
+}
+
+//战报数据
+message MineRecord {
+  required uint64 battle_id = 1; //战报id
+  required bool is_win = 2;//是否胜利
+  required uint32 atker_lost_power = 3;//攻击者战损战力
+  required uint32 defer_lost_power = 4;//防守者战损战力
+  required UserSnapshot attacker = 5; //攻击着快照
+  required UserSnapshot defender = 6;//防守者快照
+  required uint32 atker_power = 7;//攻击者当前战力
+  required uint32 defer_power = 8;//防守者当前战力
+  required uint32 battle_ts = 9;//战报时间戳
+  repeated Award awards = 10;//节日掉落展示
+}
+
+//事件通知数据
+message MineEventInfo{
+    optional uint32 cityId = 1; //城池id
+    optional uint32 eventId = 2;//事件id
+}
+
+//傲视战斗结果
+message MineBattleResult{
+    optional uint32 powerBefore = 1;
+    optional uint32 powerAfter = 2;
+}
+
+//傲视服务器信息
+message ServerInfo{
+    optional uint32 sid = 1;//服务器名字
+    optional string serverName = 2;//服务器名字
+}
+
+//傲视城池玩家展示数据
+message MineCityUserInfo{
+    optional UserSnapshot user = 1;//玩家UserSnapshot
+    optional uint32 power  = 2;//兵力
+}
+
+//傲视城池状态信息 包括占城状态和当前人数
+message MineCityStatusInfo{
+    optional uint32 cityId = 1;//城池id
+    optional uint32 captureStatus = 2;//占领状态 0 无人占领 1 占领 2 占领+独占
+    optional GuildSnapshot guildSnapShot = 3;//占领的军团快照
+    optional uint32 num = 4;//当前人数
+}
+
+//傲视天下城池信息
+message MineCityInfo{
+    required uint32 cityId = 1;//城池id
+    optional uint32 num = 2;//人数
+    optional GuildSnapshot guildSnapShot = 3;//军团快照
+    optional uint32 eventId = 4;//当前所处的事件
+    optional uint32 captureStatus = 5;//占城状态 0 无人占领 1 占领 2 占领+独占
+}
+
+//傲视天下军团排名信息
+message MineRankInfo{
+    required uint32 rank = 1;//排名
+    optional uint32 cityId = 2;//占领的城池id
+    optional uint32 eventId = 3;//城池的事件状态id 0 表示普通状态
+    optional GuildSnapshot guildSnapShot = 4;//军团快照
+}
+
+//军团boss-活动信息
+message GuildBossActivity {
+  required uint32 id = 1; //活动ID
+  required uint32 start_time = 2; //活动开始时间
+  required uint32 end_time = 3; //活动结束时间
+}
+
+//军团boss-广播信息
+message GuildBossBroadcast{
+  optional UserSnapshot user = 1;
+  optional uint64 damage = 2; //伤害值
+  optional uint32 rank = 3; //排名
+}
+
+//军团Boss-军团信息
+message GuildBossInfo {
+  required uint32 start_time = 1; //活动开始时间(重置用)
+  required uint32 score = 2; //军团总积分
+  optional uint32 total_num = 3; //军团boss参与总人数
+}
+
+//军团boss-玩家数据
+message UserGuildBoss {
+  required uint32 start_time = 1; //活动开始时间(重置用)
+  required uint32 challenge_num = 2; //boss挑战次数
+  required uint32 last_challenge_time = 3; //boss最后挑战时间
+  required uint32 rob_num = 4; //抢夺次数
+  required uint32 last_rob_time = 5; //最后抢夺时间
+  required uint32 score = 6; //积分
+  required uint32 robed_num = 7; //被抢夺次数
+}
+
+//天公赐福宝箱信息
+message GodBoxInfo {
+  required uint32 box_id = 1;//宝箱唯一id
+  required uint32 config_id = 2;//配置表id
+  required uint32 buy_status = 3;//只对直冲礼包,1表示已充值，0表示未充值
+  required uint32 end_time = 4;//关闭时间
+  required uint32 isAward = 5;//宝箱是否领取, 1已领取,0未领取
+  required uint32 groupId = 6;//宝箱组id
+}
+
+message StringMap {
+  required string key = 1;
+  required string value = 2;
+}
+
+message User {
+	required uint64 id = 1;//玩家Id
+	required string name = 2;//玩家姓名
+	required uint32 level = 3;//玩家等级
+	required int64 gold = 4;//玩家元宝 会有负数
+	required uint32 vip_level = 5;//vip等级
+  required uint64 fight_value = 6;//战力
+	optional uint32 title_id = 7;//称号id
+	repeated Status titles = 8;//所有称号
+	optional uint32 base_id = 9;//主角baseid
+  optional uint64 guild_id = 10; //军团id
+	optional uint32 dress_id = 11; //时装
+  optional uint32 frame_id = 12; //头像框
+  optional uint32 guide_id = 13; //新手引导id
+  optional uint32 join_guild_limit = 14; //加入军团限制时间
+  optional string guild_name = 15; //军团名
+  optional uint32 show_id = 16; //显示uid
+  optional uint32 create_time = 17; //创角时间
+  optional uint32 guild_send_count = 18;//军团送礼次数
+  optional uint32 guild_receive_count = 19;//军团收礼次数
+  optional uint32 storm_city_lord = 20; //官职
+  optional uint64 gold_gift = 21; //赠送元宝
+}
+
+message Knight {
+  required uint64 id = 1;//唯一id
+  required uint32 base_id = 2;//表里id
+  required uint32 exp = 3;//经验
+  required uint32 level = 4;//等级
+  required uint32 position = 5;//位置
+	//repeated uint32 talent = 6;	// 天赋
+  required uint64 init_hp = 7; //血量
+  required uint32 attack = 8; //攻击
+  required uint32 phy_defence = 9; //物防
+  required uint32 mag_defence = 10; //法防
+  required uint64 fight_value = 11; //战力
+  repeated int32 star_train = 12;	// 将星属性：血、攻、物防、法防 待确认的血、攻、物防、法防
+  optional uint32 advance_level = 13;	// 进阶等级
+  repeated uint32 advance_equip_id = 14;	// 当前穿戴的进阶装备
+  optional uint32 star_level = 15;	// 将星等级
+  repeated KV other_attrs = 16; //二级属性
+	required bool is_star_activited = 17;//当前等级将星是否激活
+  optional uint32 skin = 18;	// 皮肤
+  optional uint32 skin_ts = 19;	// 皮肤有效期
+  optional uint32 awake_stage = 20; //觉醒阶段
+  optional uint32 awake_task = 21; //觉醒任务阶段
+  optional uint64 awake_task_value = 22; //觉醒任务进度
+  optional uint32 pendant_level = 23; //饰品等级
+  repeated uint64 adjutant  =24;//副将ID
+  optional uint64 purplize_id = 25;//幻紫后对应的武将id
+}
+
+message Equipment {
+  required uint64 id = 1;//唯一id
+  required uint32 base_id = 2;//表里id
+  required uint32 level = 3;//等级
+  optional uint32 position = 4;//位置
+  optional uint32 refining_level = 5;//精炼等级
+  optional uint32 refining_exp = 6;//精炼经验
+  optional uint32 glyph_level = 7; //雕纹等级
+  optional uint32 castLevel =8; //铸灵等级
+  optional uint32 castExp =9; //铸灵经验
+  // repeated Status castCost =10; //铸灵已消耗,id:道具id,status:数量
+  optional EquipmentDotInfo dot_infos = 10;  //点化信息组
+  optional uint32 magic_route = 11; //幻化路线，0无1火2水
+}
+
+message Treasure {
+  required uint64 id = 1;//唯一id
+  required uint32 base_id = 2;//表里id
+  required uint32 level = 3;//等级
+  optional uint32 exp = 4;//经验
+  optional uint32 position = 5;//位置
+  optional uint32 refining_level = 6;//精炼等级
+  optional uint32 glyph_level = 7; //雕纹等级
+  optional uint32 golden_level = 8;//升金等级
+  optional uint32 purplize_stage = 9;//幻紫大节点等级
+  repeated uint32 purplize_nodes = 10;//幻紫小节点
+}
+
+//红点规则
+//红点逻辑主要由客户端计算
+//客户端在进主界面时，除了关联性很强的info协议（列入主线副本），其他尽量把需要做红点的内容做到红点协议中
+//服务器设计红点结构体时，如果碰到repeated对象需要传递，需要跟客户端对一下逻辑，这时候需要写一点小逻辑，减少发送内容
+//eg.客户端进叛军界面时候会拉所有叛军信息，但是在主界面的红点只需要知道自己主线触发的叛军数量是多少
+//这时候服务器就不要传所有叛军过去，而直接告诉客户端这个数量是多少把 repeated OBJ => uint32,至于具体逻辑客户端会在进界面时候拉完做逻辑的
+message RedPoint {
+	//各自模块用一个message结构体包含
+	//例如 optional TestRedPoint test_rp = 0;
+	optional DeadBattleHint dead_battle_hint = 1;//无双试练红点
+	optional AchievementHint achievement_hint = 2;//成就
+  optional RecruitHint recruit_hint = 3;	// 招将
+  optional DungeonHint dungeon_hint = 4; // 主线副本
+  optional CityHint city_hint = 5; // 封地巡逻
+  optional BiographyHint biography_hint = 6; //名将传
+  optional GuildHint guild_hint = 7; //军团
+  repeated ModuleTaskHint module_task_hints = 8; //模块任务
+  optional ShopHint shop_hint = 9;	// 商店红点
+  optional ScrollHint scroll_hint = 10; //三国志
+  optional FightingHint fighting_hint = 11; //战力竞赛
+	optional RebelHint rebel_hint = 12;//叛军相关红点
+	optional CommonHint common_hint = 13;//----------------------------common value红点
+  repeated RecruitKnight recruit_knight_hint = 14; //限时神将红点
+  optional StormHint storm_hint = 15; //攻城略地红点
+  optional OnlineGiftHint online_gift_hint = 16; // 在线礼包小红点
+  optional ArtifactRecruit artifact_recruit_hint = 17; // 神器抽卡红点
+  optional AuctionHint auction_hint = 18; // 拍卖行红点
+  optional HallOfFameHint hallOfFame_hint = 19; // 名人堂红点
+  optional MineHint mine_hint = 20; // 傲视天下红点
+  optional RprainHint rprain_hint = 21; // 红包雨红点
+  optional StormCityLordHint storm_city_lord_hint = 22; //霸主相关红点
+  optional uint32 wish_shop_hint = 23; // 心愿商店红点
+  optional uint32 retrieve_res_hint = 24; // 資源找回 0--没红点 1---有红点
+  optional HolidayHint holiday_hint = 25; // 欢庆佳节红点
+  optional bool register = 26; //超级vip是否已注册(客户端要判断是否达到激活超级vip等级)
+  optional OrderWorldHint order_world_hint = 27; //号令天下红点
+  optional HolidayHint pdd_hint = 28; // 拼多多红点
+  optional MysteryBossHint mstboss_hint = 29; //秘境boss红点
+  repeated MonthFundHint month_fund_hint = 30; //月基金红点
+  optional WrestHint wrest_hint = 31; // 攻城新赛季红点
+  optional KSoulDrawHint ksoul_hint = 32; // 将灵抽卡红点
+  optional DemonBossHint demon_boss_hint = 33; // 讨伐魔将红点
+  optional EliteDungeonHint elite_dungeon_hint = 34; //精英副本红点
+  optional WarlordHint warlord_hint = 35; //乱世英杰红点
+  repeated uint32 month_card_active_hint = 36; //月卡活跃奖励红点
+  optional DeadTowerHint dead_tower_hint = 37; //无双地牢红点
+  optional FlameCityHint flame_city_hint = 38; // 烽火连城红点
+  optional GVGHint gvg_hint = 39; // 军团战红点
+  optional FundHint fund_hint = 40; //基金红点
+  optional DebateHint debate_hint = 41; //学宫红点
+  optional GuideWindHint guide_wind_hint = 42; // 周末狂欢红点
+}
+
+// 周末狂欢红点
+message GuideWindHint { 
+  optional uint32 pro_level = 1; // 进度奖励等级
+  repeated uint32 award_pro_id = 2; // 已领奖的进度id
+  optional uint32 jackpot_id = 3; // 奖池id
+  repeated out_base.GuideWindAward award_pool = 4; // 奖池
+}
+
+// 学宫论战红点
+message DebateHint {
+  optional uint32 doctor_num = 1;       // 战胜五经博士数量
+  repeated uint32 doctor_awarded = 2;   // 已领取五经博士奖励
+}
+
+// 军团战红点
+message GVGHint {
+  optional uint32 activity_id = 1; //配置表里的活动ID
+  optional uint32 start_time = 2; //活动开始时间
+  optional uint32 end_time = 3; //活动结束时间
+  optional bool is_joined = 4; //当前玩家是否已参战
+  optional bool is_guild_joined = 5; //军团是否已报名
+  optional bool avail_achieve_award = 6; //有待领取的成就奖励
+  optional bool avail_match_achieve_award = 7; //有待领取的单场比赛成就奖励
+  optional bool server_ever_gvg = 8; //本服务器是否开启过军团战
+}
+
+// 烽火连城红点
+message FlameCityHint {
+  optional bool pass_redpoint = 1; // 通关奖励红点
+  optional bool treasure_redpoint = 2; // 宝藏奖励可领(包含小宝箱) 
+}
+
+// 无双地牢红点
+message DeadTowerHint {
+  optional uint32 challenge_num = 1;   //挑战次数
+  optional uint32 challenge_fool = 2;  //挑战层数
+  repeated uint32 treasure_has_id = 3; //寻宝进度
+}
+
+// 攻城新赛季红点
+message WrestHint {
+  optional uint32 power = 1;//当前兵力 0 表示死亡 1 未死亡 不传真实兵力 不需要
+  optional uint32 mission_reward = 2;//是否有赛季任务可以领取 1 有 0 没有
+  optional uint32 tp = 3; // 活动类型  0 老活动 1 新活动
+}
+
+//傲视红点
+message MineHint{
+  optional uint32 start_time = 1;//本服开启时间戳 跨服会传0 主要用于本服第二天开启
+  optional uint32 power = 2;//当前兵力 0 表示死亡 1 未死亡 不传真实兵力 不需要
+  optional uint32 mission_reward = 3;//是否有赛季任务可以领取 1 有 0 没有
+}
+
+//红包雨红点
+message RprainHint{
+  repeated out_base.RpRainFish fishes = 1;	//上次锦鲤, 20点后就是本次锦鲤
+  optional out_base.RedPacketInfo redPacketInfo = 2;	// 领取红包信息
+  optional uint32 end_time = 3;	// 活动结束时间
+  optional uint32 activity_id = 4;	// 活动id
+  optional uint32 days = 5;	// 当前活动天数
+}
+
+//欢庆佳节红点
+message HolidayHint {
+  optional uint32 days = 1;	// 当前活动天数
+  optional bool awardable = 2;	// 是否可领奖
+  optional uint32 end_time = 3;	// 活动结束时间戳
+  optional uint32 activity_id = 4;	// 对应活动表配置ID
+  optional string activity_name = 5;	// 对应活动表配置名
+  optional uint32 turn_end_time = 6;	// 轮次结束时间
+  repeated uint32 good_ids = 7;	// 已购买商品ID列表
+  repeated uint32 shop_num_list = 8;	// 已购买商品次数列表
+  repeated out_base.CommonTask task_list = 9; // 任务信息
+}
+
+//号令天下红点
+message OrderWorldHint {
+  optional uint32 days = 1;	// 当前活动天数
+  optional uint32 start_time = 2;	// 活动开始时间戳
+  optional uint32 end_time = 3;	// 活动结束时间戳
+  optional uint32 sub_id = 4;	// 活动子id
+  optional bool   guild_mars = 5; //是否公会战神奖
+  optional bool   server_mars = 6; //是否区服战神奖
+  optional bool   task_award = 7; // 任务可领奖
+  optional bool   recharge_award = 8;// 充值可领奖
+  optional bool   level_award = 9;// 公会等级可领奖
+}
+
+//霸主相关红点
+message StormCityLordHint {
+  optional bool has_new_lord = 1; //是否有新一期霸主
+  optional bool has_achive_award = 2; //是否有可领取的霸主成就
+  optional bool has_max_lord_award = 3; //是有有可以领取的巅峰霸主全服奖励
+  optional uint32 point = 4; //霸主成就点
+}
+
+message OnlineGiftHint {
+  optional uint32 online_time = 1; // 在线时间
+  repeated out_base.KV reward_record = 2; // 领奖记录
+}
+
+message CommonHint {
+	optional uint32 red_treasure_compose = 1;//合成红色宝物次数
+  optional uint32 arena_max_rank = 2;//竞技场最高排名
+}
+
+message StormHint {
+  repeated uint32 finish_storm_ids = 1;	// 已通关关隘ID(已领取通关奖励)
+  optional uint32 total_progress = 2;	// 总进度
+  repeated uint32 clear_storm_ids = 3;	// 今日已扫荡关隘ID
+  repeated uint32 storm_ids = 4; // 关隘id列表
+  repeated uint32 max_order = 5; // 关隘id列表对应的最大配置表order数
+  optional uint32 lord_awarded = 6; //官职奖励领取时间
+}
+
+message RebelHint {
+  optional uint32 level = 1;	// 今日0点前最高击杀叛军等级
+	optional uint32 self_rebel = 2;//自己主线触发的叛军数量
+  repeated uint64 award_ids = 3;	// 今日已领取的奖励配置id
+  optional uint64 total_damage = 4;	// 今日累计伤害
+  optional uint64 max_damage = 5;	// 今日最高伤害
+}
+
+message DeadBattleHint {
+	optional uint32 fail = 1;//本次已经失败次数
+	optional uint32 shop_size = 2;//商店数量
+	optional bool is_award = 3;//本层宝箱是否领取
+	optional uint32 record_star = 4;//最高星数
+}
+
+message AchievementHint {
+	repeated out_base.Status status = 1;//成就状态
+	repeated uint64 finish = 2;//成就完成奖励
+	repeated uint64 reward = 3;//成绩点奖励
+}
+
+message RecruitHint {
+  repeated uint32 free_count = 1;  // 今日已使用免费次数(依次为普通、高级招募)
+  repeated uint32 free_time = 2; // 上次免费抽取的时间戳(依次为普通、高级招募)
+  repeated uint32 total_count = 3;  // 总招募次数(依次为普通、高级招募)
+}
+
+message KSoulDrawHint {
+  repeated uint32 free_count = 1;  // 今日已使用免费次数(依次为普通、高级招募)
+  repeated uint32 free_time = 2; // 上次免费抽取的时间戳(依次为普通、高级招募)
+  repeated uint32 total_count = 3;  // 总招募次数(依次为普通、高级招募)
+  repeated uint32 daily_count = 4;  // 每日招募次数(依次为普通、高级招募)
+}
+
+message DungeonHint {
+  repeated ChapterHint chapters = 1;//主线副本
+}
+
+message ChapterHint {
+  optional uint32 id = 1; //章节id
+  optional uint32 star = 2; //章节星数
+  repeated uint32 star_chest = 3; //已领取星数宝箱
+  repeated uint32 stage_finish = 4; //已完成关卡
+  repeated uint32 stage_chest = 5; //已领取关卡宝箱
+}
+
+message CityHint {
+  optional bool can_patrol = 1; //是否有城池可巡逻
+  optional bool patrol_award = 2; //是否有巡逻奖励未领取
+  optional out_base.ActionTaskInfo common_tasks = 3; //成就信息
+  repeated uint64 task_awarded = 4; //已领取成就id
+}
+
+message BiographyHint {
+  repeated out_base.BioMission missions = 1; //关卡信息
+  repeated out_base.BioCampaign campaigns = 2; //完成战役
+  repeated out_base.CampaignInvitation invitations = 4;//所有邀请函
+  repeated uint64 mission_chain_awarded = 5; //任务链奖励
+  repeated uint64 mission_progress_awarded = 6;//支线任务进度奖励
+	repeated out_base.KV mission_preset_condition = 7;//判断战役信息的前置条件，id为表id，num为对应要求的状态
+}
+
+message GuildHint {
+  optional uint64 guild_id = 1; //军团id
+  optional uint32 guild_level = 2; //军团等级
+  optional uint32 join_guild_limit = 3; //加入军团限制时间
+  optional uint32 apply_num = 4; //未处理申请数量
+  repeated uint32 message_time = 5; //所有留言时间 客户端需记录上一次进入留言板的时间
+  repeated uint32 worship_record = 6; //今日祭天记录
+  optional uint32 worship_progress = 7; //祭天进度
+  repeated uint32 worship_awarded = 8; //已领取进度奖励
+  optional GuildDungeonHint dungeon_hint = 9; //军团副本
+	optional bool has_red_packet = 10;//可领取的红包
+  optional uint32 member_position = 11; //成员职位
+	optional uint32 gold_redpacket_left_time = 12;//每日元包红包可领取次数//这个逻辑不用了
+  optional GuildWorship worship = 13; //祭天玩家信息
+  repeated out_base.Task missions = 14; //祭天任务进度
+  optional uint32 zero_hour_level = 15; //军团0点等级
+  optional GuildStatueHint statue = 16; //军团神像红点
+}
+
+message GuildDungeonHint {
+  optional uint32 current_chapter = 1; //当前章节
+  optional uint32 rollback_chapter = 2; //当前回滚章节
+  repeated uint64 chapter_awarded = 3; //已领取奖励章节
+  repeated uint32 stage_finished = 4; //通关关卡
+  repeated uint32 stage_awarded = 5; //已领取奖励关卡
+  repeated uint32 mvp_award = 7; //可领取mvp奖励的关卡
+  optional out_base.ActionTaskInfo daily_tasks = 8; //每日任务状态
+  repeated uint64 daily_task_awarded = 9; //已领取奖励的任务
+  optional out_base.ActionTaskInfo weekly_tasks = 10; //每周任务状态
+  repeated uint64 weekly_task_awarded = 11; //已领取奖励的任务
+  repeated uint32 skill_id = 12; //副本技能id
+}
+
+message ModuleTaskHint {
+  required uint32 module_id = 1; //模块id，关联action_task_info.xml
+  optional out_base.ActionTaskInfo common_tasks = 2; //永久任务
+  optional out_base.ActionTaskInfo daily_tasks = 3; //每日任务
+  optional out_base.ActionTaskInfo weekly_tasks = 4; //每周任务
+  repeated uint64 common_awards = 5; //已领取永久任务奖励
+  repeated uint64 daily_awards = 6; //已领取每日任务奖励
+  repeated uint64 weekly_awards = 7; //已领取每周任务奖励
+}
+
+message ShopHint {
+	repeated out_base.KV infos = 1;//商店
+}
+
+message ScrollHint {
+	repeated uint32 main_ids = 1;//主线节点激活情况
+	repeated uint32 hero_ids = 2;//名将节点激活情况
+	repeated uint32 nightmare_ids = 3;//噩梦节点激活情况
+  repeated uint32 town_soul_ids = 4; //镇魂节点激活情况
+  repeated uint32 elite_ids = 5; //精英副本节点激活情况
+}
+
+message FightingHint {
+  optional uint64 fight_value = 1;	// 历史最高战力
+  repeated uint32 ids = 2;	// 已领取过的战力奖励id
+}
+
+//基金红点
+message FundHint {
+  optional uint32 dead_battle = 1;	// 无双历史最高层数
+}
+
+message OpKnight {
+	repeated Knight insert = 1;
+	repeated Knight update = 2;
+	repeated uint64 del = 3;
+}
+
+message OpEquipment {
+	repeated Equipment insert = 1;
+	repeated Equipment update = 2;
+	repeated uint64 del = 3;
+}
+
+message OpTreasure {
+	repeated Treasure insert = 1;
+	repeated Treasure update = 2;
+	repeated uint64 del = 3;
+}
+
+message OpUniteToken {
+  repeated UniteToken insert = 1;
+  repeated UniteToken update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpKV {
+	repeated KV insert = 1;
+	repeated KV update = 2;
+	repeated uint64 del = 3;
+}
+
+message OpResource {
+	repeated Resource insert = 1;
+	repeated Resource update = 2;
+	repeated uint64 del = 3;
+}
+
+message OpDress {
+  repeated Dress insert = 1;
+  repeated Dress update = 2;
+  repeated uint32 del = 3;
+}
+
+message OpSkin {
+  repeated Skin insert = 1;
+  repeated Skin update = 2;
+  repeated uint32 del = 3;
+}
+
+message OpRecruitKnight {
+  repeated RecruitKnight insert = 1;
+  repeated RecruitKnight update = 2;
+  repeated uint32 del = 3;
+}
+
+message OpRecruitAuKnight {
+  repeated RecruitAuKnight insert = 1;
+  repeated RecruitAuKnight update = 2;
+  repeated uint32 del = 3;
+}
+
+message OpArtifact {
+  repeated Artifact insert = 1;
+  repeated Artifact update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpRecruitEquip {
+  repeated RecruitEquip insert = 1;
+  repeated RecruitEquip update = 2;
+  repeated uint32 del = 3;
+}
+
+message OpConditionAct {
+  repeated ConditionAct insert = 1;
+  repeated ConditionAct update = 2;
+  repeated uint64 del = 3;
+}
+
+message UniteToken {
+  required uint32 id = 1;//todo
+  required uint32 base_id = 2;
+  required uint32 level = 3;
+  required bool awaken = 4;
+  required uint32 position = 5;
+  optional uint32 star = 6;
+  optional uint32 runes = 7;
+  repeated uint32 stamp_orders = 8;  //激活的刻印序号
+}
+
+message Award {
+  required uint32 type = 1;
+  required uint64 value = 2;
+  required uint64 size = 3;
+}
+
+message Awards {
+  repeated Award detail = 1;
+}
+
+message Formation {
+	repeated uint32 position = 1;//侠客出战位置
+	repeated uint64 knight_id = 2;//上阵侠客
+	repeated uint32 unite_token_id = 3;//上阵兵符
+	repeated uint64 equipment_id = 4;//上阵装备
+	repeated uint64 treasure_id = 5;//上阵宝物
+  repeated uint64 artifact_id = 6;//上阵神器
+  repeated uint64 pet_id = 7; // 上阵神兽
+  repeated uint64 pet_equipment_id = 8; // 上阵神兽装备
+  repeated uint32 purplize_lv = 9; //原始武将星级
+  repeated uint64 magic_id = 10; //上阵战法
+}
+
+message UserSnapshot {
+	required uint64 id = 1;//唯一id
+	optional uint32 sid = 2;//服务器id
+	optional string name = 3;//名字
+	optional uint32 level = 4;//等级
+	optional uint32 vip_level = 5;//vip
+	optional uint32 base_id = 6;//主角baseid
+	optional uint64 fight_value = 7;//战力
+  optional uint32 robot_type = 8; //机器人类型 0:表示正常玩家，999:表示竞技场机器人,其他表示robot_info.xml中的机器人
+  optional uint32 offline_time = 9;	// 离线时间戳
+	optional uint32 dress_id = 10;//时装id
+	optional uint32 title_id = 11;//称号id
+	optional uint32 title_time = 12;//称号时间
+  optional uint32 join_guild_limit = 13; //加入军团限制时间
+  optional uint32 trouble_city_num = 14; //发生动乱城池数量
+  optional string guild_name = 15; //军团名
+  optional uint32 frame_id = 16; //头像框
+  optional uint32 hof_fv_like = 17; //名人堂战力点赞
+  optional uint32 hof_lv_like = 18; //名人堂等级点赞
+  optional uint32 join_guild_time = 19; //加入军团时间
+  optional uint64 guild_id = 20; //军团id
+  optional uint32 storm_city_lord = 21; //攻城掠地官职
+  optional string server_name = 22; //服务器名
+  repeated uint32 knights = 23; //出阵武将base_id
+  optional uint32 city = 24; //攻城略地所占城池
+  optional uint32 rank = 25; //所在城池排行
+  optional uint32 card_id = 26; //化身卡
+  optional uint32 wing_id = 27; //翅膀
+  optional uint32 param = 28;   //可以复用-在王者竞技榜里是段位 //过关斩将霸主连任
+  optional uint32 param1 = 29;  //可以服用-在王者竞技相关的排行榜里表示出战次数
+  optional uint32 param2 = 30;  //可以服用-在王者竞技相关的排行榜里表示胜率
+  optional uint32 ksoul_book_num = 31; //激活将灵图鉴数
+  optional Artifact artifact = 32;	//洗炼评分最高神兵信息
+}
+
+// 老玩家数据
+message AfkPlayer {
+	optional string name = 1;//名字
+	optional uint32 vip_level = 2;//vip等级
+	optional uint32 vip_exp = 3;//vip exp
+	optional uint32 sid = 4;//服务器id
+}
+
+message GuildSnapshot {
+	required uint64 id = 1; //军团id
+	required uint32 sid = 2; //服务id
+	optional string name = 3; //名字
+	optional uint32 level = 4; //等级
+  optional uint32 exp = 5; //经验
+  optional uint32 member_num = 6; //成员数量
+  optional uint32 icon = 7; //头像
+  optional uint32 frame = 8; //边框
+  optional bool confirm = 9; //是否需要审核
+  optional uint32 apply_level = 10; //申请限制等级
+  optional string announcement = 11; //公告
+  optional string declaration = 12; //宣言
+  optional uint64 leader_id = 13; //军团长id
+  optional uint32 leader_base_id = 14; //军团长baseId
+  optional string leader_name = 15; //军团长名字
+  optional uint64 fight_value = 16; //军团战力
+  optional uint32 current_chapter = 17; //军团副本进度
+  optional uint32 leader_dress_id = 18; //军团长时装
+  optional uint32 statue_stage = 19; //军团神像品质
+  optional string server_name = 20; //服务器名
+  optional uint32 boss_total_num = 21; //军团boss参与总人数
+  optional uint32 today_join_num = 22; //今日加入人数
+}
+
+message Chapter {
+  required uint32 id = 1;//todo
+  repeated uint32 star_chest = 2;
+  repeated uint32 stage_chest = 3;
+}
+
+message Stage {
+  required uint32 id = 1;//todo
+  required uint32 star = 2;
+  required uint32 reset_count = 3;
+  required uint32 challenge_count = 4;
+  optional string min_round_name = 5; //最快通关玩家
+  optional string min_fight_value_name = 6; //最低战力通关
+}
+
+message FinishResult {
+  required uint32 index = 1;//todo
+  required uint32 role_exp = 2;
+  required uint32 silver = 3;
+  repeated Award awards = 4;
+  repeated Award drops = 5;
+}
+
+message RankUnit {
+  required uint32 rank = 1;//todo
+  required uint64 score = 2;
+  optional UserSnapshot user = 3;
+  optional GuildSnapshot guild = 4;
+}
+
+message ArenaUnit {
+  required uint32 rank = 1;//todo
+  required UserSnapshot user = 2;
+  optional bool can_challenge = 3;
+  optional uint32 robot_id = 4;
+}
+
+message DropAward {
+  required uint32 drop_id = 1;
+  repeated Award awards = 2;
+}
+
+message ArenaAward {
+  repeated Award awards = 1;
+  optional uint32 drop_id = 2;
+  repeated Award drops = 3;
+}
+
+message ContendTreasureAward {
+  repeated Award awards = 1;//todo
+  optional uint32 drop_id = 2;
+  repeated Award drops = 3;
+}
+
+message TaskInfo {
+  required uint32 type = 1;
+  required uint64 value = 2;
+}
+
+message ActionTaskInfo {
+  repeated TaskInfo task_info = 1;
+  optional uint32 user_level = 2; //玩家等级,action使用(common:当前玩家等级 daily:每日零点等级 weekly:每周零点等级)
+}
+
+message Mail {
+  required uint32 id = 1;
+  required uint32 base_id = 2;	// 配置表id
+  optional uint64 sender_id = 3;	// 发送者
+  optional uint32 time = 4; // 时间戳
+  repeated string keys = 5;	// 模板字段名
+  repeated string values = 6;	// 模板字段值
+  repeated Award awards = 7;	// 奖励
+  optional bool got_award = 8;	// 是否已经领取奖励
+  optional uint32 reason = 9; // 发奖原因
+  optional string name = 10;	// 发送者名字
+  optional uint32 sub_type = 11;
+  optional string voice_path = 12;
+  optional uint32 voice_time = 13;
+  optional string voice_param = 14;
+}
+
+message CommonPlayNum {
+	required uint32 id = 1;
+	optional uint64 left_count = 2;//剩余次数
+	optional uint64 buy_count = 3;//已经购买的次数
+}
+
+//状态说明
+//当floor_star都>0时 floor_buff为0代表宝箱还没有领取 
+//当领取宝箱奖励之后floor_star全部为0 并且生成floor_buff
+//当floor_buff只有在floor_star都为0的时候才可能有值
+//以上逻辑作废 宝箱逻辑为is_award
+message DeadBattle {
+	optional uint32 floor = 1;//当前floorid 0开始
+	optional uint32 total_star = 2;//本次总星数
+	optional uint32 buff_star = 3;//购买buff剩余星数
+	optional uint32 record_star = 4;//历史最高星数
+	repeated uint32 floor_buff = 5;//本层可以选择的buff 3个
+	repeated uint32 floor_star = 6;//本层的星数
+	repeated uint32 buffs = 7;//所有选择的buff
+	optional uint32 fail = 8;//失败次数
+	optional uint32 week_star = 9;//本周星数
+	repeated uint32 history_id = 10;//所有关卡id
+	repeated uint32 history_star = 11;//所有关卡历史最高星
+  optional bool is_award = 12;//本层是否领奖
+}
+
+message DeadBattleShop {
+	required uint32 id = 1;//id
+	repeated Status items = 2;//商城道具
+	required uint32 due_time = 3;//过期时间
+}
+
+message BioMission {
+  required uint32 id = 1;//关卡id
+  optional bool finish = 2;//是否完成
+  optional uint32 attack_count = 3;//已挑战次数
+  optional uint32 reset_count = 4;//已重置次数
+}
+
+message BioMissionAward {
+  required uint32 index = 1;      //扫荡时第几次
+  optional uint32 role_exp = 2;   //主角经验
+  optional uint32 knight_exp = 3; //武将经验
+  optional uint32 silver = 4;     //银两
+  repeated Award first_drops = 5; //首次掉落
+  repeated Award finish_drops = 6;//通关掉落
+	repeated Award rare_drops = 7; //金色掉落，目前只有天降福袋用到
+}
+
+message BioCampaign {
+  required uint32 id = 1; //战役id
+  optional bool finish = 2; //是否通关
+  optional bool award = 3; //首次通关奖励
+}
+
+message BioBoss {
+	required uint32 base_id = 1;//bossid
+	required uint32 chapter_id = 2;//章节id
+	required uint64 hp = 3;//已扣除血量
+	required uint32 position = 4;//章节中的具体位置
+  optional bool is_first = 5;//是否首次挑战触发
+}
+
+message CampaignTeam {
+  required uint64 id = 1;          //队伍id
+  required uint32 campaign_id = 2; //战役id
+  optional bool only_invited = 3; //只接受被邀请的
+  repeated CampaignMember members = 4; //队员
+  optional uint32 online_addition = 5; //在线加成
+  optional uint32 friend_addition = 6; //好友加成
+  optional uint32 guild_addition = 7; //军团加成
+  optional bool lock = 8; //是否开放
+}
+
+message CampaignMember {
+  required UserSnapshot user = 1; //玩家数据
+  optional bool captain = 2; //是否是队长
+  optional bool prepare = 3; //是否已准备
+  optional uint32 position = 4; //位置从1开始
+  optional bool robot = 5; //是否是机器人
+}
+
+message CampaignInvitation {
+  required uint64 team_id = 1; //队伍id
+  required uint32 campaign_id = 2; //战役id
+  required uint32 invite_time = 3; //邀请时间
+  required out_base.UserSnapshot inviter = 4; //邀请人
+}
+
+message CardAward {
+  required Award award = 1; //翻牌获得奖励
+  repeated Award shows = 2; //显示其他牌奖励
+}
+
+message CampaignAward {
+  required uint32 silver = 1; //银两
+  required uint32 material = 2; //兵符精华
+  repeated Award drops = 3; //普通掉落
+  optional CardAward award_card = 4; //翻牌奖励
+  repeated TeammateCardAward mate_cards = 6; //队友翻牌奖励
+}
+
+message TeammateCardAward {
+  required uint64 user_id = 1; //队友id
+  optional uint32 base_id = 2; //队友品质
+  optional string name = 3; //队友名字
+  optional Award award = 4; //翻牌奖励
+}
+
+message City {
+  required uint32 id = 1;//todo
+  required uint32 level = 2;
+  required uint32 model_id = 3;
+  optional uint32 knight_id = 4; //knight_info中的id
+  optional uint32 start_time = 5;
+  optional CityRecommendEvent recommend_event = 6;
+  repeated CityResourceEvent resource_event = 7;
+  repeated CityTroubleEvent trouble_event = 8;
+}
+
+message CityResourceEvent {
+  required uint32 time = 1;//todo
+  required uint32 type = 2;
+  repeated Award awards = 3;
+}
+
+message CityRecommendEvent {
+  required uint32 time = 1;//todo
+  required uint32 multiple = 2;
+  repeated Award awards = 3;
+}
+
+message CityTroubleEvent {
+  required uint32 time = 1; //todo
+  required uint32 trouble_id = 2;
+  optional string friend_name = 3;
+  optional uint32 friend_time = 4;
+  repeated Award awards = 5;
+}
+
+message CityRecommendKnight {
+  required uint32 city_id = 1;//todo
+  required uint32 city_level = 2;
+  repeated uint32 knight_id = 3; //city_knight_info中的id
+}
+
+message CityTroubleFriend {
+  required uint64 friend_id = 1; // 好友id
+  repeated uint32 city_ids = 2; // 封地id
+}
+
+message CityOneKeyPatrol {
+  required uint32 city_id = 1;  //todo
+  required uint32 model_id = 2;
+  optional uint64 knight_id = 3; //武将的唯一ID
+  optional out_base.City city = 4;
+}
+
+message Friend {
+  optional UserSnapshot user = 1;
+  optional uint32 gift_id = 2;	// 可领取的礼物id
+  optional uint32 intimate = 3;	// 亲密度
+  repeated uint32 task_id = 4;	// 任务id
+  repeated uint32 task_count = 5;	// 今日任务已完成次数(与task_id对应)
+}
+
+message BattleUser {
+  optional UserSnapshot user = 1;//todo
+  //required uint64 user_id = 1;
+  //required uint32 server_id = 2;
+  //required string name = 3;
+  //required uint32 level = 4;
+  //required uint64 fight_value = 5;
+  required Formation formation = 6;
+  repeated Knight knights = 7;
+  repeated UniteToken unite_tokens = 8;
+  repeated Equipment equipments = 9;
+	repeated Treasure treasures = 10;
+	//optional uint32 dress_id = 9;
+  repeated Artifact artifacts = 11;
+  repeated Card card = 12;//化身卡
+  repeated CardCompose cardc = 13;//组合化身
+  repeated Wing wing = 14;//翅膀
+  repeated WingRefine wingr = 15;//翅膀精炼
+  repeated Pet pets = 16; // 神兽
+  repeated PetEquipment petEquipments = 17; // 神兽装备
+ // repeated KSoulBook kSoulBooks = 18; //将灵图鉴
+ // optional KSoulHonor kSoulHonors = 19; //将灵荣誉
+  repeated out_base.Magic magics = 20;  // 战法
+}
+
+message GrowKnight {
+  required uint32 base_id = 1;//表里id
+  required uint32 level = 2;//等级
+}
+message UserGrowData {
+  required uint32 title_num = 1;//拥有称号数
+  required uint32 dress_num = 2;//拥有时装数
+  required uint32 skin_num = 3;//拥有变装数
+  required uint32 scroll_dungeon_max = 4;//三国志主线
+  required uint32 scroll_bio_max = 5;//三国志名将传
+  required uint32 dress_handbook_num = 6;//时装图鉴数
+  required uint32 skin_handbook_num = 7;//变装图鉴数
+  repeated Handbook knight_handbook = 8;//武将图鉴
+  required uint32 card_num = 9;//化身卡数
+  repeated GrowKnight knights = 10; //武将包括援军
+  repeated UniteToken unite_tokens = 11;//兵符信息
+  optional uint32 scroll_nightmare_num = 12; // 噩梦三国志激活数量
+  optional uint32 ksoul_book_num = 13; // 激活将灵图鉴数
+}
+
+message Handbook {
+	required uint32 id = 1;//图鉴id
+	required uint32 level = 2;//图鉴等级
+}
+
+message Dress {
+	required uint32 id = 1;//advance code
+	optional uint32 level = 2;//enhance等级
+}
+
+
+message Skin {
+	required uint32 id = 1;//advance code
+	optional uint32 ts = 2;//截止时间
+	optional bool bs = 3;//是否已发过期邮件
+}
+
+message Rebel {
+  required uint32 id = 1;	// id
+  required uint32 base_id = 2;	// 配置id
+  required uint32 level = 3;	// 等级
+  required uint64 hp = 4;	// 已扣除hp
+  required uint32 ts = 5;	// 过期时间
+  required bool share = 6;	// 是否已分享
+  required uint64 uid = 7;	// 玩家id
+}
+
+message SingleAttackData {
+  required uint64 damage = 1;	// 本次伤害
+  required bool status = 2;     // 巨兽状态(false:存活 true:死亡)
+  repeated out_base.Award awards = 3; //单次攻击的奖励
+}
+
+message GuildMember {
+  required UserSnapshot user = 1;//快照
+  required uint32 position = 2;//职位
+  required uint32 daily_contribute = 3;//每日贡献
+  required uint32 total_contribute = 4;//所有贡献
+  optional uint32 guild_send_count = 5;//军团送礼次数
+  optional uint32 guild_receive_count = 6;//军团收礼次数
+}
+
+message GuildMessage {
+  required uint32 id = 1;//todo
+  required bool top = 2;
+  required string message = 3;
+  required uint32 create_time = 4;
+  required uint64 member_id = 5;
+  required uint32 member_base_id = 6;
+  required string member_name = 7;
+  required uint32 member_position = 8;
+}
+
+message GuildHistory {
+  required uint32 base_id = 1;//todo
+  required uint32 time = 2;
+  repeated string key = 3;
+  repeated string value = 4;
+}
+
+message GuildRedPacket {
+	required uint64 id = 1;//唯一ID
+	required uint32 base_id = 2;//表ID
+	required uint32 due_time = 3;
+	optional uint64 from_id = 4;//玩家红包就是userid
+	optional bool picked = 5;//玩家是否已获取
+	optional uint32 pick_size = 6;//获取数量
+	optional uint32 point = 7;//如果picked为true这两个值就是领取的值
+	optional uint32 luck = 8;//幸运值
+	optional uint32 from_base_id = 9;//玩家baseid
+	optional string from_name = 10;//玩家姓名
+}
+
+message GuildDungeonStage {
+  required uint32 id = 1;
+  optional bool  mvp_awarded = 2; //mvp奖励是否已领取
+  repeated uint64 monster_hp = 3; //怪物剩余血量
+  repeated uint32 acquired_pos = 4; //已领取奖励位置
+  repeated uint64 acquired_uid = 5; //已领取奖励的玩家
+  repeated uint32 acquired_box = 6; //已领取的奖励id
+  repeated uint64 member_id = 7; //成员id
+  repeated uint64 member_damage = 8; //成员伤害
+}
+
+message GuildDungeonStageAward {
+  required uint32 stage_id = 1; //关卡id
+  required uint32 position = 2;  //领取的位置
+  repeated Award awards = 3;
+  repeated uint32 award_id = 4;
+}
+
+message Goods {
+  required uint32 id = 1;	// 配置表id
+  optional uint32 buy_count = 2;	// 已购买次数
+}
+
+message Shop {
+  required uint32 id = 1;	// 配置表id
+  optional uint32 goods_flush_time = 2;	// 货物下次刷新时间
+  optional uint32 score_flush_time = 3;	// 积分进度下次刷新时间
+  optional uint32 score = 4;	// 进度积分
+  repeated Goods special_goods = 5;	// 特殊货架物品
+  repeated Goods normal_goods = 6;	// 普通货架物品
+  // 玩家相关数据:
+  optional uint32 flush_total_max = 7;	// 总手动刷新上限
+  optional uint32 flush_total_count = 8;	// 总已手动刷新次数
+  optional uint32 flush_buy_count = 9;	// 已购买手动刷新次数
+}
+
+message Resource {
+  required uint64 id = 1;
+  required uint64 num = 2;
+  optional uint32 time = 3;
+  optional int64 refresh_time = 4;
+}
+
+message UserConfig {
+	repeated uint64 chat = 1;//聊天配置
+}
+
+message Announce {
+	required uint64 id = 1;//后台配置id
+	required uint32 begin = 2;//开始时间
+	required uint32 end = 3;//结束时间
+	required uint32 frequent = 4;//频率(秒)
+	required string announcement = 5;//内容
+}
+
+message ArenaRecord {
+  required uint64 battle_id = 1;//todo
+  required bool is_win = 2;
+  required uint32 atker_rank = 3;
+  required uint32 defer_rank = 4;
+  required UserSnapshot attacker = 5;
+  required UserSnapshot defender = 6;
+  optional uint32 atker_cur_rank = 7;
+  optional uint32 defer_cur_rank = 8;
+}
+
+message MonthCard {
+  required uint32 mc_id = 1;// id
+  required uint32 last_use_time = 2;//使用月卡时间
+  required bool mc_use = 3;//今天月卡是否可以使用
+  required uint32 end_time = 4;//月卡到期时间
+}
+
+//首充活动
+message FirstRecharge {
+  required uint32 id = 1;           //首充阶段
+  required uint32 progress = 2;     //当前阶段进度
+  repeated uint32 ids = 3;          //已领取奖励的阶段id
+}
+
+//基金
+message FundRecharge {
+  required uint32 id = 1;           //充值表配置id
+  repeated uint32 finish_ids = 2;   //已完成的基金ID
+  repeated uint32 ids = 3;          //已领奖的基金ID
+  required uint32 active_num = 4;   //全服基金购买的人数
+  required bool is_buy = 5;         //是否购买
+}
+
+message DayRecharge {
+  required uint32 activity_id = 1;  //活动id
+  required uint32 id = 2;           //充值阶段对应id(type类型为1的id)
+  required uint32 progress = 3;     //每日累计充值进度
+  repeated uint32 finish_ids = 4;   //已完成的id(type类型为1的id)
+  repeated uint32 ids = 5;          //已领取的id(所有领过奖的id)
+  required bool is_finish = 6;      //今天是否充值完成
+}
+
+//新服累计充值
+message TotalRecharge {
+  repeated uint32 ids = 1;          //已领完奖ids
+}
+
+message OpMonthCard {
+  repeated MonthCard insert = 1;
+  repeated MonthCard update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpFirstRecharge {
+  repeated FirstRecharge insert = 1;
+  repeated FirstRecharge update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpFundRecharge {
+  repeated FundRecharge insert = 1;
+  repeated FundRecharge update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpDayRecharge {
+  repeated DayRecharge insert = 1;
+  repeated DayRecharge update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpSubRecharge {
+  repeated MonthCard insert = 1;
+  repeated MonthCard update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpTotalRecharge {
+  repeated TotalRecharge insert = 1;
+}
+
+message OpOpenPurchase {
+  repeated OpenPurchase insert = 1;
+  repeated OpenPurchase update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpDayBox {
+  repeated DayBox insert = 1;
+  repeated DayBox update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpMonthFund {
+  repeated MonthFund insert = 1;
+  repeated MonthFund update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpNewTotalRecharge {
+  repeated NewTotalRecharge insert = 1;
+  repeated NewTotalRecharge update = 2;
+  repeated uint64 del = 3;
+}
+
+message OpMagic {
+  repeated Magic insert = 1;
+  repeated Magic update = 2;
+  repeated uint64 del = 3;
+}
+
+
+message CustomActivityHideInfo {
+  required uint32 id = 1; //活动id
+  required uint32 server_limit = 2;
+  required uint32 time_type = 3; //时间类型(1:unix时间2:开服第几天)
+  required uint32 preview_time = 4; //预览时间
+  required uint32 expire_time = 5; //结束时间
+  required uint32 min_level = 6;
+  required uint32 max_level = 7;
+}
+
+message ServerTypeActivityInfo{
+    required uint32 type = 1;
+    required uint32 value = 2;
+    optional uint32 start_time = 3;
+}
+
+message CustomActivityInfo {
+  required uint32 id = 1;
+  required uint32 type = 2; //1:翻倍类2:条件类3:兑换类4:充值类
+  required string title = 3; //活动标题
+  required uint32 icon_type = 4;
+  required uint32 icon_value = 5;
+  required string description = 6;
+  required string resource = 7;
+  required uint32 server_limit = 8;
+  required uint32 time_type = 9; //时间类型(1:自然时间 2:服务器时间(开服第x天))
+  required uint32 preview_time = 10; //预览开始时间
+  required uint32 start_time = 11; //活动开始时间
+  required uint32 finish_time = 12; //活动结束时间
+  required uint32 expire_time = 13; //活动过期时间
+  required uint32 rotate_time = 14; //轮转时间(每隔多久开一次)
+  required uint32 min_level = 15;
+  required uint32 max_level = 16;
+  required uint32 icon_kind = 17; //ICON类型(1:常规icon2:活动icon)
+  repeated CustomActivityDetailInfo details = 18;
+  repeated CustomActivityCollectInfo collects = 19;
+  repeated CustomActivityRechargeInfo recharges = 20;
+  repeated CustomActivityOpenPurchaseInfo open_purchase = 21;
+  optional string show_resource = 22;
+  optional string name = 23;    //活动名称
+  optional uint32 sub_activity_id = 24;  //子活动id
+  optional uint32 resource_type = 25; //活动资源图子类型
+  repeated CustomActivityMonthFund month_fund = 26; //月基金
+  optional uint32 offline_day = 27; //离线天数
+  repeated CustomActivityWeekGiftInfo gifts = 28; //周礼包
+}
+
+message CustomActivityDetailInfo {
+  required uint32 id = 1;
+  required uint32 activity_id = 2;
+  required uint64 param1 = 3; //翻倍模块、任务类型、兑换折扣显示、 充值类任务类型(action) 新充值类任务类型(1累充2单充)
+  required uint64 param2 = 4; //翻倍倍数、任务目标、兑换限制类型、 充值类任务目标         累计充值金额或者单充额度
+  required uint64 param3 = 5; //无、      无、      兑换限制数量、 无                     可完成次数
+  required uint32 cost_type1 = 6;
+  required uint64 cost_value1 = 7;
+  required uint64 cost_size1 = 8;
+  required uint32 cost_type2 = 9;
+  required uint64 cost_value2 = 10;
+  required uint64 cost_size2 = 11;
+  required uint32 cost_type3 = 12;
+  required uint64 cost_value3 = 13;
+  required uint64 cost_size3 = 14;
+  required uint32 cost_type4 = 15;
+  required uint64 cost_value4 = 16;
+  required uint64 cost_size4 = 17;
+  required uint32 drop_type = 18; //掉落类型:1 全部掉 2 n选1
+  required uint32 award_type1 = 19;
+  required uint64 award_value1 = 20;
+  required uint64 award_size1 = 21;
+  required uint32 award_type2 = 22;
+  required uint64 award_value2 = 23;
+  required uint64 award_size2 = 24;
+  required uint32 award_type3 = 25;
+  required uint64 award_value3 = 26;
+  required uint64 award_size3 = 27;
+  required uint32 award_type4 = 28;
+  required uint64 award_value4 = 29;
+  required uint64 award_size4 = 30;
+}
+
+message CustomActivityCollectInfo {
+  required uint32 id = 1;
+  required uint32 activity_id = 2;
+  required uint32 type1 = 3;
+  required uint32 value1 = 4;
+  required uint32 type2 = 5;
+  required uint32 value2 = 6;
+  required uint32 type3 = 7;
+  required uint32 value3 = 8;
+  required uint32 type4 = 9;
+  required uint32 value4 = 10;
+  required uint32 award_type1 = 11;
+  required uint64 award_value1 = 12;
+  required uint64 award_size1 = 13;
+  required uint32 award_type2 = 14;
+  required uint64 award_value2 = 15;
+  required uint64 award_size2 = 16;
+  required uint32 award_type3 = 17;
+  required uint64 award_value3 = 18;
+  required uint64 award_size3 = 19;
+  required uint32 award_type4 = 20;
+  required uint64 award_value4 = 21;
+  required uint64 award_size4 = 22;
+  required uint32 drop_type = 23; //掉落类型:1 全部掉 2 n选1
+}
+
+message CustomActivityRechargeInfo {
+  required uint32 id = 1;
+  required uint32 activity_id = 2;
+  required uint32 type = 3; //任务类型1:每日充值2:充值大礼3:每日礼包
+  required uint32 value = 4; //每日充值=>充值金额 充值大礼=>0 每日礼包=>第几天
+  required uint32 NextId = 5; //下一个任务
+  required uint32 price = 6; //奖励价值
+  required uint32 is_open = 7; //是否开启任务 1:开启 2:关闭
+  required uint32 drop_type = 8; //掉落类型:1 全部掉 2 n选1
+  required uint32 award_type1 = 9;
+  required uint64 award_value1 = 10;
+  required uint64 award_size1 = 11;
+  required uint32 award_type2 = 12;
+  required uint64 award_value2 = 13;
+  required uint64 award_size2 = 14;
+  required uint32 award_type3 = 15;
+  required uint64 award_value3 = 16;
+  required uint64 award_size3 = 17;
+  required uint32 award_type4 = 18;
+  required uint64 award_value4 = 19;
+  required uint64 award_size4 = 20;
+}
+
+//可配置限时商人
+message CustomActivityOpenPurchaseInfo {
+  required uint32 activity_id = 1;
+  required uint32 id = 2;    //子活动id
+  required uint32 type = 3;  //子活动类型1:直冲2:每日礼包
+  required uint32 order = 4; //展示顺序
+  required uint32 start_time = 5; //开始时间
+  required uint32 finish_time = 6; //结束时间
+  required uint32 price = 7; //充值金额
+  required uint32 num = 8; //可完成次数
+  required uint32 award_type1 = 9;
+  required uint64 award_value1 = 10;
+  required uint64 award_size1 = 11;
+  required uint32 award_type2 = 12;
+  required uint64 award_value2 = 13;
+  required uint64 award_size2 = 14;
+  required uint32 award_type3 = 15;
+  required uint64 award_value3 = 16;
+  required uint64 award_size3 = 17;
+  required uint32 award_type4 = 18;
+  required uint64 award_value4 = 19;
+  required uint64 award_size4 = 20;
+}
+
+//月基金
+message CustomActivityMonthFund {
+  required uint32 id = 1;   //子活动id
+  required uint32 type = 2; //子活动类型 1:豪华基金 2:至尊基金 3:免费基金
+  optional uint32 money = 3; //直冲金额
+  optional uint32 worth_money = 4; //价值金额
+  repeated CustomActivityMonthFundAwards awards = 5;
+}
+
+message CustomActivityMonthFundAwards {
+  required uint32 day = 1;  //第几天
+  repeated Award awards = 2; //奖励
+}
+
+message CustomActivity {
+  required uint32 act_id = 1; //主活动id
+  required uint32 act_type = 2; //主活动类型
+  required uint64 spec_val = 3; //特殊值(累计充值金额)
+  repeated out_base.KV progress = 4; //活动状态(任务进度,兑换次数,充值次数)
+  repeated uint32 awarded = 5; //活动奖励id(子活动)
+  repeated out_base.KV special = 6; //特殊任务(任务id=>任务进度)(新充值类活动:任务id=>领取次数)
+}
+
+message Client {
+  required string version  = 1; //游戏版本
+  optional string ip = 2;   //客户端ip
+  optional uint64 ad_id = 3; //广告id
+  optional string bundle_id  = 4; //分包id
+  optional string model = 5; //机型
+  optional string device = 6; //设备号
+  optional string device_tp = 7; //设备类型
+  optional string device_os = 8; //操作系统
+  optional string device_id = 9; //设备id
+  optional string country = 10; //国家
+  optional string region = 11; //地区
+  optional string language = 12; //语种
+  optional string time_zone = 13; //时区
+  optional uint64 timestamp = 14; //0时区时间戳
+  optional string spare_one = 15; //备用字段(json格式)
+  optional uint64 op_id = 16;
+}
+
+message QuestionnaireInfo {
+  required uint32 id = 1; //唯一id
+  required uint32 type = 2; //问卷类型
+  required string content = 3; //问卷内容(url)
+  required string remark = 4; //备注
+  required uint32 start_time = 5; //开始时间
+  required uint32 finish_time = 6; //结束时间
+  required uint32 min_level = 7; //最小等级
+  required uint32 max_level = 8; //最高等级
+  required uint32 min_vip = 9; //最小vip
+  required uint32 max_vip = 10; //最大vip
+  required uint32 create_time = 11; //问卷创建时间
+  required uint32 qid = 12; //问卷id
+}
+
+message SevendaysTask {
+  required uint32 id = 1;	// 任务配置id
+  required uint32 value = 2;	// 完成度
+  required bool awarded = 3;	// 是否已领奖
+}
+
+message GuildStatue {
+  repeated Portion portions = 1; //每个部件的id和铸造进度
+  repeated uint64 acquired_user = 2; //已领取显灵宝箱的玩家
+  repeated uint32 acquired_box = 3; //已领取的显灵宝箱id
+  repeated uint32 acquired_pos = 4; //已领取的显灵宝箱的位置(从1开始)
+}
+
+message GuildStatueContribute {
+  required uint64 member_id = 1; //成员id
+  required uint32 contribute = 2; //贡献进度
+  required uint32 cost_stone = 3; //消耗的石头
+}
+
+message Portion {
+  required uint32 type = 1;//部件种类
+  required uint32 base_id = 2;//部件id
+  required uint32 progress = 3;//铸造进度
+}
+
+message GuildWorship {
+  required uint32 reset_time = 1; //重置时间
+  repeated uint32 awarded = 2; //已领取进度奖励索引
+  repeated Status state = 3; //祭天任务状态(任务id=>完成次数)
+}
+
+message CollectRecord {
+  required uint32 type = 1; //收集对象类型1:武将 2:兵符
+  repeated uint32 advance_id = 2; //配置id
+}
+
+message CustomCollection {
+  required uint32 id = 1; //活动id
+  repeated uint32 awarded_id = 2; //已领取奖励任务id
+  repeated CollectRecord records = 3; //已收集的武将或者兵符
+}
+
+message GuildStatueHint {
+  repeated Portion portions = 1; //每个部件的id和铸造进度
+  repeated uint32 awarded_stage = 2; //各个部件进度奖励标记
+  optional bool awarded_final = 3; //显灵宝箱是否可领取
+}
+
+/*
+//充值订阅 deprecated 使用月卡对象
+message SubRecharge {
+	required uint32 id = 1;//recharge_info 表里 id
+	required uint32 due_time = 2;//到期时间
+	required uint32 award_time = 3;//上次领奖时间
+}
+*/
+
+
+// 攻城略地地图事件
+message StormEvent {
+  required uint32 cell_id = 1;	// 地图事件表的配置id
+  required uint32 ev_id = 2;	// 事件表的配置id
+  optional UserSnapshot enemy = 3;	// 挑战事件附带敌方玩家 *如果是挑战事件但是该字段为空,需要通过Storm_GetEnemy协议获取该事件的跨服玩家数据,在获取到数据前建议显示该玩家为正在加载
+  repeated uint64 hp = 4; //血量继承
+  optional uint64 max_hp = 5; //最大血量
+  optional uint32 knight_group = 6; //阵营
+}
+
+// 战斗纪录
+message BattleRecord {
+  required uint32 function_id = 1;	// function id
+  required uint64 record_id = 2;	// id
+  optional uint64 battle_id = 3;	// 战报id
+  optional UserSnapshot attacker = 4;
+}
+
+message RechargeNotify {
+  required uint32 type = 1;//充值信息：索引对应enums里的RECHARGE_INFO_TYPE
+  optional uint32 sub_type = 2;
+  required uint32 value =3;
+}
+
+message StormSkill {
+  required uint64 score = 1;
+  required uint64 cost_score = 2;
+  repeated uint32 ids = 3;
+  repeated uint32 lvs = 4;
+}
+
+message OpenPurchaseDayTimes {
+  required uint32 day = 1;
+  required uint32 times = 2;
+}
+
+message OpenPurchaseInfo {
+  required uint32 id = 1;
+  optional uint32 last_get_time = 2; //上一次领取的时间
+  optional uint32 times = 3;         //总共领取了几次
+  repeated OpenPurchaseDayTimes day_times = 4;
+}
+
+message OpenPurchase {
+  required uint32 activity_id = 1;
+  repeated OpenPurchaseInfo open_purchase = 2;
+}
+
+message DayBoxInfo {
+  required uint32 id = 1;
+  required uint32 finish_times = 2;
+  required uint32 times = 3;
+  optional uint32 due_time = 4;
+}
+
+message DayBox {
+  required uint32 activity_id = 1;
+  repeated DayBoxInfo day_info = 2;
+  optional uint32 due_time = 3;
+}
+
+message RecruitKnight {
+  required uint32 activity_id = 1;    //活动id
+  required uint32 score = 2;          //积分
+  repeated uint32 ids = 3;            //已经领取的成就
+  required uint32 times = 4;          //抽卡次数
+  required uint32 lastFreeTime = 5;   //上一次免费领取的时间
+  required uint32 purple_score = 6;   //紫金抽将积分
+}
+
+message RecruitAuKnight {
+  required uint32 activity_id = 1;     //活动id
+  required uint32 times = 2;           //抽卡次数
+  required uint32 cost_times = 3;      //已消耗次数(用于阶段奖励)
+  optional uint32 refresh_time = 4;    //上一次刷新时间
+  repeated RecruitAuKnightRecharge recharges = 5;
+}
+
+message RecruitAuKnightRecharge {
+  required uint32 id = 1;              //对应充值配置里的id
+  required uint32 recharge_times = 2;  //已充值次数-对于每日刷新的充值档位，表示该档位当天已充值的次数
+  required uint32 award_times = 3;     //可领取次数-只要大于0就可以领取充值档位奖励
+}
+
+message MonthFundInfo {
+  required uint32 type = 1;          //购买的基金类型
+  repeated uint32 days = 2;          //已经领奖的天数
+}
+
+message MonthFund {
+  required uint32 activity_id = 1;   //活动id
+  optional uint32 last_free_time = 2; //上一次领取每日免费惊喜的时间
+  repeated MonthFundInfo infos = 3;  //购买的子任务已经领取的天数
+}
+
+message NewTotalRecharge {
+  required uint32 activity_id = 1;   //活动id
+  optional uint32 money = 2;         //活动期间累计充值金额
+  repeated uint32 ids = 3;           //已经领取奖励的子任务id
+}
+
+message StormCityUnit {
+  required uint64 id = 1; //玩家id
+  required uint32 rank = 2; //玩家排名
+  optional bool can_challenge = 3; //是否可挑战
+  optional uint32 robot_id = 4; //机器人配置id
+  optional out_base.UserSnapshot user = 5; //玩家快照
+  optional uint32 city = 6; //城池id
+  optional uint32 streak = 7;//连任
+}
+
+message ArtifactPurifyHole{
+  required uint32 id = 1;		//孔位id
+  optional KV cur_attrs = 2;	//当前属性
+  optional KV tmp_attrs = 3;	//中间属性
+  optional KV tmp_special_attrs = 4;	//特殊洗炼中间属性
+  required bool lock = 5;		
+  required uint32 quality = 6;		//当前品质
+  required uint32 tmp_quality = 7;	//洗炼品质
+  required uint32 tmp_special_quality = 8;	//特殊洗炼中间品质
+}
+
+message Artifact {
+  required uint64 id = 1; //唯一id
+  required uint32 base_id = 2; //表里id
+  required uint32 level = 3; //等级
+  required uint32 star = 4; //星级
+  required uint32 pos = 5; //阵位
+  optional uint32 castLevel = 6; //铸灵等级
+  optional uint32 castExp = 7; //铸灵经验
+  optional uint64 helper_id = 8; //协战神兵ID
+  repeated ArtifactPurifyHole artifact_purify_holes = 9; //孔位信息
+  optional int32 select_special_hole = 10; //特殊洗炼选中的孔位id
+  optional uint32 purify_score = 11;	//洗炼评分
+}
+
+message ArtifactRecruit {
+  required uint32 id = 1;
+  required bool free = 2;     //是否可以免费领取
+  required uint32 refresh_times = 3;  //今天刷新次数
+  repeated uint32 indexs = 4;
+  required uint32 score = 5;
+  optional uint32 daily_num = 6; //每日抽取次数
+}
+
+message Auction {
+  required uint64 act_id = 1; // 活动ID
+  required uint32 auction_id = 2; // 拍卖表ID
+  required uint32 bonus = 3; // 分红
+  repeated out_base.AuctionGoods goods = 4; // 拍卖货物
+  optional bool has_goods = 5; // 是否有货物
+}
+
+message AuctionGoods {
+  required uint64 act_id = 1; // 活动ID
+  required uint64 goods_id = 2; // 货物ID
+  required uint32 auction_item_id = 3; // 货物道具ID
+  required uint32 status = 4; // 状态(0:空白,1:拍卖中,2：我出价最高)
+  required uint32 rest_time = 5; // 剩余时间
+  required uint32 auction_num = 6; // 拍卖次数
+  optional uint32 start_time = 7; // 开始时间
+}
+
+message AuctionRecord {
+  required uint32 auction_item_id = 2; // 货物道具ID
+  required uint32 deal_time = 3; // 成交时间
+  required uint32 status = 4; // 成交状态（0：流拍，1：普通竞拍，2：一口价）
+  optional uint32 auction_price = 5; // 竞拍价
+  optional uint64 goods_id = 6; // 货物ID
+}
+
+message RecruitEquipTask {
+  required uint32 id = 1;           //任务id
+  required uint32 value = 2;        //任务进度
+  required uint32 finish_times = 3; //完成次数 （任务每完成一次，finishTimes会+1，没领奖一次times会+1，只有finishTimes>times才可领奖，领奖的同时回将任务进度重置）
+  required uint32 times = 4;        //领奖次数
+}
+
+message RecruitEquipHistory {
+  required string user_name = 1;    //玩家名字
+  required string item_name = 2;    //物品名字
+  required uint32 quality = 3;      //装备品质
+}
+
+message RecruitEquip {
+  required uint32 activityId = 1;   //活动id
+  required uint32 times = 2;        //抽卡次数
+  repeated RecruitEquipTask tasks = 3; //任务数据
+  repeated RecruitEquipHistory historys = 4; //本服抽卡历史数据
+}
+
+message ConditionAct {
+  required uint32 activity_value = 1; //活动关联ID
+  required uint32 value = 2;          //进度
+  repeated uint32 finish_awards = 3;  //已领奖任务task_id
+}
+
+message AuctionHint {
+  repeated uint64 act_id = 1; // 活动ID
+}
+
+message HallOfFameHint {
+  required uint64 like_times = 1; // 已点赞次数
+}
+
+//通用活动任务
+message ActivityCommonTask {
+  required uint32 task_id = 1;               //任务id
+  required uint32 task_progress = 2;         //进度
+  required uint32 task_finish_times = 3;     //完成次数
+  required uint32 task_times = 4;            //任务领取次数
+}
+
+//通用活动记录
+message ActivityCommonRecord {
+  required uint64 id = 1;              //记录id
+  required uint32 activityId = 2;      //进度
+  required uint32 activityType = 3;    //进度
+  required string user_name = 4;       //完成次数
+  required uint64 time = 5;            //任务领取次数
+  repeated uint32 args = 6;
+}
+
+//限时头像框
+message LimitFrameInfo {
+    required uint32 frame_id = 1; //头像框id
+    required uint32 expired_time = 2; //过期时间
+}
+
+//红包雨-锦鲤
+message RpRainFish {
+  required uint32 id = 1;	// 1~3 第几名
+  required UserSnapshot user = 2;	// 锦鲤玩家
+  required uint32 code = 3;	// 幸运码
+  repeated Award awards = 4;	// 奖励
+  required uint32 ts = 5;	// 锦鲤生成时间
+  required bool fish_awarded = 6; // 是否已领取锦鲤奖励
+}
+
+//红包雨-领取红包信息
+message RedPacketInfo {
+  repeated Award awards = 1;	// 奖励
+  required uint32 code = 2;	// 幸运码
+  required uint32 ts = 3;	// 领取时间
+}
+
+//红包雨-红包动态/弹幕
+message RpRainMessage {
+  required string name = 1;	// 玩家名
+  required Award award = 2;	// 奖励
+  required uint32 tp = 3;	// 配置表中的类型:动态/弹幕
+  required uint32 base_id = 4;	// 玩家base id
+}
+
+message WeChatShare {
+  required uint32 id = 1;
+  required uint32 last_award_time = 2; //上一次领奖时间
+}
+
+//无双试炼奖励
+message DeadBattleAward {
+   repeated Award award = 1;	// 奖励
+}
+
+message OpCard {
+  repeated Card insert = 1;
+  repeated Card update = 2;
+}
+
+message Card {
+	required uint32 id = 1;//化身卡id
+	optional uint32 state = 2;//化身卡状态// 0未激活,1，已激活，2，已穿戴
+}
+
+message OpCardCompose {
+  repeated CardCompose insert = 1;
+  repeated CardCompose update = 2;
+}
+
+message CardCompose {
+	required uint32 id = 1;//id
+	optional uint32 state = 2;// 0未激活,1，已激活，2，已穿戴
+}
+
+//聊天气泡框和表情
+message TalkShow {
+  required uint32 id = 1;      //对应配置表的Group字段
+  required uint32 due_time = 2;//为0表示永久 否则是一个时间戳表示是限时表情或气泡框，客户端需自己判断是否过期或者剩余时常
+}
+
+//历史霸主数据
+message StormCityLordHistory {
+  required uint32 time = 1;
+  required uint32 period = 2;
+  repeated out_base.UserSnapshot users = 3;
+}
+
+//自己的霸主之路记录
+message StormCityLords {
+  required uint32 time = 1;   //当期时间
+  required uint32 city = 2;   //在哪个城池
+  required uint32 point = 3;  //获得的霸主积分
+}
+
+// 通用任务信息
+message CommonTask {
+  required uint32 id = 1;	// 任务配置id
+  required uint64 value = 2;	// 完成度/充值次数
+  required bool awarded = 3;	// 是否已领奖
+}
+
+
+//資源找回信息
+message RetrieveRes {
+  optional uint32 id				= 1;//找回資源玩法id
+  optional uint32 retrieve_time		= 2;//玩法目标时间点
+  optional uint32 remainder_times	= 3;//玩法目标剩余次数
+  optional uint32 receive			= 4;//领取状态 0--未领取，1---已领取
+  optional uint32 receive_type		= 5;//领取方式 2--元宝领取，1---免费领取
+  repeated Award  awards			= 6;//元宝购买数量
+}
+
+message OpRetrieveRes {
+	repeated RetrieveRes update = 1;
+	repeated uint32 del = 2;
+}
+
+// 节日掉落
+message ExtraDropData {
+  required uint32 drop_id = 1; //掉落id
+  required uint32 drop_num = 2; //今日已掉落次数
+}
+
+
+// 号令天下捐赠记录
+message OrderWorldRecord {
+ required uint64 id = 1;
+ required uint32 activityId = 2;
+ required string user_name = 3;
+ required string guild_name = 4;
+ required uint32 sid = 5;
+ required uint32 base_id = 6;
+ required uint32 item_id = 7;
+ required uint32 item_num = 8;
+ required uint32 time = 9;
+}
+
+
+
+// 号令天下商店购买次数记录
+message OrderWorldBuyNum {
+ required uint32 goods_id = 1;
+ required uint64 buy_num = 2;
+}
+
+message OpWingRefine {
+  repeated WingRefine update	= 1;//精炼
+}
+
+message WingRefine {
+	optional uint32 id = 1;//精炼id
+	repeated out_base.KV attrs = 2; // 精炼属性值
+}
+
+message OpWing {
+	repeated Wing update	= 1;//翅膀
+}
+message Wing {
+	required uint32 id			= 1;//翅膀id
+	required uint32 is_show		= 2;//显示flag
+}
+
+//广告页信息
+message AbvertPage {
+  required uint32 id = 1;             //广告id
+  required string title = 2;          //广告标题
+  required string pic = 3;            //广告图片url地址-到公告系统里去拉取图片
+  required uint32 function_id = 4;    //功能开启id-前端判断是否满足function_info里的条件进行弹出广告页
+  required string skip_id = 5;        //跳转id
+  required string skip_content = 6;   //跳转提示
+  required uint32 preview_time = 7;   //活动预览时间-跟可配置活动一样，服务器只推送符合预览时间内的广告页
+  required uint32 start_time = 8;     //活动开始时间
+  required uint32 finish_time = 9;    //活动结束时间
+  required uint32 expire_time = 10;   //活动过期时间
+  required uint32 order = 11;         //优先级-数字越小越先弹出-前端自己判断
+  required uint32 server_limit = 12;  //开服时间限制
+  optional uint32 view_type = 13 ;    //道具类型
+  optional uint32 view_value = 14;    //道具id
+  optional uint32 skip_type = 15;     //跳转类型,1功能跳转；2游戏内打开外链；3游戏外打开外链
+  optional string effect = 16;        //特效路径
+  optional uint32 screen_orient = 17; //屏幕方向,1竖屏;2横屏
+}
+
+//广告页隐藏信息(当前时间)
+message AbvertPageHideInfo {
+  required uint32 id = 1;            //广告id
+  required uint32 function_id = 2;   //功能开启id-前端判断是否满足function_info里的条件进行弹出广告页
+  required uint32 preview_time = 3;  //活动预览时间-跟可配置活动一样，服务器只推送符合预览时间内的广告页
+  required uint32 expire_time = 4;  //活动过期时间
+}
+
+// 通用充值
+message CommonRecharge {
+  required uint32 id = 1;
+  required uint32 buy_times = 2; // 已购买次数
+  required uint32 award_times = 3; // 已领奖次数
+}
+
+// 神兽
+message Pet {
+  required uint64 id = 1; // 唯一ID
+  required uint32 base_id = 2; // 配置表ID
+  required uint32 level = 3; // 等级
+  optional uint32 exp = 4; // 经验
+  optional uint32 position = 5; // 位置
+  required uint32 star = 6; // 星级
+  repeated uint64 helps = 7; // 协战的宠物唯一ID
+}
+
+message OpPet {
+	repeated Pet insert = 1;
+	repeated Pet update = 2;
+	repeated uint64 del = 3;
+}
+
+// 坐标
+message Pos {
+  required uint32 x = 1;
+  required uint32 y = 2;
+}
+
+// 神兽秘境-怪物
+message MysteryMonster {
+  required uint32 base_id = 1;	// 配置表id
+  required uint32 hp = 2;	// 当前血量(配置表就是32位的)
+  required uint32 resurrect = 3;	// 下次复活时间(HP为0时, 当前时间大于该时间代表已经满血复活)
+}
+
+// 神兽秘境-玩家
+message MysteryUser {
+  required UserSnapshot user = 1;
+  required Pos pos = 2;
+}
+
+message OpPetEquipment {
+	repeated PetEquipment insert = 1;
+	repeated PetEquipment update = 2;
+	repeated uint64 del = 3;
+}
+
+// 神兽装备
+message PetEquipment {
+  required uint64 id = 1;
+  required uint32 base_id = 2;
+  required uint32 level = 3;
+  required uint64 exp = 4;
+  required uint32 position = 5;
+  repeated uint32 attribute_ids = 6;
+  repeated uint32 attribute_values = 7;
+  required bool lockStatus = 8;
+}
+
+//秘境boss红点
+message MysteryBossHint {
+  optional MysteryBossUserInfo self = 1;
+  optional bool is_dead = 2; //boss是否死亡
+  optional uint32 create_time = 3;//即将复活时间或创建时间
+}
+
+//秘境boss玩家自己的信息(存储在玩家身上)
+message MysteryBossUserInfo {
+  optional uint32 id = 1;                 //所在房间的boss
+  optional uint32 care_id = 2;            //关注的bossId
+  optional uint32 award_times = 3;        //普通boss每日奖励次数
+  optional uint32 last_award_time = 4;    //普通boss上一次获得奖励的时间-跟当前时间比只要不在同一天，都可以获得奖励
+  optional uint32 cross_award_times = 5;  //跨服boss(普通和特殊公用次数)每日奖励次数
+  optional uint32 last_cross_award_time = 6;//跨服boss上一次获得奖励的时间-跟当前时间比只要不在同一天，都可以获得奖励
+  optional uint32 last_attack_time = 7;   //上一次攻击时间(无论输赢都会记录)
+  optional uint32 last_spec_attack_time = 8; //上一次攻击时间(至尊boss挑战位玩家攻击挑战位玩家会记录)
+}
+
+//房间自己的信息
+message MysteryBossRoomUserInfo {
+  optional uint64 damage = 1;               //自己对boss造成的伤害
+  optional uint32 last_dead_time = 2;       //从坑位上被打下来或挑战失败的时间
+  optional uint32 last_attacked_time = 3;   //从挑战位打到归属位的复活时间
+}
+
+//秘境boss玩家据点信息
+message MysteryBossPos {
+  required uint64 user_id = 1;
+  optional uint32 pos = 2;                  //挑战位置=>0表示未占坑,6个位置取值从1~6 | 对于跨服特殊boss来说，index为1表示是归属位
+  optional UserSnapshot user = 3;           //玩家信息
+  optional uint32 last_protect_time = 4;    //上一次保护时间生效时间
+  optional uint32 last_fight_time = 5;      //上一次攻击boss时间
+  optional uint64 damage = 6;               //总伤害
+  optional uint64 first_damage = 7;         //首次伤害
+  optional uint32 last_hold_time = 8;       //挑战位占领时间-从等待位到挑战位，从归属位到挑战位都会开始计时
+  optional uint32 last_attack_time = 9;     //在挑战位上首次攻击别人的时间
+}
+
+//秘境boss单个玩家排行信息-跨服特殊boss不需要这些信息
+message MysteryBossUserRank {
+  optional UserSnapshot user = 1;           //玩家信息
+  optional uint64 damage = 2;               //玩家对boss的伤害信息
+  optional uint32 last_damage_time = 3;     //上一次造成伤害时间(对于排行榜：相同伤害，时间大的排名在时间小的前面，保证跟服务器排序规则一致)
+}
+
+//秘境boss入口展示信息(同一时间)
+message MysteryBossShowInfo {
+  required uint32 id = 1;                   //bossId=>对应mystery_boss_info表的id
+  optional uint64 hp = 2;                   //boss初始血量
+  optional uint64 hp_left = 3;              //boss剩余血量
+  optional uint32 dead_time = 4;            //boss死亡时间
+  optional uint32 create_time = 5;          //boss即将复活或创建时间,如果create_time大于当前时间，则未复活，客户端也可以根据这个时间来判断复活
+  repeated MysteryBossKiller killers = 6;   //boss前三期击杀者
+  optional uint32 pos_num = 7;              //上阵玩家数量
+}
+
+//秘境boss击杀者
+message MysteryBossKiller {
+  required UserSnapshot user = 1;           //上一次获得第一名的玩家
+  required uint32 time = 2;                 //击杀时间
+  required uint64 damage = 3;               //总伤害
+}
+
+//秘境boss具体信息
+message MysteryBossDetailInfo {
+  required MysteryBossShowInfo show = 1;    //boss简化信息
+  repeated MysteryBossPos poss = 2;         //挑战位上的玩家信息(包括自己-自己不一定要在挑战位上)
+  repeated MysteryBossUserRank ranks = 3;   //排行信息，都是已经排过序了,伤害从高到低-(当有玩家伤害变化时，服务器会广播玩家的伤害，需要客户端自己维护排名变更)
+  optional MysteryBossRoomUserInfo self = 4; //自己在房间的信息
+  repeated UserSnapshot users = 5;          //特殊boss的观战列表
+}
+
+//月基金红点
+message MonthFundHint {
+  optional uint32 activity_id = 1;
+  optional bool has_free = 2;    //是否有每日奖励
+  optional bool has_luxury = 3;  //是否有豪华基金奖励
+  optional bool has_most = 4;    //是否有至尊基金奖励
+}
+
+//兑换活动开服活动数据结构
+message Exchange {
+  required uint32 activity_id = 1;
+  repeated uint32 ids = 2;       //购买的子id
+  repeated uint32 nums = 3;      //购买的子id对应的数量
+}
+
+//玩家流失数据
+message UserLost {
+  required uint32 activity_id = 1;
+  optional uint32 id = 2;
+  optional bool got_award = 3;
+  repeated Award awards = 4;
+}
+
+//通用活动事件
+message ActivityCommonEvent {
+  required uint64 id = 1;
+  required uint32 activity_id = 2;
+  required uint32 activity_type = 3;
+  required uint32 config_id = 4;   //事件配置id
+  required uint32 create_time = 5; //生成时间
+  required uint32 status = 6;//状态
+  required uint32 arg = 7; // 当事件为答题时为题库问题编号
+}
+
+// 王者荣耀队伍信息
+message GroupBattleRoom {
+  required uint64 id = 1; // 房间ID
+  required bool is_open = 2; // 是否开放房间
+  required string captain = 3; // 队长ID
+  repeated GroupBattleUser users = 4; // 队伍内玩家
+  repeated out_base.UserSnapshot user_show = 5; // 队伍内玩家的展示数据
+  required uint32 map_id = 6; // 地图id
+  required uint32 status = 7; // 房间状态
+}
+
+// 王者荣耀玩家信息
+message GroupBattleUser {
+  required string guid = 1; // 唯一id
+  required uint64 user_id = 2; // 玩家ID
+  required bool is_ready = 3; // 是否准备
+  required uint32 position = 4; // 位置
+  required bool is_robot = 5; // 机器人
+  required uint32 title = 6; // 称号
+  required uint32 play_num = 7; // 剩余奖励次数
+}
+
+// 王者荣耀房间阵容
+message GroupBattleRoomLineUp {
+  required string guid = 1;
+  required uint32 position = 2;
+}
+
+// 王者荣耀战斗轮次数据
+message GroupBattleFightTurn {
+  required string atk_guid = 1;
+  required string def_guid = 2;
+  required bool atk_is_win = 3;
+  required uint32 hp_percent = 4;
+  required uint64 atk_lose_hp = 5;
+  required uint64 def_lose_hp = 6;
+  optional uint32 id = 7;
+}
+
+// 王者荣耀战斗数据
+message GroupBattleFightReport {
+  repeated GroupBattleFightTurn normal_turn = 1; // 常规轮次数据
+  repeated GroupBattleFightTurn extra_turn = 2; // 加赛轮次数据
+  required uint64 win_room_id = 3; // 获胜房间号
+  repeated GroupBattleUserKillNum user_kill_num = 4; // 每个玩家击杀人数
+  required string mvp_guid = 5;// mvp玩家
+  optional uint32 user_add_score = 6; // 玩家获得的积分
+  optional uint32 user_add_honor = 7; // 玩家获得的荣誉
+  optional uint32 map_id = 8; // 地图id
+  repeated uint32 atk_extra_match_pos = 9; // 加赛攻击方房间位置
+  repeated uint32 def_extra_match_pos = 10; // 加赛攻击方房间位置
+  optional uint64 atk_room_id = 11; // 攻击方房间ID
+  optional uint64 def_room_id = 12; // 防守方房间ID
+  repeated out_base.UserSnapshot atk_user_show = 13; // 攻击方玩家信息
+  repeated out_base.UserSnapshot def_user_show = 14; // 防守方玩家信息
+  repeated out_base.GroupBattleUser atk_user = 15; // 攻击方玩家玩法信息
+  repeated out_base.GroupBattleUser def_user = 16; // 防守方玩家玩法信息
+}
+
+// 王者荣耀邀请函数据
+message GroupBattleInvitation {
+  required uint64 room_id = 1; // 房间ID
+  required out_base.UserSnapshot invite_user = 2;// 邀请人
+  required uint32 create_time = 3; // 邀请时间
+}
+
+// 王者荣耀玩家击杀数
+message GroupBattleUserKillNum {
+  required string guid = 1; // 玩家id
+  required uint32 kill_num = 2; // 击杀数
+}
+
+//GM天公赐福信息
+message StaticGmGodBoxInfo {
+  required uint32 actid = 1;//活动Id
+  required string title = 2;//标题
+  required uint32 expire = 3;//持续时间
+  required uint32 warnning = 4;//预警时间
+  repeated StaticGmGodBoxPackageInfo packages = 5;
+  optional string group_name = 6; //礼包组名称
+} 
+
+//GM天公赐福宝箱信息
+message StaticGmGodBoxPackageInfo {
+  required uint32 box_id = 1;//宝箱唯一id
+  required uint32 price = 2;//礼包价格
+  required uint32 ori_price = 3;//礼包原价
+  required string desc = 4;//描述
+  repeated Award reward = 5;//奖励内容
+}
+
+//王者竞技-活动信息
+message PeakArenaInfo {
+  required uint32 period = 1;
+  optional uint32 start_time = 2;
+  optional uint32 finish_time = 3;
+}
+
+//王者竞技-战报--玩家战力,名字从录像里拿
+message PeakArenaRecord {
+  required out_base.UserSnapshot atk_show = 1;  //攻击方
+  required out_base.UserSnapshot dfd_show = 2;  //防守方
+  optional uint64 atk_score = 3; //攻击方初始积分
+  optional uint64 dfd_score = 4; //防守方初始积分
+  optional uint64 atk_score_finish = 5; //攻击方战斗结束之后分数
+  optional uint64 dfd_score_finish = 6; //防守方战斗结束之后分数
+  optional uint32 atk_lv = 7;    //攻击方初始段位(小段位)
+  optional uint32 dfd_lv = 8;    //防守方初始段位(小段位)
+  optional uint32 atk_lv_finish = 9; //攻击方战斗结束之后段位(小段位)
+  optional uint32 dfd_lv_finish = 10; //防守方战斗结束之后段位(小段位)
+  optional uint32 atk_rk = 11;   //攻击者排名(0表示未上榜)
+  optional uint32 dfd_rk = 12;   //防御者排名(0表示未上榜)
+  required bool is_win = 13;     //是否胜利
+  required uint64 battle_id = 14; //根据battle_id找到bs.BattleVideo的序列化数据
+  required uint32 time = 15;     //战斗时间
+  optional uint32 score = 16;    //录像评分
+}
+
+//王者竞技-玩家自己的信息(当前赛季)
+message PeakArenaSelf {
+  optional uint64 score = 1;     //当前积分
+  optional uint32 lv = 2;        //当前段位(小段位)
+  optional uint32 max_lv = 3;    //历史最高段位(能激活的合击根据历史最高段位来)
+  repeated uint32 unit_tokens = 5;//上阵的合击,数组的索引就是上阵位,值就是兵符配置id
+  repeated uint32 self_ranks = 6; //个人排名信息 本服-战区-全服
+}
+
+//巅峰历史记录
+message PeakArenaHistory {
+  required uint32 time = 1;
+  required uint32 period = 2;
+  repeated UserSnapshot units = 3; //本服-战区-全服
+  repeated uint32 poss = 4; //位置
+}
+
+// 噩梦副本怪物扣除血量
+message MonsterHpList {
+  required uint32 monster_id = 1;//怪物id
+  repeated uint64 hp = 2;//扣除的血量
+}
+
+// 噩梦副本升降台和控制台
+message StdLifts {
+  required uint32 grid_id = 1;//格子id
+  required uint32 status = 2; //状态
+}
+
+// 噩梦副本有效路径
+message EffectPos {
+	required out_base.Pos pos = 1;
+	repeated uint32 event_ids = 2;
+}
+
+// 噩梦副本关卡进度
+message StdChapterProgress {
+  required uint32 chapterId = 1;
+  repeated uint32 awards = 2;
+}
+
+//屏蔽活动
+message BlockActivity{
+  required uint32 id = 1; //功能ID
+  required uint32 openDay = 2; //开服天数
+  repeated uint32 act_ids = 3; //活动ID，为空则表示屏蔽整个功能
+}
+
+//===============================攻城略地新赛季================================
+//攻城略地玩家展示数据
+message WrestCityUserInfo{
+  optional UserSnapshot user = 1;//玩家UserSnapshot
+  optional uint32 power  = 2;//兵力
+  optional uint32 index = 3; // 位置
+  optional uint32 zone = 4; // 联盟
+}
+
+//攻城略地城池状态信息 包括占城状态和当前人数
+message WrestCityStatusInfo{
+  optional uint32 cityId = 1;//城池id
+  optional uint32 captureStatus = 2;//占领状态 0 无人占领 1 占领 2 占领+独占
+  optional GuildSnapshot guildSnapShot = 3;//占领的军团快照
+  optional uint32 num = 4;//当前人数
+  optional uint32 speed = 5;//元宝产出速度 s/个
+  optional uint32 zone = 6; // 联盟
+}
+
+//攻城略地城池信息
+message WrestCityInfo{
+  required uint32 cityId = 1;//城池id
+  optional uint32 num = 2;//人数
+  optional GuildSnapshot guildSnapShot = 3;//军团快照
+  optional uint32 captureStatus = 4;//占城状态 0 无人占领 1 占领 2 占领+独占
+  optional uint32 zone = 5; // 联盟
+}
+
+
+//攻城略地战报数据
+message WrestRecord {
+  required uint64 battle_id = 1; //战报id
+  required bool is_win = 2;//是否胜利
+  required uint32 atker_lost_power = 3;//攻击者战损战力
+  required uint32 defer_lost_power = 4;//防守者战损战力
+  required UserSnapshot attacker = 5; //攻击着快照
+  required UserSnapshot defender = 6;//防守者快照
+  required uint32 atker_power = 7;//攻击者当前战力
+  required uint32 defer_power = 8;//防守者当前战力
+  required uint32 battle_ts = 9;//战报时间戳
+  repeated Award awards = 10;//节日掉落展示
+  optional uint32 city_id = 11; //城池ID
+}
+
+//攻城略地战斗结果
+message WrestBattleResult{
+    optional uint32 powerBefore = 1;
+    optional uint32 powerAfter = 2;
+}
+
+// 攻城略地新赛季任务数据
+message WrestAction {
+  required uint32 id = 1;
+  required uint64 value = 2;
+  required uint32 state = 3;
+}
+
+//周礼包内容
+message CustomActivityWeekGiftInfo {
+    required uint32 id = 1; //礼包ID
+    required string name = 2; //礼包名称
+    required uint32 purchase_type = 3; //购买类型，1:直充，2:元宝
+    required uint32 price = 4; //价格
+    repeated Award awards = 5; //奖励内容
+    required uint32 purchase_limit = 6; //限制购买次数
+    required uint32 picture_id = 7;	// 图片资源ID
+    required uint32 return_rate = 8; // 返利比
+    required uint32 quality = 9;  //礼包品质，4-紫色，5-橙色，6-红色，7-金色
+    required uint32 act_id = 10; //活动ID
+}
+
+//礼包购买历史
+message WeekGiftHistory {
+    required uint32 gift_id = 1;//礼包id
+    required uint32 act_id = 2; //活动ID
+    required uint32 purchased_times = 3; //已购买次数
+    required uint32 received_times = 4; //已领取次数
+}
+
+message OpWeekGift {
+  repeated WeekGiftHistory insert = 1;
+  repeated WeekGiftHistory update = 2;
+  repeated uint64 del = 3;
+}
+
+//少年商店购买记录
+message YoungStoreHistory {
+  required uint32 id = 1; //充值任务表里面的id
+  required uint32 purchased_times = 2; //已购买次数
+  required uint32 received_times = 3; //已领取次数
+  required uint32 day = 4; //日期,零点时间戳
+}
+
+//少年商店
+message OpYoungStore {
+  repeated YoungStoreHistory insert = 1;
+  repeated YoungStoreHistory update = 2;
+  repeated uint32 del = 3;
+}
+
+// 攻城略地新赛季成就数据
+message WrestAchieve {
+  required uint32 id = 1;
+  required uint32 state = 2;
+}
+//仇人
+message WrestEnemyUser{
+  optional UserSnapshot user = 1;
+  optional uint32 num = 2;//仇恨值
+  optional uint32 nowCityId = 3;//当前所在城池id
+}
+
+//敌对军团
+message WrestEnemyGuild{
+  optional GuildSnapshot guild = 1;
+  optional uint32 num = 2;//敌对值
+}
+
+// 匹配公示
+message WrestServerInfo {
+  required uint32 sid = 1; // 服务器ID
+  required string name = 2;// 服务器名称
+  required uint32 zone = 3;// 所属区域
+}
+
+// 联盟信息
+message WrestUnion {
+  required uint32 zone = 1; // 联盟id
+  required string name = 2; // 联盟名称
+  required string leader = 3; // 联盟长
+  required uint64 score = 4; // 积分
+}
+
+// 军团信息
+message WrestGuildMember {
+  optional UserSnapshot user_show = 1; // 玩家信息
+  optional uint32 position = 2; // 职位
+  optional uint32 city_id = 3; // 所在城池
+  optional uint32 power = 4; // 兵力
+  optional uint32 score = 5; // 积分
+}
+
+// 服务器信息
+message WrestUnionServer {
+  required uint32 sid = 1;// 服务器id
+  required string name = 2; // 服务器名称
+  required uint64 score = 3; // 积分
+  required string guild_name = 4; // 军团名称
+}
+
+message WrestUnionName {
+  required uint32 zone = 1; // 联盟id
+  required string name = 2; // 联盟名称
+  required string guild_name = 3; // 军团名称
+}
+
+// 将灵图鉴
+message KSoulBook {
+  required uint32 id = 1;
+  required uint32 chapter_id = 2;
+  required uint32 star = 3;
+}
+
+message KSoulChapterInfo {
+  required uint32 chapter_id = 1;
+  repeated out_base.KSoulBook books = 2; //图鉴列表
+}
+
+//少年节活动
+message YoungActInfo {
+  required uint32 id = 1; //后台生成的活动唯一ID
+  required string description = 2; //活动介绍
+  required uint32 young_id = 3; //配置表中的少年节活动ID
+  required uint32 open_day = 4; //开服天数限制
+  required uint32 preview_time = 5; //活动预览时间戳
+  required uint32 start_time = 6; //活动开始时间戳
+  required uint32 finish_time = 7; //活动结束时间戳
+  required uint32 gift_limit_open_day = 8; //大礼包开服天数限制
+}
+
+//阶段奖励领取详情
+message StageRewardDetail {
+  required uint32 stage_id = 1; //阶段ID
+  required bool has_received = 2; //是否已领取
+}
+
+//噩梦成就
+message YoungActNightMareTask {
+  required uint32 dungeon_id = 1; //噩梦副本ID
+  required uint32 completed_times = 2; //通关次数
+  required uint32 received_times = 3; //领奖次数
+}
+
+//少年节代币兑换历史记录
+message YoungActTokenExchangeHis {
+  required uint32 good_id = 1; //商品ID
+  required uint32 exchange_times = 2; //兑换次数
+}
+
+/****************************军团支柱玩法数据结构*******************************/
+//自己的领取信息
+message GuildBattleUserSelf {
+  repeated uint32 ids = 1;             //目前已经领取的id
+  optional uint32 fight_times = 2;     //今日剩余挑战次数
+  optional uint32 last_award_time = 3; //根据这个时间客户端自行判断是否重置
+  optional uint32 join_guild_time = 4; //加入公会时间-加入军团客户端需要更新这个时间
+  optional uint64 score = 5;           //个人为本军团共享的积分-离开军团要重置，每日重置
+}
+
+//匹配的玩家信息(客户端需要判断当前时间是日常和战区)
+message GuildBattleUser {
+  optional uint32 chariot_id = 1; //战车配置id
+  optional uint32 index = 2;      //user的唯一id
+  optional uint64 left = 3;       //用于日常玩法的时候表示是剩余攻打次数，用于战车玩法的时候表示剩余血量百分比
+  optional UserSnapshot show = 4;
+  repeated uint32 unites = 5;     //合击
+}
+
+//军团玩法的信息
+message GuildBattleInfo {
+  optional uint64 score = 1;
+  repeated uint32 ids = 2;    //解锁的id
+  repeated uint32 times = 3;  //每个段位对应的解锁时间 跟ids一一对应
+}
+
+//军团战报信息(战车玩法只要攻击就记录，日常玩法只有击败才记录)
+message GuildBattleRecord {
+  optional string atk_name = 1;
+  optional uint32 dfd_id = 2;      //score表的id
+  optional uint64 score = 3;       //获得积分
+  optional uint32 index = 4;
+}
+
+//战斗信息
+message GuildBattleFightResult {
+  required uint64 battle_id = 1;
+  required uint32 index = 2;        //目标的唯一id
+  required uint64 atk_hp_left = 3;  //自己的剩余血量百分比
+  required uint64 dfd_hp_left = 4;  //自己的剩余血量百分比
+  required bool is_win = 5;
+}
+
+// 讨伐魔将-战报
+message DemonBossReport {
+  required uint32 boss_grade = 1; // 等级
+  optional UserSnapshot user = 2; // 玩家信息
+  optional uint32 attack_user_num = 3; // 攻击玩家人数
+  repeated Award lucky_awards = 4; // 奖励
+}
+
+// 讨伐魔将-荣誉排行榜玩家
+message DemonBossHonorRankUser {
+  required uint32 team = 1; // 阵营
+  required UserSnapshot user = 2; // 玩家展示数据
+  required uint64 honor = 3; // 荣誉值
+}
+
+// 讨伐魔将-红点
+message DemonBossHint {
+  required uint32 team = 1; // 阵营
+  required uint32 start_time = 2; // 开始时间
+  required uint32 end_time = 3; // 结束时间
+  required bool task_award = 4; // 任务是否可以领奖
+}
+
+/****************************精英副本数据结构*******************************/
+//关卡信息
+message EliteDungeonStage {
+  required uint32 stage_id = 1;
+  repeated uint32 finishs = 2; //通关的难度
+}
+
+//章节信息
+message EliteDungeonChapter {
+  required uint32 chapter_id = 1;
+  repeated uint32 star_ids = 2;  //已经领取的星数宝箱
+  repeated uint32 stage_ids = 3; //已经领取的关卡宝箱
+}
+
+//录像信息
+message EliteDungeonRecord {
+  optional uint32 rec_type = 1;   //录像类型-对应enums.ELITE_DUNGEON_RECORD_TYPE
+  optional UserSnapshot show = 2; //玩家显示信息(客户端做容错)
+  optional uint32 time = 3;       //通关时间
+}
+
+//红点信息
+message EliteDungeonChapterHint {
+  required uint32 chapter_id = 1;
+  optional uint32 star = 2;      //章节星数
+  repeated uint32 star_ids = 3;  //已经领取的星数宝箱
+  repeated uint32 stage_ids = 4; //已经领取的关卡宝箱
+  repeated uint32 finish_stages = 5; //已经通关的关卡(不区分难度)
+}
+
+message EliteDungeonHint {
+  optional uint32 left_times = 1; //今日剩余挑战次数
+  repeated uint32 achive_ids = 2; //已经领取的成就id
+  optional uint32 star = 3;       //副本总星数
+  repeated EliteDungeonChapterHint chapts = 5;//章节红点信息
+}
+
+message EliteDungeon {
+  optional uint32 star = 1;       //目前累计总星数
+  optional uint32 times = 2;      //今日剩余挑战次数
+  repeated uint32 achive_ids = 3; //已经领取的星数成就奖励
+  repeated EliteDungeonStage stages = 4;
+  repeated EliteDungeonChapter chapts = 5;
+}
+
+message EliteDungeonStageState {
+  optional uint32 diff_type = 1;
+  repeated uint32 tps = 2;
+  repeated uint64 states = 3;
+}
+
+// 幸运翻牌-奖励池
+message LuckyDrawAward {
+  required uint32 award_id = 1; // 配置表id
+  required uint32 index = 2; // 抽奖的顺序，如果有了就代表已经抽到了
+}
+
+
+message EquipmentDotInfo {
+  required uint32 stage_id = 1; //最高阶段
+  repeated uint32 node_ids = 2; //激活的属性点id
+}
+
+// 无双地牢
+message DeadTowerGrid {
+  required uint32 grid_id = 1;
+  required uint32 grid_status = 2;
+  required uint32 parcel_id = 3;
+}
+
+message DeadTowerProgress {
+  optional uint64 user_id = 1;     //玩家id
+  optional uint32 zone_id = 2;    //区域
+  optional uint32 fool_id = 3;    //层
+}
+
+message UseItem {
+  required uint32 id = 1;	// id
+  required uint32 num = 2;	// 数量
+  optional uint32 index = 3;  // 可选道具用于选择位置 非可选道具没用
+}
+//===================乱世英杰 活动=============================
+message WarlordAction {
+  required uint32 id = 1;
+  required uint64 value = 2;
+  required uint32 state = 3;
+}
+
+message WarlordDamage {
+  required uint32 enemy = 1; //warlordID
+  required uint32 skill_id = 2;
+  required uint64 damage = 3;
+}
+
+message WarlordHint {
+  optional uint32 ach_award = 1; //成就可领奖次数
+}
+
+// 军团图腾
+message GuildTotem {
+  required uint32 id = 1; // 图腾advanceId
+  required uint32 quality = 2; // 图腾品质
+  repeated NodeInfo node_info = 3; // 节点信息
+}
+
+message NodeInfo {
+  required uint32 id = 1; // 节点id
+  required uint32 level = 2; // 节点等级
+}
+
+// 烽火连城-章节信息
+message FlameCityChapter {
+  required uint32 id = 1; // 章节ID
+  required uint32 main_num = 2; // 主线通关数量
+  required uint32 branch_num = 3; // 支线通关数量
+  optional bool redpoint = 4; // 红点
+}
+
+// 烽火连城-格子信息
+message FlameCityBlock {
+  required uint32 id = 1; // 格子ID
+  required uint32 cost_hp = 2; // 格子已扣除血量
+}
+
+// 烽火连城-战报
+message FlameCityReport {
+  optional uint32 block_id = 1; // 格子
+  optional uint32 time = 2; // 时间
+  optional uint32 tp = 3; // 类型(0：占领格子  1:设置攻击目标)
+}
+
+// 烽火连城-宝藏
+message FlameCityTreasure {
+  required uint32 block_id = 1; // 格子id
+  repeated FlameCityTreasureAward awards = 2; // 奖励
+  optional uint32 chapter_id = 3; // 章节id
+  optional bool is_award = 4; // 玩家是否领取
+}
+
+// 烽火连城-已领奖宝藏信息
+message FlameCityTreasureAward {
+  optional uint64 user_id = 1; // 玩家ID
+  optional uint32 award_id = 2; // 奖励id
+}
+
+// 烽火连城-军团成员信息
+message FlameCityMember {
+  optional UserSnapshot user = 1; // 玩家
+  optional uint32 cost_hp = 2; // 降低血量
+  optional uint32 challenge_num = 3; // 挑战次数
+  optional uint32 cost_hp_time = 4; // 降低血量时间
+}
+
+// 烽火连城-快速挑战奖励
+message FlameCityAttackAward {
+  required uint32 cost_hp = 1; // 降低血量
+  repeated out_base.Award awards = 2; // 每次的奖励
+}
+
+// 烽火连城-赢的格子难度
+message FlameCityBlockWinGrade {
+  required uint32 block_id = 1; // 格子id
+  required uint32 max_grade = 2; // 最高难度
+}
+
+//军团战-玩家成就
+message GVGUserAchieve {
+  required uint32 id = 1;
+  optional uint64 value = 2;
+  optional uint32 state = 3;
+}
+
+//GVG赛季结果
+message GVGSeasonResult {
+  required uint32 config_id = 1; //配置编号
+  required out_base.GuildSnapshot king = 2; //王者军团
+  optional uint32 start_time = 3; //赛季开始时间
+}
+
+//军团战-比赛场景
+message GVGMatchInfo {
+  required uint64 id = 1; //比赛ID
+  required uint32 map_id = 2; //地图ID
+  required uint32 start_time = 3; //开始时间
+  required uint32 round = 4; //轮次
+  required uint32 match_tp = 5; //比赛类型 1:海选赛 2:晋级赛 3:决赛 4:特殊海选赛
+  repeated GVGMatchGuild guilds = 6; //参战军团列表
+  optional GVGMatchUser mvp = 7; //mvp玩家
+  optional GVGMatchUser mars = 8; //战神玩家
+}
+
+//军团战-比赛中玩家身上的buff
+message GVGMatchBuff {
+  required uint32 buff_id = 1; //Buff编号
+  required uint32 remain_effect_times = 2; //剩余生效次数
+}
+
+//军团战-比赛中的玩家信息
+message GVGMatchUser {
+  required uint64 user_id = 1; //玩家ID
+  optional uint64 score = 2; //玩家积分
+  optional uint32 kill_num = 3; //杀人数
+  optional uint32 continuous_kill_num = 4; //连续杀人数
+  optional uint32 power = 5; //当前兵力
+  optional uint32 pos_id = 6; //当前位置或移动目标位置ID
+  optional uint32 move_start_pos_id = 7; //移动目标起始位置ID 非移动中为空
+  optional uint32 move_arrive_time = 8; //到达时间 非移动中为空
+  optional GVGMatchBuff buff = 9; //当前持有buff
+  optional uint32 tower_protect_end_time = 10; //如果玩家在炮台占领位，则有炮台占领位保护结束时间
+  optional UserSnapshot snapshot = 11; //玩家快照
+  optional bool is_in_match = 12; //是否在比赛中
+}
+
+//军团战-比赛成就
+message GVGMatchAchieve {
+  required uint32 id = 1; //成就ID
+  required uint64 value = 2; //成就进度
+  required uint32 state = 3; //成就状态
+}
+
+//军团战-比赛中的军团
+message GVGMatchGuild {
+  required GuildSnapshot guild = 1; //军团快照
+  required uint32 revive_grid_id = 2; //复活区格子ID
+  optional uint32 user_num = 3; //参战人数
+  optional uint64 score = 4; //当前积分
+  optional uint32 rank = 5; //排名
+}
+
+//军团战-比赛中的炮台区
+message GVGMatchGridTower {
+  required uint32 grid_id = 1; //炮台所在区域ID
+  optional uint64 guild_id = 2; //占领者军团ID
+}
+
+//军团战-比赛中的buff区
+message GVGMatchGridBuff {
+  required uint32 grid_id = 1; //Buff所在区域ID
+  required uint32 buff_id = 2; //Buff编号
+  required uint32 end_time = 3; //消失时间
+}
+
+//军团战-比赛中的城门区
+message GVGMatchGridGate {
+  required uint32 grid_id = 1; //城门所在区域ID
+  required uint64 hp = 2; //当前耐久
+}
+
+//比赛对阵概况
+message GVGMatchSummary {
+  required uint32 index = 1; //序号
+  repeated GVGMatchGuild guilds = 2; //军团列表
+  optional uint64 winner_guild_id = 3; //胜利者军团
+}
+
+//军团战推送
+message GVGNotify {
+  required uint32 message_id = 1; //消息ID
+  optional bytes content = 2; //消息内容
+}
+
+//学宫论战匹配玩家
+message DebateUser {
+  optional uint32 index = 1;          // 玩家编号
+  repeated uint32 line_up = 2;        // 学宫布阵
+  optional UserSnapshot user = 3;     // 玩家基础信息
+  optional uint64 first_ability = 4;  // 首阵战力
+  optional uint64 second_ability = 5; // 次阵战力
+}
+
+//战法
+message Magic {
+	required uint64	id			= 1;	//唯一id
+	required uint32 base_id		= 2;	//配置id
+	required uint32 level_base_id = 3;	//等级配置id
+	required uint32 position	  = 4;	//神兵在阵位中的位置，0，未上阵
+}
+
+//预抽卡
+message PreDrawActInfo {
+  required string title = 1; //活动标题
+  required string icon = 2; //icon
+  required string banner = 3; //资源图
+  required uint32 start_time = 4; //开始时间
+  required uint32 end_time = 5; //结束时间
+  repeated Award login_award = 6; //直登奖励
+  required uint32 act_id = 7; //活动ID
+  optional string url = 8; //外链跳转地址
+}
+
+//预抽卡用户数据
+message UserPreDraw {
+  required bool login_received = 1;
+  required bool final_received = 2;
+  required uint32 already_login_day = 3;
+  repeated Award final_awards = 4; //用户奖励
+  required uint32 need_login_day = 5; //需要累登多少天可以领取大奖
+}
+
+// 周末狂欢奖励
+message GuideWindAward {
+  repeated Award awards = 1; // 奖励
+  optional bool is_draw = 2; // 是否被抽中
+  optional uint32 pos = 3; // 位置
+}

@@ -14,10 +14,13 @@
       <sourceFolder url="file://$MODULE_DIR$/com/shaosan/ss_proto" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/com/gvg_xieyi" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.7 (RobotizationTest)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-  </component>
-  <component name="TestRunnerService">
-    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+    <orderEntry type="module" module-name="sanguohero2" />
+    <orderEntry type="module" module-name="gvg_xieyi" />
+    <orderEntry type="module" module-name="load-test" />
+    <orderEntry type="module" module-name="MyPoco" />
+    <orderEntry type="module" module-name="sanguohero2" />
+    <orderEntry type="module" module-name="autotest" />
   </component>
 </module>

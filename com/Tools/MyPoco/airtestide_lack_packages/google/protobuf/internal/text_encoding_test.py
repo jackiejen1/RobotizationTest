@@ -58,9 +58,9 @@ class TextEncodingTestCase(unittest.TestCase):
   def testCEscape(self):
     for escaped, escaped_utf8, unescaped in TEST_VALUES:
       self.assertEqual(escaped,
-                        text_encoding.CEscape(unescaped, as_utf8=False))
+                       text_encoding.CEscape(unescaped, as_utf8=False))
       self.assertEqual(escaped_utf8,
-                        text_encoding.CEscape(unescaped, as_utf8=True))
+                       text_encoding.CEscape(unescaped, as_utf8=True))
 
   def testCUnescape(self):
     for escaped, escaped_utf8, unescaped in TEST_VALUES:

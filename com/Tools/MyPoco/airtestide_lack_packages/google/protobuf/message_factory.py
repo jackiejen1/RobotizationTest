@@ -34,7 +34,7 @@ The easiest way to use this class is if you have access to the FileDescriptor
 protos containing the messages you want to create you can just do the following:
 
 message_classes = message_factory.GetMessages(iterable_of_file_descriptors)
-my_proto_instance = message_classes['some.ss_proto.package.MessageName']()
+my_proto_instance = message_classes['some.proto.package.MessageName']()
 """
 
 __author__ = 'matthewtoia@google.com (Matt Toia)'
@@ -105,7 +105,7 @@ class MessageFactory(object):
       files: The file names to extract messages from.
 
     Returns:
-      A dictionary mapping ss_proto names to the message classes. This will include
+      A dictionary mapping proto names to the message classes. This will include
       any dependent messages as well as any messages defined in the same file as
       a specified message.
     """
@@ -142,7 +142,7 @@ def GetMessages(file_protos):
     file_protos: Iterable of FileDescriptorProto to build messages out of.
 
   Returns:
-    A dictionary mapping ss_proto names to the message classes. This will include
+    A dictionary mapping proto names to the message classes. This will include
     any dependent messages as well as any messages defined in the same file as
     a specified message.
   """

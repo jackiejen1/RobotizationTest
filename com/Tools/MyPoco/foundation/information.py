@@ -18,11 +18,35 @@ from MyPoco.foundation.config import *
 
 
 class Information:
-    def __init__(self):
+    def __init__(self,App_name = 'App_Name'):
         root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+        # self.cf = configparser.ConfigParser()
+        # 获取当前文件所在目录的上一级目录
+        # 拼接得到config.ini文件的路径，直接使用
+        # self.root_dir_path = root_dir + "\\info_tab\\config.ini"
+        # self.cf.read(self.root_dir_path)
+        self.App_Name = App_name
         self.config_dic_obj = Config()
         self.config_dic_obj.Information["设置"]["my_poco_path"] = root_dir
 
+    # def remove_section(self, section_name):
+    #     '''
+    #     删除配置文件中的项
+    #     :param section_name:项名称
+    #     :return:
+    #     '''
+    #     self.cf.remove_section(section_name)
+    #     self.cf.write(open(self.root_dir_path, "w"))
+    #
+    #
+    # def remove_option(self, section_name,option_name):
+    #     '''
+    #     删除配置文件中项的指定元素
+    #     :param section_name:项名称
+    #     :return:
+    #     '''
+    #     self.cf.remove_option(section_name,option_name)
+    #     self.cf.write(open(self.root_dir_path, "w"))
 
     def is_section_exist(self, section_name):
         '''
@@ -30,6 +54,11 @@ class Information:
         :param section_name:模块名称
         :return:True/False
         '''
+        # sections_list = self.cf.sections()
+        # if section_name in sections_list:
+        #     return True
+        # else:
+        #     return False
         in_keys = self.config_dic_obj.Information.keys()
         if section_name in in_keys:
             return True
@@ -40,6 +69,31 @@ class Information:
                     return True
             return False
 
+    # def add_section(self, section_name):
+    #     '''
+    #     在配置文件中添加模块
+    #     :param section_name:模块名称
+    #     :return:
+    #     '''
+    #     self.cf.add_section(section_name)
+    #     self.cf.write(open(self.root_dir_path, "w"))
+    # def add_section(self, dic_name ,key,value):
+    #     '''
+    #     在配置类中添加模块
+    #     :param section_name:模块名称
+    #     :return:
+    #     '''
+    #     self.config_dic_obj.Information[dic_name][key]=value
+
+    # def get_config(self, list_name, key):
+    #     """
+    #     从配置文件中读取信息
+    #     :param list_name: 模块名
+    #     :param key: key
+    #     :return: value
+    #     """
+    #     value = self.cf.get(list_name, key)
+    #     return value
     def get_config(self, dic_name ,key):
         """
         从配置文件中读取信息
@@ -48,7 +102,14 @@ class Information:
         :return: value
         """
         return self.config_dic_obj.Information[dic_name][key]
-
+    # def get_options(self, list_name):
+    #     """
+    #     从配置文件中读取模块下所有key
+    #     :param list_name: 模块名
+    #     :return: keys_list
+    #     """
+    #     keys_list = self.cf.options(list_name)
+    #     return keys_list
     def get_options(self, dic_name):
         """
         从配置文件中读取模块下所有key
@@ -66,6 +127,17 @@ class Information:
         :return:
         """
         self.config_dic_obj.Information[dic_name][key] = value
+
+    # def set_config(self, list_name, key, value):
+    #     """
+    #     设置配置文件中模块下key-value
+    #     :param list_name: 模块名
+    #     :param key: key
+    #     :param value: value
+    #     :return:
+    #     """
+    #     self.cf.set(list_name, key, value)
+    #     self.cf.write(open(self.root_dir_path, "w"))
 
     def get_phone_name(self):
         """
@@ -93,7 +165,7 @@ class Information:
         :return:
         """
         sleep(3)
-        game_name = self.get_config("App_Name", "game_name")
+        game_name = self.get_config(self.App_Name, "app_name")
         islist = os.popen("adb shell pidof " + game_name).readlines()
         if len(islist) == 0:
             is_run = False
@@ -126,4 +198,3 @@ class Information:
             shutil.rmtree(file_path)  # 若为文件夹，则直接删除
         elif os.path.isfile(file_path):  # 判断该文件是否为文件
             pass
-

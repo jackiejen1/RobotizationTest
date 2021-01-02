@@ -37,10 +37,7 @@ try:
 except ImportError:
   import unittest
 
-from google.protobuf import unittest_pb2
-from google.protobuf import descriptor
-from google.protobuf import descriptor_pool
-from google.protobuf import symbol_database
+from google.protobuf import symbol_database, unittest_pb2, descriptor_pool, descriptor
 
 
 class SymbolDatabaseTest(unittest.TestCase):
@@ -70,7 +67,7 @@ class SymbolDatabaseTest(unittest.TestCase):
 
   def testGetMessages(self):
     messages = self._Database().GetMessages(
-        ['google/protobuf/unittest.ss_proto'])
+        ['google/protobuf/unittest.proto'])
     self.assertTrue(
         unittest_pb2.TestAllTypes is
         messages['protobuf_unittest.TestAllTypes'])
@@ -119,19 +116,19 @@ class SymbolDatabaseTest(unittest.TestCase):
   def testFindFileContainingSymbol(self):
     # Lookup based on either enum or message.
     self.assertEqual(
-        'google/protobuf/unittest.ss_proto',
+        'google/protobuf/unittest.proto',
         self._Database().pool.FindFileContainingSymbol(
             'protobuf_unittest.TestAllTypes.NestedEnum').name)
     self.assertEqual(
-        'google/protobuf/unittest.ss_proto',
+        'google/protobuf/unittest.proto',
         self._Database().pool.FindFileContainingSymbol(
             'protobuf_unittest.TestAllTypes').name)
 
   def testFindFileByName(self):
     self.assertEqual(
-        'google/protobuf/unittest.ss_proto',
+        'google/protobuf/unittest.proto',
         self._Database().pool.FindFileByName(
-            'google/protobuf/unittest.ss_proto').name)
+            'google/protobuf/unittest.proto').name)
 
 
 if __name__ == '__main__':

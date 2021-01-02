@@ -8,7 +8,9 @@
 # @Function:
 # @Method:
 # Reference:********************************
-from airtest.core.helper import G
+import sys
+
+from airtest.core.helper import G, log
 
 
 def add_msg_in_log(msg, is_pass=True):
@@ -27,6 +29,7 @@ class NoneException(Exception):
 
     def __init__(self, msg=""):
         self.msg = str(msg) + "节点没有找到"
+        # log(str(msg) + "节点没有找到", snapshot=True)
 
     def __str__(self):
         return str(self.msg)
@@ -38,6 +41,7 @@ class ProtocolException(Exception):
 
     def __init__(self, msg=""):
         self.msg = str(msg)
+        log(str(msg), snapshot=True)
 
     def __str__(self):
         return str(self.msg)
@@ -49,6 +53,7 @@ class NoneStrException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        log(str(msg), snapshot=True)
 
     def __str__(self):
         return str("")
@@ -60,6 +65,7 @@ class GameNotPassException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        log(str(msg), snapshot=True)
 
     def __str__(self):
         return str("")
@@ -72,6 +78,7 @@ class NotHaveGameException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        log(str(msg), snapshot=True)
 
     def __str__(self):
         return str("")
@@ -83,6 +90,7 @@ class NotPocoServeException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        log(str(msg), snapshot=True)
 
     def __str__(self):
         return str("")
@@ -95,6 +103,7 @@ class PocoVverstepBoundaryException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        log(str(msg), snapshot=True)
 
     def __str__(self):
         return str("")
@@ -107,6 +116,7 @@ class GameServerStopException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        # log(str(msg), snapshot=True)
         print(self.my_msg)
 
     def __str__(self):
@@ -120,6 +130,7 @@ class GameServerMaintenanceException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        log(str(msg), snapshot=True)
         print(self.my_msg)
 
     def __str__(self):
@@ -132,6 +143,7 @@ class GmException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        # log(str(msg), snapshot=True)
         print(self.my_msg)
 
     def __str__(self):
@@ -144,6 +156,7 @@ class ValueException(Exception):
 
     def __init__(self, msg=""):
         self.my_msg = msg
+        log(str(msg), snapshot=True)
         print(self.my_msg)
 
     def __str__(self):

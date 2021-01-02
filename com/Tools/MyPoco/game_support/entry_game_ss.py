@@ -12,7 +12,7 @@
 from MyPoco.foundation.information import Information
 from MyPoco.poco.my_poco_object import MyPocoObject
 from airtest.core.api import *
-from poco.drivers.android.uiautomation import AndroidUiautomationPoco
+from MyPoco.airtestide_lack_packages.poco.drivers.android.uiautomation import AndroidUiautomationPoco
 class EntryGameSs:
 
     def __init__(self,phone_id):

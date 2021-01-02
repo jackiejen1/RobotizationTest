@@ -16,6 +16,18 @@ from MyPoco.foundation.make_poco_dic import MakePocoDic
 class UnexpectedWinSs2:
     def __init__(self, game_name,phone_id):
         self.make_poco_dic = MakePocoDic(game_name,phone_id)
+        # self.poco = StdPoco()
+        # self.make_poco_dic.set_poco(self.poco)
+
+    # def get_poco_dic(self):
+    #     now_poco_dic = self.make_poco_dic.get_poco_dic()
+    #     self.now_poco_path_list = now_poco_dic.keys()
+    # 
+    # def is_in_dic(self, poco_path):
+    #     if poco_path in self.now_poco_path_list:
+    #         return True
+    #     else:
+    #         return False
 
     def unexpected_win(self):
         """
@@ -33,21 +45,44 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("未命名0/popup/ComTxtPop/__view/txt"):  # 点击完下载资源启动游戏
             txt_text = self.make_poco_dic.get_poco_any_value("未命名0/popup/ComTxtPop/__view/txt","text")
             if "MB" in txt_text or "KB" in txt_text:
-                self.make_poco_dic.my_touch("未命名0/popup/ComTxtPop/__view/cancel/title")
-                time.sleep(30)
+                for i in range(5):
+                    self.make_poco_dic.get_poco_dic()  # 这里会不停的刷新表
+                    if self.make_poco_dic.is_in_dic('未命名0/popup/ComTxtPop/__view/cancel/title'):
+                        self.make_poco_dic.my_touch("未命名0/popup/ComTxtPop/__view/cancel/title", func_text='点击开始更新')
+                    else:
+                        break
+                time.sleep(10)
                 for i in range(20):
                     self.make_poco_dic.get_poco_dic()#这里会不停的刷新表
+                    if self.make_poco_dic.is_in_dic(
+                            '未命名0/module/SevenDaysMainLayer/__view/ComTopBar/Btn_return'):  # 欧美加了个cg动画
+                        self.my_poco_obj.touch_poco('Btn_return')
                     if self.make_poco_dic.is_in_dic("InputName"):
                         break
-                    time.sleep(15)
+                    time.sleep(30)
+
         # if self.make_poco_dic.is_in_dic("天公福利,限时抢购"):  # 天公赐福
+        if self.make_poco_dic.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close/n4"):  # 限时直冲
+            self.make_poco_dic.my_touch("未命名0/popup/GodboxPop/__view/Btn_close/n4", func_text="关闭限时直冲活动")
+            time.sleep(1)
         if self.make_poco_dic.is_in_dic("未命名0/popup/GodboxPop/__view/Label_title"):  # 天公赐福
             self.make_poco_dic.my_touch("Btn_close/n4")
             time.sleep(1)
+        if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close/n5"):#限时金将
+            self.make_poco_dic.my_touch("未命名0/popup/HomeAdvPop/__view/Btn_close/n5")
+            time.sleep(1)
+        if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close/n5"):
+            self.make_poco_dic.my_touch("未命名0/popup/HomeAdvPop/__view/Btn_close/n5")
+            time.sleep(1)
+        if self.make_poco_dic.is_in_dic("未命名0/popup/HelperSpeedUpPop/__view/btn0"):
+            self.make_poco_dic.my_touch("未命名0/popup/HelperSpeedUpPop/__view/btn0")#助手
+            time.sleep(1)
+            # self.make_poco_dic.my_touch("未命名0/popup/HelperPop/__view/ComPopPanel/btn0")
         # if self.make_poco_dic.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 首页广告
         #     self.make_poco_dic.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("RedPacketRainPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("RedPacketRainPop/__view/Btn_close")
+            time.sleep(1)
         if self.make_poco_dic.is_in_dic("FloatMessageLayer/未命名0/4001"):#邮件,在这里对邮件模块进行测试
             self.make_poco_dic.my_touch("FloatMessageLayer/未命名0/4001")
             self.make_poco_dic.my_touch("List_mail/未命名0")
@@ -89,9 +124,6 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("巨獸-龍炮"):  # 副本龙炮
             if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):
                 self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
-        if self.make_poco_dic.is_in_dic("괴수-용 대포"):  # 副本龙炮
-            if self.make_poco_dic.is_in_dic("未命名0/popup/ComAssistPop/__view/Btn_cancel/title"):
-                self.make_poco_dic.my_touch("未命名0/popup/ComAssistPop/__view/Btn_cancel/title")
         if self.make_poco_dic.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close"):
             self.make_poco_dic.my_touch("未命名0/popup/GodboxPop/__view/Btn_close")
         if self.make_poco_dic.is_in_dic("将军抱歉，为了更好的体验，我们正在对服务器进行维护，请稍后重新登录哦~"):
@@ -103,6 +135,8 @@ class UnexpectedWinSs2:
         if self.make_poco_dic.is_in_dic("未命名0/popup/JumpReviewPop/__view/Label_desc"):
             if self.make_poco_dic.is_this_text("未命名0/popup/JumpReviewPop/__view/Label_desc","評価"):
                 self.make_poco_dic.my_touch("未命名0/popup/JumpReviewPop/__view/n0/btn0")
+        if self.make_poco_dic.is_in_dic('未命名0/popup/HotItemPop/__view/Btn_close'):
+            self.make_poco_dic.my_touch('未命名0/popup/HotItemPop/__view/Btn_close')
         # if self.make_poco_dic.is_in_dic("推荐[color=#FFE71A]普通月卡[/color]"):
         #     self.make_poco_dic.my_touch("未命名0/popup/FirstChargeMainPop/__view/btn3")
 

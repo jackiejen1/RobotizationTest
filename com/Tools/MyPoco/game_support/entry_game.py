@@ -12,7 +12,7 @@ from MyPoco.foundation.information import Information
 from MyPoco.game_support.entry_game_ss2 import EntryGameSs2
 from MyPoco.game_support.entry_game_sx import EntryGameSx
 from MyPoco.game_support.entry_game_ss import EntryGameSs
-
+from MyPoco.game_support.entry_game_shaoxia import EntryGameShaoXia
 class EntryGame:
 
     def __init__(self,game_name,phone_id):
@@ -50,6 +50,15 @@ class EntryGame:
             egss2.entry_game_ss2(sever_name_input, game_account_input)
         elif self.game_name == "com.vng.thieunien3qvng":
             egss2 = EntryGameSs2(self.phone_id,self.game_name)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
+        elif self.game_name == "com.youzu.sxgame.qa1": #少侠
+            egss2 = EntryGameShaoXia(self.phone_id,self.game_name)
+            egss2.entry_game_shaoxia(sever_name_input, game_account_input)
+        elif self.game_name == "com.yoozoogames.ss2dsom":
+            egss2 = EntryGameSs2(self.phone_id,self.game_name)
+            egss2.entry_game_ss2(sever_name_input, game_account_input)
+        elif self.game_name == "com.youzu.test.qa3":
+            egss2 = EntryGameSs2(self.phone_id, self.game_name)
             egss2.entry_game_ss2(sever_name_input, game_account_input)
         else:
             pass

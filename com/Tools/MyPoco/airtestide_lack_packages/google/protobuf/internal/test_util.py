@@ -40,8 +40,7 @@ import numbers
 import operator
 import os.path
 
-from google.protobuf import unittest_import_pb2
-from google.protobuf import unittest_pb2
+from google.protobuf import unittest_import_pb2, unittest_pb2
 
 try:
   long        # Python 2
@@ -721,7 +720,7 @@ def SetAllUnpackedFields(message):
 class NonStandardInteger(numbers.Integral):
   """An integer object that does not subclass int.
 
-  This is used to verify that both C++ and regular ss_proto systems can handle
+  This is used to verify that both C++ and regular proto systems can handle
   integer others than int and long and that they handle them in predictable
   ways.
 

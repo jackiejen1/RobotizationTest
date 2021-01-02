@@ -8,7 +8,7 @@
 # @Function:
 # @Method:
 # Reference:********************************
-
+from MyPoco.game_support.unexpected_win import UnexpectedWin
 from airtest.core.api import *
 from MyPoco.foundation.information import Information
 from MyPoco.poco.my_poco_object import MyPocoObject
@@ -31,8 +31,13 @@ class EntryGameSs2:
             game_name_text = "少三2新马"
         elif self.game_name == "com.vng.thieunien3qvng":
             game_name_text = "少三2越南"
+        elif self.game_name ==  "com.yoozoogames.ss2dsom":
+            game_name_text = "少三2欧美"
+        elif self.game_name == "com.youzu.test.qa3":
+            game_name_text = "少三2国内自动化"
         else:
             raise ValueException("没有该游戏名")
+        self.uw = UnexpectedWin(game_name_text, phone_id)
         self.my_poco_obj = MyPocoObject(game_name_text,phone_id)
         self.phone_id = phone_id
 
@@ -43,17 +48,19 @@ class EntryGameSs2:
         :param game_account_input: 需要登录的账号，和ini一致
         :return:
         """
-        home()
-        snapshot()
+        # home()  # 发现有home()的时候可能会导致点击后直接关掉角色输入面板，暂时屏蔽，后续有需要再放开
+        # snapshot()
         stop_app(self.game_name)
         time.sleep(2)
         start_app(self.game_name)
-        if ("emulator" in self.phone_id) or ("127.0.0.1:"in self.phone_id):
+        if ("emulator" in self.phone_id) or ("127.0.0.1:" in self.phone_id):
             time.sleep(30)
         else:
             time.sleep(16)
+        self.my_poco_obj.get_poco_dic()
         self.my_poco_obj.touch_poco("InputName")
         text(game_account_input)
+        # snapshot(text(game_account_input))
         # self.my_poco_obj.text_str(game_account_input)
         self.my_poco_obj.touch_poco("未命名0/popup/LoginAccountPop/__view/ButtonConfirm/title")
         time.sleep(1)
@@ -61,18 +68,28 @@ class EntryGameSs2:
         time.sleep(3)
         if self.my_poco_obj.is_in_dic("未命名0/popup/LoginLawJpPop/__view/btn_ok/title"):
             self.my_poco_obj.touch_poco("未命名0/popup/LoginLawJpPop/__view/label0/btn0")
-        self.my_poco_obj.touch_poco("未命名0/module/LoginLayer2/__view/Btn_server/TextServerTip")
-        self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",click_list=[0.95, 0.15])  #切第一个区服列表# todo 不同游戏可能要改
-        if self.my_poco_obj.is_in_dic(sever_name_input):
-            self.my_poco_obj.touch_poco(sever_name_input)
-        else:
-            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title"):#切第二个区服列表
-                self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title",
-                                            click_list=[0.95, 0.15])
+        if not self.my_poco_obj.is_in_dic(sever_name_input):
+            self.my_poco_obj.touch_poco("未命名0/module/LoginLayer2/__view/Btn_server/TextServerTip")
+            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPopEn/__view/List_kind_server/未命名1/title"):
+                self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPopEn/__view/List_kind_server/未命名1/title",func_text="欧美列表服")
+            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title"):
+                self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",click_list=[0.95, 0.15])  #切第一个区服列表# todo 不同游戏可能要改
+            if self.my_poco_obj.is_in_dic(sever_name_input):
+                self.my_poco_obj.touch_poco(sever_name_input)
+            else:
+                if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title"):#切第二个区服列表
+                    self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名2/title",
+                                                click_list=[0.95, 0.15])
                 if self.my_poco_obj.is_in_dic(sever_name_input):
                     self.my_poco_obj.touch_poco(sever_name_input)
-            else:
-                raise ValueException("区服选择错误")
+                else:
+                    if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名3/title"):  # 切第三个区服列表
+                        self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名3/title",
+                                                    click_list=[0.95, 0.15])
+                    if self.my_poco_obj.is_in_dic(sever_name_input):
+                        self.my_poco_obj.touch_poco(sever_name_input)
+                    else:
+                        raise ValueException("区服选择错误")
         self.my_poco_obj.touch_poco("Txt_guide")  # 关闭新手引导
         self.my_poco_obj.touch_poco("Btn_login")  # 开始游戏
         if self.my_poco_obj.is_in_dic("LoginLawPop/__view/btn_ok"):
@@ -95,8 +112,12 @@ class EntryGameSs2:
             if self.my_poco_obj.is_in_dic("未命名0/popup/LoginLawJpPop/__view/btn_ok/title"):
                 self.my_poco_obj.touch_poco("未命名0/popup/LoginLawJpPop/__view/label0/btn0")
             self.my_poco_obj.touch_poco("未命名0/module/LoginLayer2/__view/Btn_server/TextServerTip")
-            self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",
-                                        click_list=[0.95, 0.15])  # 切第一个区服列表# todo 不同游戏可能要改
+            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPopEn/__view/List_kind_server/未命名1/title"):
+                self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPopEn/__view/List_kind_server/未命名1/title",
+                                            func_text="欧美列表服")
+            if self.my_poco_obj.is_in_dic("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title"):
+                self.my_poco_obj.touch_poco("未命名0/popup/LoginServerListPop/__view/List_kind_server/未命名1/title",
+                                            click_list=[0.95, 0.15])  # 切第一个区服列表# todo 不同游戏可能要改
             if self.my_poco_obj.is_in_dic(sever_name_input):
                 self.my_poco_obj.touch_poco(sever_name_input)
             else:
@@ -122,12 +143,29 @@ class EntryGameSs2:
                 time.sleep(2)
                 self.my_poco_obj.touch_poco("未命名0/popup/FortuneBagOpenPop/__view/Comp_progress/Btn_upgrade/title")
                 self.my_poco_obj.touch_poco("Btn_return")
+                time.sleep(1)
             if self.my_poco_obj.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close"):  # 广告
                 self.my_poco_obj.touch_poco("Btn_close")
+                time.sleep(1)
+                if self.my_poco_obj.is_in_dic("未命名0/module/SevenDaysMainLayer/__view/ComTopBar/Btn_return"):
+                    self.my_poco_obj.touch_poco('Btn_return')
+                time.sleep(1)
             if self.my_poco_obj.is_in_dic("Comp_day1"):  # 签到
                 self.my_poco_obj.touch_poco("LoginRewardPop/__view/n3/img0")
+                time.sleep(1)
             if self.my_poco_obj.is_in_dic("RedPacketRainPop/__view/Btn_close"):  # 红包雨锦鲤
                 self.my_poco_obj.touch_poco("RedPacketRainPop/__view/Btn_close")
+                time.sleep(1)
+            if self.my_poco_obj.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close/n5"):
+                self.my_poco_obj.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close/n5")
+                time.sleep(1)
+            if self.my_poco_obj.is_in_dic("未命名0/popup/SuperVipPop/__view/n11"):
+                self.my_poco_obj.touch_poco("未命名0/popup/SuperVipPop/__view/n11")
+                time.sleep(1)
+                # self.my_poco_obj.touch_poco("未命名0/popup/HomeAdvPop/__view/Btn_close/n5")
+            # if self.my_poco_obj.is_in_dic("未命名0/popup/HomeAdvPop/__view/Btn_close/n5"):
+            #     self.my_poco_obj.touch_poco("未命名0/module/HomeLayer/__view/Comp_top_btn/Btn_11/n9")
+            #     self.my_poco_obj.touch_poco("未命名0/module/HomeLayer/__view/Comp_top_btn/Btn_11/n9")
             # if self.my_poco_obj.is_in_dic("未命名0/popup/GodboxPop/__view/Btn_close"):
             #     self.my_poco_obj.touch_poco("未命名0/popup/GodboxPop/__view/Btn_close")
 

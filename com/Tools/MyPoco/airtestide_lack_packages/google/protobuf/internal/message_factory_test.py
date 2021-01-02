@@ -39,14 +39,8 @@ try:
 except ImportError:
   import unittest
 
-from google.protobuf import descriptor_pb2
-from google.protobuf.internal import api_implementation
-from google.protobuf.internal import factory_test1_pb2
-from google.protobuf.internal import factory_test2_pb2
-from google.protobuf.internal import testing_refleaks
-from google.protobuf import descriptor_database
-from google.protobuf import descriptor_pool
-from google.protobuf import message_factory
+from google.protobuf import descriptor_pb2, message_factory, descriptor_database, descriptor_pool
+from google.protobuf.internal import api_implementation, testing_refleaks, factory_test2_pb2, factory_test1_pb2
 
 
 @testing_refleaks.TestCase
@@ -163,7 +157,7 @@ class MessageFactoryTest(unittest.TestCase):
 
     # Add Container message.
     f = descriptor_pb2.FileDescriptorProto()
-    f.name = 'google/protobuf/internal/container.ss_proto'
+    f.name = 'google/protobuf/internal/container.proto'
     f.package = 'google.protobuf.python.internal'
     msg = f.message_type.add()
     msg.name = 'Container'
@@ -176,9 +170,9 @@ class MessageFactoryTest(unittest.TestCase):
 
     # Extend container.
     f = descriptor_pb2.FileDescriptorProto()
-    f.name = 'google/protobuf/internal/extension.ss_proto'
+    f.name = 'google/protobuf/internal/extension.proto'
     f.package = 'google.protobuf.python.internal'
-    f.dependency.append('google/protobuf/internal/container.ss_proto')
+    f.dependency.append('google/protobuf/internal/container.proto')
     msg = f.message_type.add()
     msg.name = 'Extension'
     ext = msg.extension.add()
@@ -193,9 +187,9 @@ class MessageFactoryTest(unittest.TestCase):
 
     # Add Duplicate extending the same field number.
     f = descriptor_pb2.FileDescriptorProto()
-    f.name = 'google/protobuf/internal/duplicate.ss_proto'
+    f.name = 'google/protobuf/internal/duplicate.proto'
     f.package = 'google.protobuf.python.internal'
-    f.dependency.append('google/protobuf/internal/container.ss_proto')
+    f.dependency.append('google/protobuf/internal/container.proto')
     msg = f.message_type.add()
     msg.name = 'Duplicate'
     ext = msg.extension.add()

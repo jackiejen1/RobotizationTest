@@ -11,6 +11,7 @@
 import json
 import os
 import time
+import traceback
 from socket import create_connection
 from MyPoco.foundation.MyException import *
 from MyPoco.protocol import battle_tools
@@ -21,7 +22,7 @@ from MyPoco.protocol.login_game import LoginGame
 from MyPoco.protocol.protocol_tools import ProtocolTools
 from MyPoco.foundation.information import Information
 # from google.protobuf.json_format import MessageToJson
-import lupa
+# import lupa
 
 
 class ProtocolFunction:
@@ -65,6 +66,10 @@ class ProtocolFunction:
             region = "台湾"
         elif "越南" in game_name:
             region = "越南"
+        elif "欧美" in game_name:
+            region = "欧美"
+        elif "少侠" in game_name:
+            region = "少侠"
         else:
             region = "国内"
         self.uid = 0
@@ -1292,14 +1297,28 @@ class ProtocolFunction:
         :param sid:
         :return:
         """
-
         flag_C2S_Test, data_C2S_Test = self.protocol.MSG_C2S_Test(type_into, value_into, size_into, self.uid, self.sid)
         S2C_Test = cs_pb2.S2C_Test()  # 创建返回协议对象
         S2C_Test.ParseFromString(data_C2S_Test)  # 解析协议返回值
+# <<<<<<< .mine
+#         try:
+#             if S2C_Test.ret == 1:
+#                 print("添加道具成功")
+#             else:
+#                 raise ProtocolException(str(self.uid) + "添加道具失败" + str(S2C_Test.ret))
+#         except ProtocolException as exception:
+#             log(traceback, snapshot=True)
+# ||||||| .r21660
+#         if S2C_Test.ret == 1:
+#             print("添加道具成功")
+#         else:
+#             raise ProtocolException(str(self.uid) + "添加道具失败" + str(S2C_Test.ret))
+# =======
         if S2C_Test.ret == 1:
             print("添加道具成功")
         else:
-            raise ProtocolException(str(self.uid) + "添加道具失败" + str(S2C_Test.ret))
+            raise ProtocolException(str(self.uid) + "添加道具{}，{}失败".format(type_into,value_into) + str(S2C_Test.ret))
+# >>>>>>> .r21826
 
     def del_resource_pb(self, type_into, value_into, size_into):
         """
@@ -1319,7 +1338,7 @@ class ProtocolFunction:
         if S2C_Test.ret == 1:
             print("消耗道具成功")
         else:
-            raise ProtocolException(str(self.uid) + "消耗道具失败" + str(S2C_Test.ret))
+            raise ProtocolException(str(self.uid) + "消耗道具{},{}失败".format(type_into,value_into) + str(S2C_Test.ret))
 
     def get_resource_pb(self, find_name, ):
         """

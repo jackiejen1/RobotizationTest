@@ -47,6 +47,10 @@ class LoginGame:
             key = "Wjiqv6sjw4NIFhKY7i598bO1AWjru2en"
         elif region == "越南":
             key = "5l6PeNKsO2jWKWRtJU7GRp8IIQQ53BsW"
+        elif region == "少侠":
+            key = "LoHTmV0muDJeOOq5XQPYVUBIE3Dl39cn"
+        elif region == "欧美":
+            key = "mhwGkSkDTiBAPRa0yvQ14XUSSc3oiyxj"
         else:
             raise ProtocolException("版本信息输入错误，登录信息设置失败")
         string = "account_system_id=1_&channel_id=1&extend=1|1|1&osdk_game_id=196377847&osdk_user_id=1_" + self.username + "&time=123&user_id=" + self.username + key

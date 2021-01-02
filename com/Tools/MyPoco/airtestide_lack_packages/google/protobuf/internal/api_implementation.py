@@ -37,7 +37,7 @@ import sys
 
 try:
   # pylint: disable=g-import-not-at-top
-  from google.protobuf.internal import _api_implementation
+  from google import _api_implementation
   # The compile-time constants in the _api_implementation module can be used to
   # switch to a certain implementation of the Python API at build time.
   _api_version = _api_implementation.api_version
@@ -50,11 +50,11 @@ if _api_version == 1:
   raise ValueError('api_version=1 is no longer supported.')
 if _api_version < 0:  # Still unspecified?
   try:
-    # The presence of this module in a build allows the ss_proto implementation to
+    # The presence of this module in a build allows the proto implementation to
     # be upgraded merely via build deps rather than a compiler flag or the
     # runtime environment variable.
     # pylint: disable=g-import-not-at-top
-    from google.protobuf import _use_fast_cpp_protos
+    from google import _use_fast_cpp_protos
     # Work around a known issue in the classic bootstrap .par import hook.
     if not _use_fast_cpp_protos:
       raise ImportError('_use_fast_cpp_protos import succeeded but was None')
@@ -63,7 +63,7 @@ if _api_version < 0:  # Still unspecified?
   except ImportError:
     try:
       # pylint: disable=g-import-not-at-top
-      from google.protobuf.internal import use_pure_python
+      from google import use_pure_python
       del use_pure_python  # Avoids a pylint error and namespace pollution.
     except ImportError:
       # TODO(b/74017912): It's unsafe to enable :use_fast_cpp_protos by default;
@@ -110,10 +110,10 @@ _implementation_version = int(_implementation_version_str)
 
 # Detect if serialization should be deterministic by default
 try:
-  # The presence of this module in a build allows the ss_proto implementation to
+  # The presence of this module in a build allows the proto implementation to
   # be upgraded merely via build deps.
   #
-  # NOTE: Merely importing this automatically enables deterministic ss_proto
+  # NOTE: Merely importing this automatically enables deterministic proto
   # serialization for C++ code, but we still need to export it as a boolean so
   # that we can do the same for `_implementation_type == 'python'`.
   #
@@ -123,7 +123,7 @@ try:
   # this boolean outside of this module.
   #
   # pylint: disable=g-import-not-at-top,unused-import
-  from google.protobuf import enable_deterministic_proto_serialization
+  from google import enable_deterministic_proto_serialization
   _python_deterministic_proto_serialization = True
 except ImportError:
   _python_deterministic_proto_serialization = False

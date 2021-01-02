@@ -19,8 +19,8 @@ from MyPoco.poco.xn_test_tools import XnTest
 from MyPoco.protocol.gm_method import GmMethod
 from MyPoco.poco.my_poco_object import MyPocoObject, time
 # from MyPoco.protocol.protocol_function import ProtocolFunction  # 暂时不接入协议
-from MyPoco.protocol.protocol_interface import ProtocolInterface
-from MyPoco.foundation.tools import *
+from MyPoco.foundation.tools import new_excel_tab
+from MyPoco.protocol.gm_function.gm_function import Gm_function
 
 
 class MyPoco:
@@ -35,30 +35,45 @@ class MyPoco:
         self.game_name = self.info.get_config(game_name, "app_name")
         self.my_poco_obj = MyPocoObject(game_name, phone_id)
         self.gm = GmMethod(game_name, self.ui_path)
+        self.gm_function = Gm_function(game_name, phone_id, self.ui_path).run()
         self.rg = ResourceGm(game_name, phone_id)
+        # self.newaccount = NewAccount(game_name, phone_id)
         self.phone_id = phone_id
         self.xt = None
+        add_msg_in_log('测试版本：%s；使用设备：%s' % (game_name, phone_id))
 
-    def make_new_role(self, server_name, username="", protocol_name="", is_new_account_into=False):
-        """
-        登录或创建角色协议，协议和GM的init方法
-        如果是新账号就创角并登录，并二次记录记录uid
-        老账号就直接登录
-        :param server_name: 服务器名
-        :param username: 账号
-        :param protocol_name: 协议名
-        :return:时间戳
-        """
-        self.protocol = None
-        self.GM_server_name = server_name
-        if username == "":
-            username = self.get_random_account()
-        # self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username,
-        #                                  is_new_account=is_new_account_into, ui_path=self.ui_path)
-        protocol_obj = ProtocolInterface(self.game_name_key, server_name, protocol_name, username,
-                                          is_new_account=is_new_account_into, ui_path=self.ui_path)
-        self.protocol = protocol_obj.get_pro()
-        return self.protocol.sever_time
+    def __getattr__(self, name):
+        def errorInfo():
+            self.__data['log'].info("Action: %s not defined" % name)
+
+        if hasattr(self.gm_function, name):
+            self.__action = eval("self.gm_function.{}(self)".format(name))
+            func = self.__action.run
+        else:
+            return errorInfo
+
+        def wrapper(*args, **kwargs):
+            _result = func(*args, **kwargs)  # 执行方法
+            return _result
+        return wrapper
+
+    # def make_new_role(self, server_name, username="", protocol_name="", is_new_account_into=False):
+    #     """
+    #     登录或创建角色协议，协议和GM的init方法
+    #     如果是新账号就创角并登录，并二次记录记录uid
+    #     老账号就直接登录
+    #     :param server_name: 服务器名
+    #     :param username: 账号
+    #     :param protocol_name: 协议名
+    #     :return:时间戳
+    #     """
+    #     self.protocol = None
+    #     self.GM_server_name = server_name
+    #     if username == "":
+    #         username = self.get_random_account()
+    #     self.protocol = ProtocolFunction(self.game_name_key, server_name, protocol_name, username,
+    #                                      is_new_account=is_new_account_into, ui_path=self.ui_path)
+    #     return self.protocol.sever_time
 
     def set_account_information_gm(self, account, server_name, role_id="", role=""):
         """
@@ -71,14 +86,15 @@ class MyPoco:
         if role_id != "":
             return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id, role=role)
         else:
-            if self.game_name_key == "少三2" or self.game_name_key == "少三2越南"or self.game_name_key == "少三2台湾" or self.game_name_key == "少三2日本" or self.game_name_key == "少三2韩国" or self.game_name_key == "少三2新马":
+            if self.game_name_key == "少三2" or self.game_name_key == "少三2越南"or self.game_name_key == "少三2台湾" or \
+                    self.game_name_key == "少三2日本" or self.game_name_key == "少三2韩国" or self.game_name_key == "少三2新马" \
+                    or self.game_name_key == "少三2欧美" or self.game_name_key == "少三2国内自动化" or self.game_name_key == "少侠":
                 role_id, sever_time = self.protocol.get_role_id()
                 return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,
                                                        role=role)
             else:
                 return self.gm.set_account_information(account, server_name_input=server_name, role_id=role_id,
                                                        role=role)
-
     def get_resource_pb(self, find_name):
         """
         获取资源数量
@@ -108,7 +124,10 @@ class MyPoco:
             self.protocol.shangzhenwujiang(pos, only_id)
             self.wujiangshengxing(name, only_id)
         else:
-            raise GmException("请先添加武将" + name)
+            try:
+                raise GmException("请先添加武将" + name)
+            except Exception as e:
+                log(e, snapshot=True)
 
     def wujiangshengxing(self, name, only_id):
         """
@@ -155,7 +174,10 @@ class MyPoco:
             self.protocol.Pet_StarUp(only_id, only_id_list[6:8])
             self.protocol.Pet_StarUp(only_id, only_id_list[-3:])
         else:
-            raise GmException("请先添加神兽" + name)
+            try:
+                raise GmException("请先添加神兽" + name)
+            except Exception as e:
+                log(e, snapshot=True)
         #穿戴神兽装备
         pet_equipment_name = "幻紫仙爪"
         add_type, add_zhua_value = self.protocol.mri.get_type_id_from_name(pet_equipment_name)
@@ -204,7 +226,10 @@ class MyPoco:
                     break
             only_id_list.pop(0)  # 都操作完了之后把该装备从列表里删除
         else:
-            raise GmException("请先添加装备" + name)
+            try:
+                raise GmException("请先添加装备" + name)
+            except Exception as e:
+                log(e, snapshot=True)
     def yijianshangzhenshenbing(self):
         """
         上阵神兵,
@@ -212,7 +237,7 @@ class MyPoco:
         :param name: 道具的名字
         :return:
         """
-        shenbing1="曲燕"
+        shenbing1="太公护符"
         shenbing2="倚天剑"
         shenbing3="七星宝刀"
         shenbing4="青釭剑"
@@ -259,7 +284,10 @@ class MyPoco:
             for i in range(6):
                 self.protocol.Treasure_Glyph(only_id_list[0])#雕纹
         else:
-            raise GmException("请先添加装备" + name)
+            try:
+                raise GmException("请先添加装备" + name)
+            except Exception as e:
+                log(e, snapshot=True)
 
     def chuandaishenbing(self, pos, name):
         """
@@ -280,7 +308,10 @@ class MyPoco:
             self.protocol.Artifact_LevelUp(only_id, 239)  # 强化
             self.protocol.Artifact_Star(only_id, 50)#升星
         else:
-            raise GmException("请先添加装备" + name)
+            try:
+                raise GmException("请先添加装备" + name)
+            except Exception as e:
+                log(e, snapshot=True)
 
     def add_friend(self, name):
         """
@@ -337,7 +368,7 @@ class MyPoco:
         """
         return self.my_poco_obj.get_poco_dic()
 
-    def my_touch_in_dic(self, poco_path, poco_dic, click_list=None):
+    def my_touch_in_dic(self, poco_path, poco_dic, click_list=None,func_text = ''):
         """
         传入缓存的poco节点字典，直接去点击字典里面缓存的节点
         :param poco_path: poco name
@@ -346,9 +377,12 @@ class MyPoco:
         :return:
         """
         if self.is_in_dic(poco_path, poco_dic):
-            self.my_touch(poco_path, click_list=click_list)
+            self.my_touch(poco_path, click_list=click_list,func_text = func_text)
         else:
-            raise NoneException(poco_path)
+            try:
+                raise NoneException(poco_path)
+            except Exception as e:
+                log(e, snapshot=True)
 
     def is_this_text(self, poco_path, text, is_in=False):
         """
@@ -366,6 +400,7 @@ class MyPoco:
         """
         self.xt = XnTest()
 
+    # @err_close_game
     def open_game(self, sever_name_input, game_account_input, password=None):
         """
         功能向,启动游戏并到游戏主界面
@@ -375,6 +410,12 @@ class MyPoco:
         :param red_info: 是否读取表中的账号
         :return:返回StdPoco().poco对象，可使用原生框架
         """
+        # game_text = self.my_poco_obj.get_game_run_text()
+        # game_name_list = ["少三2", "少西", "少三", "少三2台湾", "少三2日本", "少三2韩国", ]
+        # for game_name in game_name_list:
+        #     game_name_activities = self.info.get_config(game_name, "app_name")
+        #     if game_name_activities in game_text:
+        #         stop_app(game_name_activities)
         self.my_poco_obj.close_all_app()
         print("关闭app")
         entry = EntryGame(self.game_name_key, self.phone_id)
@@ -399,7 +440,8 @@ class MyPoco:
         """
         self.my_poco_obj.swipe(pos1, pos2, duration=duration)
 
-    def my_swipe(self, start_path, end_path, timein=3):
+    # @err_close_game
+    def my_swipe(self, start_path, end_path, timein=3,func_text = ''):
         """
         两个对象中心点之间的滑动
         :param start_path:开始路径
@@ -407,7 +449,7 @@ class MyPoco:
         :param timein:不传的话默认2秒
         :return:两个对象的坐标
         """
-        return self.my_poco_obj.my_swipe(start_path, end_path, timein)
+        return self.my_poco_obj.my_swipe(start_path, end_path, timein,func_text = func_text)
 
     def my_swipe_pos(self, start_pos_list, end_pos_list, timein=3):
         """
@@ -417,14 +459,25 @@ class MyPoco:
         """
         self.my_poco_obj.swipe_pos(start_pos_list, end_pos_list, timein)
 
-    def my_touch(self, poco_path, click_list=None):
+    # @err_close_game
+    def my_touch(self, poco_path, click_list=None, func_text = ''):
         """
         :param poco_path:控件路径
         :param click_list:控件点击偏移点[0,0]-[1,1]范围
         :return:Exception
         """
-
-        self.my_poco_obj.touch_poco(poco_path, click_list=click_list)
+# <<<<<<< .mine
+#         try:
+#             self.my_poco_obj.touch_poco(poco_path, click_list=click_list,func_text=func_text)
+#         except Exception as e:
+#             log(e)
+# ||||||| .r21660
+# =======
+        try:
+            self.my_poco_obj.touch_poco(poco_path, click_list=click_list,func_text=func_text)
+        except Exception as e:
+            raise
+# >>>>>>> .r21826
 
     def my_touch_pos(self, pos_list_int, is_sleep=True):
         """
@@ -579,7 +632,7 @@ class MyPoco:
         获取当前手机的分辨率
         :return:list_int[宽，高]
         """
-        return self.my_poco_obj.make_poco_dic.get_phone_size()
+        return self.info.get_phone_size()
 
     def contrast_first_second(self, first, second, msg):
         """
@@ -726,6 +779,15 @@ class MyPoco:
         """
         return self.gm.get_resource_id(resource_name)
 
+    # def get_sever_time(self):
+    #     """
+    #     查询服务器时间
+    #     :param server_name:str 服务器名
+    #     :return:[int(ymd),int(hms),int(week)]
+    #     """
+    #     # return self.gm.select_server_time(server_name)
+    #     return self.rg.get_sever_time()
+
     def set_sever_time(self, dic_input):
         """
         修改服务器时间
@@ -734,6 +796,7 @@ class MyPoco:
         """
         self.gm.set_server_time(dic_input)
 
+    # def set_checkpoint(self, checkpoint):
     def set_checkpoint(self, account, sever_name_input, checkpoint):
         """
         设置通关关卡数，目前仅限于少三2
@@ -770,6 +833,15 @@ class MyPoco:
         :return: str 8位数字
         """
         return self.my_poco_obj.make_random_account()
+
+    # def start_protocol(self, server_name, protocol_name):#暂时不接入协议
+    #     """
+    #     传入服务器名和协议名
+    #     :param server_name: 服务器名
+    #     :param protocol_name:
+    #     :return:
+    #     """
+    #     self.pf = ProtocolFunction(self.game_name, server_name, protocol_name)
 
     def GM_fengkuang_fuben(self, checkpoint_name, num):
         """
@@ -1338,6 +1410,16 @@ class MyPoco:
             self.make_new_role(sever_name, account1)
             self.protocol.add_resource_pb(add_type, add_value, 4899990)
             self.protocol.socket_close()
+        # Thread_list = []
+        # for i in range(num):
+        #     thread = myThread(sever_name, account1)
+        #     print("创建新线程"+str(i))
+        #     # 开启新线程
+        #     thread.start()
+        #     Thread_list.append(thread)
+        # for thread in Thread_list:
+        #     print("开始线程")
+        #     thread.join()
         for i in range(num):
             time.sleep(0.1)
             self.make_new_role(sever_name, self.get_random_account())
@@ -1422,47 +1504,6 @@ class MyPoco:
             tongji_str_z = tongji_str_z + "\r\n" + tongji + "：" + str(shuliangtongji_dic[tongji]) + "个"
         return log_str_z, tongji_str_z, shijiancishu
 
-    def make_ui_log_by_gm_dongfeng(self, resource_dic_list_input):
-        """
-        用来给抽奖类方法处理统一的日志
-        :param resource_dic_list_input: 抽奖返回值奖励列表[{"type":,"value":,"size":,},]
-        :return:
-        """
-        resources_dic = {}
-        for resource_dic in resource_dic_list_input:
-            # 获得道具名
-            query_dic = {}
-            query_dic['type'] = resource_dic['type']
-            query_dic['id'] = resource_dic['value']
-            resources_name = self.protocol.mri.get_name_from_type_id(query_dic)
-            name = resources_name + str(resource_dic['size'])
-            # 把名字和次数一一对应
-            if name not in resources_dic.keys():  # 第一次添加，初始化
-                resources_name_dic = {}
-                resources_name_dic["抽到次数"] = 1
-                resources_name_dic["道具名字"] = resources_name
-                resources_name_dic["道具数量"] = resource_dic['size']
-                resources_dic[name] = resources_name_dic
-            else:
-                resources_dic[name]["抽到次数"] = resources_dic[name]["抽到次数"] + 1
-        shuliangtongji_dic = {}
-        log_str_z = "抽奖结果，"
-        for name in resources_dic.keys():
-            if name != "事件":
-                log_dic = resources_dic[name]
-                resources_name = log_dic["道具名字"]
-                resources_shuliang = log_dic["道具数量"]
-                resources_zongcishu = log_dic["抽到次数"]
-                if str(resources_name) in shuliangtongji_dic.keys():
-                    shuliangtongji_dic[str(resources_name)] = shuliangtongji_dic[str(resources_name)] + int(
-                        resources_shuliang) * int(resources_zongcishu)
-                else:
-                    shuliangtongji_dic[str(resources_name)] = int(resources_shuliang) * int(resources_zongcishu)
-                log_str = "道具：" + str(resources_name) + "，数量：" + str(resources_shuliang) + "，一共抽到：" + str(
-                    resources_zongcishu) + "次"
-                log_str_z = log_str_z +log_str
-        return log_str_z
-
     def GM_fengkuang_hengsaoqianjun(self, activity_id, cishu):
         """
         横扫千军10连抽，
@@ -1489,22 +1530,26 @@ class MyPoco:
         :param cishu: int 抽多少次
         :return:
         """
-        id = 1000001
+        id = 1000005
         # add_type, add_value = self.protocol.mri.get_type_id_from_name("角色经验")
         # self.protocol.add_resource_pb(add_type, add_value, 99999999)
-        add_type, add_value = self.protocol.mri.get_type_id_from_name("封神召唤令")
+        add_type, add_value = self.protocol.mri.get_type_id_from_name("福禄召唤令")
         self.protocol.add_resource_pb(add_type, add_value, cishu * 10)
         resource_dic_list = []
         for i in range(cishu):
+            print("当前第{}次".format(i+1))
             award_list = self.protocol.shikongzhaohuan_shilian(activity_id, id)
             resource_dic_list = resource_dic_list + award_list
         log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
+        print("JKJKJKJKJKJKKJ")
+        print(log_str_z, tongji_str_z, shijiancishu)
+        print("JKJKJKJKJKJKKJ")
         new_excel_tab("时空召唤", log_str_z, tongji_str_z, shijiancishu)
         return log_str_z, tongji_str_z, shijiancishu
 
-    def GM_fengkuang_xianshijinjiang(self, activity_id, id_name_into, camps_name, cishu,resource_name=None):
+    def GM_fengkuang_xianshijinjiang(self, activity_id, id_name_into, camps_name, cishu):
         """
-        限时神将10连抽，检测是否抽到指定的东西,默认抽到一次后就停止
+        限时神将10连抽，按照次数统计抽到的道具，用于概率测试
         :param activity_id: int 活动ID，GM后台配置
         :param id_name_into: str 第几期活动的名字，GM后台配置
         :param camps_name: str 阵营 魏蜀吴群
@@ -1527,8 +1572,9 @@ class MyPoco:
                        "金3(2.2.0)": "100009",
                        "第六期金1-金5": "100010",
                        "紫金1双卡池": "100011",
-                       "紫金2双卡池": "100015",}
-        # "配置对应的期数ID": "实际协议传输的ID",
+                       "紫金3双卡池": "100016"
+                       }
+        # "配置对应的期数ID": "实际协议传输的ID",对应数值配表recruit_knight_show_info.ID
         id_into_dic = {"100000": 1,
                        "100001": 5,
                        "100002": 9,
@@ -1541,7 +1587,7 @@ class MyPoco:
                        "100009": 37,
                        "100010": 41,
                        "100011": 45,
-                       "100015": 59,
+                       "100016": 61,
                        }
         id_into_key = id_name_dic[id_name_into]
         if camps_name == "魏":
@@ -1559,35 +1605,25 @@ class MyPoco:
         elif camps_name == "金":
             id_into = id_into_dic[id_into_key]
             sub_type = 1
-        elif camps_name == "紫金1":
-            id_into = id_into_dic[id_into_key] + 1
-            sub_type = 2
-        elif camps_name == "紫金1-2":
+        elif camps_name == "紫金":
             id_into = id_into_dic[id_into_key] + 1
             sub_type = 2
         else:
-            raise GmException("阵营不存在")
+            try:
+                raise GmException("阵营不存在")
+            except Exception as e:
+                log(e, snapshot=True)
         add_type, add_value = self.protocol.mri.get_type_id_from_name("金将令")
-        self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)
+        self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)  # 加金将令
         add_type, add_value = self.protocol.mri.get_type_id_from_name("紫金神将令")
-        self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)
-        resource_dic_list = []
-        find_num_list = []
-        if resource_name!=None:
-            find_type, find_value = self.protocol.mri.get_type_id_from_name(resource_name)
+        self.protocol.add_resource_pb(add_type, add_value, 10 * cishu)  # 加紫金将令
+        resource_dic_list = []  # 结果列表
         for i in range(cishu):
-            award_list = self.protocol.xianshishenjiang_shilian(activity_id, id_into, sub_type)
-            if resource_name != None:
-                for award in award_list:
-                    if award["type"] ==find_type and award["value"] ==find_value:
-                        find_num_list.append(i+1)
-            resource_dic_list = resource_dic_list + award_list
-        log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)
-        new_excel_tab("限时金将", log_str_z, tongji_str_z, shijiancishu)
-        print("-------------------------")
-        print("指定的奖励出现的次数")
-        print(find_num_list)
-        print("-------------------------")
+            print('当前执行第{}次'.format(i+1))
+            award_list = self.protocol.xianshishenjiang_shilian(activity_id, id_into, sub_type)  # 执行限时神将十连抽操作
+            resource_dic_list = resource_dic_list + award_list  # 结果增加进列表
+        log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(resource_dic_list)  # 对结果进行处理，返回对应道具名
+        new_excel_tab("限时金将", log_str_z, tongji_str_z, shijiancishu)  # 生成excel文件
         return log_str_z, tongji_str_z, shijiancishu
 
     def GM_fengkuang_shenbingxilian(self, artifact_name, cishu):
@@ -1624,6 +1660,27 @@ class MyPoco:
                             pinzhi_dic["紫金"] = pinzhi_dic["紫金"] + 1
                         else:
                             print("没有对应品质" + pinzhi)
+                    # for artifacts_dic in artifacts_dic_list:
+                    #     for ii in range(6):
+                    #         pinzhi = artifacts_dic[str(1)]
+                    #         if pinzhi == "1":
+                    #             pinzhi_dic["白"] = pinzhi_dic["白"] + 1
+                    #         elif pinzhi == "2":
+                    #             pinzhi_dic["绿"] = pinzhi_dic["绿"] + 1
+                    #         elif pinzhi == "3":
+                    #             pinzhi_dic["蓝"] = pinzhi_dic["蓝"] + 1
+                    #         elif pinzhi == "4":
+                    #             pinzhi_dic["紫"] = pinzhi_dic["紫"] + 1
+                    #         elif pinzhi == "5":
+                    #             pinzhi_dic["橙"] = pinzhi_dic["橙"] + 1
+                    #         elif pinzhi == "6":
+                    #             pinzhi_dic["红"] = pinzhi_dic["红"] + 1
+                    #         elif pinzhi == "7":
+                    #             pinzhi_dic["金"] = pinzhi_dic["金"] + 1
+                    #         elif pinzhi == "8":
+                    #             pinzhi_dic["紫金"] = pinzhi_dic["紫金"] + 1
+                    #         else:
+                    #             print("没有对应品质" + pinzhi)
             else:
                 print("次数太少了")
                 return ""
@@ -1657,6 +1714,7 @@ class MyPoco:
         resources_dic = {}
         resources_dic["事件"] = 0
         for i in range(cishu):
+            print("当前第{}次".format(i+1))
             award_list, event_num = self.protocol.fujiatianxia_shilian(activity_id, sub_type)
             resources_dic["事件"] = resources_dic["事件"] + event_num
             # 每十次抽奖统计一次
@@ -1757,28 +1815,16 @@ class MyPoco:
         if not is_win:
             self.protocol.Debate_BattleStart(0)
 
-
-    def dongfengxunbao(self,dengji):
+    def __del__(self):
         """
-        东风寻宝
-        :return:
+        删除实例时把app关掉
         """
-        exp_dic = {20:6230,59:1662490,60:1828280,80:8230080,81:8723680,120:48011290,}
-        exp_num = exp_dic[dengji]
-        self.protocol.add_resource_pb(1, 1, exp_num)
-        open_award_list = self.protocol.GuideWind_Start()#开启奖池
-        self.protocol.add_resource_pb(3, 262, 5)
-        log_str_z, tongji_str_z, shijiancishu = self.make_ui_log_by_gm(open_award_list)
-        log_str_z = log_str_z.replace("抽奖结果：","启阵结果，")
-        log_str_z = log_str_z.replace("道具", "启阵道具")
-        choujiang_log = log_str_z+"\r\n"
-        for i in range(5):
-            get_award_list = self.protocol.GuideWind_Draw()#开始抽奖
-            log_str_z= self.make_ui_log_by_gm_dongfeng(get_award_list)
-            if i == 0:
-                choujiang_log = choujiang_log + "第" + str(i + 1) + "次" + log_str_z
-            else:
-                choujiang_log = choujiang_log+"\r\n"+"第"+str(i+1)+"次"+log_str_z
-        return choujiang_log
+        pass
+        # try:
+            # stop_app(self.game_name)
+        # except:
+            # pass
 
-
+if __name__ == '__main__':
+    test = MyPoco('少侠', 1)
+    print(test.make_new_role)

@@ -5,9 +5,9 @@
 
 from hrpc.exceptions import TransportDisconnected
 
-from poco.sdk.interfaces.hierarchy import HierarchyInterface
-from poco.utils.hrpc.utils import transform_node_has_been_removed_exception
-from poco.utils.retry import retries_when
+from MyPoco.airtestide_lack_packages.poco.sdk.interfaces.hierarchy import HierarchyInterface
+from MyPoco.airtestide_lack_packages.poco.utils.hrpc.utils import transform_node_has_been_removed_exception
+from MyPoco.airtestide_lack_packages.poco.utils.retry import retries_when
 
 
 class RemotePocoHierarchy(HierarchyInterface):

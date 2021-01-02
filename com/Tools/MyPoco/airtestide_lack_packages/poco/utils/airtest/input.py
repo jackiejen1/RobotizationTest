@@ -5,7 +5,7 @@ from functools import wraps
 from airtest.core.api import device as current_device
 from airtest.core.api import touch, swipe
 from airtest.core.helper import device_platform, logwrap
-from poco.sdk.interfaces.input import InputInterface
+from MyPoco.airtestide_lack_packages.poco.sdk.interfaces.input import InputInterface
 
 __all__ = ['AirtestInput']
 

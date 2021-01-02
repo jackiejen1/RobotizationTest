@@ -32,11 +32,11 @@
 
 Simple usage example:
 
-  # Create a ss_proto object and serialize it to a json format string.
+  # Create a proto object and serialize it to a json format string.
   message = my_proto_pb2.MyMessage(foo='bar')
   json_string = json_format.MessageToJson(message)
 
-  # Parse a json format string to ss_proto object.
+  # Parse a json format string to proto object.
   message = json_format.Parse(json_string, my_proto_pb2.MyMessage())
 """
 
@@ -56,13 +56,10 @@ import math
 from operator import methodcaller
 
 import re
-import sys
 
 import six
 
-from google.protobuf import descriptor
-from google.protobuf import symbol_database
-
+from google.protobuf import symbol_database, descriptor
 
 _TIMESTAMPFOMAT = '%Y-%m-%dT%H:%M:%S'
 _INT_TYPES = frozenset([descriptor.FieldDescriptor.CPPTYPE_INT32,
@@ -113,8 +110,8 @@ def MessageToJson(
         repeated fields, and map fields will always be serialized.  If
         False, only serialize non-empty fields.  Singular message fields
         and oneof fields are not affected by this option.
-    preserving_proto_field_name: If True, use the original ss_proto field
-        names as defined in the .ss_proto file. If False, convert the field
+    preserving_proto_field_name: If True, use the original proto field
+        names as defined in the .proto file. If False, convert the field
         names to lowerCamelCase.
     indent: The JSON object will be pretty-printed with this indent level.
         An indent level of 0 or negative will only insert newlines.
@@ -153,8 +150,8 @@ def MessageToDict(
         repeated fields, and map fields will always be serialized.  If
         False, only serialize non-empty fields.  Singular message fields
         and oneof fields are not affected by this option.
-    preserving_proto_field_name: If True, use the original ss_proto field
-        names as defined in the .ss_proto file. If False, convert the field
+    preserving_proto_field_name: If True, use the original proto field
+        names as defined in the .proto file. If False, convert the field
         names to lowerCamelCase.
     use_integers_for_enums: If true, print integers instead of enum names.
     descriptor_pool: A Descriptor Pool for resolving types. If None use the
@@ -380,7 +377,7 @@ class _Printer(object):
 
 
 def _IsWrapperMessage(message_descriptor):
-  return message_descriptor.file.name == 'google/protobuf/wrappers.ss_proto'
+  return message_descriptor.file.name == 'google/protobuf/wrappers.proto'
 
 
 def _DuplicateChecker(js):

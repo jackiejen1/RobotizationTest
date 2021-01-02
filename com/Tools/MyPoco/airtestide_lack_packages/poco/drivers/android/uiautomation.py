@@ -14,14 +14,14 @@ from airtest.core.android.ime import YosemiteIme
 
 from hrpc.client import RpcClient
 from hrpc.transport.http import HttpTransport
-from poco.pocofw import Poco
-from poco.agent import PocoAgent
-from poco.sdk.Attributor import Attributor
-from poco.sdk.interfaces.screen import ScreenInterface
-from poco.utils.hrpc.hierarchy import RemotePocoHierarchy
-from poco.utils.airtest.input import AirtestInput
-from poco.utils import six
-from poco.drivers.android.utils.installation import install, uninstall
+from MyPoco.airtestide_lack_packages.poco.pocofw import Poco
+from MyPoco.airtestide_lack_packages.poco.agent import PocoAgent
+from MyPoco.airtestide_lack_packages.poco.sdk.Attributor import Attributor
+from MyPoco.airtestide_lack_packages.poco.sdk.interfaces.screen import ScreenInterface
+from MyPoco.airtestide_lack_packages.poco.utils.hrpc.hierarchy import RemotePocoHierarchy
+from MyPoco.airtestide_lack_packages.poco.utils.airtest.input import AirtestInput
+from MyPoco.airtestide_lack_packages.poco.utils import six
+from MyPoco.airtestide_lack_packages.poco.drivers.android.utils.installation import install, uninstall
 
 __all__ = ['AndroidUiautomationPoco', 'AndroidUiautomationHelper']
 this_dir = os.path.dirname(os.path.realpath(__file__))

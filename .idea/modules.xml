@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../tools/AirtestIDE-win-1.2.6/AirtestIDE/MyPoco/.idea/MyPoco.iml" filepath="$PROJECT_DIR$/../../tools/AirtestIDE-win-1.2.6/AirtestIDE/MyPoco/.idea/MyPoco.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/RobotizationTest.iml" filepath="$PROJECT_DIR$/.idea/RobotizationTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../autotest/.idea/autotest.iml" filepath="$PROJECT_DIR$/../autotest/.idea/autotest.iml" />
+      <module fileurl="file://E:/svn/自动化仓库/文档/压力测试/loadTest/.idea/gvg_xieyi.iml" filepath="E:/svn/自动化仓库/文档/压力测试/loadTest/.idea/gvg_xieyi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../load-test/.idea/load-test.iml" filepath="$PROJECT_DIR$/../load-test/.idea/load-test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../autotest/sanguohero2/.idea/sanguohero2.iml" filepath="$PROJECT_DIR$/../autotest/sanguohero2/.idea/sanguohero2.iml" />
     </modules>
   </component>
 </project>

@@ -216,7 +216,7 @@ def _PropertyName(proto_field_name):
 
   Args:
     proto_field_name: The protocol message field name, exactly
-      as it appears (or would appear) in a .ss_proto file.
+      as it appears (or would appear) in a .proto file.
   """
   # TODO(robinson): Escape Python keywords (e.g., yield), and test this support.
   # nnorwitz makes my day by writing:
@@ -657,7 +657,7 @@ def _AddPropertiesForRepeatedField(field, cls):
     raise AttributeError('Assignment not allowed to repeated field '
                          '"%s" in protocol message object.' % proto_field_name)
 
-  doc = 'Magic attribute generated for "%s" ss_proto field.' % proto_field_name
+  doc = 'Magic attribute generated for "%s" proto field.' % proto_field_name
   setattr(cls, property_name, _FieldProperty(field, getter, setter, doc=doc))
 
 
@@ -716,7 +716,7 @@ def _AddPropertiesForNonRepeatedScalarField(field, cls):
   setter.__doc__ = 'Setter for %s.' % proto_field_name
 
   # Add a property to encapsulate the getter/setter.
-  doc = 'Magic attribute generated for "%s" ss_proto field.' % proto_field_name
+  doc = 'Magic attribute generated for "%s" proto field.' % proto_field_name
   setattr(cls, property_name, _FieldProperty(field, getter, setter, doc=doc))
 
 
@@ -760,7 +760,7 @@ def _AddPropertiesForNonRepeatedCompositeField(field, cls):
                          '"%s" in protocol message object.' % proto_field_name)
 
   # Add a property to encapsulate the getter.
-  doc = 'Magic attribute generated for "%s" ss_proto field.' % proto_field_name
+  doc = 'Magic attribute generated for "%s" proto field.' % proto_field_name
   setattr(cls, property_name, _FieldProperty(field, getter, setter, doc=doc))
 
 
@@ -1117,7 +1117,7 @@ def _AddMergeFromStringMethod(message_descriptor, cls):
   def MergeFromString(self, serialized):
     if isinstance(serialized, memoryview) and six.PY2:
       raise TypeError(
-          'memoryview not supported in Python 2 with the pure Python ss_proto '
+          'memoryview not supported in Python 2 with the pure Python proto '
           'implementation: this is to maintain compatibility with the C++ '
           'implementation')
 
@@ -1144,7 +1144,7 @@ def _AddMergeFromStringMethod(message_descriptor, cls):
     """Create a message from serialized bytes.
 
     Args:
-      self: Message, instance of the ss_proto message object.
+      self: Message, instance of the proto message object.
       buffer: memoryview of the serialized data.
       pos: int, position to start in the serialized data.
       end: int, end position of the serialized data.

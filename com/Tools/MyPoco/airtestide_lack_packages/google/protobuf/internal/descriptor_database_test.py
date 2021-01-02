@@ -40,12 +40,8 @@ except ImportError:
   import unittest
 import warnings
 
-from google.protobuf import unittest_pb2
-from google.protobuf import descriptor_pb2
-from google.protobuf.internal import factory_test2_pb2
-from google.protobuf.internal import no_package_pb2
-from google.protobuf.internal import testing_refleaks
-from google.protobuf import descriptor_database
+from google.protobuf import descriptor_pb2, descriptor_database, unittest_pb2
+from google.protobuf.internal import testing_refleaks, factory_test2_pb2, no_package_pb2
 
 
 @testing_refleaks.TestCase
@@ -61,7 +57,7 @@ class DescriptorDatabaseTest(unittest.TestCase):
     db.Add(file_desc_proto2)
 
     self.assertEqual(file_desc_proto, db.FindFileByName(
-        'google/protobuf/internal/factory_test2.ss_proto'))
+        'google/protobuf/internal/factory_test2.proto'))
     # Can find message type.
     self.assertEqual(file_desc_proto, db.FindFileContainingSymbol(
         'google.protobuf.python.internal.Factory2Message'))
@@ -125,7 +121,7 @@ class DescriptorDatabaseTest(unittest.TestCase):
       self.assertIn('Conflict register for file "other_file2": ',
                     str(w[0].message))
       self.assertIn('already defined in file '
-                    '"google/protobuf/unittest.ss_proto"',
+                    '"google/protobuf/unittest.proto"',
                     str(w[0].message))
 
 if __name__ == '__main__':

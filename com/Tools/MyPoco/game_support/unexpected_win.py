@@ -12,6 +12,7 @@ from MyPoco.foundation.information import Information
 from MyPoco.game_support.unexpected_win_ss2 import UnexpectedWinSs2
 from MyPoco.game_support.unexpected_win_sx import UnexpectedWinSx
 from MyPoco.game_support.unexpected_win_ss import UnexpectedWinSs
+from MyPoco.game_support.unexpected_win_shaoxia import UnexpectedWinShaoXia
 class UnexpectedWin:
     def __init__(self, game_name,phone_id):
         self.info = Information()
@@ -43,6 +44,14 @@ class UnexpectedWin:
                 self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
             elif self.game_name == "com.vng.thieunien3qvng":
                 self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.youzu.sxgame.qa1":
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.yoozoogames.ss2dsom":
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.youzu.test.qa3":
+                self.uw = UnexpectedWinSs2(self.game_name_key,self.phone_id)
+            elif self.game_name == "com.youzu.sxgame.qa1":  # 少侠
+                self.uw = UnexpectedWinShaoXia(self.game_name_key, self.phone_id)
             else:
                 pass
         print("开始查找异常窗口")

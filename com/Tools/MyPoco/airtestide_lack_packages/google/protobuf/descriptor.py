@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Descriptors essentially contain exactly the information found in a .ss_proto
+"""Descriptors essentially contain exactly the information found in a .proto
 file, in types that make this information accessible in Python.
 """
 
@@ -44,7 +44,9 @@ if api_implementation.Type() == 'cpp':
   # Used by MakeDescriptor in cpp mode
   import binascii
   import os
-  from google.protobuf.pyext import _message
+  from google import _message
+  from google.protobuf import descriptor_pb2
+
   _USE_C_DESCRIPTORS = True
 
 
@@ -53,7 +55,7 @@ class Error(Exception):
 
 
 class TypeTransformationError(Error):
-  """Error transforming between python ss_proto type and corresponding C++ type."""
+  """Error transforming between python proto type and corresponding C++ type."""
 
 
 if _USE_C_DESCRIPTORS:
@@ -202,10 +204,10 @@ class _NestedDescriptorBase(DescriptorBase):
     self._serialized_end = serialized_end
 
   def CopyToProto(self, proto):
-    """Copies this to the matching ss_proto in descriptor_pb2.
+    """Copies this to the matching proto in descriptor_pb2.
 
     Args:
-      proto: An empty ss_proto instance from descriptor_pb2.
+      proto: An empty proto instance from descriptor_pb2.
 
     Raises:
       Error: If self couldnt be serialized, due to to few constructor arguments.
@@ -391,17 +393,17 @@ class Descriptor(_NestedDescriptorBase):
 # of runtime checks we must do in reflection.py...
 class FieldDescriptor(DescriptorBase):
 
-  """Descriptor for a single field in a .ss_proto file.
+  """Descriptor for a single field in a .proto file.
 
   A FieldDescriptor instance has the following attributes:
 
-    name: (str) Name of this field, exactly as it appears in .ss_proto.
+    name: (str) Name of this field, exactly as it appears in .proto.
     full_name: (str) Name of this field, including containing scope.  This is
       particularly relevant for extensions.
     camelcase_name: (str) Camelcase name of this field.
     index: (int) Dense, 0-indexed index giving the order that this
-      field textually appears within its message in the .ss_proto file.
-    number: (int) Tag number declared for this field in the .ss_proto file.
+      field textually appears within its message in the .proto file.
+    number: (int) Tag number declared for this field in the .proto file.
 
     type: (One of the TYPE_* constants below) Declared type.
     cpp_type: (One of the CPPTYPE_* constants below) C++ type used to
@@ -585,18 +587,18 @@ class FieldDescriptor(DescriptorBase):
 
   @staticmethod
   def ProtoTypeToCppProtoType(proto_type):
-    """Converts from a Python ss_proto type to a C++ Proto Type.
+    """Converts from a Python proto type to a C++ Proto Type.
 
     The Python ProtocolBuffer classes specify both the 'Python' datatype and the
     'C++' datatype - and they're not the same. This helper method should
     translate from one to another.
 
     Args:
-      proto_type: the Python ss_proto type (descriptor.FieldDescriptor.TYPE_*)
+      proto_type: the Python proto type (descriptor.FieldDescriptor.TYPE_*)
     Returns:
       descriptor.FieldDescriptor.CPPTYPE_*, the C++ type.
     Raises:
-      TypeTransformationError: when the Python ss_proto type isn't known.
+      TypeTransformationError: when the Python proto type isn't known.
     """
     try:
       return FieldDescriptor._PYTHON_TO_CPP_PROTO_TYPE_MAP[proto_type]
@@ -606,7 +608,7 @@ class FieldDescriptor(DescriptorBase):
 
 class EnumDescriptor(_NestedDescriptorBase):
 
-  """Descriptor for an enum defined in a .ss_proto file.
+  """Descriptor for an enum defined in a .proto file.
 
   An EnumDescriptor instance has the following attributes:
 
@@ -622,7 +624,7 @@ class EnumDescriptor(_NestedDescriptorBase):
       but indexed by the "number" field of each EnumValueDescriptor.
     containing_type: (Descriptor) Descriptor of the immediate containing
       type of this enum, or None if this is an enum defined at the
-      top level in a .ss_proto file.  Set by Descriptor's constructor
+      top level in a .proto file.  Set by Descriptor's constructor
       if we're passed into one.
     file: (FileDescriptor) Reference to file descriptor.
     options: (descriptor_pb2.EnumOptions) Enum options message or
@@ -676,7 +678,7 @@ class EnumValueDescriptor(DescriptorBase):
 
     name: (str) Name of this value.
     index: (int) Dense, 0-indexed index giving the order that this
-      value appears textually within its enum in the .ss_proto file.
+      value appears textually within its enum in the .proto file.
     number: (int) Actual number assigned to this enum value.
     type: (EnumDescriptor) EnumDescriptor to which this value
       belongs.  Set by EnumDescriptor's constructor if we're
@@ -753,7 +755,7 @@ class ServiceDescriptor(_NestedDescriptorBase):
     name: (str) Name of the service.
     full_name: (str) Full name of the service, including package name.
     index: (int) 0-indexed index giving the order that this services
-      definition appears withing the .ss_proto file.
+      definition appears withing the .proto file.
     methods: (list of MethodDescriptor) List of methods provided by this
       service.
     methods_by_name: (dict str -> MethodDescriptor) Same MethodDescriptor
@@ -846,7 +848,7 @@ class FileDescriptor(DescriptorBase):
 
   Note that enum_types_by_name, extensions_by_name, and dependencies
   fields are only set by the message_factory module, and not by the
-  generated ss_proto code.
+  generated proto code.
 
   name: name of file, relative to root of source tree.
   package: name of the package
@@ -872,7 +874,7 @@ class FileDescriptor(DescriptorBase):
                 dependencies=None, public_dependencies=None,
                 syntax=None, pool=None):
       # FileDescriptor() is called from various places, not only from generated
-      # files, to register dynamic ss_proto files and messages.
+      # files, to register dynamic proto files and messages.
       # pylint: disable=g-explicit-bool-comparison
       if serialized_pb == '':
         # Cpp generated code must be linked in if serialized_pb is ''
@@ -997,11 +999,10 @@ def MakeDescriptor(desc_proto, package='', build_file_if_cpp=True,
     # definition in the C++ descriptor pool. To do this, we build a
     # FileDescriptorProto with the same definition as this descriptor and build
     # it into the pool.
-    from google.protobuf import descriptor_pb2
     file_descriptor_proto = descriptor_pb2.FileDescriptorProto()
     file_descriptor_proto.message_type.add().MergeFrom(desc_proto)
 
-    # Generate a random name for this ss_proto file to prevent conflicts with any
+    # Generate a random name for this proto file to prevent conflicts with any
     # imported ones. We need to specify a file name so the descriptor pool
     # accepts our FileDescriptorProto, but it is not important what that file
     # name is actually set to.
@@ -1009,10 +1010,10 @@ def MakeDescriptor(desc_proto, package='', build_file_if_cpp=True,
 
     if package:
       file_descriptor_proto.name = os.path.join(package.replace('.', '/'),
-                                                proto_name + '.ss_proto')
+                                                proto_name + '.proto')
       file_descriptor_proto.package = package
     else:
-      file_descriptor_proto.name = proto_name + '.ss_proto'
+      file_descriptor_proto.name = proto_name + '.proto'
 
     _message.default_pool.Add(file_descriptor_proto)
     result = _message.default_pool.FindFileByName(file_descriptor_proto.name)

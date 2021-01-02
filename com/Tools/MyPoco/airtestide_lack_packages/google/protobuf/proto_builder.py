@@ -37,20 +37,19 @@ except ImportError:
 import hashlib
 import os
 
-from google.protobuf import descriptor_pb2
-from google.protobuf import message_factory
+from google.protobuf import descriptor_pb2, message_factory
 
 
 def _GetMessageFromFactory(factory, full_name):
-  """Get a ss_proto class from the MessageFactory by name.
+  """Get a proto class from the MessageFactory by name.
 
   Args:
     factory: a MessageFactory instance.
-    full_name: str, the fully qualified name of the ss_proto type.
+    full_name: str, the fully qualified name of the proto type.
   Returns:
     A class, for the type identified by full_name.
   Raises:
-    KeyError, if the ss_proto is not found in the factory's descriptor pool.
+    KeyError, if the proto is not found in the factory's descriptor pool.
   """
   proto_descriptor = factory.pool.FindMessageTypeByName(full_name)
   proto_cls = factory.GetPrototype(proto_descriptor)
@@ -63,10 +62,10 @@ def MakeSimpleProtoClass(fields, full_name=None, pool=None):
   Note: this doesn't validate field names!
 
   Args:
-    fields: dict of {name: field_type} mappings for each field in the ss_proto. If
+    fields: dict of {name: field_type} mappings for each field in the proto. If
         this is an OrderedDict the order will be maintained, otherwise the
         fields will be sorted by name.
-    full_name: optional str, the fully-qualified name of the ss_proto type.
+    full_name: optional str, the fully-qualified name of the proto type.
     pool: optional DescriptorPool instance.
   Returns:
     a class, the new protobuf class with a FileDescriptor.
@@ -89,14 +88,14 @@ def MakeSimpleProtoClass(fields, full_name=None, pool=None):
     field_items = sorted(field_items)
 
   # Use a consistent file name that is unlikely to conflict with any imported
-  # ss_proto files.
+  # proto files.
   fields_hash = hashlib.sha1()
   for f_name, f_type in field_items:
     fields_hash.update(f_name.encode('utf-8'))
     fields_hash.update(str(f_type).encode('utf-8'))
-  proto_file_name = fields_hash.hexdigest() + '.ss_proto'
+  proto_file_name = fields_hash.hexdigest() + '.proto'
 
-  # If the ss_proto is anonymous, use the same hash to name it.
+  # If the proto is anonymous, use the same hash to name it.
   if full_name is None:
     full_name = ('net.proto2.python.public.proto_builder.AnonymousProto_' +
                  fields_hash.hexdigest())
@@ -107,7 +106,7 @@ def MakeSimpleProtoClass(fields, full_name=None, pool=None):
       # The factory's DescriptorPool doesn't know about this class yet.
       pass
 
-  # This is the first time we see this ss_proto: add a new descriptor to the pool.
+  # This is the first time we see this proto: add a new descriptor to the pool.
   factory.pool.Add(
       _MakeFileDescriptorProto(proto_file_name, full_name, field_items))
   return _GetMessageFromFactory(factory, full_name)

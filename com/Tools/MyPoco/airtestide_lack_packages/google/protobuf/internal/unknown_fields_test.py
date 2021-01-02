@@ -39,19 +39,9 @@ try:
   import unittest2 as unittest  #PY26
 except ImportError:
   import unittest
-from google.protobuf import map_unittest_pb2
-from google.protobuf import unittest_mset_pb2
-from google.protobuf import unittest_pb2
-from google.protobuf import unittest_proto3_arena_pb2
-from google.protobuf.internal import api_implementation
-from google.protobuf.internal import encoder
-from google.protobuf.internal import message_set_extensions_pb2
-from google.protobuf.internal import missing_enum_values_pb2
-from google.protobuf.internal import test_util
-from google.protobuf.internal import testing_refleaks
-from google.protobuf.internal import type_checkers
-from google.protobuf.internal import wire_format
-from google.protobuf import descriptor
+from google.protobuf import map_unittest_pb2, unittest_proto3_arena_pb2, unittest_mset_pb2, unittest_pb2, descriptor
+from google.protobuf.internal import api_implementation, message_set_extensions_pb2, testing_refleaks, wire_format, \
+    encoder, test_util, missing_enum_values_pb2, type_checkers
 
 
 @testing_refleaks.TestCase
@@ -412,7 +402,7 @@ class UnknownEnumValuesTest(unittest.TestCase):
     just_string.dummy = 'blah'
 
     missing = missing_enum_values_pb2.TestEnumValues()
-    # The parse is invalid, storing the string ss_proto into the set of
+    # The parse is invalid, storing the string proto into the set of
     # unknown fields.
     missing.ParseFromString(just_string.SerializeToString())
 

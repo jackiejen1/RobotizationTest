@@ -45,7 +45,7 @@ Example usage:
 
   # The database can be used as a MessageFactory, to generate types based on
   # their name:
-  types = db.GetMessages(['my_proto.ss_proto'])
+  types = db.GetMessages(['my_proto.proto'])
   my_message_instance = types['MyMessage']()
 
   # The database's underlying descriptor pool can be queried, so it's not
@@ -164,7 +164,7 @@ class SymbolDatabase(message_factory.MessageFactory):
       files: The file names to extract messages from.
 
     Returns:
-      A dictionary mapping ss_proto names to the message classes.
+      A dictionary mapping proto names to the message classes.
 
     Raises:
       KeyError: if a file could not be found.
