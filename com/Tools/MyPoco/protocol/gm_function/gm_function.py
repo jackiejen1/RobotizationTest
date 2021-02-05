@@ -20,7 +20,6 @@ class Gm_function:
         self.game_name = self.info.get_config(game_name, "app_name")
         self.gm_func = None
         self.phone_id = phone_id
-        self.run()
 
     def run(self):
         """
@@ -28,7 +27,7 @@ class Gm_function:
         :param poco_input: poco对象
         :return:
         """
-        if self.gm_func == None:
+        if self.gm_func is None:
             if "少侠" in self.game_name_key:  # 少侠
                 self.gm_func = shaoxia_gm_function(self.game_name_key, self.phone_id)
             elif "少三2" in self.game_name_key:

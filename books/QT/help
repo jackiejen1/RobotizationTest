@@ -4,6 +4,12 @@ pip install pyinstaller
 pip install opencv-python==3.4.2.17 numpy==1.14.5
 将py打包成exe
 pyinstaller.exe -F -w XXX.py    一般不带-w，日志打印窗
+pyinstaller -F -w -i ss2.png ss2GMTools.py -p D:\uitest\LoadTest  有依赖包时放到主目录下打包
+pyinstaller -F -w -i D:\uitest\GMTool\ss2.ico ss2GMTools.py -p D:\uitest\GMTool\  有依赖包时放到主目录下打包
+pyinstaller -F ss2GMTools.spec
+pyinstaller -D -w -i D:\uitest\GMTool\ss2.ico ss2GMTools.py -p D:\uitest\GMTool\
+
+(r'D:\uitest\GMTool\info_tab','info_tab')
 
 qt  ui转py
 python -m PyQt5.uic.pyuic -o ui_xxx.py xxx.ui
