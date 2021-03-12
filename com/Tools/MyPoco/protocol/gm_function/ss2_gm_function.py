@@ -1406,3 +1406,13 @@ class ss2_gm_function:
         is_win = self.protocol.Debate_BattleStart(2)
         if not is_win:
             self.protocol.Debate_BattleStart(0)
+
+    def sanGuoZhi_zhuxian(self):
+        """主线三国志点亮"""
+        self.add_resource(3, 24, 1000)  # 加主线残卷
+        _id = 1
+        while True:
+            _result = self.person.MSG_C2S_Scroll_Activate(_id, 1)
+            _id += 1
+            if _result is None or _result['ret'] != 1:
+                break
